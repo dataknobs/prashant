@@ -1,0 +1,2187 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head id="ctl00_head1"><title>
+	LLM Overview Slides | LLM & RAG Guide
+</title><meta http-equiv="content-type" content="text/html; charset=utf-8" /><meta name="description" content="LLM 101 - This slide session walk thru LLM applications, architecture and building blocks. Slides describe open source vs closed LLM  and how to choose.  Slides also focus on LLM steerability.  Session slides also describe prompt engineering , tokenization  and factors to consider while building applications using LLM. At last it describe process architectur, component architecture and how to estimate cost of LLM." /><meta name="keywords" content="LLM 101, Large Language Model overview, slides for LLM, LLM applications, architecture, building blocks, Large Language model slides,open source vs closed LLM, LM steerability,   prompt engineering , tokenization  factors to consider while building applications using LLM, LLM process architectur, LLM component architecture, estimate cost of LLM
+" />
+		
+    <!-- Favicon -->
+    <link href="https://storage.googleapis.com/kreatewebsites/site102/img/favicon.ico" rel="icon" />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet" />
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" /><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <!-- Libraries Stylesheet -->
+    <link href="https://storage.googleapis.com/kreatewebsites/site102/lib/animate/animate.min.css" rel="stylesheet" /><link href="https://storage.googleapis.com/kreatewebsites/site102/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" /><link href="https://storage.googleapis.com/kreatewebsites/site102/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="https://storage.googleapis.com/kreatewebsites/site102/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Template Stylesheet -->
+    <link href="https://storage.googleapis.com/kreatewebsites/site102/css/style.css" rel="stylesheet" />
+
+
+     <style>
+        .gsc-input {
+            padding: 0px 10px !important;
+            border-radius: 50px;
+            background-color: #f2f2f2;
+        }
+
+        .gsc-search-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 100px;
+            padding: 6px 8px;
+            cursor: pointer;
+        }
+
+        .gsc-search-button button {
+            background-color: transparent;
+        }
+
+        .gsc-search-box {
+            padding: 10px;
+            border-radius: 100px;
+            background-color: #f2f2f2;
+        }
+
+        .gsc-control-cse {
+            margin: 0 !important;
+            border: none !important;
+            background-color: transparent !important;
+        }
+
+        .gsc-input-box {
+            margin: 0 !important;
+            border: none !important;
+            background-color: transparent !important;
+        }
+
+        .gsc-expansionArea{
+            background-color: white !important;
+        }
+
+        .gsc-result {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 10px 15px 10px 15px !important;
+        }
+
+        .gsc-cursor-box {
+            background-color: white;
+            border-radius: 10px !important;
+        }
+    </style>
+
+     <style>
+    .hero-header{
+         background: linear-gradient(to right top, #2a2a2a, #242426, #1e1e22, #17191f, #10131b, #10151d, #10171e, #101920, #192328, #232c2f, #2d3637, #394040);;
+    }
+    </style>
+</head>
+  
+	<body>
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+
+
+
+    <div class="container-fluid position-relative p-0">
+        <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+            <a href="" class="navbar-brand p-0">
+                <h3 class="text-primary m-0">Portfolio</h3>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="fa fa-bars"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav ms-auto py-0">
+                    <a href="/" class="nav-item nav-link active">Home</a>
+                    <a href="#skills" class="nav-item nav-link">Skills</a>
+                    <a href="#experience" class="nav-item nav-link">Experience</a>
+                    <a href="#certifications" class="nav-item nav-link">Certifications</a>
+                    <a href="#publications" class="nav-item nav-link">Publications</a>
+                    <a href="#achievements" class="nav-item nav-link">Achievements</a>
+                </div>
+                <a href="#contact" class="btn btn-primary rounded-pill py-2 px-4" >Contact</a>
+            </div>
+        </nav>
+
+      
+        <div class="container-fluid bg-primary py-5 hero-header">
+            <!--
+            <div class="container py-5">
+                <div class="row justify-content-center py-5">
+                   
+                    <div class="col-lg-10 pt-lg-5 mt-lg-5 text-center">
+                          
+                        <h1 class="display-3 text-white mb-3 animated slideInDown">Prashant Dhingra</h1>
+                        <p class="fs-4 text-white mb-4 animated slideInDown">Author of Generative AI Finance paper. Building Data Products using Generative AI, AI, knobs at DataKnobs, Ex-Microsoft, Google, JP Morgan Chase. Redmond, Washington, United States.</p>
+                             
+
+                    </div>
+                </div>
+            </div>
+        </div>
+            --->
+        
+    </div>
+
+										        
+		
+
+	   <div class="container-xxl py-5">
+        <div class="container">
+            
+
+
+		
+							
+										
+
+
+                                         
+					  <h2><span id="ctl00_ContentPlaceHolder1_title">LLM Overview Slides | LLM & RAG Guide</span></h2>						
+										
+						 <span class="byline"> <span id="ctl00_ContentPlaceHolder1_metadesc">LLM 101 - This slide session walk thru LLM applications, architecture and building blocks. Slides describe open source vs closed LLM  and how to choose.  Slides also focus on LLM steerability.  Session slides also describe prompt engineering , tokenization  and factors to consider while building applications using LLM. At last it describe process architectur, component architecture and how to estimate cost of LLM.</span></span>	
+     
+                                           
+    <br />
+							<table id="ctl00_ContentPlaceHolder1_RepDetails" cellspacing="0" border="0">
+	<tr>
+		<td>
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl01_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide1.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl01_Image1" alt="SLIDE1" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide1.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide1.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl01_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide1.png">SLIDE1</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl02_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide2.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl02_Image1" alt="SLIDE2" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide2.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide2.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl02_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide2.png">SLIDE2</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl03_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide3.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl03_Image1" alt="SLIDE3" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide3.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide3.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl03_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide3.png">SLIDE3</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl04_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide4.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl04_Image1" alt="SLIDE4" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide4.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide4.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl04_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide4.png">SLIDE4</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl05_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide5.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl05_Image1" alt="SLIDE5" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide5.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide5.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl05_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide5.png">SLIDE5</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl06_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide6.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl06_Image1" alt="SLIDE6" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide6.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide6.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl06_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide6.png">SLIDE6</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl07_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide7.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl07_Image1" alt="SLIDE7" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide7.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide7.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl07_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide7.png">SLIDE7</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl08_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide8.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl08_Image1" alt="SLIDE8" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide8.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide8.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl08_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide8.png">SLIDE8</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl09_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide9.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl09_Image1" alt="SLIDE9" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide9.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide9.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl09_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide9.png">SLIDE9</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl10_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide10.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl10_Image1" alt="SLIDE10" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide10.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide10.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl10_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide10.png">SLIDE10</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl11_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide11.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl11_Image1" alt="SLIDE11" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide11.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide11.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl11_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide11.png">SLIDE11</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl12_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide12.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl12_Image1" alt="SLIDE12" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide12.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide12.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl12_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide12.png">SLIDE12</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl13_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide13.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl13_Image1" alt="SLIDE13" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide13.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide13.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl13_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide13.png">SLIDE13</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl14_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide14.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl14_Image1" alt="SLIDE14" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide14.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide14.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl14_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide14.png">SLIDE14</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl15_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide15.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl15_Image1" alt="SLIDE15" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide15.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide15.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl15_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide15.png">SLIDE15</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl16_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide16.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl16_Image1" alt="SLIDE16" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide16.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide16.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl16_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide16.png">SLIDE16</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl17_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide17.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl17_Image1" alt="SLIDE17" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide17.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide17.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl17_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide17.png">SLIDE17</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl18_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide18.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl18_Image1" alt="SLIDE18" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide18.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide18.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl18_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide18.png">SLIDE18</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl19_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide19.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl19_Image1" alt="SLIDE19" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide19.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide19.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl19_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide19.png">SLIDE19</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl20_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide20.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl20_Image1" alt="SLIDE20" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide20.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide20.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl20_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide20.png">SLIDE20</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl21_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide21.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl21_Image1" alt="SLIDE21" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide21.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide21.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl21_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide21.png">SLIDE21</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl22_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide22.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl22_Image1" alt="SLIDE22" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide22.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide22.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl22_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide22.png">SLIDE22</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl23_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide23.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl23_Image1" alt="SLIDE23" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide23.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide23.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl23_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide23.png">SLIDE23</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl24_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide24.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl24_Image1" alt="SLIDE24" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide24.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide24.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl24_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide24.png">SLIDE24</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl25_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide25.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl25_Image1" alt="SLIDE25" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide25.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide25.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl25_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide25.png">SLIDE25</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl26_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide26.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl26_Image1" alt="SLIDE26" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide26.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide26.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl26_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide26.png">SLIDE26</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl27_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide27.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl27_Image1" alt="SLIDE27" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide27.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide27.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl27_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide27.png">SLIDE27</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl28_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide28.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl28_Image1" alt="SLIDE28" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide28.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide28.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl28_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide28.png">SLIDE28</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl29_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide29.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl29_Image1" alt="SLIDE29" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide29.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide29.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl29_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide29.png">SLIDE29</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl30_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide30.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl30_Image1" alt="SLIDE30" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide30.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide30.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl30_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide30.png">SLIDE30</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl31_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide31.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl31_Image1" alt="SLIDE31" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide31.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide31.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl31_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide31.png">SLIDE31</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl32_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide32.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl32_Image1" alt="SLIDE32" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide32.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide32.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl32_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide32.png">SLIDE32</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl33_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide33.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl33_Image1" alt="SLIDE33" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide33.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide33.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl33_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide33.png">SLIDE33</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl34_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide34.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl34_Image1" alt="SLIDE34" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide34.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide34.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl34_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide34.png">SLIDE34</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl35_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide35.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl35_Image1" alt="SLIDE35" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide35.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide35.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl35_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide35.png">SLIDE35</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl36_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide36.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl36_Image1" alt="SLIDE36" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide36.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide36.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl36_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide36.png">SLIDE36</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl37_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide37.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl37_Image1" alt="SLIDE37" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide37.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide37.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl37_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide37.png">SLIDE37</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl38_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide38.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl38_Image1" alt="SLIDE38" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide38.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide38.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl38_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide38.png">SLIDE38</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl39_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide39.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl39_Image1" alt="SLIDE39" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide39.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide39.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl39_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide39.png">SLIDE39</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl40_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide40.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl40_Image1" alt="SLIDE40" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide40.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide40.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl40_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide40.png">SLIDE40</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl41_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide41.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl41_Image1" alt="SLIDE41" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide41.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide41.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl41_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide41.png">SLIDE41</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl42_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide42.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl42_Image1" alt="SLIDE42" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide42.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide42.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl42_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide42.png">SLIDE42</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl43_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide43.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl43_Image1" alt="SLIDE43" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide43.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide43.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl43_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide43.png">SLIDE43</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl44_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide44.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl44_Image1" alt="SLIDE44" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide44.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide44.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl44_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide44.png">SLIDE44</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl45_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide45.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl45_Image1" alt="SLIDE45" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide45.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide45.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl45_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide45.png">SLIDE45</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl46_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide46.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl46_Image1" alt="SLIDE46" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide46.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide46.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl46_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide46.png">SLIDE46</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl47_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide47.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl47_Image1" alt="SLIDE47" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide47.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide47.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl47_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide47.png">SLIDE47</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl48_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide48.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl48_Image1" alt="SLIDE48" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide48.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide48.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl48_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide48.png">SLIDE48</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl49_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide49.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl49_Image1" alt="SLIDE49" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide49.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide49.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl49_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide49.png">SLIDE49</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl50_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide50.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl50_Image1" alt="SLIDE50" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide50.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide50.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl50_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide50.png">SLIDE50</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl51_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide51.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl51_Image1" alt="SLIDE51" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide51.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide51.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl51_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide51.png">SLIDE51</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl52_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide52.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl52_Image1" alt="SLIDE52" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide52.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide52.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl52_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide52.png">SLIDE52</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl53_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide53.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl53_Image1" alt="SLIDE53" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide53.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide53.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl53_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide53.png">SLIDE53</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl54_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide54.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl54_Image1" alt="SLIDE54" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide54.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide54.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl54_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide54.png">SLIDE54</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl55_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide55.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl55_Image1" alt="SLIDE55" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide55.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide55.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl55_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide55.png">SLIDE55</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl56_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide56.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl56_Image1" alt="SLIDE56" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide56.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide56.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl56_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide56.png">SLIDE56</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl57_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide57.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl57_Image1" alt="SLIDE57" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide57.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide57.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl57_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide57.png">SLIDE57</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl58_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide58.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl58_Image1" alt="SLIDE58" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide58.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide58.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl58_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide58.png">SLIDE58</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl59_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide59.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl59_Image1" alt="SLIDE59" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide59.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide59.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl59_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide59.png">SLIDE59</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl60_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide60.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl60_Image1" alt="SLIDE60" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide60.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide60.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl60_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide60.png">SLIDE60</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+ <span class="image image-full">                           
+<a id="ctl00_ContentPlaceHolder1_RepDetails_ctl61_imghyperlink" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide61.png"><img id="ctl00_ContentPlaceHolder1_RepDetails_ctl61_Image1" alt="SLIDE61" NavigateUrl="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide61.png" src="https://storage.googleapis.com/generate-slides/photos700/llm-slides/Slide61.png" border="0" /></a>
+     </span>
+
+                                                <blockquote>  <a id="ctl00_ContentPlaceHolder1_RepDetails_ctl61_hyperlink1" href="https://kreate.blob.core.windows.net/image.html?imageurl=https://storage.googleapis.com/generate-slides/photos1200/llm-slides/Slide61.png">SLIDE61</a></blockquote>
+												 
+				
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                							
+		
+
+  </div>
+
+</td>
+	</tr><tr>
+		<td>
+
+
+
+</td>
+	</tr>
+</table>
+										
+									<span id="ctl00_ContentPlaceHolder1_labeltext"><br/>
+<br/><h1>Large Language Models (LLMs)</h1>
+<br/>LLMs are a type of artificial intelligence (AI) capable of processing and generating human-like text in response to a wide range of prompts and questions. Trained on massive datasets of text and code, they can perform various tasks such as:
+<br/>
+<br/>Generating different creative text formats: poems, code, scripts, musical pieces, emails, letters, etc.
+<br/>Answering open ended, challenging, or strange questions in an informative way: drawing on their internal knowledge and understanding of the world.
+<br/>Translating languages: seamlessly converting text from one language to another.
+<br/>Writing different kinds of creative content: stories, poems, scripts, musical pieces, etc., often indistinguishable from human-written content.
+<br/>
+<br/>
+<h2>Retrieval Augmented Generation (RAG)</h2>
+<br/>RAG is a novel approach that combines the strengths of LLMs with external knowledge sources. It works by:
+<br/>
+<br/>Retrieval: When given a prompt, RAG searches through an external database of relevant documents to find information related to the query.
+<br/>Augmentation: The retrieved information is then used to enrich the context provided to the LLM. This can be done by incorporating facts, examples, or arguments into the prompt.
+<br/>Generation: Finally, the LLM uses the enhanced context to generate a response that is grounded in factual information and tailored to the specific query.
+<br/>RAG offers several advantages over traditional LLM approaches:
+<br/>
+<br/>Improved factual accuracy: By anchoring responses in real-world data, RAG reduces the risk of generating false or misleading information.
+<br/>Greater adaptability: As external knowledge sources are updated, RAG can access the latest information, making it more adaptable to changing circumstances.
+<br/>Transparency: RAG facilitates a clear understanding of the sources used to generate responses, fostering trust and accountability.
+<br/>However, RAG also has its challenges:
+<br/>
+<br/>Data quality: The accuracy and relevance of RAG's outputs depend heavily on the quality of the external knowledge sources.
+<br/>Retrieval efficiency: Finding the most relevant information from a large database can be computationally expensive.
+<br/>Integration complexity: Combining two different systems (retrieval and generation) introduces additional complexity in terms of design and implementation.
+<br/>
+<br/>
+<h2>Prompt Engineering</h2>
+<br/>Prompt engineering is a crucial technique for guiding LLMs towards generating desired outputs. It involves crafting prompts that:
+<br/>
+<br/>Clearly define the task: Specify what the LLM should do with the provided information.
+<br/>Provide context: Give the LLM enough background knowledge to understand the prompt and generate an appropriate response.
+<br/>Use appropriate language: Frame the prompt in a way that aligns with the LLM's capabilities and training data.
+<br/>
+<br/>
+</span>	
+
+                                                           														
+                            <br />
+                            <br />
+
+                               <table id="ctl00_ContentPlaceHolder1_RepComments" cellspacing="0" border="0">
+	<tr>
+		<td>
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl01_label2"><font color="Black" size="4"><h2>Advantage of using RAG</h2>
+<br/>Better Accuracy: If factual correctness is crucial, RAG can be fantastic. It retrieves information from external sources, allowing the AI assistant to double-check its responses and provide well-sourced answers.
+<br/>Domain Knowledge: Imagine an AI assistant for medical diagnosis or legal or up to date tax laws. RAG can access medical databases to enhance its responses and ensure they align with established medical knowledge.
+<br/>Reduce Hallucination: LLMs can sometimes fabricate information, a phenomenon called hallucination in which they make up things. RAG mitigates this risk by grounding the response in retrieved data.
+<br/>Building Trust: By citing sources, RAG fosters trust with users. Users can verify the information and see the reasoning behind the response.
+<h2>Disadvantages of using RAG</h2>
+<br/>Speed is Crucial: RAG involves retrieving information, which can add a slight delay to the response. If real-time response is essential, a pre-trained LLM might be sufficient.
+<br/>Limited Context: RAG works best when the user's query and context are clear. If the conversation is ambiguous, retrieved information might not be relevant.
+<br/>Privacy Concerns: If the AI assistant deals with sensitive user data, RAG might raise privacy concerns. External retrievals could potentially expose user information.</font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl02_label2"><font color="Black" size="4"><br/></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl03_label2"><font color="Black" size="4"><h2> When to finetune LLM </h2></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl04_label2"><font color="Black" size="4">Consider fine-tuning a large language model (LLM) when you want it to perform better at a specific task or adapt to a particular domain. Here are exampple scenarios where fine-tuning is optimal
+<br/>
+<br/>Domain-Specific Nuances:  If you need an LLM for financial analysis, legal document or on medical document - finething is better.  Example word capital has meaning in finance domain.   While a pre-trained LLM might understand language, it won't grasp legal, finance or medical specific terms or jargons. Fine-tuning on finance Q&A, document or legal documents will imrpove the LLM to that specific domain.
+<br/>
+<br/>Instruction Fine-Tuning: This is a recent advancement where you provide the LLM with instructions or demonstrations alongside training data. This can be useful for tasks where you want the LLM to follow a certain style or format, like writing safety instructions in a specific tone.
+<br/>
+<br/>Specialized Tasks:  Imagine you want an LLM to write different kinds of creative content, like poems or code. Fine-tuning on a dataset of poems can improve its poetry generation skills, while fine-tuning on code samples can enhance its code writing abilities.
+<br/>
+<br/>However, fine-tuning isn't always the right answer. Here are examples when you should not do fine tuning. In fact you should first use standard LLM, prompt engineering.  Then try RAG.  Later consider fine tuning.
+<br/>
+<br/>General Use Cases: If you need a broad LLM for various tasks, a pre-trained model will do better job. Pre-trained models are versatile, trained on diverse data and can handle many tasks well enough without specific fine-tuning.
+<br/>
+<br/>Limited Data: Fine-tuning works well when you have lot of data related to your specific task or domain. If you only add few records which most demo shows - fine-tuning might not be effective and could even harm the model's performance.
+<br/>
+<br/>Knowledge Integration: If your goal is to add propietary/latest/specific knowledge to the LLM, retrieval-augmented-generation (RAG)is better approach. In RAG LLM retrieves relevant information from a knowledge base. You can use out of box RAG.  You can further optimize it by smmarizing knowledge,, creating embeddings with meta data etc.</font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl05_label2"><font color="Black" size="4"><br/></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl06_label2"><font color="Black" size="4"><h4>Fine Tuning Steps</h4></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl07_label2"><font color="Black" size="4"><br/>How can LLMs be fine-tuned for summarization?
+<br/>LLMs (Large Language Models) like GPT-3 can be fine-tuned for summarization using the following approaches:
+<br/><b>Supervised training</b> - The simplest approach is to fine-tune the LLM using a large dataset of text-summary pairs. The model is trained to generate the corresponding summary given the input text.
+<br/>This requires a sizable supervised dataset, which can be expensive to create. Public datasets like CNN/DailyMail can be used.
+<br/>
+<br/>Self-supervised training - The LLM is trained using the original text as input and the first few sentences as the "summary". This creates weak supervision from the data itself.
+<br/>The model is then fine-tuned on a smaller set of human-written summaries to improve accuracy. This approach requires less labeled data.
+<br/>
+<br/>Reinforcement learning - The LLM is first trained autoencoding - to reproduce the input text. Then, rewards are given based on the quality and conciseness of the generated summary.
+<br/>The model learns to generate better summaries through trial-and-error to maximize these rewards. However, this requires defining a good reward function.
+<br/>
+<br/>Filtering and post-processing - Generated summaries from the LLM can be filtered and refined using techniques like:
+<br/>• Extracting sentences with the highest similarity to human references• Removing repetitive sentences• Combining overlapping content into a single sentence, etc.
+<br/>This requires minimal fine-tuning of the base LLM but provides less control over the summary style.
+<br/>
+<br/>Prompting - The LLM can be "prompted" to generate a summary using natural language instructions. For example:
+<br/>In 2-3 short paragraphs, summarize the main points of the following text:
+<br/>This relies more on the pre-trained LLM abilities and requires less labeled data. But accuracy tends to be lower.
+<br/>So in short, there are a variety of approaches to fine-tune LLMs for summarization - from fully supervised to minimally supervised. The choice depends on the available data, required accuracy and custom need.
+<br/></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl08_label2"><font color="Black" size="4"><br/></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl09_label2"><font color="Black" size="4"><h2>Verify LLM and AI Assistant Answers</li></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl10_label2"><font color="Black" size="4">If you are using AI Assistant, you should cross check facts/number given by AI Assistant 
+<br/>
+<br/>Check in Vecor DB:  If you are using Vector DB/RAG, you can check what value RAG provide. This will help to ensure that response generated by RAG is in line with value stored in vector DB.
+<br/>Use Second LLM: Other/aditional approach is you can ask a smaller question from second or same LLM and se what answer you get e.g. if there is 1 page of text and it says company Dataknobs has revenue of $78M, you can ask a smaller question "how much revneue Dataknobs has".  However you need to consider additional cost of 2nd call? You may have more than one fact and multiple calls may be needed for each fact.
+<br/>Call to Search Engine: You can run a query on search engine programmatically and chec response.  However depending on domain this result may or may not work. It may require parsing result from search engine.  
+</font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl11_label2"><font color="Black" size="4"><br/></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl12_label2"><font color="Black" size="4"><br/></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl13_label2"><font color="Black" size="4"><h2>How to evaluate LLM </h2></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl14_label2"><font color="Black" size="4"><div>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Perplexity</td>
+            <td>Perplexity measures how well a language model predicts a sample of text. Lower perplexity indicates better performance.</td>
+        </tr>
+        <tr>
+            <td>BLEU Score</td>
+            <td>BLEU (Bilingual Evaluation Understudy) Score is commonly used to evaluate the quality of machine-translated text by comparing it to human-generated translations.</td>
+        </tr>
+        <tr>
+            <td>ROUGE Score</td>
+            <td>ROUGE (Recall-Oriented Understudy for Gisting Evaluation) Score is used to evaluate the quality of summaries produced by a language model by comparing them to reference summaries.</td>
+        </tr>
+        <tr>
+            <td>Human Evaluation</td>
+            <td>Human evaluation involves having human judges assess the quality of text generated by the language model based on criteria such as fluency, coherence, and relevance.</td>
+        </tr>
+        <tr>
+            <td>Word Error Rate (WER)</td>
+            <td>WER measures the difference between the words generated by the language model and the reference text. Lower WER indicates better performance.</td>
+        </tr>
+    </table>
+</div></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl15_label2"><font color="Black" size="4"><br></font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl16_label2"><font color="Black" size="4">			<div id="main-wrapper">
+				<div class="main-wrapper-style3">
+					<div class="inner">
+						<div class="5grid-layout">
+							<div class="row">
+								<div class="8u">
+									<!-- Article list -->
+										<section class="box-article-list">
+											<h2 class="icon icon-news">From the Slides blog</h2>
+											<!-- Excerpt -->
+												<article class="box-excerpt">
+													<a href="https://www.dataknobs.com/generativeai/10-llms/" class="image image-left"><img src="https://storage.googleapis.com/create-website/slides/photos200/llm-101/Slide0.png"  alt="LLM Overview" /></a>
+													<div>
+														<header>
+															<span class="date">LLM Overview</span>
+															<h3><a href="https://www.dataknobs.com/generativeai/10-llms/">Kreatebots - Build Smart AI Assistant</a></h3>
+														</header>
+														<p>Boost team productivity by automating repetitive tasks with AI assistants created using Kreatebots - a no code bot builder platform. </p>
+													</div>
+												</article>
+											<!-- Excerpt -->
+												
+
+
+
+
+										</section>
+
+								</div>
+
+								<div class="4u">
+
+								
+
+									<!-- Spotlight -->
+
+										<section class="box-spotlight pad-left">
+
+											<h2 class="icon icon-paper">Spotlight</h2>
+
+											<article>
+
+												<a href="https://www.dataknobs.com/products/kreate/" class="image image-full"><img src="https://storage.googleapis.com/create-website/slides/photos200/dataknobs-product-kreatewebsites/Slide4.png"  alt=""></a>
+
+												<header>
+
+													<h3><a href="https://www.dataknobs.com/products/kreate/">Futuristic interfaces</a></h3>
+
+													<span class="byline">Website and chatbot</span>
+
+												</header>
+
+												<p>Future-proof interfaces: Build unified web-chatbot experiences that anticipate user needs and offer effortless task completion.
+
+                                                    </p>
+
+
+												<footer>
+
+													<a href="https://www.dataknobs.com/products/kreate/" class="button button-alt button-icon button-icon-paper">Continue Reading</a>
+
+												</footer>
+
+											</article>
+
+										</section>
+
+								
+
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+
+
+		<!-- Footer Wrapper -->
+
+
+</font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+
+</td>
+	</tr>
+</table>    
+                            <br />
+                            <br />
+                             <div class="fb-activity" data-site="https://prashant.dhingra.website/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
+	
+								
+                                <div class="fb-comments" data-href="https://prashant.dhingra.website/" data-numposts="5" data-colorscheme="light" data-order-by="reverse_time"></div>
+			
+<!--
+                            <div class="fb-post" data-href="https://www.facebook.com/DiwaliCelebrations" data-width="500"></div>		
+                              <div class="fb-recommendations" data-site="https://prashant.dhingra.website/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
+		
+                            -->
+     
+             
+ 
+ 
+ 
+	
+						
+		<span id="ctl00_ContentPlaceHolder1_label1"></span>	
+
+                                                           														
+ 
+           <span id="ctl00_ContentPlaceHolder1_ad728_ad"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-8316025625209198";
+/* 728x90, created 7/29/11 */
+google_ad_slot = "4730481353";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></span>
+                                        <br /><br />
+    <!--
+				 <a id="ctl00_ContentPlaceHolder1_buttonmain" class="button"></a>
+                                                            <a id="ctl00_ContentPlaceHolder1_buttonall" class="button button-alt"></a>	
+    -->
+												
+
+
+
+
+            <br />
+            <br />
+            </div>
+          </div>
+             <!-- 
+
+    
+
+
+
+												
+									
+		<a id="ctl00_articleshome_RepLinks_ctl01_title" class="btn btn-link" href="https://prashant.dhingra.website/">Home</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome_RepLinks_ctl02_title" class="btn btn-link" href="https://prashant.dhingra.website/blog/">Blog</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome_RepLinks_ctl03_title" class="btn btn-link" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome_RepLinks_ctl04_title" class="btn btn-link" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome_RepLinks_ctl05_title" class="btn btn-link" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome_RepLinks_ctl06_title" class="btn btn-link" href="https://prashant.dhingra.website/slides/">Slides</a>
+      
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+ -->
+
+		<!-- Footer Wrapper -->
+   <!-- Footer Start -->
+        <!--
+    <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Most popular</h4>
+                
+                    
+
+    
+
+
+
+												
+									
+		<a id="ctl00_articleshome2_RepLinks_ctl01_title" class="btn btn-link" href="https://prashant.dhingra.website/">Home</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome2_RepLinks_ctl02_title" class="btn btn-link" href="https://prashant.dhingra.website/blog/">Blog</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome2_RepLinks_ctl03_title" class="btn btn-link" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome2_RepLinks_ctl04_title" class="btn btn-link" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome2_RepLinks_ctl05_title" class="btn btn-link" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_articleshome2_RepLinks_ctl06_title" class="btn btn-link" href="https://prashant.dhingra.website/slides/">Slides</a>
+      
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Links</h4>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>Importan Links</p>
+                     
+
+    
+
+
+
+											
+					
+			<a id="ctl00_articlessub_RepLinks_ctl01_title" class="btn btn-link" href="https://prashant.dhingra.website/"><em><b>Home</b></em></a>
+            
+
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+
+                    <div class="d-flex pt-2">
+                        <a class="btn btn-outline-light btn-social" href="https://www.twitter.com/dataknobs/"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-outline-light btn-social" href="https://www.facebook.com/dataknobs/"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+                        <a class="btn btn-outline-light btn-social" href="https://www.linkedin.com/company/dataknobs/"><i class="fab fa-linkedin-in"></i></a>
+                        
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Gallery</h4>
+                    <div class="row g-2 pt-2">
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-1.jpg" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-2.jpg" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-3.jpg" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-2.jpg" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-3.jpg" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-1.jpg" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-3">Newsletter</h4>
+                    <p>Sign up for our newsletter and get inspired for your next trip.</p>
+                    <div class="position-relative mx-auto" style="max-width: 400px;">
+                        <input class="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email">
+                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">SignUp</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="copyright">
+                <div class="row">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        &copy; <a class="border-bottom" href="#">USA City Trip</a>, All Right Reserved
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="footer-menu">
+                            <a href="https://www.usacitytrip.com/">Home</a>
+                            <a href="https://www.usacitytrip.com/new-york/">East Coast</a>
+                            <a href="https://www.usacitytrip.com/colorado/">Central USA</a>
+                            <a href="https://www.usacitytrip.com/washington/">North West</a>
+                            <a href="https://www.usacitytrip.com/california/">South West</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        -->
+
+        
+
+   <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
+       <div class="container py-5">
+           <div class="row g-5">
+               <div class="col-lg-3 col-md-6">
+                   <!-- <h4 class="text-white mb-3">Most popular</h4> -->
+                   <h4><a id="ctl00_footer_footerhead" title="Home" class="text-white mb-3" href="https://prashant.dhingra.website/">Home</a></h4>
+                   
+
+    
+
+
+
+												
+									
+		<a id="ctl00_footer_Articleshome3_RepLinks_ctl01_title" class="btn btn-link" href="https://prashant.dhingra.website/">Home</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_footer_Articleshome3_RepLinks_ctl02_title" class="btn btn-link" href="https://prashant.dhingra.website/blog/">Blog</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_footer_Articleshome3_RepLinks_ctl03_title" class="btn btn-link" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_footer_Articleshome3_RepLinks_ctl04_title" class="btn btn-link" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_footer_Articleshome3_RepLinks_ctl05_title" class="btn btn-link" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a>
+      
+
+
+
+
+
+												
+									
+		<a id="ctl00_footer_Articleshome3_RepLinks_ctl06_title" class="btn btn-link" href="https://prashant.dhingra.website/slides/">Slides</a>
+      
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+               
+               </div>
+               <div class="col-lg-3 col-md-6">
+                   <h4 class="text-white mb-3">Links</h4>
+                   <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>Select the perfect comforter</p>
+                    
+
+    
+
+
+
+											
+					
+			<a id="ctl00_footer_articlessub_RepLinks_ctl01_title" class="btn btn-link" href="https://prashant.dhingra.website/"><em><b>Home</b></em></a>
+            
+
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+                   <!--
+                   <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>www.usacitytrip.com</p>
+                   <p class="mb-2"><i class="fa fa-envelope me-3"></i>info@usacitytrip.com</p>
+                   -->
+                   <div class="d-flex pt-2">
+                       <a class="btn btn-outline-light btn-social" href="https://www.twitter.com/usacitytrip/"><i class="fab fa-twitter"></i></a>
+                       <a class="btn btn-outline-light btn-social" href="https://www.facebook.com/uscitytrip/"><i class="fab fa-facebook-f"></i></a>
+                       <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+                       <a class="btn btn-outline-light btn-social" href="https://www.linkedin.com/company/dataknobs/"><i class="fab fa-linkedin-in"></i></a>
+                       
+                   </div>
+               </div>
+               <div class="col-lg-3 col-md-6">
+                   <h4 class="text-white mb-3">Gallery</h4>
+                   <div class="row g-2 pt-2">
+                       <div class="col-4">
+                           <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-1.jpg" alt="">
+                       </div>
+                       <div class="col-4">
+                           <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-2.jpg" alt="">
+                       </div>
+                       <div class="col-4">
+                           <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-3.jpg" alt="">
+                       </div>
+                       <div class="col-4">
+                           <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-2.jpg" alt="">
+                       </div>
+                       <div class="col-4">
+                           <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-3.jpg" alt="">
+                       </div>
+                       <div class="col-4">
+                           <img class="img-fluid bg-light p-1" src="https://storage.googleapis.com/kreatewebsites/site102/img/package-1.jpg" alt="">
+                       </div>
+                   </div>
+               </div>
+               <div class="col-lg-3 col-md-6">
+                   <h4 class="text-white mb-3">Newsletter</h4>
+                   <!--
+                   <p>Sign up for our newsletter and get inspired for your next trip.</p>
+                   <div class="position-relative mx-auto" style="max-width: 400px;">
+                       <input class="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email">
+                       <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">SignUp</button>
+                   </div>
+                   -->
+                   
+               </div>
+           </div>
+       </div>
+       <div class="container">
+           <div class="copyright">
+               <div class="row">
+                   <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                       &copy; <a id="ctl00_footer_footerfooter" class="text-white mb-3" href="https://prashant.dhingra.website/">Home</a>, All Right Reserved
+                   </div>
+                   <div class="col-md-6 text-center text-md-end">
+                       <div class="footer-menu">
+                          
+
+    
+
+
+
+												
+						
+			<a id="ctl00_footer_articlesdirectorylimited_RepLinks_ctl01_title" href="https://prashant.dhingra.website/"><em><b>Home</b></em></a>
+            
+           
+        
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+
+
+
+			
+								
+								
+								
+    <!-- Footer End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/lib/wow/wow.min.js"></script>
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/lib/easing/easing.min.js"></script>
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/lib/waypoints/waypoints.min.js"></script>
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <!-- Google Search -->
+    <script async src="https://cse.google.com/cse.js?cx=014d08d10e77b477c">
+    </script>
+
+    <!-- Template Javascript -->
+    <script src="https://storage.googleapis.com/kreatewebsites/site102/js/main.js"></script>
+
+	</body>
+</html>
