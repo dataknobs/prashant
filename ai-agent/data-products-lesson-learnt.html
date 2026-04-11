@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Building AI Data Products: Mistakes &amp; Lessons Learned</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutrals with Slate & Emerald Accents -->
+    <!-- Application Structure Plan: 
+         1. Hero/Intro: Establishes context and value proposition.
+         2. Landscape (Dashboard): Uses charts to show quantitative failure rates and causes, answering "Why care?".
+         3. The Mistakes Matrix (Interactive Explorer): A master-detail view where users click common pitfalls to reveal deep dives, preventing information overload.
+         4. Lessons Learned (Actionable Playbook): Tabbed interface mapping to project phases to provide structured, actionable takeaways.
+         This structure guides the user from understanding the problem's magnitude, to exploring specific issues, to finding solutions. -->
+    <!-- Visualization & Content Choices: 
+         - Goal: Show proportion of failure causes -> Donut Chart (Chart.js) -> Hover for exact % -> Easy comparison of primary risks.
+         - Goal: Show cost escalation of fixing errors -> Bar Chart (Chart.js) -> Hover for values -> Visually demonstrates the "shift-left" principle.
+         - Goal: Explore qualitative mistakes -> Interactive Master-Detail Grid (HTML/JS) -> Click card to update side-panel -> Keeps user engaged without scrolling through walls of text.
+         - Goal: Organize solutions by phase -> Tabbed Interface (HTML/JS) -> Click tab to show phase-specific lessons -> Logical categorization of text.
+         CONFIRMING: No SVG, no Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            accent: '#059669' // Emerald for success/lessons
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc; /* brand-50 */
+            color: #1e293b; /* brand-800 */
+        }
+        
+        /* REQUIRED CHART CONTAINER STYLING */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; /* Constrain max width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; 
+            max-height: 350px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-width: 600px;
+            }
+        }
+
+        /* Custom Scrollbar for detail panels */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #059669;
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .card-active {
+            border-color: #059669;
+            background-color: #ecfdf5;
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-accent selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🤖</span>
+                    <span class="font-bold text-xl tracking-tight text-brand-900">AI Product Insights</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a class="text-gray-600 hover:text-brand-accent transition-colors" href="#landscape">The Landscape</a>
+                    <a class="text-gray-600 hover:text-brand-accent transition-colors" href="#mistakes">Common Mistakes</a>
+                    <a class="text-gray-600 hover:text-brand-accent transition-colors" href="#lessons">Lessons Learned</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-white border-b border-gray-200 py-16 md:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-900 mb-6 leading-tight">
+                Building AI Data Products: <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-slate-600 to-brand-accent">Mistakes &amp; Lessons Learned</span>
+            </h1>
+            <p class="mt-4 text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                An interactive report synthesizing the most common failure points when transitioning AI from research to production, and the strategic playbooks required to build robust, user-centric data products.
+            </p>
+            <div class="mt-10">
+                <a class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-brand-800 hover:bg-brand-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-800 transition-colors" href="#landscape">
+                    Explore the Data <span>↓</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Section 1: The Landscape -->
+        <section class="py-16 bg-brand-50" id="landscape">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10 text-center max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-brand-900 mb-4">The Reality of AI Implementations</h2>
+                    <p class="text-lg text-gray-700">
+                        <strong>Purpose of this section:</strong> Before diving into specific mistakes, it is crucial to understand the macro environment. This dashboard presents quantitative data illustrating why AI data products often fail to deliver ROI. By interacting with these charts, you will see that technical shortcomings are rarely the primary culprit; rather, alignment and data foundation issues dominate the landscape.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                    <!-- Chart 1: Failure Causes -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-semibold mb-2 text-center">Primary Causes of Project Failure</h3>
+                        <p class="text-sm text-gray-500 text-center mb-6">Hover over segments to see specific percentage breakdowns.</p>
+                        <div class="chart-container">
+                            <canvas id="failureCausesChart"></canvas>
+                        </div>
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-700 border-l-4 border-slate-400">
+                            <strong>Key Takeaway:</strong> Over 65% of failures stem from non-algorithmic issues, highlighting a critical gap between business alignment, data engineering, and data science.
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Cost of fixing -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-semibold mb-2 text-center">Cost to Fix Data/Model Errors</h3>
+                        <p class="text-sm text-gray-500 text-center mb-6">Relative cost multiplier by project lifecycle stage.</p>
+                        <div class="chart-container">
+                            <canvas id="costToFixChart"></canvas>
+                        </div>
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-700 border-l-4 border-red-400">
+                            <strong>Key Takeaway:</strong> Discovering a conceptual or data pipeline error during deployment is exponentially more expensive than catching it during the ideation or data preparation phases.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Interactive Mistakes Matrix -->
+        <section class="py-16 bg-white border-y border-gray-200" id="mistakes">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10 max-w-4xl">
+                    <h2 class="text-3xl font-bold text-brand-900 mb-4">The Top 5 Mistakes in AI Product Building</h2>
+                    <p class="text-lg text-gray-700">
+                        <strong>Purpose of this section:</strong> This interactive explorer allows you to drill down into the most critical pitfalls identified in the report. Click on any of the common mistakes listed on the left to reveal a detailed analysis on the right, including the root cause, its impact on the business, and symptoms to watch out for. This design allows you to focus on the issues most relevant to your current challenges.
+                    </p>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Master List -->
+                    <div class="w-full lg:w-1/3 flex flex-col gap-3" id="mistakesList">
+                        <!-- JS injected list items go here -->
+                    </div>
+
+                    <!-- Detail View -->
+                    <div class="w-full lg:w-2/3 bg-slate-50 border border-slate-200 rounded-xl p-8 shadow-inner min-h-[400px]" id="mistakeDetail">
+                        <div class="h-full flex flex-col justify-center items-center text-gray-400">
+                            <span class="text-5xl mb-4">👈</span>
+                            <p class="text-lg">Select a mistake from the list to view its deep-dive analysis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Lessons Learned Playbook -->
+        <section class="py-16 bg-brand-900 text-white" id="lessons">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10 text-center max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-white mb-4">The Playbook: Lessons Learned</h2>
+                    <p class="text-lg text-slate-300">
+                        <strong>Purpose of this section:</strong> Moving from failure to success requires structured frameworks. This section categorizes the core lessons learned into four distinct phases of the AI product lifecycle. Use the tabs below to navigate through best practices for Ideation, Data Foundations, Modeling, and Operations.
+                    </p>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="flex flex-wrap border-b border-slate-700 mb-8" id="lessonsTabs">
+                    <button class="px-6 py-3 text-lg font-medium text-slate-400 hover:text-white transition-colors tab-active" data-target="tab-ideation">1. Ideation &amp; Alignment</button>
+                    <button class="px-6 py-3 text-lg font-medium text-slate-400 hover:text-white transition-colors" data-target="tab-data">2. Data Foundations</button>
+                    <button class="px-6 py-3 text-lg font-medium text-slate-400 hover:text-white transition-colors" data-target="tab-model">3. Modeling &amp; UX</button>
+                    <button class="px-6 py-3 text-lg font-medium text-slate-400 hover:text-white transition-colors" data-target="tab-ops">4. Operations (MLOps)</button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="bg-slate-800 rounded-xl p-6 md:p-8 border border-slate-700 shadow-xl">
+                    
+                    <!-- Ideation Tab -->
+                    <div class="tab-content block animate-fade-in" id="tab-ideation">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-full bg-brand-accent flex items-center justify-center text-2xl shadow-lg">💡</div>
+                            <h3 class="text-2xl font-bold">Fall in love with the problem, not the model.</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8 text-slate-300">
+                            <div>
+                                <h4 class="text-white font-semibold mb-2 border-b border-slate-600 pb-2">The Playbook</h4>
+                                <ul class="space-y-3 mt-4">
+                                    <li class="flex gap-2"><span>✓</span> Define the specific business metric you are trying to move before writing a single line of code.</li>
+                                    <li class="flex gap-2"><span>✓</span> Start with a heuristic or rule-based baseline. If a simple IF/THEN statement solves 80% of the problem, do not use deep learning.</li>
+                                    <li class="flex gap-2"><span>✓</span> Map out the end-user workflow. How will they actually consume this prediction?</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-700 p-5 rounded-lg border-l-4 border-brand-accent">
+                                <h4 class="text-white font-semibold mb-2">Quote from the Field</h4>
+                                <p class="italic">"We spent 6 months building a state-of-the-art churn prediction model. When we deployed it, we realized the customer success team didn't have the budget or authority to actually offer retention discounts. The model was perfect; the product failed."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Tab -->
+                    <div class="tab-content hidden animate-fade-in" id="tab-data">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-2xl shadow-lg">📈</div>
+                            <h3 class="text-2xl font-bold">Treat data as a first-class product.</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8 text-slate-300">
+                            <div>
+                                <h4 class="text-white font-semibold mb-2 border-b border-slate-600 pb-2">The Playbook</h4>
+                                <ul class="space-y-3 mt-4">
+                                    <li class="flex gap-2"><span>✓</span> Implement strict data contracts between producers (software engineers) and consumers (data scientists).</li>
+                                    <li class="flex gap-2"><span>✓</span> Version your datasets exactly as you version your code.</li>
+                                    <li class="flex gap-2"><span>✓</span> Invest heavily in data observability. You need to know when an upstream schema change breaks your downstream features.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-700 p-5 rounded-lg border-l-4 border-blue-500">
+                                <h4 class="text-white font-semibold mb-2">The "Garbage In" Rule</h4>
+                                <p>A mediocre algorithm with high-quality, clean, and recent data will consistently outperform a state-of-the-art algorithm trained on noisy, outdated data. Allocate your engineering resources accordingly.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Tab -->
+                    <div class="tab-content hidden animate-fade-in" id="tab-model">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center text-2xl shadow-lg">🤖</div>
+                            <h3 class="text-2xl font-bold">Design for trust, explainability, and error handling.</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8 text-slate-300">
+                            <div>
+                                <h4 class="text-white font-semibold mb-2 border-b border-slate-600 pb-2">The Playbook</h4>
+                                <ul class="space-y-3 mt-4">
+                                    <li class="flex gap-2"><span>✓</span> Models are probabilistic. Design the UI to gracefully handle the times the model is wrong (e.g., easy override buttons, confidence scores).</li>
+                                    <li class="flex gap-2"><span>✓</span> Avoid "black boxes" in high-stakes environments. Users need to know *why* a recommendation was made.</li>
+                                    <li class="flex gap-2"><span>✓</span> Build in feedback loops from day one. How does the user correct the model, and how does the model learn from that correction?</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-700 p-5 rounded-lg border-l-4 border-purple-500">
+                                <h4 class="text-white font-semibold mb-2">UX Over Accuracy</h4>
+                                <p>An AI product's success is governed by user adoption, not just F1 scores. If users do not trust the outputs because they are opaque or fail ungracefully, they will abandon the tool, rendering the accuracy moot.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ops Tab -->
+                    <div class="tab-content hidden animate-fade-in" id="tab-ops">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-2xl shadow-lg">⚙️</div>
+                            <h3 class="text-2xl font-bold">Deployment is the starting line, not the finish line.</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8 text-slate-300">
+                            <div>
+                                <h4 class="text-white font-semibold mb-2 border-b border-slate-600 pb-2">The Playbook</h4>
+                                <ul class="space-y-3 mt-4">
+                                    <li class="flex gap-2"><span>✓</span> Monitor for Data Drift and Concept Drift continuously. The world changes, and your model will decay.</li>
+                                    <li class="flex gap-2"><span>✓</span> Establish cross-functional ML pods (Data Engineering, ML Engineering, DevOps) to own the product post-launch.</li>
+                                    <li class="flex gap-2"><span>✓</span> Automate retraining pipelines early to reduce the manual burden of keeping the model fresh.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-700 p-5 rounded-lg border-l-4 border-orange-500">
+                                <h4 class="text-white font-semibold mb-2">The Hidden Technical Debt</h4>
+                                <p>Only a tiny fraction of the code in many ML systems is actually devoted to learning or prediction. The vast majority of the complexity lies in configuration, automation, data verification, and serving infrastructure.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <!-- CSS Animation Utility -->
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. CHARTS INITIALIZATION ---
+            
+            // Chart configuration defaults
+            Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+            Chart.defaults.color = '#64748b';
+
+            // Chart 1: Failure Causes (Donut)
+            const ctxFailure = document.getElementById('failureCausesChart').getContext('2d');
+            new Chart(ctxFailure, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Lack of Business Alignment', 
+                        'Poor Data Quality/Pipeline Issues', 
+                        'Siloed Teams/Cultural Friction', 
+                        'Lack of MLOps/Monitoring', 
+                        'Algorithm/Model Inaccuracy'
+                    ],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            '#0f172a', // Brand 900
+                            '#334155', // Slate 700
+                            '#64748b', // Slate 500
+                            '#059669', // Brand accent (Emerald)
+                            '#cbd5e1'  // Slate 300
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            // Chart 2: Cost of Fixing (Bar)
+            const ctxCost = document.getElementById('costToFixChart').getContext('2d');
+            new Chart(ctxCost, {
+                type: 'bar',
+                data: {
+                    labels: ['Ideation', 'Data Prep', 'Modeling', 'Deployment', 'Post-Launch'],
+                    datasets: [{
+                        label: 'Relative Cost Multiplier',
+                        data: [1, 5, 15, 50, 100],
+                        backgroundColor: '#0f172a',
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Cost Multiplier (1x to 100x)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' Cost: ' + context.parsed.y + 'x';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- 2. INTERACTIVE MISTAKES MATRIX LOGIC ---
+
+            const mistakesData = [
+                {
+                    id: 'm1',
+                    icon: '&#128296;',
+                    title: 'The Hammer Looking for a Nail',
+                    subtitle: 'Technology-first approach instead of user-centric.',
+                    category: 'Ideation & Strategy',
+                    impact: 'High',
+                    description: 'Companies often start with a desire to "use AI/LLMs" and then try to find a business problem it fits. This leads to complex, expensive solutions that users do not actually need or want.',
+                    symptoms: [
+                        'Project mandates starting with "We need to implement ChatGPT/Deep Learning..."',
+                        'Inability to define the baseline metric being improved.',
+                        'End-users are not consulted until the model is already built.'
+                    ],
+                    quote: 'AI is an enabler, not a strategy. Start with the user pain point, and if a simple SQL query solves it, use that.'
+                },
+                {
+                    id: 'm2',
+                    icon: '&#128465;&#65039;',
+                    title: 'Garbage In, Gospel Out',
+                    subtitle: 'Underestimating the data engineering effort.',
+                    category: 'Data Foundation',
+                    impact: 'Critical',
+                    description: 'Treating the data pipeline as an afterthought. Data scientists spend 80% of their time cleaning data because upstream systems change schemas without notice, or historical data is fundamentally biased.',
+                    symptoms: [
+                        'No formal "Data Contracts" between engineering and data teams.',
+                        'Dashboards breaking frequently due to missing fields.',
+                        'Models performing well in training but failing drastically in the real world.'
+                    ],
+                    quote: 'The most sophisticated neural network cannot overcome systematically flawed input data.'
+                },
+                {
+                    id: 'm3',
+                    icon: '&#128101;',
+                    title: 'The Silo Trap',
+                    subtitle: 'Isolating Data Science from the rest of the business.',
+                    category: 'Culture & Org',
+                    impact: 'High',
+                    description: 'Data Scientists operating in a vacuum, handing off "finished" models to ML Engineers over a wall, who then hand it to IT. This waterfall approach leads to models that are impossible to deploy or scale.',
+                    symptoms: [
+                        '"Works on my machine" mentality in the data science team.',
+                        'Deployment takes months after the model is "done".',
+                        'Friction between software engineering (who value stability) and data science (who value experimentation).'
+                    ],
+                    quote: 'AI data products require cross-functional pods working simultaneously, not sequential hand-offs.'
+                },
+                {
+                    id: 'm4',
+                    icon: '&#128225;',
+                    title: 'Ignoring the Last Mile (UX)',
+                    subtitle: 'Poor integration into existing user workflows.',
+                    category: 'Product & UX',
+                    impact: 'Medium-High',
+                    description: 'Providing a highly accurate prediction in a format or system the user never checks. If a sales rep has to leave Salesforce to check an AI dashboard, adoption will be zero.',
+                    symptoms: [
+                        'High model accuracy metrics, but zero movement in business KPIs.',
+                        'Low daily active user (DAU) count for internal AI tools.',
+                        'Users keeping private spreadsheets to double-check the AI\'s work.'
+                    ],
+                    quote: 'A model is not a product. The product is how the model\'s output is presented, explained, and actioned.'
+                },
+                {
+                    id: 'm5',
+                    icon: '&#128164;',
+                    title: 'Set It and Forget It',
+                    subtitle: 'Lack of MLOps and post-deployment monitoring.',
+                    category: 'Operations',
+                    impact: 'High',
+                    description: 'Assuming a deployed model will continue to work indefinitely. Real-world data distributions change (concept drift), APIs break, and latency creeps up. Without monitoring, models silently degrade, leading to disastrous automated decisions.',
+                    symptoms: [
+                        'No alerts set up for data drift or prediction distribution shifts.',
+                        'Retraining requires starting the entire process from scratch manually.',
+                        'The team has moved on to the next project immediately after launch.'
+                    ],
+                    quote: 'Unlike traditional software, AI models begin to decay the moment they are deployed. Day 2 operations are mandatory.'
+                }
+            ];
+
+            const mistakesListContainer = document.getElementById('mistakesList');
+            const mistakeDetailContainer = document.getElementById('mistakeDetail');
+
+            // Render list
+            mistakesData.forEach((mistake, index) => {
+                const isFirst = index === 0;
+                const card = document.createElement('div');
+                card.className = `p-5 rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-md ${isFirst ? 'card-active' : 'border-gray-200 bg-white hover:border-slate-400'}`;
+                card.dataset.id = mistake.id;
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="text-2xl mt-1">${mistake.icon}</div>
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">${mistake.category}</span>
+                            <h3 class="text-lg font-bold text-brand-900">${mistake.title}</h3>
+                            <p class="text-sm text-gray-600 mt-1">${mistake.subtitle}</p>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', function() {
+                    // Update active state in list
+                    document.querySelectorAll('#mistakesList > div').forEach(el => {
+                        el.classList.remove('card-active');
+                        el.classList.add('border-gray-200', 'bg-white');
+                        el.classList.remove('border-brand-accent', 'bg-emerald-50');
+                    });
+                    this.classList.add('card-active');
+                    this.classList.remove('border-gray-200', 'bg-white');
+
+                    // Render detail
+                    renderDetail(mistake);
+                });
+
+                mistakesListContainer.appendChild(card);
+            });
+
+            // Function to render the detail view
+            function renderDetail(mistake) {
+                let symptomsHtml = mistake.symptoms.map(s => `<li class="flex items-start gap-2 text-slate-700"><span class="text-red-500 mt-1">&#10007;</span> ${s}</li>`).join('');
+                
+                // Get impact color
+                let impactColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                if (mistake.impact === 'High') impactColor = 'bg-orange-100 text-orange-800 border-orange-200';
+                if (mistake.impact === 'Critical') impactColor = 'bg-red-100 text-red-800 border-red-200';
+
+                mistakeDetailContainer.innerHTML = `
+                    <div class="animate-fade-in custom-scroll overflow-y-auto max-h-[600px] pr-2">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-4xl">${mistake.icon}</span>
+                            <div>
+                                <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">${mistake.category}</span>
+                                <h3 class="text-3xl font-bold text-brand-900 leading-tight">${mistake.title}</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6 flex items-center gap-2">
+                            <span class="text-sm text-slate-500 font-medium">Business Impact:</span>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full border ${impactColor}">${mistake.impact}</span>
+                        </div>
+
+                        <div class="prose max-w-none text-slate-700">
+                            <h4 class="text-lg font-bold text-brand-900 mb-2 border-b pb-2">The Core Issue</h4>
+                            <p class="mb-6 leading-relaxed">${mistake.description}</p>
+
+                            <h4 class="text-lg font-bold text-brand-900 mb-3 border-b pb-2">Symptoms & Warning Signs</h4>
+                            <ul class="space-y-3 mb-8 bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                ${symptomsHtml}
+                            </ul>
+
+                            <div class="bg-brand-900 text-white p-6 rounded-xl border-l-4 border-brand-accent shadow-md">
+                                <h4 class="text-sm text-brand-accent font-bold uppercase tracking-wider mb-2">Bottom Line</h4>
+                                <p class="text-lg italic font-light">"${mistake.quote}"</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Initialize with first item
+            renderDetail(mistakesData[0]);
+
+
+            // --- 3. TABS LOGIC ---
+            
+            const tabs = document.querySelectorAll('#lessonsTabs button');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active state from all tabs
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.remove('text-brand-accent');
+                        t.classList.add('text-slate-400');
+                    });
+                    
+                    // Add active state to clicked tab
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('text-slate-400');
+
+                    // Hide all content
+                    contents.forEach(c => {
+                        c.classList.add('hidden');
+                        c.classList.remove('block');
+                    });
+
+                    // Show target content
+                    const targetId = tab.getAttribute('data-target');
+                    const targetContent = document.getElementById(targetId);
+                    targetContent.classList.remove('hidden');
+                    targetContent.classList.add('block');
+                });
+            });
+
+        });
+    </script>
+
+</body></html>

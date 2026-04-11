@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="An interactive exploration of Federated Computational Governance in Data Mesh, featuring policy-as-code, federated domain councils, and automated enforcement architectures." name="description"/>
+    <meta content="Data Mesh, Federated Computational Governance, Policy-as-code, Open Policy Agent, OPA, Apache Ranger, DataHub, Collibra, automated enforcement, data architecture" name="keywords"/>
+    <title>Federated Computational Governance | Data Mesh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfbf9; /* Warm neutral background */
+            color: #292524; /* Stone 800 */
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            min-height: 300px;
+            max-height: 450px;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #0f766e; /* Teal 700 */
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom scrollbar for inner containers */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f5f5f4; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals with Deep Teal Accents -->
+    <!-- Application Structure Plan: The SPA is structured to guide the user from the high-level problem (balancing autonomy and control) down to the specific mechanisms and technologies. 
+         1. Hero/Intro: Establishes the context of Data Mesh and why governance is hard.
+         2. The Balancing Act (Interactive): An interactive slider/button group allowing users to experience the trade-offs between centralized, siloed, and federated models, explaining WHY this approach is needed.
+         3. Core Mechanisms (Tabs): Breaks down the abstract concepts (Policy-as-code, Councils, Automation) into digestible, selectable chunks to prevent cognitive overload.
+         4. Technology Stack (Visual Layout): Uses HTML/CSS grid to show the architectural relationship between tools like DataHub, OPA, and Ranger.
+         5. Impact Analysis (Chart.js): Provides a quantifiable (simulated) view of how this architecture impacts delivery speed vs overhead, concluding the narrative. -->
+    <!-- Visualization & Content Choices: 
+         - The Balancing Act -> Goal: Compare organizational models -> Viz: Interactive State buttons updating text panels -> Interaction: Click -> Justification: Active learning of trade-offs -> Method: Vanilla JS DOM manipulation.
+         - Core Concepts -> Goal: Inform -> Viz: Tabbed interface with descriptions -> Interaction: Click to switch context -> Justification: Organizes complex text without scrolling -> Method: HTML/Tailwind + JS.
+         - Architecture -> Goal: Organize/Relationships -> Viz: Layered block diagram -> Interaction: Hover effects for definitions -> Justification: Shows how tech fits together without complex SVG diagrams -> Method: Tailwind CSS Grid/Flexbox.
+         - Impact Metrics -> Goal: Change/Trends -> Viz: Line/Bar chart -> Interaction: Tooltips -> Justification: Shows the theoretical "before and after" impact over time -> Method: Chart.js (NO SVG). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased selection:bg-teal-200 selection:text-teal-900">
+
+    <nav class="sticky top-0 z-50 bg-[#fcfbf9]/90 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center font-bold text-xl text-stone-800 tracking-tight">
+                    <span class="mr-2 text-2xl">🏛️</span> FedGov<span class="text-teal-700">Mesh</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-stone-600">
+                    <a class="hover:text-teal-700 transition-colors" href="#challenge">The Challenge</a>
+                    <a class="hover:text-teal-700 transition-colors" href="#mechanisms">Core Mechanisms</a>
+                    <a class="hover:text-teal-700 transition-colors" href="#technology">Architecture</a>
+                    <a class="hover:text-teal-700 transition-colors" href="#impact">Business Impact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+
+        <section class="text-center max-w-4xl mx-auto mt-8" id="hero">
+            <div class="inline-block px-3 py-1 rounded-full bg-stone-200 text-stone-700 text-xs font-semibold tracking-wider uppercase mb-6 shadow-sm border border-stone-300">
+                Data Mesh Core Principle
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-6 leading-tight">
+                Federated Computational Governance
+            </h1>
+            <p class="text-lg md:text-xl text-stone-600 leading-relaxed">
+                Often cited as the hardest part of Data Mesh implementation. It is the delicate art of maintaining global standards and compliance while empowering domain teams with maximum autonomy over their data products.
+            </p>
+        </section>
+
+        <section class="scroll-mt-24" id="challenge">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4 flex items-center">
+                    <span class="text-3xl mr-3">⚖️</span> The Balancing Act
+                </h2>
+                <p class="text-stone-600 text-lg leading-relaxed max-w-3xl">
+                    This section explores the fundamental tension in data architecture. Traditional approaches fail at scale. Interact with the models below to understand why a federated approach is necessary to avoid the pitfalls of bottlenecks and chaos.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 md:p-8">
+                <div class="flex flex-col md:flex-row gap-4 mb-8">
+                    <button class="flex-1 py-4 px-6 rounded-xl border-2 border-stone-200 bg-stone-50 hover:bg-stone-100 transition-all text-left group" id="btn-central" onclick="setModel('central')">
+                        <div class="font-bold text-stone-800 mb-1 group-hover:text-teal-700 transition-colors">Centralized IT</div>
+                        <div class="text-sm text-stone-500">High Control, Low Agility</div>
+                    </button>
+                    <button class="flex-1 py-4 px-6 rounded-xl border-2 border-stone-200 bg-stone-50 hover:bg-stone-100 transition-all text-left group" id="btn-silo" onclick="setModel('silo')">
+                        <div class="font-bold text-stone-800 mb-1 group-hover:text-teal-700 transition-colors">Data Silos</div>
+                        <div class="text-sm text-stone-500">Low Control, High Agility</div>
+                    </button>
+                    <button class="flex-1 py-4 px-6 rounded-xl border-2 border-teal-600 bg-teal-50 transition-all text-left shadow-sm ring-1 ring-teal-600/20" id="btn-federated" onclick="setModel('federated')">
+                        <div class="font-bold text-teal-800 mb-1">Federated Governance</div>
+                        <div class="text-sm text-teal-600">Balanced Autonomy &amp; Control</div>
+                    </button>
+                </div>
+
+                <div class="min-h-[150px] bg-stone-50 rounded-xl p-6 border border-stone-100 fade-in" id="model-content">
+                    <h3 class="text-xl font-bold text-teal-800 mb-2">The Data Mesh Target State</h3>
+                    <p class="text-stone-700 mb-4">Governance is shared between a central council (defining global rules like PII handling) and domain owners (defining local rules like data quality metrics for their specific product). Execution is automated, removing human bottlenecks.</p>
+                    <div class="flex gap-4 text-sm font-medium">
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full">✓ High Agility</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full">✓ High Compliance</span>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full">⚠ High Complexity</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-24" id="mechanisms">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4 flex items-center">
+                    <span class="text-3xl mr-3">⚙️</span> Core Mechanisms
+                </h2>
+                <p class="text-stone-600 text-lg leading-relaxed max-w-3xl">
+                    How do we actually achieve this balance? This section breaks down the three essential pillars of Federated Computational Governance. Click through the concepts to understand the shift from manual bureaucracy to automated engineering.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="md:col-span-1 space-y-2">
+                    <button class="w-full text-left px-4 py-4 rounded-lg bg-white border border-stone-200 shadow-sm hover:border-teal-300 transition-colors tab-active flex items-center justify-between" id="tab-policy" onclick="setMechanism('policy')">
+                        <span class="font-semibold text-stone-800">Policy-as-Code</span>
+                        <span class="text-xl">📜</span>
+                    </button>
+                    <button class="w-full text-left px-4 py-4 rounded-lg bg-stone-50 border border-transparent hover:bg-stone-100 transition-colors flex items-center justify-between text-stone-600" id="tab-councils" onclick="setMechanism('councils')">
+                        <span class="font-medium">Federated Councils</span>
+                        <span class="text-xl">👥</span>
+                    </button>
+                    <button class="w-full text-left px-4 py-4 rounded-lg bg-stone-50 border border-transparent hover:bg-stone-100 transition-colors flex items-center justify-between text-stone-600" id="tab-automation" onclick="setMechanism('automation')">
+                        <span class="font-medium">Automated Enforcement</span>
+                        <span class="text-xl">🤖</span>
+                    </button>
+                </div>
+
+                <div class="md:col-span-2 bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
+                    <div class="fade-in" id="mech-content">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-100 text-teal-700 text-2xl mb-4">📜</div>
+                        <h3 class="text-2xl font-bold text-stone-800 mb-3">Policy-as-Code</h3>
+                        <p class="text-stone-600 mb-6 leading-relaxed">
+                            Instead of written documents or wiki pages, governance rules are codified into machine-readable scripts. This allows rules to be version-controlled, tested, and executed systematically across the entire organization.
+                        </p>
+                        <div class="bg-stone-800 rounded-lg p-4 text-sm font-mono text-teal-300 overflow-x-auto">
+                            <div class="text-stone-500 mb-2"># Example Concept: Restricting PII access</div>
+                            <div>allow = true</div>
+                            <div>deny {</div>
+                            <div class="ml-4">input.data_classification == "PII"</div>
+                            <div class="ml-4">not input.user_role == "Authorized_Analyst"</div>
+                            <div>}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-24" id="technology">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4 flex items-center">
+                    <span class="text-3xl mr-3">🏗️</span> The Technology Stack
+                </h2>
+                <p class="text-stone-600 text-lg leading-relaxed max-w-3xl">
+                    Governance requires a specialized tooling ecosystem. This architectural view illustrates how different technologies collaborate to enforce policy-as-code at scale, separating metadata, decision logic, and actual data access.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 overflow-x-auto">
+                <div class="min-w-[600px] flex flex-col gap-6">
+                    
+                    <!-- Top Layer: Metadata & Discovery -->
+                    <div class="flex gap-4 items-center">
+                        <div class="w-48 text-right font-semibold text-stone-500 uppercase tracking-wider text-sm">Control Plane</div>
+                        <div class="flex-1 bg-blue-50 border-2 border-blue-200 rounded-xl p-4 relative group cursor-pointer hover:bg-blue-100 transition-colors">
+                            <div class="font-bold text-blue-900 text-lg flex items-center gap-2">
+                                <span>🗂️</span> DataHub / Collibra
+                            </div>
+                            <div class="text-blue-700 text-sm mt-1">Data Catalog &amp; Governance Framework</div>
+                            
+                            <!-- Tooltip -->
+                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-stone-800 text-white text-xs rounded p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                                Defines data domains, assigns owners, tags PII, and stores organizational governance structures.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flow Arrows -->
+                    <div class="flex gap-4 items-center">
+                        <div class="w-48"></div>
+                        <div class="flex-1 flex justify-center text-stone-300 text-2xl">⬇️ ⬆️</div>
+                    </div>
+
+                    <!-- Middle Layer: Policy Engine -->
+                    <div class="flex gap-4 items-center">
+                        <div class="w-48 text-right font-semibold text-stone-500 uppercase tracking-wider text-sm">Decision Plane</div>
+                        <div class="flex-1 bg-teal-50 border-2 border-teal-200 rounded-xl p-4 relative group cursor-pointer hover:bg-teal-100 transition-colors">
+                            <div class="font-bold text-teal-900 text-lg flex items-center gap-2">
+                                <span>🧠</span> Open Policy Agent (OPA)
+                            </div>
+                            <div class="text-teal-700 text-sm mt-1">Universal Policy Engine</div>
+                            
+                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-stone-800 text-white text-xs rounded p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                                Receives context (User X wants Data Y) and evaluates it against written Policy-as-Code to return an Allow/Deny decision.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flow Arrows -->
+                    <div class="flex gap-4 items-center">
+                        <div class="w-48"></div>
+                        <div class="flex-1 flex justify-center text-stone-300 text-2xl">⬇️ ⬆️</div>
+                    </div>
+
+                    <!-- Bottom Layer: Enforcement -->
+                    <div class="flex gap-4 items-center">
+                        <div class="w-48 text-right font-semibold text-stone-500 uppercase tracking-wider text-sm">Data Plane</div>
+                        <div class="flex-1 bg-orange-50 border-2 border-orange-200 rounded-xl p-4 relative group cursor-pointer hover:bg-orange-100 transition-colors">
+                            <div class="font-bold text-orange-900 text-lg flex items-center gap-2">
+                                <span>🛡️</span> Apache Ranger
+                            </div>
+                            <div class="text-orange-700 text-sm mt-1">Centralized Access Security</div>
+                            
+                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-stone-800 text-white text-xs rounded p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                                Physically blocks or allows access at the database/storage level based on decisions from the Policy Engine. Can mask columns dynamically.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-24 mb-24" id="impact">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4 flex items-center">
+                    <span class="text-3xl mr-3">📊</span> Business Impact Analysis
+                </h2>
+                <p class="text-stone-600 text-lg leading-relaxed max-w-3xl">
+                    The ultimate goal of computational governance is to decouple compliance from speed. This visualization demonstrates the projected shift when moving from manual review boards to automated, code-driven policies.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
+                <div class="mb-4 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-stone-800">Delivery Velocity vs. Security Incidents</h3>
+                    <div class="space-x-2">
+                        <button class="px-3 py-1 text-sm rounded border border-stone-300 bg-stone-100 hover:bg-stone-200" onclick="updateChart('pre')">Pre-Mesh</button>
+                        <button class="px-3 py-1 text-sm rounded border border-teal-600 bg-teal-600 text-white hover:bg-teal-700" onclick="updateChart('post')">Post-Mesh Transition</button>
+                    </div>
+                </div>
+                <!-- CRITICAL: Chart Container styled according to requirements -->
+                <div class="chart-container">
+                    <canvas id="impactChart"></canvas>
+                </div>
+                <div class="mt-6 text-center text-sm text-stone-500">
+                    <p id="chart-insight">As Data Mesh scales, automated enforcement allows data product deployment to accelerate rapidly while simultaneously reducing compliance breaches due to systemic, codified rules rather than human oversight.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <script>
+        // --- State Data ---
+        const models = {
+            central: {
+                title: "Centralized IT Model",
+                desc: "All data requests and governance rules must pass through a single centralized IT or data team. Manual approvals are required for access and publication.",
+                pros: ["✓ Consistent global rules", "✓ Clear chain of command"],
+                cons: ["✗ Massive bottleneck", "✗ Slow time-to-market", "✗ IT lacks domain context"],
+                color: "blue"
+            },
+            silo: {
+                title: "Data Silos (Un-governed)",
+                desc: "Domains have total autonomy over their data. They choose their own tech stacks and governance standards with little to no global oversight.",
+                pros: ["✓ High speed within domain", "✓ Total flexibility"],
+                cons: ["✗ Impossible to join data", "✗ High compliance risk", "✗ Duplicated effort"],
+                color: "orange"
+            },
+            federated: {
+                title: "The Data Mesh Target State",
+                desc: "Governance is shared between a central council (defining global rules like PII handling) and domain owners (defining local rules). Execution is automated via code.",
+                pros: ["✓ High Agility", "✓ High Compliance", "✓ Interoperable data"],
+                cons: ["⚠ High implementation complexity", "⚠ Requires culture shift"],
+                color: "teal"
+            }
+        };
+
+        const mechanisms = {
+            policy: {
+                icon: "📜",
+                title: "Policy-as-Code",
+                desc: "Instead of written documents or wiki pages, governance rules are codified into machine-readable scripts. This allows rules to be version-controlled, tested, and executed systematically across the entire organization.",
+                code: `<div><span class="text-stone-500"># Example Concept: Restricting PII access</span></div>
+                       <div>allow = <span class="text-blue-400">true</span></div>
+                       <div>deny {</div>
+                       <div class="ml-4">input.data_classification == <span class="text-amber-300">"PII"</span></div>
+                       <div class="ml-4">not input.user_role == <span class="text-amber-300">"Authorized_Analyst"</span></div>
+                       <div>}</div>`
+            },
+            councils: {
+                icon: "👥",
+                title: "Federated Domain Councils",
+                desc: "Governance is not a top-down mandate. Councils are composed of domain data product owners and central security/compliance experts. They collaborate to define the 'Global' policies that apply to everyone, while leaving 'Local' policies to individual domains.",
+                code: `<ul class="list-disc pl-5 space-y-2 text-stone-300 font-sans">
+                            <li><strong class="text-teal-400">Global Rule:</strong> All datasets must have an owner registered in DataHub.</li>
+                            <li><strong class="text-teal-400">Global Rule:</strong> Data tagged 'Financial' cannot leave designated regions.</li>
+                            <li><strong class="text-blue-400">Local Rule (Marketing):</strong> Customer interaction data must be updated hourly.</li>
+                       </ul>`
+            },
+            automation: {
+                icon: "🤖",
+                title: "Automated Enforcement",
+                desc: "Policies are useless if manually checked. Automated enforcement integrates Policy-as-Code engines (like OPA) directly into CI/CD pipelines (for deployment checks) and data access layers (like Ranger, for query-time checks).",
+                code: `<div class="flex items-center gap-4 font-sans text-sm text-stone-300">
+                            <div class="bg-stone-700 p-2 rounded">User Query</div>
+                            <div>➡️</div>
+                            <div class="bg-teal-900 border border-teal-500 p-2 rounded">OPA Evaluates Rule</div>
+                            <div>➡️</div>
+                            <div class="bg-stone-700 p-2 rounded">Apache Ranger Grants/Blocks</div>
+                       </div>`
+            }
+        };
+
+        // --- Interaction Logic ---
+
+        function setModel(type) {
+            // Update Buttons
+            ['central', 'silo', 'federated'].forEach(id => {
+                const btn = document.getElementById(`btn-${id}`);
+                btn.className = `flex-1 py-4 px-6 rounded-xl border-2 transition-all text-left group ${
+                    id === type 
+                    ? `border-${models[type].color}-600 bg-${models[type].color}-50 shadow-sm ring-1 ring-${models[type].color}-600/20` 
+                    : 'border-stone-200 bg-stone-50 hover:bg-stone-100'
+                }`;
+                
+                // Reset text colors for inactive
+                if(id !== type) {
+                    btn.querySelector('div:first-child').className = "font-bold text-stone-800 mb-1 group-hover:text-teal-700 transition-colors";
+                    btn.querySelector('div:last-child').className = "text-sm text-stone-500";
+                } else {
+                    btn.querySelector('div:first-child').className = `font-bold text-${models[type].color}-800 mb-1`;
+                    btn.querySelector('div:last-child').className = `text-sm text-${models[type].color}-600`;
+                }
+            });
+
+            // Update Content
+            const content = document.getElementById('model-content');
+            const data = models[type];
+            
+            // Re-trigger animation
+            content.classList.remove('fade-in');
+            void content.offsetWidth; 
+            content.classList.add('fade-in');
+
+            let tagsHtml = data.pros.map(p => `<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full">${p}</span>`).join('');
+            tagsHtml += data.cons.map(c => `<span class="px-3 py-1 bg-${type==='federated'?'amber':'red'}-100 text-${type==='federated'?'amber':'red'}-800 rounded-full">${c}</span>`).join('');
+
+            content.innerHTML = `
+                <h3 class="text-xl font-bold text-${data.color}-800 mb-2">${data.title}</h3>
+                <p class="text-stone-700 mb-4">${data.desc}</p>
+                <div class="flex flex-wrap gap-3 text-sm font-medium">
+                    ${tagsHtml}
+                </div>
+            `;
+        }
+
+        function setMechanism(type) {
+            // Update Tabs
+            ['policy', 'councils', 'automation'].forEach(id => {
+                const tab = document.getElementById(`tab-${id}`);
+                if (id === type) {
+                    tab.className = "w-full text-left px-4 py-4 rounded-lg bg-white border border-stone-200 shadow-sm transition-colors tab-active flex items-center justify-between";
+                    tab.querySelector('span:first-child').classList.replace('text-stone-600', 'text-stone-800');
+                    tab.querySelector('span:first-child').classList.replace('font-medium', 'font-semibold');
+                } else {
+                    tab.className = "w-full text-left px-4 py-4 rounded-lg bg-stone-50 border border-transparent hover:bg-stone-100 transition-colors flex items-center justify-between text-stone-600";
+                    tab.querySelector('span:first-child').classList.replace('text-stone-800', 'text-stone-600');
+                    tab.querySelector('span:first-child').classList.replace('font-semibold', 'font-medium');
+                }
+            });
+
+            // Update Content
+            const content = document.getElementById('mech-content');
+            const data = mechanisms[type];
+            
+            content.classList.remove('fade-in');
+            void content.offsetWidth; 
+            content.classList.add('fade-in');
+
+            content.innerHTML = `
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-100 text-teal-700 text-2xl mb-4">${data.icon}</div>
+                <h3 class="text-2xl font-bold text-stone-800 mb-3">${data.title}</h3>
+                <p class="text-stone-600 mb-6 leading-relaxed">${data.desc}</p>
+                <div class="bg-stone-800 rounded-lg p-5 text-sm font-mono overflow-x-auto min-h-[120px] flex flex-col justify-center">
+                    ${data.code}
+                </div>
+            `;
+        }
+
+        // --- Chart.js Implementation ---
+        
+        let impactChartInstance = null;
+        
+        const chartData = {
+            pre: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [
+                    {
+                        label: 'New Data Products Deployed',
+                        data: [5, 6, 5, 8],
+                        borderColor: '#9ca3af', // stone-400
+                        backgroundColor: 'rgba(156, 163, 175, 0.2)',
+                        type: 'bar',
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Time to Access Data (Days)',
+                        data: [25, 28, 24, 30],
+                        borderColor: '#dc2626', // red-600
+                        borderWidth: 3,
+                        tension: 0.3,
+                        type: 'line',
+                        yAxisID: 'y1'
+                    }
+                ],
+                insight: "In a pre-mesh centralized model, output is stagnant. As demand grows, the centralized team becomes a bottleneck, leading to increased waiting times for data access."
+            },
+            post: {
+                labels: ['Q1 (Init)', 'Q2 (Adopt)', 'Q3 (Scale)', 'Q4 (Mature)'],
+                datasets: [
+                    {
+                        label: 'New Data Products Deployed',
+                        data: [8, 15, 32, 55],
+                        borderColor: '#0f766e', // teal-700
+                        backgroundColor: 'rgba(15, 118, 110, 0.7)',
+                        type: 'bar',
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Time to Access Data (Days)',
+                        data: [20, 10, 2, 0.5], // Days to hours
+                        borderColor: '#f59e0b', // amber-500
+                        borderWidth: 3,
+                        tension: 0.3,
+                        type: 'line',
+                        yAxisID: 'y1'
+                    }
+                ],
+                insight: "With Federated Computational Governance, domain teams deploy products autonomously (scaling exponentially). Automated policy enforcement drops access approval time from weeks to minutes."
+            }
+        };
+
+        function initChart() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            
+            // Custom plugin to wrap long labels if necessary (though short here)
+            const wrapLabelsPlugin = {
+                id: 'wrapLabels',
+                beforeInit: function(chart) {
+                   // Label wrapping logic implemented via chart.js defaults below
+                }
+            };
+
+            impactChartInstance = new Chart(ctx, {
+                data: chartData.post, // Start with post
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // CRITICAL for container constraints
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            backgroundColor: 'rgba(28, 25, 23, 0.9)',
+                            padding: 12,
+                            titleFont: { size: 14, family: 'Inter' },
+                            bodyFont: { size: 13, family: 'Inter' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Products Deployed', color: '#57534e' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Access Wait Time (Days)', color: '#57534e' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(scenario) {
+            const data = chartData[scenario];
+            impactChartInstance.data = data;
+            impactChartInstance.update();
+            
+            const insightText = document.getElementById('chart-insight');
+            insightText.style.opacity = 0;
+            setTimeout(() => {
+                insightText.innerText = data.insight;
+                insightText.style.opacity = 1;
+            }, 300);
+            
+            // Update buttons visually
+            const btns = document.querySelectorAll('button[onclick^="updateChart"]');
+            btns.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(scenario)) {
+                    btn.className = "px-3 py-1 text-sm rounded border border-teal-600 bg-teal-600 text-white hover:bg-teal-700 transition-colors";
+                } else {
+                    btn.className = "px-3 py-1 text-sm rounded border border-stone-300 bg-stone-100 hover:bg-stone-200 transition-colors text-stone-700";
+                }
+            });
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            // Ensure insight text transitions smoothly
+            document.getElementById('chart-insight').style.transition = "opacity 0.3s ease";
+        });
+
+    </script>
+
+</body></html>

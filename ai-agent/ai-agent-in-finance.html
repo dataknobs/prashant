@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AI in Finance: Sector Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#f4f1eb', // Warm neutral background
+                            DEFAULT: '#2c3e50', // Deep sophisticated blue/gray
+                            accent: '#c87c53', // Muted terracotta
+                            success: '#5b7c75', // Muted sage green
+                            surface: '#ffffff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f4f1eb; color: #2c3e50; font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Merriweather', serif; }
+        
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 350px; 
+            max-height: 400px; 
+        }
+        
+        @media (max-width: 768px) { 
+            .chart-container { height: 280px; } 
+        }
+
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-btn.active { 
+            background-color: #2c3e50; 
+            color: #ffffff; 
+            border-bottom: 4px solid #c87c53;
+        }
+        .tab-btn:hover:not(.active) { background-color: #e2dfd8; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f4f1eb; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Warm Neutrals with Deep Blue/Gray and Terracotta Accents (Minimalist Finance) -->
+    <!-- Application Structure Plan: The application is structured as a single-page interactive dashboard. It begins with a 'Global Overview' to set the context on AI adoption across finance. The core is the 'Sector Explorer', a tabbed interface allowing users to drill down into specific financial domains (Banks, PE, PC, Commercial Lending, Fintech). This structure was chosen because financial professionals often specialize in one area but need awareness of macroeconomic trends; tabs provide focused, uncluttered views of specific use cases without overwhelming the user. Finally, an 'AI Agent Simulator' provides an interactive, task-oriented demonstration of how an AI might output data. -->
+    <!-- Visualization & Content Choices: 
+         1. Overview: Goal is to inform on macro trends -> Horizontal Bar Chart (Adoption) & Doughnut (Savings) -> Chart.js.
+         2. Sector Explorer: Goal is to detail use cases and show specific metrics -> Text Cards for use cases + interactive Line/Bar charts depending on the sector's key metric (e.g., Time series for processing time, Bar for accuracy) -> Chart.js + Tailwind CSS grids.
+         3. AI Simulator: Goal is to demonstrate interaction -> Dropdown + dynamic text/chart generation -> Vanilla JS state management.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-brand text-brand-surface py-8 shadow-md border-b-4 border-brand-accent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-bold mb-2">AI Agent Application in Finance</h1>
+            <p class="text-xl text-gray-300 font-light max-w-3xl">An interactive exploration of artificial intelligence use cases, adoption metrics, and transformative impact across private equity, commercial lending, banking, and fintech.</p>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <section class="glass-panel rounded-xl p-6 md:p-8" id="overview">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-brand border-b-2 border-brand-light pb-2 inline-block">Macro Landscape: The AI Transformation</h2>
+                <p class="mt-4 text-gray-700 leading-relaxed">
+                    This section provides a high-level view of how deeply Artificial Intelligence is penetrating various sectors of the financial industry. By analyzing adoption rates and projected cost savings, we can understand the magnitude of AI's impact. These metrics form the baseline for the specific use cases explored in the sections below.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-center mb-2">AI Adoption Rate by Sector (2025 Est.)</h3>
+                    <p class="text-sm text-gray-500 text-center mb-4">Percentage of institutions deploying AI models in production.</p>
+                    <div class="chart-container">
+                        <canvas id="adoptionChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-center mb-2">Projected Annual Cost Savings</h3>
+                    <p class="text-sm text-gray-500 text-center mb-4">Estimated global savings (in Billions USD) driven by operational efficiencies.</p>
+                    <div class="chart-container">
+                        <canvas id="savingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-200" id="sector-explorer">
+            <div class="bg-brand text-white p-6 pb-0">
+                <h2 class="text-2xl font-bold mb-2">Sector Use Case Explorer</h2>
+                <p class="text-gray-300 text-sm mb-6">
+                    Select a financial sector below to reveal tailored AI applications. This interactive module isolates the specific workflows and performance metrics where AI agents are driving the most value for each distinct market segment.
+                </p>
+                
+                <div class="flex flex-wrap gap-2 pb-0 border-b border-gray-600" id="sector-tabs">
+                    <button class="tab-btn active px-6 py-3 rounded-t-lg font-semibold text-sm focus:outline-none" data-sector="banks">Retail &amp; Inv. Banks</button>
+                    <button class="tab-btn px-6 py-3 rounded-t-lg font-semibold text-sm focus:outline-none bg-white/10 text-gray-200" data-sector="privateEquity">Private Equity</button>
+                    <button class="tab-btn px-6 py-3 rounded-t-lg font-semibold text-sm focus:outline-none bg-white/10 text-gray-200" data-sector="privateCredit">Private Credit</button>
+                    <button class="tab-btn px-6 py-3 rounded-t-lg font-semibold text-sm focus:outline-none bg-white/10 text-gray-200" data-sector="commercialLending">Commercial Lending</button>
+                    <button class="tab-btn px-6 py-3 rounded-t-lg font-semibold text-sm focus:outline-none bg-white/10 text-gray-200" data-sector="fintech">Fintech &amp; Others</button>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8 bg-white" id="sector-content">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <div class="lg:col-span-5 flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-4xl text-brand-accent" id="sector-icon">🏨</span>
+                            <h3 class="text-3xl font-bold text-brand" id="sector-title">Retail &amp; Inv. Banks</h3>
+                        </div>
+                        <p class="text-gray-600 mb-6 leading-relaxed" id="sector-desc">
+                            Banks are utilizing AI to overhaul legacy systems, significantly improving fraud detection rates while deploying autonomous agents to handle tier-1 customer support inquiries 24/7.
+                        </p>
+                        
+                        <h4 class="font-bold text-gray-800 mb-3 border-b pb-2 uppercase text-xs tracking-wider">Primary AI Agent Use Cases</h4>
+                        <div class="space-y-3" id="use-cases-container">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-brand-light p-6 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="font-bold text-lg text-brand" id="chart-title">Impact Metric</h4>
+                                <p class="text-sm text-gray-500" id="chart-subtitle">Data visualization of AI performance</p>
+                            </div>
+                            <div class="bg-brand-success text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm" id="metric-highlight">
+                                High Impact
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="sectorChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-panel rounded-xl p-6 md:p-8 border-l-4 border-brand-accent" id="simulator">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-brand mb-2">Interactive AI Agent Simulator</h2>
+                <p class="text-gray-700">
+                    Experience how an AI Agent processes complex financial queries. Select a prompt from the dropdown to simulate the agent extracting data, performing analysis, and generating visual reports on demand.
+                </p>
+            </div>
+
+            <div class="bg-gray-900 rounded-lg shadow-inner p-1">
+                <div class="bg-gray-800 rounded-t-md p-3 flex items-center justify-between border-b border-gray-700">
+                    <div class="flex space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div class="text-gray-400 text-xs font-mono">finance_agent_v2.1 — Terminal</div>
+                </div>
+                
+                <div class="p-4 md:p-6 bg-gray-900 rounded-b-md text-gray-300 font-mono text-sm md:text-base space-y-4">
+                    <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                        <span class="text-brand-success font-bold">User &gt;</span>
+                        <select class="w-full md:w-auto bg-gray-800 text-white border border-gray-600 rounded p-2 focus:ring-2 focus:ring-brand-accent outline-none" id="sim-prompt">
+                            <option value="none">-- Select a task for the AI Agent --</option>
+                            <option value="portfolio_risk">Analyze Portfolio Risk (Private Credit)</option>
+                            <option value="market_sentiment">Synthesize Market Sentiment (Equities)</option>
+                            <option value="loan_approval">Automate Loan Underwriting (Commercial)</option>
+                        </select>
+                        <button class="bg-brand-accent hover:bg-orange-700 text-white px-4 py-2 rounded transition-colors w-full md:w-auto" id="run-sim-btn">Execute</button>
+                    </div>
+
+                    <div class="hidden text-yellow-400 animate-pulse" id="sim-loading">
+                        [System] Processing multi-modal financial data... Agent compiling response...
+                    </div>
+
+                    <div class="hidden border-t border-gray-700 pt-4 mt-4" id="sim-output">
+                        <div class="flex items-start gap-3">
+                            <span class="text-blue-400 font-bold mt-1">Agent &gt;</span>
+                            <div class="flex-grow space-y-4">
+                                <p class="leading-relaxed text-gray-100" id="sim-text-response"></p>
+                                <div class="bg-white rounded p-2 max-w-2xl mx-auto">
+                                    <div class="chart-container h-48 sm:h-64">
+                                        <canvas id="simChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <script>
+        const sectorData = {
+            banks: {
+                title: "Retail & Investment Banks",
+                icon: "&#127976;", 
+                desc: "Banks are utilizing AI to overhaul legacy systems, significantly improving fraud detection rates while deploying autonomous agents to handle tier-1 customer support inquiries 24/7.",
+                highlight: "Fraud Detection +40%",
+                useCases: [
+                    { icon: "&#128373;", title: "Real-time Fraud Detection", detail: "ML models analyzing transaction patterns to flag anomalies instantly." },
+                    { icon: "&#129302;", title: "Conversational Agents", detail: "LLM-powered chatbots handling complex customer account inquiries." },
+                    { icon: "&#128200;", title: "Algorithmic Trading", detail: "Predictive agents executing high-frequency trades based on market sentiment." }
+                ],
+                chart: {
+                    type: 'bar',
+                    title: "Fraud Detection Accuracy (%)",
+                    subtitle: "Legacy Rules vs AI-Driven Models",
+                    labels: ['False Positives', 'True Fraud Caught', 'Processing Speed'],
+                    datasets: [
+                        { label: 'Legacy Rules', data: [35, 60, 40], backgroundColor: '#94a3b8' },
+                        { label: 'AI Agent System', data: [12, 94, 95], backgroundColor: '#c87c53' }
+                    ]
+                }
+            },
+            privateEquity: {
+                title: "Private Equity",
+                icon: "&#128188;",
+                desc: "In PE, AI agents are revolutionizing deal origination and due diligence. Natural language processing models rapidly ingest thousands of target company documents to surface risks and opportunities.",
+                highlight: "Due Diligence Time -60%",
+                useCases: [
+                    { icon: "&#128269;", title: "Deal Sourcing", detail: "Web scraping agents identifying non-obvious acquisition targets." },
+                    { icon: "&#128196;", title: "Automated Due Diligence", detail: "Agentic extraction of key clauses from virtual data rooms (VDRs)." },
+                    { icon: "&#128202;", title: "Portfolio Value Creation", detail: "Predictive analytics applied to portco operational data." }
+                ],
+                chart: {
+                    type: 'line',
+                    title: "Average Days Spent on Due Diligence",
+                    subtitle: "Pre-AI vs Agentic Integration Timeline",
+                    labels: ['Phase 1 (Financials)', 'Phase 2 (Legal)', 'Phase 3 (Tech)', 'Phase 4 (Market)'],
+                    datasets: [
+                        { label: 'Traditional Analyst Team', data: [14, 21, 10, 15], borderColor: '#2c3e50', fill: false, tension: 0.1 },
+                        { label: 'AI-Augmented Team', data: [3, 5, 2, 4], borderColor: '#5b7c75', backgroundColor: 'rgba(91, 124, 117, 0.2)', fill: true, tension: 0.4 }
+                    ]
+                }
+            },
+            privateCredit: {
+                title: "Private Credit",
+                icon: "&#128176;",
+                desc: "Private Credit firms deploy AI to continuously monitor borrower covenants and predict cash flow disruptions before they occur, shifting risk management from reactive to proactive.",
+                highlight: "Predictive Accuracy: 88%",
+                useCases: [
+                    { icon: "&#128209;", title: "Covenant Monitoring", detail: "Agents reading financial statements to verify compliance automatically." },
+                    { icon: "&#9888;&#65039;", title: "Early Warning Systems", detail: "Predicting default probability using alternative data signals." },
+                    { icon: "&#128181;", title: "Cash Flow Forecasting", detail: "Deep learning models simulating various macroeconomic stress scenarios." }
+                ],
+                chart: {
+                    type: 'doughnut',
+                    title: "Default Prediction Lead Time",
+                    subtitle: "When does the system flag high risk?",
+                    labels: ['< 1 Month before', '1-3 Months', '3-6 Months', '6+ Months Lead Time'],
+                    datasets: [{
+                        data: [5, 15, 45, 35],
+                        backgroundColor: ['#e2e8f0', '#94a3b8', '#5b7c75', '#c87c53']
+                    }]
+                }
+            },
+            commercialLending: {
+                title: "Commercial Lending",
+                icon: "&#127981;",
+                desc: "Commercial lenders utilize AI to drastically reduce the friction in underwriting. Intelligent Document Processing (IDP) agents extract data from tax returns and appraisals in seconds.",
+                highlight: "Origination Cost -30%",
+                useCases: [
+                    { icon: "&#9201;&#65039;", title: "Automated Underwriting", detail: "Instant pre-approvals based on integrated API data streams." },
+                    { icon: "&#128193;", title: "Intelligent Document Processing", detail: "OCR + LLMs extracting unstructured data from complex PDFs." },
+                    { icon: "&#127758;", title: "ESG Scoring", detail: "Agents assessing climate risk and sustainability metrics of commercial properties." }
+                ],
+                chart: {
+                    type: 'bar',
+                    title: "Loan Processing Time (Days)",
+                    subtitle: "By Loan Complexity",
+                    labels: ['Small Business ($100k)', 'Mid-Market ($5M)', 'Complex CRE ($50M+)'],
+                    datasets: [
+                        { label: 'Traditional Process', data: [14, 45, 90], backgroundColor: '#2c3e50' },
+                        { label: 'AI Agent Process', data: [1, 12, 35], backgroundColor: '#5b7c75' }
+                    ]
+                }
+            },
+            fintech: {
+                title: "Fintech & Wealthtech",
+                icon: "&#128187;",
+                desc: "Fintechs are the native adopters of AI, using it to create hyper-personalized user experiences, advanced robo-advisors, and alternative credit scoring models for the unbanked.",
+                highlight: "User Engagement +300%",
+                useCases: [
+                    { icon: "&#127919;", title: "Hyper-Personalization", detail: "App interfaces that adapt based on user spending habits." },
+                    { icon: "&#129297;", title: "Advanced Robo-Advisors", detail: "Agents dynamically rebalancing portfolios based on tax-loss harvesting and news sentiment." },
+                    { icon: "&#128275;", title: "Alternative Credit Scoring", detail: "Using utility payments and telco data to score thin-file customers." }
+                ],
+                chart: {
+                    type: 'radar',
+                    title: "Fintech Capability Maturity",
+                    subtitle: "Traditional vs GenAI Native",
+                    labels: ['Personalization', 'Risk Assessment', 'Customer Ops', 'Speed to Market', 'Yield Gen'],
+                    datasets: [
+                        { label: 'Traditional Fintech', data: [60, 70, 50, 65, 55], borderColor: '#94a3b8', backgroundColor: 'rgba(148, 163, 184, 0.2)' },
+                        { label: 'AI-First Fintech', data: [95, 90, 85, 95, 80], borderColor: '#c87c53', backgroundColor: 'rgba(200, 124, 83, 0.4)' }
+                    ]
+                }
+            }
+        };
+
+        // State Variables
+        let currentSectorChart = null;
+        let simChartInstance = null;
+
+        // Common Chart Options
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'Inter' } } },
+                tooltip: { backgroundColor: 'rgba(44, 62, 80, 0.9)', titleFont: { size: 14 }, bodyFont: { size: 13 }, padding: 10, cornerRadius: 4 }
+            }
+        };
+
+        // Initialize Global Overview Charts
+        function initOverviewCharts() {
+            const ctxAdoption = document.getElementById('adoptionChart').getContext('2d');
+            new Chart(ctxAdoption, {
+                type: 'bar',
+                data: {
+                    labels: ['Fintech', 'Banks', 'Comm. Lending', 'Private Equity', 'Private Credit'],
+                    datasets: [{
+                        label: 'Adoption Rate (%)',
+                        data: [85, 65, 45, 30, 25],
+                        backgroundColor: ['#c87c53', '#2c3e50', '#5b7c75', '#94a3b8', '#cbd5e1'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...defaultChartOptions,
+                    indexAxis: 'y', // Horizontal bar
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, max: 100 } }
+                }
+            });
+
+            const ctxSavings = document.getElementById('savingsChart').getContext('2d');
+            new Chart(ctxSavings, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Back Office Ops', 'Fraud/Risk Mgmt', 'Customer Service', 'Underwriting', 'Trading/Alpha'],
+                    datasets: [{
+                        data: [120, 85, 60, 45, 30],
+                        backgroundColor: ['#2c3e50', '#5b7c75', '#c87c53', '#e2e8f0', '#94a3b8'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    ...defaultChartOptions,
+                    cutout: '65%'
+                }
+            });
+        }
+
+        // Render Sector Explorer Content
+        function renderSector(sectorKey) {
+            const data = sectorData[sectorKey];
+            if (!data) return;
+
+            // Update DOM text
+            document.getElementById('sector-title').textContent = data.title;
+            document.getElementById('sector-icon').innerHTML = data.icon;
+            document.getElementById('sector-desc').textContent = data.desc;
+            document.getElementById('metric-highlight').textContent = data.highlight;
+            document.getElementById('chart-title').textContent = data.chart.title;
+            document.getElementById('chart-subtitle').textContent = data.chart.subtitle;
+
+            // Build Use Cases
+            const ucContainer = document.getElementById('use-cases-container');
+            ucContainer.innerHTML = '';
+            data.useCases.forEach(uc => {
+                const div = document.createElement('div');
+                div.className = 'bg-white border border-gray-100 p-4 rounded-lg shadow-sm flex items-start gap-4 transition-transform hover:-translate-y-1';
+                div.innerHTML = `
+                    <div class="text-2xl mt-1">${uc.icon}</div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-sm">${uc.title}</h5>
+                        <p class="text-xs text-gray-500 mt-1">${uc.detail}</p>
+                    </div>
+                `;
+                ucContainer.appendChild(div);
+            });
+
+            // Update Chart
+            if (currentSectorChart) currentSectorChart.destroy();
+            
+            const ctx = document.getElementById('sectorChart').getContext('2d');
+            
+            let specificOptions = { ...defaultChartOptions };
+            if (data.chart.type === 'bar') {
+                 specificOptions.scales = { y: { beginAtZero: true } };
+            } else if (data.chart.type === 'line') {
+                 specificOptions.scales = { y: { beginAtZero: true } };
+                 specificOptions.plugins.tooltip.mode = 'index';
+                 specificOptions.plugins.tooltip.intersect = false;
+            } else if (data.chart.type === 'radar') {
+                 specificOptions.scales = { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 100 } };
+            }
+
+            currentSectorChart = new Chart(ctx, {
+                type: data.chart.type,
+                data: {
+                    labels: data.chart.labels,
+                    datasets: data.chart.datasets
+                },
+                options: specificOptions
+            });
+        }
+
+        // Setup Tab Navigation
+        function setupTabs() {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Update active styling
+                    buttons.forEach(b => {
+                        b.classList.remove('active');
+                        b.classList.add('bg-white/10', 'text-gray-200');
+                    });
+                    e.target.classList.add('active');
+                    e.target.classList.remove('bg-white/10', 'text-gray-200');
+
+                    // Render content
+                    const sectorKey = e.target.getAttribute('data-sector');
+                    renderSector(sectorKey);
+                });
+            });
+        }
+
+        // Simulator Logic
+        function runSimulator() {
+            const select = document.getElementById('sim-prompt');
+            const outputArea = document.getElementById('sim-output');
+            const loadingArea = document.getElementById('sim-loading');
+            const textResponse = document.getElementById('sim-text-response');
+            const val = select.value;
+
+            if (val === 'none') return;
+
+            // Hide output, show loading
+            outputArea.classList.add('hidden');
+            loadingArea.classList.remove('hidden');
+
+            // Simulate API delay
+            setTimeout(() => {
+                loadingArea.classList.add('hidden');
+                outputArea.classList.remove('hidden');
+
+                if (simChartInstance) simChartInstance.destroy();
+                const ctx = document.getElementById('simChart').getContext('2d');
+
+                let chartType, chartData, chartOptions, responseText;
+
+                switch(val) {
+                    case 'portfolio_risk':
+                        responseText = "Analyzed 45 portfolio companies. Identified 3 companies with deteriorating cash conversion cycles. Overall portfolio health remains stable, but sector concentration in commercial real estate requires hedging.";
+                        chartType = 'scatter';
+                        chartData = {
+                            datasets: [{
+                                label: 'Portfolio Companies (Risk vs Yield)',
+                                data: Array.from({length: 45}, () => ({x: Math.random() * 10, y: Math.random() * 15 + 5})),
+                                backgroundColor: '#c87c53'
+                            }]
+                        };
+                        chartOptions = { ...defaultChartOptions, scales: { x: { title: { display: true, text: 'Default Risk Score'}}, y: { title: { display: true, text: 'Expected Yield (%)'}}} };
+                        break;
+                    case 'market_sentiment':
+                        responseText = "Ingested 15,000 news articles and earnings call transcripts over the last 24 hours. Sentiment around AI chip manufacturers is strongly positive, while retail sector sentiment is trending negative due to consumer spending reports.";
+                        chartType = 'line';
+                        chartData = {
+                            labels: ['-5 Days', '-4 Days', '-3 Days', '-2 Days', 'Yesterday', 'Today'],
+                            datasets: [
+                                { label: 'Tech Sentiment Score', data: [60, 65, 62, 70, 85, 90], borderColor: '#5b7c75', tension: 0.3 },
+                                { label: 'Retail Sentiment Score', data: [55, 50, 48, 45, 40, 35], borderColor: '#e28743', tension: 0.3 }
+                            ]
+                        };
+                        chartOptions = { ...defaultChartOptions };
+                        break;
+                    case 'loan_approval':
+                        responseText = "Applicant Data Extracted. Bank statements verified via Plaid API. Tax returns cross-referenced. Debt-to-Income ratio is within threshold. Risk profile: LOW. Recommendation: Automated Approval for $250,000 credit facility.";
+                        chartType = 'doughnut';
+                        chartData = {
+                            labels: ['Credit Score Weight', 'Cash Flow Weight', 'Collateral Weight', 'Industry Risk'],
+                            datasets: [{
+                                data: [40, 35, 15, 10],
+                                backgroundColor: ['#2c3e50', '#5b7c75', '#c87c53', '#94a3b8']
+                            }]
+                        };
+                        chartOptions = { ...defaultChartOptions, cutout: '50%', plugins: { title: { display: true, text: 'Decision Weighting' }} };
+                        break;
+                }
+
+                textResponse.innerHTML = responseText;
+                
+                simChartInstance = new Chart(ctx, {
+                    type: chartType,
+                    data: chartData,
+                    options: chartOptions
+                });
+
+            }, 1200);
+        }
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            initOverviewCharts();
+            setupTabs();
+            renderSector('banks'); // Load initial sector
+            
+            document.getElementById('run-sim-btn').addEventListener('click', runSimulator);
+            document.getElementById('sim-prompt').addEventListener('change', () => {
+                // Reset view when dropdown changes
+                document.getElementById('sim-output').classList.add('hidden');
+                document.getElementById('sim-loading').classList.add('hidden');
+            });
+        });
+
+    </script>
+
+</body></html>

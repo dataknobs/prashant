@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Data Quality for Data Product Development</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutrals with Trust Blue and Alert Amber -->
+    <!-- Application Structure Plan: A single-page scrolling dashboard with a sticky sidebar for navigation. The structure is designed for a logical narrative flow: 1) The 'Why' (Business Impact), 2) The 'What' (The 6 Dimensions of Data Quality), and 3) The 'How' (Lifecycle Integration). Interactive grids and toggleable charts allow users to drill down into specific metrics without leaving the context of the main narrative, reducing cognitive load compared to a static, multi-page PDF report. -->
+    <!-- Visualization & Content Choices: 
+         1. Impact -> Goal: Compare -> Viz: Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Clearly contrasts the financial impact of good vs. poor data quality. 
+         2. Dimensions -> Goal: Organize/Inform -> Viz: Radar Chart (Chart.js) + Interactive Grid -> Interaction: Click grid items to update focus area -> Justification: Radar chart perfectly illustrates multidimensional balance; clicking isolates details without clutter. 
+         3. Lifecycle -> Goal: Change/Process -> Viz: CSS/HTML Flowchart + Line Chart (Chart.js) -> Interaction: Click process stages to see anomaly trends -> Justification: Shows how data quality changes over time and pipeline stages. 
+         Methods confirm NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC; /* Slate 50 */
+            color: #1E293B; /* Slate 800 */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #F1F5F9; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        /* Chart Container Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 380px; }
+        }
+
+        /* Utility classes for NO SVG icons (using unicode/CSS) */
+        .icon-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 1.5rem;
+        }
+        
+        .active-tab {
+            border-left: 4px solid #0EA5E9;
+            background-color: #F0F9FF;
+            color: #0369A1;
+        }
+
+        .pipeline-stage {
+            transition: all 0.2s ease;
+        }
+        .pipeline-stage.active {
+            background-color: #0EA5E9;
+            color: white;
+            border-color: #0284C7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen overflow-x-hidden">
+
+    <!-- Sidebar Navigation -->
+    <nav class="w-full md:w-64 bg-white border-r border-slate-200 shadow-sm fixed md:sticky top-0 z-50 md:h-screen overflow-y-auto">
+        <div class="p-6">
+            <h1 class="text-xl font-bold text-slate-900 leading-tight">Data Quality <br/><span class="text-sky-600 font-medium text-lg">for Data Products</span></h1>
+            <p class="text-xs text-slate-500 mt-2">Interactive Research Report</p>
+        </div>
+        <ul class="flex flex-row md:flex-col overflow-x-auto md:overflow-visible border-b md:border-b-0 border-slate-200">
+            <li><a class="block px-6 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-sky-600 whitespace-nowrap active-nav" href="#exec-summary" id="nav-exec-summary">Executive Summary</a></li>
+            <li><a class="block px-6 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-sky-600 whitespace-nowrap" href="#business-impact" id="nav-business-impact">Business Impact</a></li>
+            <li><a class="block px-6 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-sky-600 whitespace-nowrap" href="#dq-dimensions" id="nav-dq-dimensions">The 6 Dimensions</a></li>
+            <li><a class="block px-6 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-sky-600 whitespace-nowrap" href="#lifecycle" id="nav-lifecycle">Lifecycle Integration</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full max-w-7xl mx-auto p-6 md:p-10 lg:p-12 mt-32 md:mt-0">
+        
+        <!-- Section: Executive Summary -->
+        <section class="mb-20 scroll-mt-10" id="exec-summary">
+            <div class="mb-8">
+                <span class="bg-sky-100 text-sky-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Introduction</span>
+                <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-4 text-slate-900">Treating Data as a Product</h2>
+                <p class="text-lg text-slate-600 leading-relaxed max-w-4xl">
+                    In the era of AI and advanced analytics, data can no longer be treated as a passive byproduct of applications. It must be managed as a <strong>first-class product</strong>. This section outlines the paradigm shift required. Just as software products have strict quality assurance (QA) processes, data products require rigorous, continuous data quality (DQ) management to ensure trust, usability, and value.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="icon-box bg-emerald-100 text-emerald-600 mb-4">🔑</div>
+                    <h3 class="text-lg font-bold mb-2">The Key Mandate</h3>
+                    <p class="text-sm text-slate-600">Data products (APIs, dashboards, ML models) are only as reliable as their underlying data. Poor quality directly translates to product failure.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="icon-box bg-amber-100 text-amber-600 mb-4">⚠️</div>
+                    <h3 class="text-lg font-bold mb-2">The Silent Killer</h3>
+                    <p class="text-sm text-slate-600">Silent data failures—where pipelines run successfully but data is semantically wrong—cost enterprises millions in flawed decision-making.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="icon-box bg-indigo-100 text-indigo-600 mb-4">📈</div>
+                    <h3 class="text-lg font-bold mb-2">The Shift Left</h3>
+                    <p class="text-sm text-slate-600">Quality must be enforced at the point of ingestion (Shift Left), not patched at the dashboard layer. Prevention is cheaper than remediation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Business Impact -->
+        <section class="mb-20 scroll-mt-10" id="business-impact">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">The Cost of Poor Data Quality (COPQ)</h2>
+                <p class="text-slate-600 leading-relaxed max-w-4xl">
+                    This section visualizes the financial and operational friction caused by ignoring data quality. Review the chart below to understand the distribution of hidden costs associated with unreliable data products. Interact by hovering over the bars to see specific monetary impacts across different operational categories.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col lg:flex-row gap-8 items-center">
+                    <div class="w-full lg:w-1/3 space-y-6">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
+                            <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Average Annual Cost</h4>
+                            <div class="text-4xl font-bold text-slate-900 mt-1">$12.9M</div>
+                            <p class="text-xs text-slate-500 mt-2">For a mid-to-large enterprise, factoring in wasted time and lost opportunities.</p>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <span class="text-rose-500 mr-2 mt-0.5">✘</span>
+                                <span class="text-sm text-slate-700"><strong>Data Downtime:</strong> Time spent by engineers fixing broken pipelines instead of building features.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-amber-500 mr-2 mt-0.5">⚠️</span>
+                                <span class="text-sm text-slate-700"><strong>Lost Revenue:</strong> Missed cross-sell opportunities due to incomplete customer profiles.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-sky-500 mr-2 mt-0.5">ℹ️</span>
+                                <span class="text-sm text-slate-700"><strong>Erosion of Trust:</strong> Business users abandoning dashboards and reverting to localized spreadsheets.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="w-full lg:w-2/3">
+                        <div class="chart-container">
+                            <canvas id="copqChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: The 6 Dimensions -->
+        <section class="mb-20 scroll-mt-10" id="dq-dimensions">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">The 6 Dimensions of Data Quality</h2>
+                <p class="text-slate-600 leading-relaxed max-w-4xl">
+                    Data quality is not a single metric; it is a composite of several dimensions. This interactive matrix allows you to explore the standard framework for measuring data health. <strong>Click on any of the six dimension cards below</strong> to see its definition, how it is calculated, and its specific impact on the overall radar chart profile of a typical enterprise data product.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Interactive Grid -->
+                <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <button class="dq-card-btn text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-sky-300 hover:shadow-md transition-all active-tab focus:outline-none" data-dimension="accuracy">
+                        <div class="text-2xl mb-2">🎯</div>
+                        <h4 class="font-bold text-slate-800">Accuracy</h4>
+                        <div class="text-xs text-slate-500 mt-1">Reflects reality</div>
+                    </button>
+                    <button class="dq-card-btn text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-sky-300 hover:shadow-md transition-all focus:outline-none" data-dimension="completeness">
+                        <div class="text-2xl mb-2">🧩</div>
+                        <h4 class="font-bold text-slate-800">Completeness</h4>
+                        <div class="text-xs text-slate-500 mt-1">No missing values</div>
+                    </button>
+                    <button class="dq-card-btn text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-sky-300 hover:shadow-md transition-all focus:outline-none" data-dimension="consistency">
+                        <div class="text-2xl mb-2">🔁</div>
+                        <h4 class="font-bold text-slate-800">Consistency</h4>
+                        <div class="text-xs text-slate-500 mt-1">Matches across systems</div>
+                    </button>
+                    <button class="dq-card-btn text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-sky-300 hover:shadow-md transition-all focus:outline-none" data-dimension="timeliness">
+                        <div class="text-2xl mb-2">⏱️</div>
+                        <h4 class="font-bold text-slate-800">Timeliness</h4>
+                        <div class="text-xs text-slate-500 mt-1">Fresh and available</div>
+                    </button>
+                    <button class="dq-card-btn text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-sky-300 hover:shadow-md transition-all focus:outline-none" data-dimension="validity">
+                        <div class="text-2xl mb-2">✔️</div>
+                        <h4 class="font-bold text-slate-800">Validity</h4>
+                        <div class="text-xs text-slate-500 mt-1">Matches rules/formats</div>
+                    </button>
+                    <button class="dq-card-btn text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-sky-300 hover:shadow-md transition-all focus:outline-none" data-dimension="uniqueness">
+                        <div class="text-2xl mb-2">🔑</div>
+                        <h4 class="font-bold text-slate-800">Uniqueness</h4>
+                        <div class="text-xs text-slate-500 mt-1">No duplicates</div>
+                    </button>
+                </div>
+
+                <!-- Dynamic Detail View & Chart -->
+                <div class="lg:col-span-5 flex flex-col">
+                    <div class="bg-white p-6 rounded-t-xl border border-b-0 border-slate-200 shadow-sm relative overflow-hidden">
+                        <!-- Dynamic Text Area -->
+                        <div class="relative z-10" id="dq-detail-content">
+                            <h3 class="text-2xl font-bold text-sky-700 flex items-center gap-2" id="dq-title">
+                                <span>🎯</span> Accuracy
+                            </h3>
+                            <p class="text-slate-600 mt-3 text-sm" id="dq-desc">The degree to which data correctly describes the "real world" object or event being described.</p>
+                            
+                            <div class="mt-5 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Example Metric</span>
+                                <p class="text-slate-800 font-medium text-sm mt-1" id="dq-metric">Percentage of CRM addresses that match official postal service records.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Radar Chart Container -->
+                    <div class="bg-white p-4 rounded-b-xl border border-slate-200 shadow-sm flex-1 flex flex-col justify-center">
+                        <div class="text-center text-xs text-slate-400 mb-2 font-semibold tracking-wider uppercase">Product Quality Profile</div>
+                        <div class="chart-container" style="height: 250px; max-height: 280px;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Lifecycle Integration -->
+        <section class="mb-20 scroll-mt-10" id="lifecycle">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">Continuous Quality Integration (The Lifecycle)</h2>
+                <p class="text-slate-600 leading-relaxed max-w-4xl">
+                    Data quality is not a one-time audit; it must be continuously monitored across the data lifecycle. The flowchart below maps the typical stages of a data product pipeline. <strong>Click on a pipeline stage</strong> (Ingestion, Transformation, or Serving) to analyze where data anomalies typically occur and view a 30-day trend of anomaly detection rates specific to that stage.
+                </p>
+            </div>
+
+            <!-- Interactive HTML Flowchart -->
+            <div class="bg-slate-900 rounded-2xl p-6 md:p-8 shadow-lg mb-8 text-white relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+                    
+                    <!-- Stage 1 -->
+                    <button class="pipeline-btn flex-1 w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 focus:outline-none pipeline-stage active" data-stage="ingestion">
+                        <div class="text-xs text-sky-400 font-bold uppercase tracking-wider mb-1">Stage 1</div>
+                        <h4 class="text-lg font-bold">Data Ingestion</h4>
+                        <p class="text-xs text-slate-400 mt-2 line-clamp-2">Extracting from source DBs, APIs, and streams. Catching schema drift.</p>
+                    </button>
+                    
+                    <!-- Arrow -->
+                    <div class="text-slate-500 hidden md:block text-2xl">➞</div>
+                    <div class="text-slate-500 block md:hidden text-2xl">⬇</div>
+
+                    <!-- Stage 2 -->
+                    <button class="pipeline-btn flex-1 w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 focus:outline-none pipeline-stage" data-stage="transformation">
+                        <div class="text-xs text-amber-400 font-bold uppercase tracking-wider mb-1">Stage 2</div>
+                        <h4 class="text-lg font-bold">Transformation</h4>
+                        <p class="text-xs text-slate-400 mt-2 line-clamp-2">Cleaning, joining, and aggregating. Enforcing business logic rules.</p>
+                    </button>
+
+                    <!-- Arrow -->
+                    <div class="text-slate-500 hidden md:block text-2xl">➞</div>
+                    <div class="text-slate-500 block md:hidden text-2xl">⬇</div>
+
+                    <!-- Stage 3 -->
+                    <button class="pipeline-btn flex-1 w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 focus:outline-none pipeline-stage" data-stage="serving">
+                        <div class="text-xs text-emerald-400 font-bold uppercase tracking-wider mb-1">Stage 3</div>
+                        <h4 class="text-lg font-bold">Product Serving</h4>
+                        <p class="text-xs text-slate-400 mt-2 line-clamp-2">Delivering to BI tools, ML models, or APIs. Checking freshness.</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Chart Area for Lifecycle -->
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800" id="trend-title">Anomaly Detection Trend: Ingestion Phase</h3>
+                        <p class="text-sm text-slate-500 mt-1" id="trend-desc">Monitoring schema changes, null volumes, and API timeouts at the source.</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex items-center gap-4 text-sm font-medium">
+                        <span class="flex items-center gap-1 text-slate-600"><span class="w-3 h-3 rounded-full bg-sky-500 inline-block"></span> Caught Anomalies</span>
+                        <span class="flex items-center gap-1 text-slate-600"><span class="w-3 h-3 rounded-full bg-rose-400 inline-block"></span> Passed to Next Stage</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="lifecycleChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    </main>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DATA STORE ---
+            
+            // Data for Dimensions section
+            const dimensionsData = {
+                accuracy: {
+                    title: "Accuracy",
+                    icon: "&#127919;",
+                    desc: "The degree to which data correctly describes the 'real world' object or event being described. High accuracy means the data is a true reflection of reality.",
+                    metric: "Example: Percentage of CRM addresses that successfully match official postal service verification records.",
+                    radarValues: [95, 80, 85, 90, 85, 90] // Target is high in Accuracy
+                },
+                completeness: {
+                    title: "Completeness",
+                    icon: "&#129513;",
+                    desc: "The proportion of stored data against the potential of 100% complete data. It answers: 'Are all required fields populated?'",
+                    metric: "Example: Percentage of user profile records missing a primary email address or mandatory demographic field.",
+                    radarValues: [80, 98, 85, 90, 85, 90]
+                },
+                consistency: {
+                    title: "Consistency",
+                    icon: "&#128257;",
+                    desc: "The absence of difference when comparing two or more representations of a thing against a definition. Data should be exactly the same across all systems.",
+                    metric: "Example: Checking if 'Total Revenue' in the Sales database matches 'Total Revenue' in the Finance ledger.",
+                    radarValues: [80, 80, 95, 90, 85, 90]
+                },
+                timeliness: {
+                    title: "Timeliness",
+                    icon: "&#9201;&#65039;",
+                    desc: "The degree to which data represents reality from the required point in time. Is the data fresh enough to support the business process?",
+                    metric: "Example: Time elapsed between a customer transaction occurring and it appearing in the real-time fraud detection model.",
+                    radarValues: [80, 80, 85, 99, 85, 90]
+                },
+                validity: {
+                    title: "Validity",
+                    icon: "&#10004;&#65039;",
+                    desc: "The degree to which data conforms to the defined business rules or constraints (e.g., format, type, range).",
+                    metric: "Example: Ensuring all 'IP Address' fields follow a valid IPv4 or IPv6 format regex structure.",
+                    radarValues: [80, 80, 85, 90, 96, 90]
+                },
+                uniqueness: {
+                    title: "Uniqueness",
+                    icon: "&#128273;",
+                    desc: "Nothing will be recorded more than once based upon how that thing is identified. Ensuring there are no redundant, duplicate records.",
+                    metric: "Example: The number of duplicated Customer IDs representing the exact same human being.",
+                    radarValues: [80, 80, 85, 90, 85, 95]
+                }
+            };
+
+            // Data for Lifecycle section (30 days mockup data)
+            const labels30Days = Array.from({length: 30}, (_, i) => `Day ${i+1}`);
+            const lifecycleData = {
+                ingestion: {
+                    title: "Anomaly Detection Trend: Ingestion Phase",
+                    desc: "Monitoring schema changes, null volumes, and API timeouts at the source system level.",
+                    caught: [120, 135, 125, 180, 140, 130, 120, 150, 400 /* spike */, 160, 140, 135, 120, 110, 130, 145, 155, 160, 140, 120, 110, 130, 140, 125, 115, 100, 110, 120, 130, 140],
+                    passed: [10, 15, 12, 18, 14, 13, 12, 15, 40, 16, 14, 13, 12, 11, 13, 14, 15, 16, 14, 12, 11, 13, 14, 12, 11, 10, 11, 12, 13, 14]
+                },
+                transformation: {
+                    title: "Anomaly Detection Trend: Transformation Phase",
+                    desc: "Identifying broken business logic, orphan records during joins, and calculation errors.",
+                    caught: [45, 50, 48, 55, 60, 45, 40, 42, 55, 65, 70 /* logic change */, 50, 45, 42, 40, 35, 38, 40, 45, 42, 38, 35, 40, 45, 48, 50, 45, 42, 40, 38],
+                    passed: [5, 4, 5, 6, 5, 4, 3, 4, 5, 6, 12, 5, 4, 3, 4, 3, 4, 3, 4, 5, 4, 3, 4, 5, 4, 5, 4, 3, 4, 3]
+                },
+                serving: {
+                    title: "Anomaly Detection Trend: Product Serving",
+                    desc: "Detecting stale data (freshness SLAs missed) or distribution shifts before models consume them.",
+                    caught: [10, 8, 12, 9, 11, 10, 15, 8, 9, 10, 12, 11, 8, 9, 14, 12, 10, 9, 8, 11, 10, 9, 8, 12, 11, 10, 9, 8, 10, 11],
+                    passed: [2, 1, 2, 1, 2, 1, 3, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 0, 1, 1, 1, 0, 2, 1, 1, 0, 1, 1, 1] // Needs to be near zero here
+                }
+            };
+
+            // Global Chart Options to ensure responsiveness inside constraints
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748B'; // slate-500
+            
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false, // CRITICAL: Allows CSS container to dictate height
+                plugins: {
+                    legend: { display: false }
+                }
+            };
+
+            // --- INITIALIZE CHARTS ---
+
+            // 1. Business Impact Bar Chart
+            const ctxCopq = document.getElementById('copqChart').getContext('2d');
+            const copqChart = new Chart(ctxCopq, {
+                type: 'bar',
+                data: {
+                    labels: ['Engineering Time (Fixing)', 'Lost Revenue (Missed Ops)', 'Compliance & Fines', 'Customer Churn', 'Compute Waste'],
+                    datasets: [{
+                        label: 'Estimated Annual Cost ($M)',
+                        data: [4.5, 3.2, 1.8, 2.5, 0.9],
+                        backgroundColor: [
+                            '#0EA5E9', // sky-500
+                            '#F59E0B', // amber-500
+                            '#F43F5E', // rose-500
+                            '#8B5CF6', // violet-500
+                            '#94A3B8'  // slate-400
+                        ],
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: '#1E293B',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14 },
+                            callbacks: {
+                                label: function(context) {
+                                    return ' $' + context.raw + ' Million';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#F1F5F9', drawBorder: false },
+                            ticks: { callback: function(value) { return '$' + value + 'M'; } }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { 
+                                maxRotation: 45, 
+                                minRotation: 45,
+                                callback: function(value) {
+                                    // Label wrapping logic (16-char max roughly before wrap via array)
+                                    const label = this.getLabelForValue(value);
+                                    if(label.length > 15) {
+                                        return label.split(' ('); // crude split for this specific chart
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Dimensions Radar Chart
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            const radarChart = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Accuracy', 'Completeness', 'Consistency', 'Timeliness', 'Validity', 'Uniqueness'],
+                    datasets: [
+                        {
+                            label: 'Current Profile',
+                            data: dimensionsData.accuracy.radarValues, // Start with accuracy focus
+                            backgroundColor: 'rgba(14, 165, 233, 0.2)', // sky-500 transparent
+                            borderColor: '#0EA5E9',
+                            pointBackgroundColor: '#0284C7',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#0EA5E9',
+                            borderWidth: 2,
+                        },
+                        {
+                            label: 'Industry Target',
+                            data: [95, 95, 95, 95, 95, 95],
+                            backgroundColor: 'rgba(203, 213, 225, 0.1)', // slate-300 transparent
+                            borderColor: '#CBD5E1',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            borderWidth: 2,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#E2E8F0' },
+                            grid: { color: '#E2E8F0' },
+                            pointLabels: {
+                                font: { size: 11, family: "'Inter', sans-serif", weight: '600' },
+                                color: '#475569'
+                            },
+                            ticks: { display: false, min: 0, max: 100 } // Hide scale numbers for cleaner look
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: '#1E293B', padding: 10 }
+                    }
+                }
+            });
+
+            // 3. Lifecycle Line Chart
+            const ctxLifecycle = document.getElementById('lifecycleChart').getContext('2d');
+            const lifecycleChart = new Chart(ctxLifecycle, {
+                type: 'line',
+                data: {
+                    labels: labels30Days,
+                    datasets: [
+                        {
+                            label: 'Anomalies Caught & Fixed',
+                            data: lifecycleData.ingestion.caught, // default to ingestion
+                            borderColor: '#0EA5E9', // sky-500
+                            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4 // Smooth curves
+                        },
+                        {
+                            label: 'Anomalies Passed (Leaked)',
+                            data: lifecycleData.ingestion.passed,
+                            borderColor: '#FB7185', // rose-400
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#F1F5F9', drawBorder: false },
+                            title: { display: true, text: 'Number of Anomalies', color: '#94A3B8', font: {size: 11} }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { maxTicksLimit: 10 }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: '#1E293B',
+                            padding: 12,
+                            usePointStyle: true,
+                        }
+                    }
+                }
+            });
+
+
+            // --- INTERACTIVITY LOGIC ---
+
+            // Functional Navigation Highlighting
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav ul li a');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (scrollY >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active-nav', 'border-l-4', 'border-sky-500', 'bg-slate-50', 'text-sky-700');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active-nav', 'border-l-4', 'border-sky-500', 'bg-slate-50', 'text-sky-700');
+                    }
+                });
+            });
+
+            // Dimensions Grid Interaction
+            const dqButtons = document.querySelectorAll('.dq-card-btn');
+            const dqTitle = document.getElementById('dq-title');
+            const dqDesc = document.getElementById('dq-desc');
+            const dqMetric = document.getElementById('dq-metric');
+
+            dqButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // UI Update
+                    dqButtons.forEach(b => {
+                        b.classList.remove('active-tab', 'border-sky-400', 'shadow-md');
+                        b.classList.add('border-slate-200');
+                    });
+                    this.classList.remove('border-slate-200');
+                    this.classList.add('active-tab', 'border-sky-400', 'shadow-md');
+
+                    // Data Update
+                    const dimKey = this.getAttribute('data-dimension');
+                    const data = dimensionsData[dimKey];
+                    
+                    dqTitle.innerHTML = `<span>${data.icon}</span> ${data.title}`;
+                    dqDesc.textContent = data.desc;
+                    dqMetric.textContent = data.metric;
+
+                    // Chart Update
+                    radarChart.data.datasets[0].data = data.radarValues;
+                    radarChart.update();
+                });
+            });
+
+            // Lifecycle Pipeline Interaction
+            const pipelineButtons = document.querySelectorAll('.pipeline-btn');
+            const trendTitle = document.getElementById('trend-title');
+            const trendDesc = document.getElementById('trend-desc');
+
+            pipelineButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // UI Update
+                    pipelineButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Data Update
+                    const stageKey = this.getAttribute('data-stage');
+                    const data = lifecycleData[stageKey];
+
+                    trendTitle.textContent = data.title;
+                    trendDesc.textContent = data.desc;
+
+                    // Chart Update
+                    lifecycleChart.data.datasets[0].data = data.caught;
+                    lifecycleChart.data.datasets[1].data = data.passed;
+                    
+                    // Adjust y-axis scale dynamically slightly to fit data better
+                    lifecycleChart.options.scales.y.suggestedMax = Math.max(...data.caught) * 1.2;
+                    lifecycleChart.update();
+                });
+            });
+        });
+    </script>
+
+</body></html>

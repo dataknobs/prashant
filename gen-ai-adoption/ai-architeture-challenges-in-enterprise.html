@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Enterprise AI Architecture: Deployment &amp; Models</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#F8FAFC', // slate-50 (warm/clean neutral)
+                            card: '#FFFFFF',
+                            textmain: '#1E293B', // slate-800
+                            textmuted: '#64748B', // slate-500
+                            accent1: '#3B82F6', // blue-500
+                            accent2: '#10B981', // emerald-500
+                            accent3: '#F59E0B', // amber-500
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Specific strict constraints for chart containers to prevent overflow */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-wrapper {
+                height: 400px;
+            }
+        }
+        
+        /* Custom scrollbar for inner interactive elements */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        /* Smooth transitions */
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-brand-bg text-brand-textmain font-sans antialiased">
+
+    <!-- Chosen Palette: Slate Neutrals with Blue/Emerald/Amber Accents -->
+    <!-- Application Structure Plan: The SPA uses a top-down scrollable dashboard structure. It starts with a high-level executive summary, flows into deployment infrastructure (Cloud vs On-Prem), dives into the models themselves (General vs Vertical LLMs), outlines evaluation criteria for AI Agents, and culminates in a functional LLM workflow visualization. This logical progression moves the user from 'Where do we host it?' to 'What model do we use?', 'How does it act?', and finally 'How is it built?'. Interactive toggles and tabs prevent information overload, keeping the UI clean and allowing exploratory learning. -->
+    <!-- Visualization & Content Choices: 
+         1. Deployment Stats -> Doughnut Chart (Chart.js) -> Hover/Click -> Shows market reality without overwhelming text.
+         2. Cloud vs On-Premises -> Interactive Buttons -> Click to swap pros/cons -> Allows side-by-side mental comparison.
+         3. General vs Vertical LLMs -> Radar Chart (Chart.js) -> Visual comparison across 5 axes (Cost, Accuracy, Latency, Privacy, Setup) -> Best way to show trade-offs.
+         4. Agent Criteria -> CSS Grid Cards -> Hover states -> Organizes the framework into digestible, interactive chunks.
+         5. LLM Workflow -> Interactive HTML Flowchart -> Click nodes to see details -> Explains complex architecture linearly without external SVG/Mermaid. 
+         All choices use standard HTML/CSS/Canvas to strictly adhere to NO SVG/Mermaid constraints. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-brand-accent1 tracking-tight">■ EnterpriseAI Insights</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="text-sm font-medium text-brand-textmuted hover:text-brand-accent1 transition-colors" href="#deployment">Deployment</a>
+                    <a class="text-sm font-medium text-brand-textmuted hover:text-brand-accent1 transition-colors" href="#models">LLM Strategy</a>
+                    <a class="text-sm font-medium text-brand-textmuted hover:text-brand-accent1 transition-colors" href="#agents">Agent Criteria</a>
+                    <a class="text-sm font-medium text-brand-textmuted hover:text-brand-accent1 transition-colors" href="#workflows">Workflows</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+
+        <!-- Header / Intro -->
+        <section class="text-center max-w-4xl mx-auto pt-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-textmain leading-tight mb-6">
+                Navigating the Enterprise AI Frontier
+            </h1>
+            <p class="text-lg md:text-xl text-brand-textmuted leading-relaxed">
+                As AI moves from experimental prototypes to production-grade systems, global enterprises are facing critical architectural decisions. This interactive report synthesizes the current trends in <strong>Infrastructure Deployment (Cloud vs. On-Premise)</strong>, <strong>Model Selection (General vs. Domain-Specific)</strong>, and the emerging criteria for autonomous <strong>AI Agents</strong>.
+            </p>
+        </section>
+
+        <!-- Section 1: Deployment Strategies -->
+        <section class="scroll-mt-24" id="deployment">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold border-b-2 border-brand-accent1 inline-block pb-2 mb-4">1. Infrastructure &amp; Deployment</h2>
+                <p class="text-brand-textmuted max-w-3xl">
+                    The debate between cloud and on-premise AI hosting is driven by data privacy, latency, and cost. While cloud offers speed and scalability, stringent regulatory environments are pushing a resurgence in specialized on-premise deployments. Explore the current market breakdown and compare the trade-offs below.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <!-- Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-semibold text-center mb-4">Enterprise AI Deployment Models (2025-2026 Projections)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="deploymentChart"></canvas>
+                    </div>
+                    <p class="text-sm text-center text-brand-textmuted mt-4">ⓘ Hybrid approaches dominate as companies balance agility with data sovereignty.</p>
+                </div>
+
+                <!-- Interactive Comparison -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col">
+                    <h3 class="text-lg font-semibold mb-6">Strategic Trade-offs</h3>
+                    
+                    <!-- Toggles -->
+                    <div class="flex bg-slate-100 p-1 rounded-lg mb-6">
+                        <button class="flex-1 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-brand-accent1 transition-all" id="btn-cloud" onclick="switchDeployment('cloud')">Public Cloud / SaaS</button>
+                        <button class="flex-1 py-2 text-sm font-semibold rounded-md text-brand-textmuted hover:text-brand-textmain transition-all" id="btn-onprem" onclick="switchDeployment('onprem')">On-Premise / VPC</button>
+                    </div>
+
+                    <!-- Dynamic Content Area -->
+                    <div class="flex-1" id="deployment-content">
+                        <!-- Default to Cloud -->
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <span class="text-brand-accent2 text-xl mr-3">✓</span>
+                                <div>
+                                    <strong class="block text-brand-textmain">Rapid Time-to-Market</strong>
+                                    <span class="text-sm text-brand-textmuted">Access to state-of-the-art models via APIs without hardware procurement delays.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-brand-accent2 text-xl mr-3">✓</span>
+                                <div>
+                                    <strong class="block text-brand-textmain">Elastic Scalability</strong>
+                                    <span class="text-sm text-brand-textmuted">Instantly scale compute resources up or down based on inference demand.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start mt-4 pt-4 border-t border-slate-100">
+                                <span class="text-brand-accent3 text-xl mr-3">⚠</span>
+                                <div>
+                                    <strong class="block text-brand-textmain">Data Privacy Concerns</strong>
+                                    <span class="text-sm text-brand-textmuted">Requires sending sensitive proprietary data over the network to third-party APIs.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-brand-accent3 text-xl mr-3">⚠</span>
+                                <div>
+                                    <strong class="block text-brand-textmain">Unpredictable OpEx</strong>
+                                    <span class="text-sm text-brand-textmuted">Per-token pricing can lead to runaway costs at high enterprise scale.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Model Strategy (General vs Vertical) -->
+        <section class="scroll-mt-24 bg-white p-8 rounded-3xl shadow-sm border border-slate-100" id="models">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold border-b-2 border-brand-accent1 inline-block pb-2 mb-4">2. The LLM Dilemma</h2>
+                <p class="text-brand-textmuted max-w-3xl mx-auto">
+                    Should enterprises rely on massive, general-purpose frontier models (like GPT-4), or deploy smaller, domain-specific open-source models (like Llama 3 fine-tuned for healthcare)? The paradigm is shifting toward a "Right Model for the Right Task" approach.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-12 gap-8 items-center">
+                <!-- Radar Chart -->
+                <div class="md:col-span-5">
+                    <div class="chart-wrapper h-[400px]">
+                        <canvas id="modelRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Model Breakdown Cards -->
+                <div class="md:col-span-7 space-y-6">
+                    
+                    <div class="interactive-card bg-slate-50 border border-slate-200 rounded-xl p-6 cursor-pointer hover:border-brand-accent1" onclick="highlightChart('general')">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-bold text-brand-textmain">🌐 General-Purpose LLMs</h3>
+                            <span class="text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-1 rounded">High Capability</span>
+                        </div>
+                        <p class="text-sm text-brand-textmuted mb-4">Massive parameter counts (100B+). Trained on internet-scale data. Best for broad reasoning, complex drafting, and undefined zero-shot tasks.</p>
+                        <div class="flex gap-2 text-xs font-semibold text-slate-600">
+                            <span class="bg-white px-2 py-1 rounded shadow-sm">High Latency</span>
+                            <span class="bg-white px-2 py-1 rounded shadow-sm">High Cost/Token</span>
+                            <span class="bg-white px-2 py-1 rounded shadow-sm">General Knowledge</span>
+                        </div>
+                    </div>
+
+                    <div class="interactive-card bg-slate-50 border border-slate-200 rounded-xl p-6 cursor-pointer hover:border-brand-accent2" onclick="highlightChart('vertical')">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-bold text-brand-textmain">🎯 Vertical (Domain-Specific) Small LLMs</h3>
+                            <span class="text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-2 py-1 rounded">High Efficiency</span>
+                        </div>
+                        <p class="text-sm text-brand-textmuted mb-4">Smaller parameter counts (7B - 14B). Fine-tuned on proprietary or industry-specific data (e.g., Legal, Med, Code). Run locally.</p>
+                        <div class="flex gap-2 text-xs font-semibold text-slate-600">
+                            <span class="bg-white px-2 py-1 rounded shadow-sm">Low Latency</span>
+                            <span class="bg-white px-2 py-1 rounded shadow-sm">Fixed Hardware Cost</span>
+                            <span class="bg-white px-2 py-1 rounded shadow-sm">Deep Niche Accuracy</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-brand-textmuted text-center italic mt-2">ⓘ Click the cards above to highlight their profiles on the radar chart.</p>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: AI Agent Criteria -->
+        <section class="scroll-mt-24" id="agents">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold border-b-2 border-brand-accent1 inline-block pb-2 mb-4">3. Evaluating Enterprise AI Agents</h2>
+                <p class="text-brand-textmuted max-w-3xl mx-auto">
+                    The next frontier beyond chat interfaces is the <strong>Autonomous AI Agent</strong>—systems that can plan, execute tools, and iterate to achieve a goal. When evaluating agents for enterprise deployment, architects must assess them across four critical dimensions.
+                </p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Agent Card 1 -->
+                <div class="interactive-card bg-white p-6 rounded-2xl border-t-4 border-t-blue-500 shadow-sm border border-slate-100 flex flex-col h-full">
+                    <div class="text-3xl mb-4">🧐</div>
+                    <h3 class="text-lg font-bold mb-2">1. Reasoning &amp; Planning</h3>
+                    <p class="text-sm text-brand-textmuted flex-1">The ability to break down a complex, ambiguous user request into a logical sequence of actionable steps (Chain-of-Thought, ReAct frameworks).</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <strong class="text-xs text-slate-500 uppercase">Metric:</strong>
+                        <span class="block text-sm font-semibold text-brand-textmain mt-1">Task Completion Rate</span>
+                    </div>
+                </div>
+
+                <!-- Agent Card 2 -->
+                <div class="interactive-card bg-white p-6 rounded-2xl border-t-4 border-t-emerald-500 shadow-sm border border-slate-100 flex flex-col h-full">
+                    <div class="text-3xl mb-4">🔧</div>
+                    <h3 class="text-lg font-bold mb-2">2. Tool Invocation</h3>
+                    <p class="text-sm text-brand-textmuted flex-1">The agent's capacity to securely connect to external APIs (CRM, ERP, SQL databases) and correctly format payloads to execute actions.</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <strong class="text-xs text-slate-500 uppercase">Metric:</strong>
+                        <span class="block text-sm font-semibold text-brand-textmain mt-1">API Error / Hallucination Rate</span>
+                    </div>
+                </div>
+
+                <!-- Agent Card 3 -->
+                <div class="interactive-card bg-white p-6 rounded-2xl border-t-4 border-t-amber-500 shadow-sm border border-slate-100 flex flex-col h-full">
+                    <div class="text-3xl mb-4">💾</div>
+                    <h3 class="text-lg font-bold mb-2">3. Memory Context</h3>
+                    <p class="text-sm text-brand-textmuted flex-1">Retaining both short-term conversational context and long-term organizational knowledge (via Vector databases) across multi-turn interactions.</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <strong class="text-xs text-slate-500 uppercase">Metric:</strong>
+                        <span class="block text-sm font-semibold text-brand-textmain mt-1">Context Window Utilization</span>
+                    </div>
+                </div>
+
+                <!-- Agent Card 4 -->
+                <div class="interactive-card bg-white p-6 rounded-2xl border-t-4 border-t-purple-500 shadow-sm border border-slate-100 flex flex-col h-full">
+                    <div class="text-3xl mb-4">🛡️</div>
+                    <h3 class="text-lg font-bold mb-2">4. Guardrails &amp; Safety</h3>
+                    <p class="text-sm text-brand-textmuted flex-1">Ensuring the agent cannot execute destructive actions, respects RBAC (Role-Based Access Control), and output does not violate compliance.</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <strong class="text-xs text-slate-500 uppercase">Metric:</strong>
+                        <span class="block text-sm font-semibold text-brand-textmain mt-1">Policy Adherence Score</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Enterprise LLM Workflow -->
+        <section class="scroll-mt-24 pb-20" id="workflows">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold border-b-2 border-brand-accent1 inline-block pb-2 mb-4">4. The Modern LLM Workflow</h2>
+                <p class="text-brand-textmuted max-w-3xl">
+                    Deploying AI in the enterprise requires more than just calling an API. It is an orchestration pipeline. 
+                    Interact with the stages below to understand a standard RAG (Retrieval-Augmented Generation) and Agent workflow.
+                </p>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                <!-- Workflow Diagram using HTML/Tailwind -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-12">
+                    
+                    <!-- Node 1 -->
+                    <div class="relative group cursor-pointer w-full md:w-1/5" onclick="updateWorkflow('ingest', this)">
+                        <div class="workflow-node bg-slate-800 text-white text-center p-4 rounded-lg shadow-md border-2 border-transparent transition-all hover:scale-105 active-node" id="node-ingest">
+                            <div class="text-2xl mb-2">📂</div>
+                            <h4 class="font-bold text-sm">Data Ingestion</h4>
+                        </div>
+                    </div>
+                    
+                    <div class="text-slate-400 text-2xl rotate-90 md:rotate-0">➜</div>
+
+                    <!-- Node 2 -->
+                    <div class="relative group cursor-pointer w-full md:w-1/5" onclick="updateWorkflow('vector', this)">
+                        <div class="workflow-node bg-slate-100 text-slate-800 text-center p-4 rounded-lg shadow border border-slate-300 transition-all hover:scale-105" id="node-vector">
+                            <div class="text-2xl mb-2">🗃️</div>
+                            <h4 class="font-bold text-sm">Vector DB / RAG</h4>
+                        </div>
+                    </div>
+
+                    <div class="text-slate-400 text-2xl rotate-90 md:rotate-0">➜</div>
+
+                    <!-- Node 3 -->
+                    <div class="relative group cursor-pointer w-full md:w-1/5" onclick="updateWorkflow('llm', this)">
+                        <div class="workflow-node bg-slate-100 text-slate-800 text-center p-4 rounded-lg shadow border border-slate-300 transition-all hover:scale-105" id="node-llm">
+                            <div class="text-2xl mb-2">🦈</div>
+                            <h4 class="font-bold text-sm">LLM / Routing</h4>
+                        </div>
+                    </div>
+
+                    <div class="text-slate-400 text-2xl rotate-90 md:rotate-0">➜</div>
+
+                    <!-- Node 4 -->
+                    <div class="relative group cursor-pointer w-full md:w-1/5" onclick="updateWorkflow('agent', this)">
+                        <div class="workflow-node bg-slate-100 text-slate-800 text-center p-4 rounded-lg shadow border border-slate-300 transition-all hover:scale-105" id="node-agent">
+                            <div class="text-2xl mb-2">🚀</div>
+                            <h4 class="font-bold text-sm">Agent Execution</h4>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Dynamic Detail Panel -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-8 min-h-[200px]" id="workflow-details">
+                    <!-- Default content matches 'ingest' -->
+                    <div class="flex items-start gap-4">
+                        <div class="text-4xl">📂</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-textmain mb-2">Stage 1: Data Ingestion &amp; Chunking</h3>
+                            <p class="text-brand-textmuted mb-4">Enterprise data (PDFs, Confluence, Jira, SQL) is extracted, cleaned, and broken down into smaller, semantically meaningful text "chunks". This prepares the data for mathematical representation.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-white text-xs px-2 py-1 rounded border border-slate-200">ETL Pipelines</span>
+                                <span class="bg-white text-xs px-2 py-1 rounded border border-slate-200">Document Parsers</span>
+                                <span class="bg-white text-xs px-2 py-1 rounded border border-slate-200">Semantic Chunking</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <!-- Application Logic -->
+    <script>
+        // --- DATA & STATE ---
+        const deploymentData = {
+            cloud: `
+                <div class="space-y-4 animate-fade-in">
+                    <div class="flex items-start">
+                        <span class="text-brand-accent2 text-xl mr-3">&#10003;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">Rapid Time-to-Market</strong>
+                            <span class="text-sm text-brand-textmuted">Access to state-of-the-art models via APIs without hardware procurement delays.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-brand-accent2 text-xl mr-3">&#10003;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">Elastic Scalability</strong>
+                            <span class="text-sm text-brand-textmuted">Instantly scale compute resources up or down based on inference demand.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start mt-4 pt-4 border-t border-slate-100">
+                        <span class="text-brand-accent3 text-xl mr-3">&#9888;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">Data Privacy Concerns</strong>
+                            <span class="text-sm text-brand-textmuted">Requires sending sensitive proprietary data over the network to third-party APIs.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-brand-accent3 text-xl mr-3">&#9888;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">Unpredictable OpEx</strong>
+                            <span class="text-sm text-brand-textmuted">Per-token pricing can lead to runaway costs at high enterprise scale.</span>
+                        </div>
+                    </div>
+                </div>
+            `,
+            onprem: `
+                <div class="space-y-4 animate-fade-in">
+                    <div class="flex items-start">
+                        <span class="text-brand-accent2 text-xl mr-3">&#10003;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">Total Data Sovereignty</strong>
+                            <span class="text-sm text-brand-textmuted">Data never leaves the corporate network, ensuring GDPR/HIPAA compliance.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-brand-accent2 text-xl mr-3">&#10003;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">Predictable CapEx</strong>
+                            <span class="text-sm text-brand-textmuted">Fixed hardware investments rather than fluctuating per-token API costs.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start mt-4 pt-4 border-t border-slate-100">
+                        <span class="text-brand-accent3 text-xl mr-3">&#9888;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">High Setup Complexity</strong>
+                            <span class="text-sm text-brand-textmuted">Requires specialized MLOps engineering and expensive GPU provisioning.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-brand-accent3 text-xl mr-3">&#9888;</span>
+                        <div>
+                            <strong class="block text-brand-textmain">Model Obsolescence</strong>
+                            <span class="text-sm text-brand-textmuted">Harder to upgrade to the latest frontier models without hardware upgrades.</span>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const workflowData = {
+            ingest: {
+                icon: '&#128194;',
+                title: 'Stage 1: Data Ingestion & Chunking',
+                desc: 'Enterprise data (PDFs, Confluence, Jira, SQL) is extracted, cleaned, and broken down into smaller, semantically meaningful text "chunks". This prepares the data for mathematical representation.',
+                tags: ['ETL Pipelines', 'Document Parsers', 'Semantic Chunking']
+            },
+            vector: {
+                icon: '&#128451;&#65039;',
+                title: 'Stage 2: Embeddings & Vector DB',
+                desc: 'Text chunks are passed through an embedding model to convert them into high-dimensional vectors. These are stored in a Vector Database. When a user queries, the system retrieves the most mathematically similar text chunks (Retrieval-Augmented Generation).',
+                tags: ['Embedding Models', 'Pinecone / Milvus', 'Similarity Search']
+            },
+            llm: {
+                icon: '&#129416;',
+                title: 'Stage 3: LLM & Semantic Routing',
+                desc: 'The retrieved context is injected into the prompt along with the user query. A router might decide to send simple queries to a small, fast vertical LLM, and complex queries to a large, general-purpose LLM.',
+                tags: ['Prompt Engineering', 'Semantic Router', 'Inference Endpoint']
+            },
+            agent: {
+                icon: '&#128640;',
+                title: 'Stage 4: Agent Tool Execution',
+                desc: 'If the LLM determines an action is needed, it acts as a reasoning engine to format an API call. The Agent executes the tool (e.g., creating a Jira ticket, sending an email), observes the result, and formulates the final response to the user.',
+                tags: ['Tool Calling', 'ReAct Logic', 'External API Integrations']
+            }
+        };
+
+        let radarChartInstance = null;
+
+        // --- INTERACTION LOGIC ---
+
+        // 1. Deployment Toggle Logic
+        function switchDeployment(type) {
+            // Update buttons
+            document.getElementById('btn-cloud').className = type === 'cloud' 
+                ? 'flex-1 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-brand-accent1 transition-all'
+                : 'flex-1 py-2 text-sm font-semibold rounded-md text-brand-textmuted hover:text-brand-textmain transition-all';
+            
+            document.getElementById('btn-onprem').className = type === 'onprem' 
+                ? 'flex-1 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-brand-accent1 transition-all'
+                : 'flex-1 py-2 text-sm font-semibold rounded-md text-brand-textmuted hover:text-brand-textmain transition-all';
+
+            // Update content with tiny fade effect
+            const contentDiv = document.getElementById('deployment-content');
+            contentDiv.style.opacity = '0';
+            setTimeout(() => {
+                contentDiv.innerHTML = deploymentData[type];
+                contentDiv.style.opacity = '1';
+                contentDiv.style.transition = 'opacity 0.3s ease';
+            }, 150);
+        }
+
+        // 2. Workflow Interactive Logic
+        function updateWorkflow(stage, element) {
+            // Reset node styles
+            document.querySelectorAll('.workflow-node').forEach(node => {
+                node.classList.remove('bg-slate-800', 'text-white', 'border-transparent');
+                node.classList.add('bg-slate-100', 'text-slate-800', 'border-slate-300');
+            });
+
+            // Highlight selected node
+            const targetNode = element.querySelector('.workflow-node');
+            targetNode.classList.remove('bg-slate-100', 'text-slate-800', 'border-slate-300');
+            targetNode.classList.add('bg-slate-800', 'text-white', 'border-transparent');
+
+            // Update Details
+            const data = workflowData[stage];
+            const tagsHtml = data.tags.map(tag => `<span class="bg-white text-xs px-2 py-1 rounded border border-slate-200">${tag}</span>`).join('');
+            
+            const detailHtml = `
+                <div class="flex items-start gap-4 transition-opacity duration-300 opacity-0" id="workflow-inner">
+                    <div class="text-4xl">${data.icon}</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-brand-textmain mb-2">${data.title}</h3>
+                        <p class="text-brand-textmuted mb-4">${data.desc}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${tagsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const container = document.getElementById('workflow-details');
+            container.innerHTML = detailHtml;
+            
+            // Trigger reflow for fade in
+            setTimeout(() => {
+                document.getElementById('workflow-inner').classList.remove('opacity-0');
+            }, 50);
+        }
+
+        // 3. Radar Chart Highlight Logic
+        function highlightChart(type) {
+            if(!radarChartInstance) return;
+            
+            if(type === 'general') {
+                radarChartInstance.data.datasets[0].borderWidth = 4;
+                radarChartInstance.data.datasets[0].backgroundColor = 'rgba(59, 130, 246, 0.4)'; // Blue bolder
+                radarChartInstance.data.datasets[1].borderWidth = 1;
+                radarChartInstance.data.datasets[1].backgroundColor = 'rgba(16, 185, 129, 0.1)'; // Emerald faded
+            } else {
+                radarChartInstance.data.datasets[0].borderWidth = 1;
+                radarChartInstance.data.datasets[0].backgroundColor = 'rgba(59, 130, 246, 0.1)'; // Blue faded
+                radarChartInstance.data.datasets[1].borderWidth = 4;
+                radarChartInstance.data.datasets[1].backgroundColor = 'rgba(16, 185, 129, 0.4)'; // Emerald bolder
+            }
+            radarChartInstance.update();
+        }
+
+
+        // --- CHART.JS INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Deployment Doughnut Chart
+            const ctxDeploy = document.getElementById('deploymentChart').getContext('2d');
+            new Chart(ctxDeploy, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hybrid (Cloud & On-Prem)', 'Public Cloud SaaS Only', 'Air-Gapped / On-Prem Only'],
+                    datasets: [{
+                        data: [55, 30, 15],
+                        backgroundColor: [
+                            '#3B82F6', // Blue
+                            '#94A3B8', // Slate
+                            '#1E293B'  // Dark
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, font: { family: 'Inter', size: 12 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Model Radar Chart (General vs Vertical)
+            const ctxRadar = document.getElementById('modelRadarChart').getContext('2d');
+            radarChartInstance = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Reasoning Breadth', 'Domain Accuracy', 'Data Privacy', 'Cost Efficiency', 'Low Latency'],
+                    datasets: [
+                        {
+                            label: 'General-Purpose LLM (e.g. GPT-4)',
+                            data: [95, 75, 40, 30, 50],
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderColor: '#3B82F6',
+                            pointBackgroundColor: '#3B82F6',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#3B82F6',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Vertical Small LLM (Local)',
+                            data: [40, 90, 95, 85, 90],
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            borderColor: '#10B981',
+                            pointBackgroundColor: '#10B981',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#10B981',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: {
+                                font: { family: 'Inter', size: 11, weight: '600' },
+                                color: '#64748B'
+                            },
+                            ticks: { display: false, min: 0, max: 100 }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { family: 'Inter', size: 12 } }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body></html>

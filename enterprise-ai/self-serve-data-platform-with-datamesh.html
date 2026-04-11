@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="Explore the architecture of a Self-Serve Data Platform for Data Mesh. Learn about data product provisioning, platform APIs, Infrastructure-as-Code (IaC), and the typical technology stack." name="description"/>
+    <meta content="Self-Serve Data Platform, Data Mesh, Data Products, Platform Architecture, Internal Developer Platform, IDP, Infrastructure-as-Code, Data Pipelines, Airflow, Dagster, Kafka, Pulsar, Iceberg, Delta Lake, Spark, Flink, DataHub, Amundsen" name="keywords"/>
+    <title>Self-Serve Data Platform Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Chosen Palette: Warm Neutrals with Slate and Accent Colors (Blue, Emerald, Amber) -->
+    <!-- Application Structure Plan: The SPA is structured logically into three main sections: 1. The Context (Why), explaining the Data Mesh paradigm using an interactive HTML/CSS diagram. 2. The Stack (What), utilizing an interactive Donut chart to explore typical technology layers and tools. 3. Advanced Capabilities (How), presenting key features via interactive cards. This structure guides the user from the high-level concept down to specific tools and advanced implementations, ensuring easy consumption of a dense technical topic. -->
+    <!-- Visualization & Content Choices: 
+         1. Concept Diagram: HTML/CSS Flexbox diagram -> Shows flow from Domains to Products via Platform -> Interactive hover states -> Built with Tailwind (NO SVG).
+         2. Stack Composition: Chart.js Doughnut Chart -> Represents the 5 pillars of the stack -> Click interaction reveals specific tools (Airflow, Kafka, etc.) -> Justified to organize categorical data interactively -> Uses Canvas.
+         3. Advanced Areas: CSS Interactive Cards -> Details platform APIs, IaC, etc. -> Hover reveals details -> Clean layout for qualitative points. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 400px; }
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .interactive-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #94a3b8;
+        }
+        .flow-arrow {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 2px;
+            background-color: #cbd5e1;
+            margin: 0 15px;
+        }
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid #cbd5e1;
+        }
+        .pulse-ring {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <header class="bg-slate-900 text-white py-12 px-6 shadow-md relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div class="w-64 h-64 bg-blue-500 rounded-full absolute -top-10 -left-10 blur-3xl"></div>
+            <div class="w-80 h-80 bg-emerald-500 rounded-full absolute bottom-10 right-10 blur-3xl"></div>
+        </div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Self-Serve Data Platform Architecture</h1>
+            <p class="text-xl text-slate-300 max-w-3xl font-light">Enabling decentralized domains to build, manage, and share data products effortlessly within a Data Mesh framework.</p>
+        </div>
+    </header>
+
+    <main class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full space-y-20">
+
+        <section class="space-y-8" id="context">
+            <div class="max-w-3xl">
+                <h2 class="text-2xl font-semibold text-slate-800 border-b-2 border-blue-500 pb-2 inline-block mb-4">The Core Paradigm</h2>
+                <p class="text-slate-600 leading-relaxed text-lg">
+                    In a modern Data Mesh, centralizing data engineering creates bottlenecks. The solution is a <strong>Self-Serve Data Platform</strong>. This section illustrates the conceptual flow: independent business domains leverage a unified platform to independently create and serve standardized data products. Hover over the elements below to understand their roles.
+                </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-x-auto">
+                
+                <div class="flex flex-col space-y-4 w-full md:w-1/4">
+                    <div class="text-center font-semibold text-slate-500 mb-2 uppercase tracking-wider text-sm">Producers</div>
+                    <div class="bg-amber-100 border border-amber-300 text-amber-800 p-4 rounded-lg text-center font-medium shadow-sm hover:bg-amber-200 transition-colors cursor-default group relative">
+                        Domain A
+                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">e.g., Marketing Team. Owns operational systems and raw data.</div>
+                    </div>
+                    <div class="bg-amber-100 border border-amber-300 text-amber-800 p-4 rounded-lg text-center font-medium shadow-sm hover:bg-amber-200 transition-colors cursor-default group relative">
+                        Domain B
+                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">e.g., Sales Team. Needs to process and publish their specific data.</div>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex flex-col items-center">
+                    <div class="text-xs text-slate-400 mb-1">Uses Platform</div>
+                    <div class="flow-arrow"></div>
+                </div>
+
+                <div class="w-full md:w-1/3 flex justify-center">
+                    <div class="bg-slate-800 text-white p-6 rounded-xl text-center w-full shadow-lg relative group">
+                        <div class="absolute inset-0 border-2 border-blue-400 rounded-xl pulse-ring"></div>
+                        <h3 class="font-bold text-xl mb-2 relative z-10">Self-Serve Platform</h3>
+                        <p class="text-slate-300 text-sm relative z-10">Abstracts infrastructure complexity.</p>
+                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-56 p-2 bg-white text-slate-800 text-xs rounded shadow-xl border border-slate-200 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">Provides tools for storage, compute, and orchestration without needing specialized infra knowledge.</div>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex flex-col items-center">
+                    <div class="text-xs text-slate-400 mb-1">Yields</div>
+                    <div class="flow-arrow"></div>
+                </div>
+
+                <div class="flex flex-col space-y-4 w-full md:w-1/4">
+                    <div class="text-center font-semibold text-slate-500 mb-2 uppercase tracking-wider text-sm">Outputs</div>
+                    <div class="bg-emerald-100 border border-emerald-300 text-emerald-800 p-4 rounded-lg text-center font-medium shadow-sm hover:bg-emerald-200 transition-colors cursor-default group relative">
+                        Data Product 1
+                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">Clean, documented, discoverable dataset ready for consumption.</div>
+                    </div>
+                    <div class="bg-emerald-100 border border-emerald-300 text-emerald-800 p-4 rounded-lg text-center font-medium shadow-sm hover:bg-emerald-200 transition-colors cursor-default group relative">
+                        Data Product 2
+                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">Real-time stream of verified events with clear SLAs.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-slate-100" id="stack-breakdown">
+            <div class="max-w-3xl">
+                <h2 class="text-2xl font-semibold text-slate-800 border-b-2 border-blue-500 pb-2 inline-block mb-4">Typical Platform Stack</h2>
+                <p class="text-slate-600 leading-relaxed text-lg">
+                    A robust self-serve platform is composed of specialized layers. This section breaks down the typical technology stack required to enable data product creation. <strong>Click on a segment in the chart</strong> to explore the specific industry-standard tools associated with each functional layer.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <div class="w-full">
+                    <div class="chart-container">
+                        <canvas id="stackChart"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-slate-400 mt-4 italic">Interactive: Click segments to view tools.</p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl h-full flex flex-col justify-center min-h-[300px]" id="stack-details-panel">
+                    <div class="text-center text-slate-400 mb-4 flex flex-col items-center justify-center h-full" id="initial-prompt">
+                        <div class="text-4xl mb-2">←</div>
+                        <p>Select a layer from the chart to see details.</p>
+                    </div>
+                    
+                    <div class="hidden h-full flex flex-col justify-center" id="layer-content">
+                        <div class="inline-block px-3 py-1 rounded-full text-sm font-semibold mb-4 w-max" id="layer-badge"></div>
+                        <h3 class="text-3xl font-bold text-slate-800 mb-2" id="layer-title">Layer Name</h3>
+                        <p class="text-slate-600 mb-6 text-lg" id="layer-desc">Description goes here.</p>
+                        
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Industry Standard Tools</h4>
+                            <div class="flex flex-wrap gap-3" id="tool-tags">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="space-y-8" id="advanced-capabilities">
+            <div class="max-w-3xl">
+                <h2 class="text-2xl font-semibold text-slate-800 border-b-2 border-blue-500 pb-2 inline-block mb-4">Advanced Platform Areas</h2>
+                <p class="text-slate-600 leading-relaxed text-lg">
+                    Beyond the base infrastructure, mature self-serve platforms implement advanced capabilities to abstract complexity and enforce standards. These areas transform a collection of tools into a true developer experience. Explore the advanced features below.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="interactive-card glass-panel p-6 rounded-xl border border-slate-200 cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl mr-4 font-bold">{ }</div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Platform APIs for Data Products</h3>
+                    </div>
+                    <p class="text-slate-600">Standardized programmatic interfaces allowing domains to register, discover, and manage the lifecycle of their data products without relying on manual ticketing systems.</p>
+                </div>
+
+                <div class="interactive-card glass-panel p-6 rounded-xl border border-slate-200 cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mr-4 font-bold">↻</div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">Data Product Provisioning</h3>
+                    </div>
+                    <p class="text-slate-600">Automated workflows that spin up necessary resources (storage buckets, compute clusters, access roles) based on standardized templates when a new data product is declared.</p>
+                </div>
+
+                <div class="interactive-card glass-panel p-6 rounded-xl border border-slate-200 cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mr-4 font-bold">&lt;/&gt;</div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600 transition-colors">IaC for Pipelines</h3>
+                    </div>
+                    <p class="text-slate-600">Infrastructure-as-Code principles applied to data pipelines. Domains define transformations and scheduling using declarative code (e.g., Terraform, custom YAML), ensuring reproducibility and version control.</p>
+                </div>
+
+                <div class="interactive-card glass-panel p-6 rounded-xl border border-slate-200 cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl mr-4 font-bold">⚙</div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600 transition-colors">Internal Developer Platforms</h3>
+                    </div>
+                    <p class="text-slate-600">A unified portal (IDP) that abstracts the underlying toolchain, providing data engineers and analysts with a self-service GUI to monitor health, manage access, and deploy code seamlessly.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const stackData = {
+                'Orchestration': {
+                    color: '#3b82f6', 
+                    bgClass: 'bg-blue-100 text-blue-800',
+                    desc: 'The control plane. Coordinates, schedules, and monitors complex data workflows and dependencies across different systems to ensure data products are updated reliably.',
+                    tools: ['Airflow', 'Dagster']
+                },
+                'Streaming': {
+                    color: '#10b981', 
+                    bgClass: 'bg-emerald-100 text-emerald-800',
+                    desc: 'The real-time nervous system. Handles high-throughput, low-latency data ingestion and processing for event-driven architectures and immediate insights.',
+                    tools: ['Kafka', 'Pulsar']
+                },
+                'Storage': {
+                    color: '#f59e0b', 
+                    bgClass: 'bg-amber-100 text-amber-800',
+                    desc: 'The foundational foundation. Provides scalable, reliable data lakehouse capabilities, supporting ACID transactions and time travel on massive datasets.',
+                    tools: ['Iceberg', 'Delta Lake']
+                },
+                'Compute': {
+                    color: '#8b5cf6', 
+                    bgClass: 'bg-purple-100 text-purple-800',
+                    desc: 'The heavy lifters. Distributed processing engines capable of transforming, aggregating, and analyzing large-scale batch and streaming data efficiently.',
+                    tools: ['Spark', 'Flink']
+                },
+                'Metadata': {
+                    color: '#ec4899', 
+                    bgClass: 'bg-pink-100 text-pink-800',
+                    desc: 'The directory and compass. Enables data discovery, observability, lineage tracking, and governance, ensuring users can find and trust the data products.',
+                    tools: ['DataHub', 'Amundsen']
+                }
+            };
+
+            const labels = Object.keys(stackData);
+            const dataValues = new Array(labels.length).fill(20); 
+            const backgroundColors = labels.map(label => stackData[label].color);
+
+            const ctx = document.getElementById('stackChart').getContext('2d');
+            
+            const stackChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 13
+                                },
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' Click to explore tools';
+                                }
+                            },
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: "'Inter', sans-serif", size: 14 },
+                            bodyFont: { family: "'Inter', sans-serif", size: 13 },
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    onClick: (event, elements, chart) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const label = chart.data.labels[index];
+                            updateDetailsPanel(label);
+                        }
+                    },
+                    onHover: (event, chartElement) => {
+                        event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                    }
+                }
+            });
+
+            function updateDetailsPanel(layerName) {
+                const data = stackData[layerName];
+                
+                document.getElementById('initial-prompt').classList.add('hidden');
+                const contentDiv = document.getElementById('layer-content');
+                contentDiv.classList.remove('hidden');
+                
+                contentDiv.classList.remove('opacity-100');
+                contentDiv.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    document.getElementById('layer-title').textContent = layerName;
+                    document.getElementById('layer-desc').textContent = data.desc;
+                    
+                    const badge = document.getElementById('layer-badge');
+                    badge.textContent = 'Platform Component';
+                    badge.className = `inline-block px-3 py-1 rounded-full text-xs font-bold mb-4 w-max ${data.bgClass}`;
+                    
+                    const tagsContainer = document.getElementById('tool-tags');
+                    tagsContainer.innerHTML = '';
+                    data.tools.forEach(tool => {
+                        const span = document.createElement('span');
+                        span.className = 'bg-slate-100 border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-mono text-sm shadow-sm';
+                        span.textContent = tool;
+                        tagsContainer.appendChild(span);
+                    });
+
+                    contentDiv.classList.remove('opacity-0');
+                    contentDiv.classList.add('opacity-100', 'transition-opacity', 'duration-500');
+                }, 150);
+            }
+        });
+    </script>
+
+</body></html>

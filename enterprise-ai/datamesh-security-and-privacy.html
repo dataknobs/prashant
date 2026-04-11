@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="A comprehensive technical paper analyzing mesh security and data privacy for distributed data platforms. Explores Zero Trust, Attribute-Based Access Control (ABAC), row-level security, and compares governance tools like Apache Ranger, Immuta, and Privacera." name="description"/>
+    <meta content="Data Mesh, Mesh Security, Data Privacy, Distributed Data Platforms, Zero Trust, ABAC, Row-Level Security, Tokenization, Apache Ranger, Immuta, Privacera, Data Governance" name="keywords"/>
+    <title>Mesh Security and Data Privacy for Distributed Data Platforms Across Domains</title>
+    
+    <!-- Google Fonts for Academic/Technical Look -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    typography: {
+                        DEFAULT: {
+                            css: {
+                                h1: { fontFamily: 'Inter, sans-serif' },
+                                h2: { fontFamily: 'Inter, sans-serif' },
+                                h3: { fontFamily: 'Inter, sans-serif' },
+                                h4: { fontFamily: 'Inter, sans-serif' },
+                                'code::before': { content: '""' },
+                                'code::after': { content: '""' },
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Academic Styles */
+        body { background-color: #f8fafc; }
+        .paper-container { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        sup { color: #2563eb; font-weight: 600; }
+        table { font-family: 'Inter', sans-serif; font-size: 0.875rem; }
+        th { background-color: #f1f5f9; }
+        .toc-link { transition: color 0.2s; }
+        .toc-link:hover { color: #2563eb; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Header / Banner -->
+    <header class="bg-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b-4 border-blue-600">
+        <div class="max-w-6xl mx-auto">
+            <p class="text-blue-300 font-semibold tracking-wider uppercase text-sm mb-2">Technical Research Paper</p>
+            <h1 class="text-3xl md:text-5xl font-bold leading-tight mb-4 font-sans">Mesh Security and Data Privacy for Distributed Data Platforms Across Domains</h1>
+            <div class="flex items-center text-slate-300 text-sm md:text-base">
+                <p>Focus Areas: Data Architecture, Zero Trust, Cross-Domain Governance</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8">
+        
+        <!-- Sidebar: Table of Contents -->
+        <aside class="w-full lg:w-1/4 flex-shrink-0 relative">
+            <div class="sticky top-8 bg-white p-6 rounded-lg paper-container border border-slate-200">
+                <h3 class="font-bold text-slate-900 mb-4 uppercase tracking-wider text-sm font-sans border-b pb-2">Contents</h3>
+                <nav class="space-y-3 text-sm text-slate-600 font-sans">
+                    <a class="block toc-link" href="#executive-summary">Executive Summary</a>
+                    <a class="block toc-link font-medium text-slate-800 mt-2" href="#core-concepts">Core Concepts</a>
+                    <div class="pl-3 space-y-2 border-l border-slate-200 ml-1">
+                        <a class="block toc-link" href="#abac">Attribute-Based Access Control</a>
+                        <a class="block toc-link" href="#rls">Row-Level Security</a>
+                        <a class="block toc-link" href="#tokenization">Tokenized PII &amp; Pseudonymization</a>
+                        <a class="block toc-link" href="#domain-boundaries">Domain-Level Boundaries</a>
+                    </div>
+                    <a class="block toc-link font-medium text-slate-800 mt-2" href="#tooling-comparison">Tooling Comparison</a>
+                    <div class="pl-3 space-y-2 border-l border-slate-200 ml-1">
+                        <a class="block toc-link" href="#ranger">Apache Ranger</a>
+                        <a class="block toc-link" href="#immuta">Immuta</a>
+                        <a class="block toc-link" href="#privacera">Privacera</a>
+                        <a class="block toc-link" href="#comparison-table">Comparison Table</a>
+                    </div>
+                    <a class="block toc-link font-medium text-slate-800 mt-2" href="#mesh-patterns">Mesh Security Patterns</a>
+                    <a class="block toc-link font-medium text-slate-800 mt-2" href="#case-studies">Case Studies</a>
+                    <a class="block toc-link font-medium text-slate-800 mt-2" href="#risks-mitigations">Risks &amp; Mitigations</a>
+                    <a class="block toc-link font-medium text-slate-800 mt-2" href="#implementation-roadmap">Implementation Roadmap</a>
+                    <a class="block toc-link font-medium text-slate-800 mt-2" href="#references">References</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="w-full lg:w-3/4 bg-white p-6 md:p-10 lg:p-12 rounded-lg paper-container border border-slate-200 font-serif">
+            <article class="prose prose-slate prose-lg max-w-none hover:prose-a:text-blue-600">
+                
+                <h2 class="text-2xl font-sans font-bold text-slate-900 mt-0" id="executive-summary">Executive Summary</h2>
+                <p>Distributed “mesh” architectures (for example, data mesh) intentionally decentralize data ownership to domain teams, which increases organizational scalability but also expands the security and privacy governance surface area. A practical “mesh security” posture therefore needs a control plane that standardizes policy, identity, metadata, and auditing while allowing domain-local enforcement close to the data and compute. This is consistent with the Zero Trust emphasis on granular, per-request authorization via policy decision/enforcement points rather than perimeter trust. <sup>[1]</sup></p>
+                <p>At the technical level, the most important building blocks for distributed policy are: Attribute-Based Access Control (ABAC) as the decision model, row-level security (RLS) and column masking as native enforcement primitives in modern warehouses/lakehouses, tokenization/pseudonymization (and related cryptographic techniques like format-preserving encryption) for minimizing exposure of sensitive identifiers, and explicit domain-level security boundaries that define who can publish, consume, and re-identify sensitive data. ABAC’s PDP/PEP/PIP/PAP architecture is explicitly designed to support centralized or distributed placement of authorization components, which is key for cross-domain environments. <sup>[2]</sup></p>
+                
+                <p>In tooling, Apache Ranger, Immuta, and Privacera represent three distinct but converging implementation strategies:</p>
+                <ul>
+                    <li><strong>Apache Ranger</strong> is an open-source, Hadoop-ecosystem-origin control plane with in-process “plugin” enforcement points for many engines, plus centralized auditing and tag-based policies via Atlas/TagSync. <sup>[3]</sup></li>
+                    <li><strong>Immuta</strong> is a commercial data security platform that positions itself as a middle control plane: it acts as a policy decision point and administers policies natively into data platforms for enforcement, with extensive audit and monitoring (“Detect”) capabilities and both SaaS and Kubernetes self-managed deployments. <sup>[4]</sup></li>
+                    <li><strong>Privacera</strong> is a commercial platform “built on/extends Ranger” to hybrid and multi-cloud, using a mixture of embedded plugins and “PolicySync” pushdown to native controls, plus discovery, masking/encryption (including an encryption gateway pattern), and enterprise integrations. <sup>[5]</sup></li>
+                </ul>
+                
+                <p>Real-world implementations consistently report that the main business benefit of mesh security is <em>faster, safer data access at scale</em>, achieved by separating policy management from platform operations and automating enforcement across domains. Thomson Reuters reports a 60× increase in data usage after using Immuta with Snowflake to centralize policy and enforce via Snowflake row access and masking policies. <sup>[6]</sup> A Microsoft partner case study reports a customer reducing onboarding from days to minutes and increasing productivity by 10× using Privacera on Azure across multiple Azure services. <sup>[7]</sup></p>
+                
+                <p>The key risks are not “lack of features” but <em>systemic mesh risks</em>: inconsistent identity/attributes across domains, policy drift and propagation delays, bypass paths (superuser/owner, alternate query engines, direct storage access), sensitive metadata leakage via tags/catalogs/audit logs, and re-identification risks even after pseudonymization/tokenization. NIST and ENISA both emphasize that de-identification/pseudonymization reduces risk but does not eliminate re-identification, and controllers must evaluate risk and safeguards holistically. <sup>[8]</sup></p>
+
+                <hr class="my-8 border-slate-200"/>
+
+                <h2 class="text-3xl font-sans font-bold text-slate-900" id="core-concepts">Core Concepts and Advanced Areas for Distributed Security</h2>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="abac">Attribute-Based Access Control</h3>
+                <h4 class="font-sans font-medium text-slate-700">What ABAC is and why it fits “mesh” environments</h4>
+                <p>NIST defines ABAC as a logical access control methodology where authorization is determined by evaluating subject, object, action, and sometimes environment attributes against policy/rules. <sup>[9]</sup> This is directly aligned to data mesh’s need for policies that can scale across many data products without proliferating role permutations (“role explosion”).</p>
+                <p>NIST SP 800-162 also describes the functional components an access control mechanism often uses: <strong>Policy Decision Point (PDP)</strong>, <strong>Policy Enforcement Point (PEP)</strong>, <strong>Policy Information Point (PIP)</strong>, and <strong>Policy Administration Point (PAP)</strong>. <sup>[10]</sup> Importantly for distributed domains, NIST explicitly notes that PDP/PEP functionality <em>can be distributed or centralized</em> and may be physically/logically separated; it even describes a centrally controlled decision service vs multiple local PDPs drawing on a centralized policy store. <sup>[11]</sup></p>
+                <p>ABAC is often implemented via standards like XACML, which defines an architecture where a PEP requests authorization decisions from a PDP and highlights that it’s undesirable for the PEP to understand policy semantics. <sup>[12]</sup></p>
+
+                <h4 class="font-sans font-medium text-slate-700">Practical benefits in mesh security</h4>
+                <p>ABAC’s main operational advantage in a mesh is that it makes policy <em>composable</em> and <em>domain-portable</em>:</p>
+                <ul>
+                    <li>A domain can publish a data product tagged/classified as PII.Customer with constraints like “only analysts with purpose=Fraud and region=EU may access raw identifiers,” while other domains consume the same product under policy-derived views (masked, tokenized, aggregated).</li>
+                    <li>A central governance body can define cross-cutting “global policies” while domains define local supplements—mirroring federated computational governance concepts in data mesh. <sup>[13]</sup></li>
+                </ul>
+
+                <h4 class="font-sans font-medium text-slate-700">Tradeoffs and failure modes</h4>
+                <p>ABAC’s core challenges tend to be “system-of-systems” issues rather than policy syntax:</p>
+                <ul>
+                    <li><strong>Attribute quality, provenance, and drift:</strong> if user attributes differ across domains or are stale, ABAC decisions become inconsistent (a classic distributed authorization problem). NIST calls out the need to identify authoritative attribute sources and coordinate ABAC capabilities when components are distributed. <sup>[11]</sup></li>
+                    <li><strong>Attribute schema normalization across organizations/domains:</strong> NIST highlights the mapping problem where different organizations use different terms for equivalent roles/attributes and stresses normalization/mappings. <sup>[14]</sup></li>
+                    <li><strong>Policy complexity and explainability:</strong> ABAC policies can become difficult to reason about; this impacts audits, incident response, and business acceptance.</li>
+                    <li><strong>Performance:</strong> ABAC often requires runtime evaluation (or caching). NIST notes that a context handler may retrieve attributes in advance or cache them to avoid delays at request time. <sup>[11]</sup></li>
+                </ul>
+
+                <h4 class="font-sans font-medium text-slate-700">Implementation considerations</h4>
+                <p>A rigorous ABAC implementation for mesh security typically requires:</p>
+                <ul>
+                    <li>A canonical attribute dictionary (identity + resource + purpose + geography + project + clearance/contract + risk posture), including lifecycle rules.</li>
+                    <li>A “PIP strategy”: what attributes come from the IdP (SAML/OIDC groups, SCIM), what comes from catalogs/tags, and what comes from runtime context (device posture, network, workload).</li>
+                    <li>A conflict-resolution model (deny-overrides vs permit-overrides; hierarchical policy layering).</li>
+                    <li>A policy testing harness (simulation and regression tests) because distribution increases the blast radius of a mistake.</li>
+                </ul>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="rls">Row-Level Security and Related Fine-Grained Enforcement</h3>
+                <h4 class="font-sans font-medium text-slate-700">What row-level security is</h4>
+                <p>Row-level security (RLS) is an enforcement mechanism that restricts which rows a user can read or modify in a table/view, typically by applying predicates that the database evaluates for each access attempt.</p>
+                <p>Examples across major platforms:</p>
+                <ul>
+                    <li><strong>PostgreSQL:</strong> “Row Security Policies” restrict, per-user, which rows can be returned or inserted/updated/deleted (RLS). <sup>[15]</sup></li>
+                    <li><strong>Snowflake:</strong> row access policies determine which rows to return in a query result. <sup>[16]</sup></li>
+                    <li><strong>BigQuery:</strong> row-level access policies can be created/managed to filter visible rows; the docs also discuss security/performance considerations and compare RLS to alternatives. <sup>[17]</sup></li>
+                    <li><strong>SQL Server:</strong> the database applies access restrictions every time data access is attempted from any tier, reducing application-layer surface area; it uses security policies and predicate functions. <sup>[18]</sup></li>
+                    <li><strong>Amazon Redshift:</strong> RLS policies restrict access to specific records based on policies defined at database object level. <sup>[19]</sup></li>
+                    <li><strong>Databricks Unity Catalog:</strong> explicitly frames row filters and column masks as row/column-level governance primitives and notes they can be managed centrally using ABAC policies (recommended) or manually on tables (harder to scale/maintain). <sup>[20]</sup></li>
+                </ul>
+
+                <h4 class="font-sans font-medium text-slate-700">Why RLS matters in cross-domain mesh security</h4>
+                <p>In a mesh, consumers often access producer-domain data through multiple tools (SQL, BI, notebooks). Central policy in the control plane is valuable, but <em>enforcement needs to happen where the data is</em> to avoid bypass paths. Native RLS is an ideal mechanism because it applies uniformly across consuming applications.</p>
+                <p>RLS is also the most direct way to implement “domain boundary” constraints like: tenant isolation, per-purpose access (e.g., analytics vs operations), and regulatory segmentation (EU vs US data residency).</p>
+
+                <h4 class="font-sans font-medium text-slate-700">Tradeoffs and limitations</h4>
+                <ul>
+                    <li><strong>Performance overhead:</strong> predicates become part of query plans; if predicates aren’t index-friendly or rely on lookup tables, performance can degrade. Databricks highlights that row filters and masks are evaluated at runtime and you should consider compute impact. <sup>[20]</sup></li>
+                    <li><strong>Policy sprawl:</strong> if every table has bespoke predicates, operational overhead grows; this is why vendors emphasize global/tag-based policies.</li>
+                    <li><strong>Side-channel considerations:</strong> BigQuery explicitly warns that some approaches can be vulnerable to carefully crafted queries, query durations, and other side-channel attacks. <sup>[21]</sup></li>
+                    <li><strong>Bypass paths:</strong> direct access to underlying storage or a different engine without the same enforcement can bypass RLS.</li>
+                </ul>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="tokenization">Tokenized PII and Pseudonymization</h3>
+                <h4 class="font-sans font-medium text-slate-700">Definitions and relationship to privacy law</h4>
+                <p>Under GDPR, “pseudonymisation” is processing personal data so it can no longer be attributed to a specific data subject without additional information that is kept separately and protected by technical/organizational measures. <sup>[23]</sup> The EDPB emphasizes that pseudonymised data is still personal data if it can be attributed using additional information. <sup>[24]</sup> Tokenization is commonly treated as a practical pseudonymization technique when it replaces identifiers with surrogates.</p>
+
+                <h4 class="font-sans font-medium text-slate-700">Tokenization as a security primitive</h4>
+                <p>The PCI Security Standards Council defines tokenization as replacing a primary account number (PAN) with a surrogate token. It notes that tokenization can reduce compliance scope but does not eliminate obligations. <sup>[25]</sup> Its design principles generalize well to PII in data meshes:</p>
+                <ul>
+                    <li>Treat the token vault / detokenization service as a <em>high-trust boundary</em>.</li>
+                    <li>Reduce blast radius by ensuring most analytics domains never receive raw identifiers.</li>
+                    <li>Maintain referential stability where needed (same PII → same token) vs single-use tokens. <sup>[26]</sup></li>
+                </ul>
+
+                <h4 class="font-sans font-medium text-slate-700">Alternatives and advanced variants</h4>
+                <ul>
+                    <li><strong>Vault-based tokenization</strong> (classic): token ↔ PII mapping is stored in a secured service.</li>
+                    <li><strong>Vaultless / cryptographic surrogate</strong> approaches: use deterministic encryption or <em>format-preserving encryption (FPE)</em>. <sup>[27]</sup></li>
+                </ul>
+                <p>However, NIST and ENISA emphasize the limits of de-identification/pseudonymization: it is a risk-reduction tool rather than a guarantee against re-identification. <sup>[28] [29]</sup></p>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="domain-boundaries">Domain-Level Security Boundaries</h3>
+                <p>Data mesh emphasizes domain-oriented decentralized ownership and federated computational governance. <sup>[13]</sup> The Thoughtworks "Data Mesh" excerpt explicitly frames governance execution as codifying and automating policies at a fine-grained level across distributed data products. <sup>[30]</sup></p>
+                <p>In security terms, each domain becomes a boundary with its own threat model, regulatory obligations (HIPAA, PCI), and policy authority. A domain boundary is only enforceable if it is represented concretely in: <strong>Identity</strong> (domain ownership as ABAC attributes), <strong>Metadata</strong> (tags/labels driving policy), <strong>Compute/Network</strong> (enforced paths), and <strong>Contracts</strong> (data product descriptors). <sup>[11] [31] [32]</sup></p>
+
+                <hr class="my-8 border-slate-200"/>
+
+                <h2 class="text-3xl font-sans font-bold text-slate-900" id="tooling-comparison">Tooling Comparison for Distributed Data Access Governance</h2>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="ranger">Apache Ranger</h3>
+                <p>Apache Ranger is a framework to enable and manage comprehensive data security across the Hadoop ecosystem. <sup>[33]</sup> Ranger’s core architectural idea is centralized policy administration with <em>lightweight Java plugins</em> embedded in service processes for enforcement. <sup>[34]</sup> It supports fine-grained controls such as row filtering and data masking. <sup>[35]</sup> Ranger provides UI/APIs for authorization and audits, integrating with Apache Atlas (TagSync) for metadata-driven control. <sup>[36] [37]</sup> Deployments are commonly on-prem or cloud-hosted as part of Hadoop/lakehouse distributions. <sup>[40]</sup></p>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="immuta">Immuta</h3>
+                <p>Immuta describes a “native integration” architecture where it functions as the PDP and enables enforcement by administering policies natively in the data platform. <sup>[41]</sup> For example, its Snowflake integration uses a system role to orchestrate policies and maintain state. <sup>[42]</sup> Immuta offers robust auditing <sup>[43]</sup> and supports SaaS and self-managed deployments (Kubernetes/Helm). <sup>[44] [45]</sup> It integrates with numerous modern platforms (Snowflake, Databricks, BigQuery) <sup>[47]</sup> and external catalogs (Collibra, Alation) for tag-driven policies. <sup>[50] [51]</sup></p>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="privacera">Privacera</h3>
+                <p>Privacera extends Apache Ranger’s model for cloud/hybrid environments. <sup>[52]</sup> It supports multiple enforcement patterns: Ranger plugin embedding, PolicySync (pushdown to native systems), and "Secure Views" as a proxy fallback. <sup>[53] [54] [55]</sup> The platform includes sensitive data discovery and classification capabilities. <sup>[57]</sup> Privacera offers SaaS (PrivaceraCloud) and self-managed deployments, featuring deep catalog integrations and SSO/SCIM-based provisioning. <sup>[59] [60] [61]</sup></p>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6" id="comparison-table">Comparison Table</h3>
+                
+                <div class="overflow-x-auto my-6 border border-slate-300 rounded shadow-sm">
+                    <table class="min-w-full text-left border-collapse bg-white m-0">
+                        <thead class="bg-slate-100 text-slate-700 font-sans border-b border-slate-300">
+                            <tr>
+                                <th class="p-3 font-semibold w-1/4 border-r border-slate-300">Capability Area</th>
+                                <th class="p-3 font-semibold border-r border-slate-300">Apache Ranger</th>
+                                <th class="p-3 font-semibold border-r border-slate-300">Immuta</th>
+                                <th class="p-3 font-semibold">Privacera</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm font-sans divide-y divide-slate-200">
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Licensing</td>
+                                <td class="p-3 border-r border-slate-300">Apache 2.0 open source. <sup>[40]</sup></td>
+                                <td class="p-3 border-r border-slate-300">Commercial. <sup>[62]</sup></td>
+                                <td class="p-3">Commercial (SaaS and self-managed). <sup>[63]</sup></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Core architectural model</td>
+                                <td class="p-3 border-r border-slate-300">Central admin + in-process plugins for enforcement. <sup>[64]</sup></td>
+                                <td class="p-3 border-r border-slate-300">Middle control plane: Administers policies natively in platforms. <sup>[41]</sup></td>
+                                <td class="p-3">Extends Ranger; enforcement via plugin and/or policy pushdown (PolicySync). <sup>[65]</sup></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Deployment models</td>
+                                <td class="p-3 border-r border-slate-300">Typically self-hosted (Hadoop/lakehouse). <sup>[66]</sup></td>
+                                <td class="p-3 border-r border-slate-300">SaaS or self-managed Kubernetes (Helm). <sup>[67]</sup></td>
+                                <td class="p-3">SaaS (PrivaceraCloud) and self-managed. <sup>[63]</sup></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Supported platforms (examples)</td>
+                                <td class="p-3 border-r border-slate-300">Hadoop ecosystem, external engines via plugins (e.g. Trino). <sup>[68]</sup></td>
+                                <td class="p-3 border-r border-slate-300">Snowflake, Databricks/Unity Catalog, BigQuery, Redshift, etc. <sup>[69]</sup></td>
+                                <td class="p-3">Broad hybrid/multi-cloud; 40+ data sources incl. S3, Redshift, Snowflake. <sup>[70]</sup></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Policy authoring style</td>
+                                <td class="p-3 border-r border-slate-300">UI/APIs; resource and tag-based. <sup>[71]</sup></td>
+                                <td class="p-3 border-r border-slate-300">“Plain language or as-code”; emphasizes global policies. <sup>[72]</sup></td>
+                                <td class="p-3">Centralized authoring translated to native systems. <sup>[73]</sup></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Enforcement points</td>
+                                <td class="p-3 border-r border-slate-300">Plugins embedded in service processes. <sup>[74]</sup></td>
+                                <td class="p-3 border-r border-slate-300">“Native integration” inside the data platform. <sup>[75]</sup></td>
+                                <td class="p-3">Plugin + policy sync pushdown; fallback secure views. <sup>[76]</sup></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Auditing</td>
+                                <td class="p-3 border-r border-slate-300">Centralized; commonly Solr/HDFS. <sup>[77]</sup></td>
+                                <td class="p-3 border-r border-slate-300">Logs app &amp; remote queries; export via Elastic/cloud. <sup>[78]</sup></td>
+                                <td class="p-3">Audit Server service collects &amp; distributes logs. <sup>[79]</sup></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium border-r border-slate-300">Metadata integration</td>
+                                <td class="p-3 border-r border-slate-300">Tag-based policies via TagSync (Apache Atlas). <sup>[80]</sup></td>
+                                <td class="p-3 border-r border-slate-300">External catalogs (Collibra, Alation) &amp; platform tags. <sup>[81]</sup></td>
+                                <td class="p-3">Catalog integrations to import tags. <sup>[59]</sup></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-slate-600 bg-slate-50 p-4 rounded border-l-4 border-yellow-400">
+                    <strong>Notable Gaps:</strong> While all three support policy centralization, architectural challenges persist. Ensuring enforcement cannot be bypassed (via direct storage access) and managing propagation lag and audit fidelity across heterogeneous platforms remain complex mesh security issues. <sup>[88]</sup>
+                </p>
+
+                <hr class="my-8 border-slate-200"/>
+
+                <h2 class="text-3xl font-sans font-bold text-slate-900" id="mesh-patterns">Mesh Security Patterns and Reference Architectures</h2>
+                
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6">Control Plane vs Data Plane</h3>
+                <p>NIST Zero Trust distinguishes logical components: a separate control plane for communication vs a data plane for application data. <sup>[89]</sup> Mesh security maps well to this:</p>
+                <ul>
+                    <li><strong>Control Plane:</strong> identity, policy authoring, attribute/tag management, distribution, audit analytics.</li>
+                    <li><strong>Data Plane:</strong> query execution, storage I/O, enforcement primitives (RLS, masking, encryption).</li>
+                </ul>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6 mb-4">Entity Relationships for a Domain-Based Policy Mesh</h3>
+                <p>This model operationalizes federated computational governance: a central set of policy standards exists, but domains own data products and can author policies within guardrails. <sup>[90]</sup></p>
+                
+                <div class="my-6 p-4 bg-white border border-slate-200 rounded-lg shadow-sm flex justify-center">
+                    <div class="mermaid">
+                    erDiagram
+                        DOMAIN ||--o{ DATA_PRODUCT : owns
+                        DATA_PRODUCT ||--o{ DATASET : exposes
+                        DATASET ||--o{ CLASSIFICATION_TAG : labeled_by
+                        POLICY ||--o{ POLICY_RULE : contains
+                        POLICY_RULE }o--|| CLASSIFICATION_TAG : references
+                        POLICY_RULE }o--|| IDENTITY_ATTRIBUTE : references
+                        IDENTITY_PROVIDER ||--o{ IDENTITY_ATTRIBUTE : issues
+                        POLICY ||--o{ ENFORCEMENT_TARGET : compiled_to
+                        ENFORCEMENT_TARGET ||--o{ AUDIT_EVENT : emits
+                        DATASET ||--o{ AUDIT_EVENT : accessed_as
+                        DOMAIN ||--o{ POLICY : authors_or_delegates
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6">Policy Decision and Enforcement Flow Patterns</h3>
+                <h4 class="font-sans font-medium text-slate-700">Pattern: Distributed PEPs with Centralized PDP + Caching</h4>
+                <p>This aligns with NIST ABAC’s note that PDP/PEP can be distributed or separated. Latency/availability tradeoffs are mitigated by policy/attribute caching at the PEP (or local PDP replicas) with a safe "fail closed" approach for PII. <sup>[10] [11]</sup></p>
+
+                <h4 class="font-sans font-medium text-slate-700">Pattern: Policy Pushdown / Compilation to Native Enforcement</h4>
+                <p>The dominant pattern in modern warehouses: compiling ABAC logic into native row policies, column masks, grants, or secure views. Immuta and Privacera heavily utilize this pattern. <sup>[91] [92]</sup> Benefits include low runtime dependency on a central PDP; costs include eventual consistency (propagation lag) and translation limits.</p>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6">Cross-Domain Trust Models and Data Residency</h3>
+                <p>A mesh needs explicit trust decisions. A practical model consists of: <strong>Root governance authority</strong> (global templates), <strong>Domain policy authority</strong> (data product policy), <strong>Identity authority</strong> (IdP/SCIM), and <strong>Metadata authority</strong> (catalogs/tags). <sup>[11] [59] [93]</sup> Data residency rules are enforced via placement (raw PII in specific regions) and policy constraints (ABAC obligations based on region). <sup>[94] [95]</sup></p>
+
+                <hr class="my-8 border-slate-200"/>
+
+                <h2 class="text-3xl font-sans font-bold text-slate-900" id="case-studies">Case Studies and Real-World Examples</h2>
+                <ul>
+                    <li><strong>Thomson Reuters (Immuta + Snowflake):</strong> Reported a 60× increase in data usage via automated access using 1 global subscription policy. Native enforcement reduced bypass risk. <sup>[6] [96]</sup></li>
+                    <li><strong>Azure Manufacturer (Privacera):</strong> A Microsoft partner case study noted a reduction in onboarding from days to minutes and a 10× productivity increase across multiple Azure services. <sup>[7] [110]</sup></li>
+                    <li><strong>AWS Lake Formation + Privacera + Databricks:</strong> Demonstrates cross-system policy orchestration, translating Lake Formation policies via Privacera to Databricks native controls. <sup>[97] [98]</sup></li>
+                </ul>
+
+                <hr class="my-8 border-slate-200"/>
+
+                <h2 class="text-3xl font-sans font-bold text-slate-900" id="risks-mitigations">Security Risks, Privacy Implications, and Mitigations</h2>
+                <div class="space-y-4 mt-6">
+                    <div>
+                        <strong class="font-sans text-slate-800">Policy misconfiguration and blast radius expansion:</strong> A mesh increases the number of policy authors. <em>Mitigation:</em> Policy-as-code workflows with automated simulation and strict separation of duties.
+                    </div>
+                    <div>
+                        <strong class="font-sans text-slate-800">Attribute poisoning / inconsistency:</strong> ABAC depends on trustworthy attributes. <em>Mitigation:</em> Apply strong IAM governance (SCIM provisioning) and monitor drift. <sup>[11] [99]</sup>
+                    </div>
+                    <div>
+                        <strong class="font-sans text-slate-800">Bypass paths around enforcement:</strong> Alternate engines, direct object-store access, or shadow datasets. <em>Mitigation:</em> Enforce at the lowest feasible layer and continuously monitor via audits.
+                    </div>
+                    <div>
+                        <strong class="font-sans text-slate-800">Sensitive metadata leakage:</strong> Tags can reveal content even if access is denied. <em>Mitigation:</em> Classify metadata itself; implement "need-to-know" visibility for sensitive tags. <sup>[100]</sup>
+                    </div>
+                    <div>
+                        <strong class="font-sans text-slate-800">Pseudonymization re-identification risk:</strong> De-identification is risk reduction, not elimination. <em>Mitigation:</em> Treat token vaults as crown jewels, apply differential privacy where appropriate for high-risk sharing. <sup>[28] [29] [101]</sup>
+                    </div>
+                </div>
+
+                <hr class="my-8 border-slate-200"/>
+
+                <h2 class="text-3xl font-sans font-bold text-slate-900" id="implementation-roadmap">Implementation Roadmap &amp; KPIs</h2>
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6">Phased Roadmap</h3>
+                <ol>
+                    <li><strong>Foundation phase:</strong> Establish control-plane primitives. Standardize identities, define a canonical classification schema, and stand up centralized audit retention. <sup>[104] [105] [106]</sup></li>
+                    <li><strong>Expansion phase:</strong> Implement ABAC at scale. Use tags to drive RLS/masking centrally and establish "policy compilation targets" per platform. <sup>[20] [107] [108]</sup></li>
+                    <li><strong>Privacy hardening phase:</strong> Implement tokenization for high-risk identifiers and apply pseudonymisation governance consistent with GDPR. <sup>[25] [95] [109]</sup></li>
+                    <li><strong>Operational excellence phase:</strong> Continuous verification. Introduce automated access request workflows and anomaly detection on audit logs. <sup>[110] [111]</sup></li>
+                </ol>
+
+                <h3 class="text-xl font-sans font-semibold text-slate-800 mt-6">KPIs for Mesh Security Success</h3>
+                <ul>
+                    <li><strong>Time-to-access / time-to-onboard:</strong> Median and p95.</li>
+                    <li><strong>Policy reuse ratio:</strong> % of assets governed by global/tag-based policies vs bespoke per-table rules.</li>
+                    <li><strong>Classification coverage:</strong> % of tables/columns with required tags.</li>
+                    <li><strong>Audit coverage:</strong> % of platforms producing centralized logs. <sup>[112]</sup></li>
+                    <li><strong>Incidents / near-misses:</strong> Number of detected policy violations; MTTR to revoke access.</li>
+                    <li><strong>Domain boundary integrity:</strong> Ratio of approved cross-domain shares to "informal copies".</li>
+                </ul>
+
+                <hr class="my-12 border-slate-300"/>
+
+                <h2 class="text-2xl font-sans font-bold text-slate-900 mb-6" id="references">References</h2>
+                <div class="text-sm font-sans space-y-3 break-words bg-slate-50 p-6 rounded-lg border border-slate-200 text-slate-600">
+                    <p id="ref-1"><strong>[1] [89]</strong> Zero Trust Architecture: <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf" rel="noopener noreferrer" target="_blank">https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf</a></p>
+                    <p id="ref-2"><strong>[2] [9] [10] [11] [14] [88] [94] [107]</strong> Guide to Attribute Based Access Control (ABAC): <a href="https://nvlpubs.nist.gov/nistpubs/specialpublications/NIST.sp.800-162.pdf" rel="noopener noreferrer" target="_blank">https://nvlpubs.nist.gov/nistpubs/specialpublications/NIST.sp.800-162.pdf</a></p>
+                    <p id="ref-3"><strong>[3] [33] [66]</strong> Apache Ranger: <a href="https://ranger.apache.org/" rel="noopener noreferrer" target="_blank">https://ranger.apache.org/</a></p>
+                    <p id="ref-4"><strong>[4] [41] [75] [91] [106]</strong> Immuta Native Integration: <a href="https://documentation.immuta.com/2024.2/detect-your-activity/getting-started/general-immuta-configuration/native-integration" rel="noopener noreferrer" target="_blank">Immuta Docs</a></p>
+                    <p id="ref-5"><strong>[5] [52]</strong> Apache Ranger and Privacera Key Similarities: <a href="https://privacera.com/wp-content/uploads/2023/01/Apache-Ranger-and-Privacera_Key-Similarities-and-Major-Privacera-Enhancements-1.pdf" rel="noopener noreferrer" target="_blank">Privacera Specs</a></p>
+                    <p id="ref-6"><strong>[6] [96]</strong> Thomson Reuters Case Study: <a href="https://www.immuta.com/case-studies/thomson-reuters/" rel="noopener noreferrer" target="_blank">https://www.immuta.com/case-studies/thomson-reuters/</a></p>
+                    <p id="ref-7"><strong>[7] [110]</strong> Microsoft Partner Case Study (Privacera): <a href="https://partner.microsoft.com/en-us/case-studies/privacera" rel="noopener noreferrer" target="_blank">https://partner.microsoft.com/en-us/case-studies/privacera</a></p>
+                    <p id="ref-8"><strong>[8] [28]</strong> De-Identification of Personal Information: <a href="https://nvlpubs.nist.gov/nistpubs/ir/2015/NIST.IR.8053.pdf" rel="noopener noreferrer" target="_blank">https://nvlpubs.nist.gov/nistpubs/ir/2015/NIST.IR.8053.pdf</a></p>
+                    <p id="ref-13"><strong>[13]</strong> Data Mesh Principles: <a href="https://martinfowler.com/articles/data-mesh-principles.html" rel="noopener noreferrer" target="_blank">https://martinfowler.com/articles/data-mesh-principles.html</a></p>
+                    <p id="ref-15"><strong>[15]</strong> PostgreSQL Row Security: <a href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html" rel="noopener noreferrer" target="_blank">https://www.postgresql.org/docs/current/ddl-rowsecurity.html</a></p>
+                    <p id="ref-16"><strong>[16] [108]</strong> Snowflake Row Access: <a href="https://docs.snowflake.com/en/user-guide/security-row-intro" rel="noopener noreferrer" target="_blank">https://docs.snowflake.com/en/user-guide/security-row-intro</a></p>
+                    <p id="ref-17"><strong>[17] [22]</strong> BigQuery Row-Level Security: <a href="https://docs.cloud.google.com/bigquery/docs/managing-row-level-security" rel="noopener noreferrer" target="_blank">https://docs.cloud.google.com/bigquery/docs/managing-row-level-security</a></p>
+                    <p id="ref-20"><strong>[20]</strong> Databricks Unity Catalog Filters: <a href="https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/" rel="noopener noreferrer" target="_blank">https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/</a></p>
+                    <p id="ref-23"><strong>[23] [95]</strong> GDPR Art 4: <a href="https://gdpr-info.eu/art-4-gdpr/" rel="noopener noreferrer" target="_blank">https://gdpr-info.eu/art-4-gdpr/</a></p>
+                    <p id="ref-24"><strong>[24] [101]</strong> EDPB Pseudonymisation Guidelines: <a href="https://www.edpb.europa.eu/system/files/2025-01/edpb_guidelines_202501_pseudonymisation_en.pdf" rel="noopener noreferrer" target="_blank">EDPB Docs</a></p>
+                    <p id="ref-25"><strong>[25] [26]</strong> PCI DSS Tokenization Guidelines: <a href="https://www.pcisecuritystandards.org/documents/Tokenization_Guidelines_Info_Supplement.pdf" rel="noopener noreferrer" target="_blank">PCI Security Standards</a></p>
+                    <p id="ref-27"><strong>[27] [109]</strong> Format-Preserving Encryption (NIST SP 800-38G): <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf" rel="noopener noreferrer" target="_blank">https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf</a></p>
+                    <p id="ref-30"><strong>[30] [90]</strong> Data Mesh Excerpt (Thoughtworks): <a href="https://www.thoughtworks.com/content/dam/thoughtworks/documents/books/bk_data_mesh_excerpt.pdf" rel="noopener noreferrer" target="_blank">Thoughtworks Book</a></p>
+                    <p id="ref-97"><strong>[70] [97] [98]</strong> AWS Lake Formation &amp; Privacera: <a href="https://aws.amazon.com/blogs/apn/governing-databricks-data-access-with-aws-lake-formation-and-privacera/" rel="noopener noreferrer" target="_blank">AWS Partner Network Blog</a></p>
+                    <p><em>(Note: Reference numbers follow the bracketed notations embedded throughout the technical paper)</em></p>
+                </div>
+
+            </article>
+        </main>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <!-- Initialize Mermaid.js for Diagrams -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+
+</body></html>

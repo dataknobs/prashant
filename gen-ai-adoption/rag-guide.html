@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>RAG - Retrieval Augmented Generation</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,0.08);
+      --panel-strong: rgba(255,255,255,0.12);
+      --card: #ffffff;
+      --text: #e8eefc;
+      --muted: #b7c3e0;
+      --dark: #111827;
+      --accent: #5eead4;
+      --accent-2: #60a5fa;
+      --accent-3: #c084fc;
+      --line: rgba(255,255,255,0.14);
+      --shadow: 0 20px 60px rgba(0,0,0,0.28);
+      --radius: 24px;
+      --maxw: 1200px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,0.25), transparent 30%),
+        radial-gradient(circle at top right, rgba(192,132,252,0.18), transparent 28%),
+        linear-gradient(180deg, #0b1020 0%, #0f172a 38%, #f8fafc 38%, #f8fafc 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(11,16,32,0.65);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .navbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 72px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      color: #06202c;
+      box-shadow: 0 12px 28px rgba(94,234,212,0.25);
+      font-weight: 800;
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 14px;
+      transition: 0.25s ease;
+    }
+    .nav-links a:hover {
+      color: white;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .hero {
+      position: relative;
+      padding: 64px 0 84px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 36px;
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      color: #dff7ff;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 0 6px rgba(94,234,212,0.08);
+    }
+    h1 {
+      font-size: clamp(40px, 7vw, 72px);
+      line-height: 0.98;
+      margin: 0;
+      letter-spacing: -0.04em;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.8;
+      margin: 22px 0 0;
+      max-width: 720px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 30px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 16px;
+      font-weight: 700;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #07131f;
+      box-shadow: 0 18px 40px rgba(96,165,250,0.28);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .hero-visual {
+      position: relative;
+      animation: float 5.5s ease-in-out infinite;
+    }
+    .hero-card {
+      border-radius: 30px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -30% auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(94,234,212,0.3), transparent 70%);
+      filter: blur(6px);
+      pointer-events: none;
+    }
+    .hero-card img {
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .floating-stat {
+      position: absolute;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(15,23,42,0.82);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      min-width: 180px;
+      animation: bob 4s ease-in-out infinite;
+    }
+    .floating-stat small {
+      color: #9fb0d5;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .floating-stat strong {
+      display: block;
+      font-size: 18px;
+    }
+    .stat-a { top: -18px; right: -18px; animation-delay: 0.2s; }
+    .stat-b { left: -26px; bottom: 24px; animation-delay: 1.1s; }
+
+    .section {
+      padding: 82px 0;
+      color: var(--dark);
+    }
+    .section-title {
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.05;
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+    .section-subtitle {
+      margin-top: 18px;
+      font-size: 18px;
+      line-height: 1.9;
+      color: #475569;
+      max-width: 860px;
+    }
+
+    .grid-4, .grid-3, .grid-2 {
+      display: grid;
+      gap: 20px;
+    }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 60px rgba(15,23,42,0.1);
+    }
+    .card .index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ccfbf1, #dbeafe);
+      color: #0f172a;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      color: #0f172a;
+    }
+    .card p, .card li {
+      color: #475569;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .dark-band {
+      background: linear-gradient(180deg, #0f172a, #0b1020);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .dark-band::before {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(96,165,250,0.18), transparent 70%);
+      top: -160px;
+      right: -100px;
+      pointer-events: none;
+    }
+    .dark-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .dark-card h3 { margin-top: 0; font-size: 22px; }
+    .dark-card p, .dark-card li {
+      color: #c7d2fe;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .diagram-wrap {
+      margin-top: 34px;
+      padding: 28px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, #eef6ff, #ffffff);
+      border: 1px solid #dbeafe;
+      box-shadow: 0 18px 60px rgba(37,99,235,0.08);
+      overflow: hidden;
+    }
+    .diagram {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      gap: 16px;
+    }
+    .node {
+      position: relative;
+      min-height: 120px;
+      border-radius: 24px;
+      background: white;
+      border: 1px solid #dbeafe;
+      box-shadow: 0 18px 30px rgba(30,41,59,0.08);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      animation: pulseCard 4.5s ease-in-out infinite;
+    }
+    .node strong {
+      display: block;
+      color: #0f172a;
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+    .node span {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .arrow {
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #93c5fd, #5eead4, #c084fc);
+      position: relative;
+      overflow: hidden;
+    }
+    .arrow::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      border-left: 12px solid #c084fc;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+    .arrow::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+      animation: flow 2.2s linear infinite;
+    }
+
+    .timeline {
+      margin-top: 34px;
+      display: grid;
+      gap: 16px;
+    }
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 18px;
+      align-items: start;
+      padding: 18px;
+      border-radius: 22px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 12px 30px rgba(15,23,42,0.05);
+    }
+    .timeline-badge {
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      background: linear-gradient(135deg, #cffafe, #dbeafe);
+    }
+    .timeline-item h4 {
+      margin: 4px 0 6px;
+      font-size: 20px;
+      color: #0f172a;
+    }
+    .timeline-item p {
+      margin: 0;
+      color: #475569;
+      line-height: 1.8;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      color: #0f172a;
+      background: linear-gradient(135deg, #ecfeff, #eff6ff);
+      border: 1px solid #dbeafe;
+    }
+
+    .callout {
+      border-radius: 32px;
+      padding: 32px;
+      background: linear-gradient(135deg, #0891b2, #2563eb 55%, #7c3aed);
+      color: white;
+      box-shadow: 0 30px 80px rgba(59,130,246,0.28);
+    }
+    .callout p {
+      color: rgba(255,255,255,0.9);
+      line-height: 1.9;
+      font-size: 17px;
+      max-width: 860px;
+    }
+
+    footer {
+      padding: 34px 0 64px;
+      color: #64748b;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes flow {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(120%); }
+    }
+    @keyframes pulseCard {
+      0%, 100% { transform: translateY(0); box-shadow: 0 18px 30px rgba(30,41,59,0.08); }
+      50% { transform: translateY(-4px); box-shadow: 0 26px 42px rgba(30,41,59,0.12); }
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid, .grid-4, .grid-3, .grid-2, .diagram {
+        grid-template-columns: 1fr 1fr;
+      }
+      .diagram .arrow:nth-child(2n) { display: none; }
+    }
+    @media (max-width: 840px) {
+      .hero-grid, .grid-4, .grid-3, .grid-2, .diagram {
+        grid-template-columns: 1fr;
+      }
+      .floating-stat { position: static; margin-top: 14px; }
+      .timeline-item { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hero { padding-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <div class="brand">
+        <div class="brand-badge">R</div>
+        <div>RAG Web Guide</div>
+      </div>
+      <div class="nav-links">
+        <a href="#topics">Topics</a>
+        <a href="#diagram">Diagram</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#evaluation">Evaluation</a>
+        <a href="#advanced">Advanced</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="reveal visible">
+        <div class="eyebrow">Retrieval-Augmented Generation</div>
+        <h1>Detailed webpage on RAG with diagram, motion, and production depth</h1>
+        <p>
+          Retrieval-Augmented Generation combines external knowledge retrieval with large language models so answers can be grounded in current, relevant, and verifiable information. Instead of depending only on what a model learned during pretraining, a RAG system fetches the best evidence at runtime and uses it to generate a more accurate response.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#topics">Explore the topics</a>
+          <a class="btn btn-secondary" href="#diagram">See the RAG diagram</a>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal visible">
+        <div class="hero-card">
+          <img alt="RAG agenda image" src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/generativeai/10-llms/rag/rag/images/Slide1000/Slide1.png"/>
+        </div>
+        <div class="floating-stat stat-a">
+          <small>Core outcome</small>
+          <strong>Grounded generation</strong>
+        </div>
+        <div class="floating-stat stat-b">
+          <small>System goal</small>
+          <strong>Better recall + better answers</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="topics">
+      <div class="container">
+        <h2 class="section-title reveal">RAG topics expanded from the source image</h2>
+        <p class="section-subtitle reveal">
+          The image highlights eight key topics: foundation, chunking, vector databases, retrieval, generation, evaluation, event, and time. This webpage expands each of them and adds the related production topics teams typically need when moving from prototype to enterprise deployment.
+        </p>
+
+        <div class="grid-4" style="margin-top: 28px;">
+          <article class="card reveal"><div class="index">01</div><h3>RAG Foundation</h3><p>What RAG is, where it fits, and why dynamic retrieval is often better than relying only on model memory.</p></article>
+          <article class="card reveal"><div class="index">02</div><h3>Chunking</h3><p>How document segmentation directly affects retrieval quality, context preservation, and system efficiency.</p></article>
+          <article class="card reveal"><div class="index">03</div><h3>Vector DB</h3><p>Embeddings, indexing, metadata, filtering, namespaces, and the role of semantic storage in retrieval.</p></article>
+          <article class="card reveal"><div class="index">04</div><h3>Retrieval</h3><p>Dense, sparse, hybrid, reranking, multi-query expansion, decomposition, and context compression.</p></article>
+          <article class="card reveal"><div class="index">05</div><h3>Generation</h3><p>Prompt assembly, grounded context, citations, answer synthesis, and structured outputs.</p></article>
+          <article class="card reveal"><div class="index">06</div><h3>Evaluation</h3><p>Metrics for retrieval quality, answer faithfulness, latency, cost, and end-to-end user experience.</p></article>
+          <article class="card reveal"><div class="index">07</div><h3>Event</h3><p>Using workflow events, logs, streams, and change notifications to keep knowledge fresh and reactive.</p></article>
+          <article class="card reveal"><div class="index">08</div><h3>Time</h3><p>Recency, temporal filtering, validity windows, and date-aware reasoning for time-sensitive knowledge.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="diagram" style="padding-top: 0;">
+      <div class="container">
+        <div class="diagram-wrap reveal">
+          <h2 class="section-title" style="font-size: clamp(28px, 4vw, 40px);">Animated RAG diagram</h2>
+          <p class="section-subtitle" style="margin-top: 12px; max-width: 900px;">
+            This simplified architecture diagram shows the most common flow used in a retrieval-augmented system. Content is ingested and indexed, queries are transformed and retrieved, relevant chunks are reranked, and the LLM generates a grounded answer.
+          </p>
+
+          <div class="diagram" style="margin-top: 28px;">
+            <div class="node"><div><strong>Data Sources</strong><span>PDFs, docs, wikis, tickets, APIs, DB records, event streams</span></div></div>
+            <div class="arrow"></div>
+            <div class="node"><div><strong>Ingestion + Chunking</strong><span>Cleaning, parsing, metadata, segmentation, embeddings</span></div></div>
+            <div class="arrow"></div>
+            <div class="node"><div><strong>Vector / Search Index</strong><span>Semantic search, keyword search, filters, namespaces</span></div></div>
+            <div class="arrow"></div>
+            <div class="node"><div><strong>Retrieval + Rerank</strong><span>Hybrid retrieval, ranking, compression, query rewriting</span></div></div>
+            <div class="arrow"></div>
+            <div class="node"><div><strong>LLM Generation</strong><span>Grounded answer, citations, JSON output, workflow actions</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dark-band section">
+      <div class="container">
+        <h2 class="section-title reveal" style="color: white;">Why RAG matters</h2>
+        <p class="section-subtitle reveal" style="color: #cbd5e1;">
+          Models are powerful, but they do not automatically know your latest internal documentation, policy changes, current product data, or customer-specific records. RAG solves that by injecting the right evidence at runtime.
+        </p>
+        <div class="grid-3" style="margin-top: 30px;">
+          <div class="dark-card reveal"><h3>RAG vs fine-tuning</h3><p>Fine-tuning changes model behavior or style. RAG injects dynamic knowledge. In real systems, the two are often complementary.</p></div>
+          <div class="dark-card reveal"><h3>RAG vs long context</h3><p>Bigger context windows help, but retrieval still matters because it reduces noise, keeps cost down, and prioritizes the best evidence.</p></div>
+          <div class="dark-card reveal"><h3>RAG as a system</h3><p>Strong RAG is not a single prompt trick. It is an end-to-end information system spanning ingestion, indexing, retrieval, ranking, generation, and feedback.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="container">
+        <h2 class="section-title reveal">Reference architecture in practice</h2>
+        <p class="section-subtitle reveal">Each stage below is a quality lever. Weakness in any one stage can reduce the final answer quality even if the model itself is strong.</p>
+
+        <div class="timeline">
+          <div class="timeline-item reveal"><div class="timeline-badge">1</div><div><h4>Ingest content</h4><p>Pull from documents, knowledge bases, support systems, structured databases, code repositories, email, CRM, and live application events.</p></div></div>
+          <div class="timeline-item reveal"><div class="timeline-badge">2</div><div><h4>Clean and normalize</h4><p>Remove boilerplate, preserve section hierarchy, extract tables if possible, and keep metadata like source, date, owner, permissions, and version.</p></div></div>
+          <div class="timeline-item reveal"><div class="timeline-badge">3</div><div><h4>Chunk and index</h4><p>Split content into retrievable units, create embeddings, store searchable text, and maintain filters for time, product, tenant, or user access.</p></div></div>
+          <div class="timeline-item reveal"><div class="timeline-badge">4</div><div><h4>Transform the query</h4><p>Rewrite, expand, or decompose complex questions so the retrieval layer can search across multiple relevant phrasings and sub-questions.</p></div></div>
+          <div class="timeline-item reveal"><div class="timeline-badge">5</div><div><h4>Retrieve and rerank</h4><p>Use dense, sparse, or hybrid search. Then rerank and compress the result set so only the highest-value evidence reaches the prompt.</p></div></div>
+          <div class="timeline-item reveal"><div class="timeline-badge">6</div><div><h4>Generate and validate</h4><p>Assemble the context, instruct the model how to answer, add citation rules or JSON schema, and validate output for faithfulness or completeness.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="background: #ffffff; padding-top: 0;">
+      <div class="container">
+        <div class="grid-2">
+          <article class="card reveal">
+            <h3>Chunking strategies</h3>
+            <p>Chunking is one of the most important design choices in RAG because retrieval quality depends on what each chunk contains and how that chunk is represented in the index.</p>
+            <ul>
+              <li><strong>Fixed-size chunking:</strong> simple and scalable, but can break meaning across boundaries.</li>
+              <li><strong>Sentence or paragraph chunking:</strong> good for clean prose and readable passages.</li>
+              <li><strong>Structure-aware chunking:</strong> preserves sections, headings, code blocks, and document hierarchy.</li>
+              <li><strong>Semantic chunking:</strong> groups related meaning, often improving recall on nuanced questions.</li>
+              <li><strong>Overlap windows:</strong> help when facts span chunk boundaries, though too much overlap increases redundancy.</li>
+            </ul>
+          </article>
+
+          <article class="card reveal">
+            <h3>Vector databases</h3>
+            <p>Vector databases store embeddings that represent semantic meaning. A production-ready vector layer usually also includes metadata filters, namespaces, source references, timestamps, versioning, and update pipelines.</p>
+            <ul>
+              <li>Fast nearest-neighbor similarity search</li>
+              <li>Metadata filtering for date, tenant, author, product, and permissions</li>
+              <li>Versioned records to handle changing documents</li>
+              <li>Support for hybrid search with traditional keyword systems</li>
+              <li>Operational visibility into recall, freshness, and query latency</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 12px;">
+      <div class="container">
+        <div class="grid-2">
+          <article class="card reveal">
+            <h3>Retrieval techniques</h3>
+            <p>Retrieval is more than “top-k nearest vectors.” High-quality systems often combine multiple methods.</p>
+            <div class="pill-list">
+              <span class="pill">Dense retrieval</span>
+              <span class="pill">BM25 / sparse search</span>
+              <span class="pill">Hybrid search</span>
+              <span class="pill">Metadata filtering</span>
+              <span class="pill">Reranking</span>
+              <span class="pill">Multi-query expansion</span>
+              <span class="pill">Query decomposition</span>
+              <span class="pill">Context compression</span>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <h3>Generation layer</h3>
+            <p>Once the right evidence is found, the generation layer turns it into a useful answer. Strong prompt construction focuses on the best context, not the most context.</p>
+            <ul>
+              <li>Explicit instructions to answer only from retrieved evidence when appropriate</li>
+              <li>Source-aware synthesis and optional citations</li>
+              <li>Fallback behavior when evidence is weak or conflicting</li>
+              <li>Control over tone, format, and level of detail</li>
+              <li>Support for structured outputs like JSON, SQL, or tool parameters</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="dark-band section" id="evaluation">
+      <div class="container">
+        <h2 class="section-title reveal" style="color: white;">Evaluation and measurement</h2>
+        <p class="section-subtitle reveal" style="color: #cbd5e1;">A RAG system is only as good as its evidence chain. You need metrics for retrieval, generation, and operations.</p>
+        <div class="grid-4" style="margin-top: 28px;">
+          <div class="dark-card reveal"><h3>Retrieval quality</h3><p>Track recall@k, precision@k, hit rate, MRR, or nDCG to know whether the right evidence is actually being found.</p></div>
+          <div class="dark-card reveal"><h3>Faithfulness</h3><p>Measure whether claims in the answer are supported by the retrieved context and whether unsupported statements appear.</p></div>
+          <div class="dark-card reveal"><h3>Operational health</h3><p>Monitor token usage, latency, cache hit rate, index freshness, and cost per query to keep the system reliable.</p></div>
+          <div class="dark-card reveal"><h3>Human review</h3><p>Rubric-based expert review is still essential for difficult domains, edge cases, ambiguity, and trust calibration.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="advanced">
+      <div class="container">
+        <h2 class="section-title reveal">Event-driven and time-aware RAG</h2>
+        <p class="section-subtitle reveal">
+          The source image includes “Event” and “Time,” which are especially important when knowledge changes frequently. These dimensions push RAG beyond static search and toward living knowledge systems.
+        </p>
+
+        <div class="grid-2" style="margin-top: 26px;">
+          <article class="card reveal">
+            <h3>Event-driven RAG</h3>
+            <p>Batch indexing alone is often not enough. Event-driven pipelines update the retrieval layer when meaningful business changes happen.</p>
+            <ul>
+              <li>New support ticket triggers a knowledge lookup workflow</li>
+              <li>Policy change triggers re-indexing and cache invalidation</li>
+              <li>CRM status updates feed personalized retrieval for account assistants</li>
+              <li>Security alerts trigger retrieval over logs, incidents, and runbooks</li>
+            </ul>
+          </article>
+
+          <article class="card reveal">
+            <h3>Time-aware RAG</h3>
+            <p>Recency and validity windows are essential when “correct” depends on date. The right answer might differ across historical and current-state questions.</p>
+            <ul>
+              <li>Prefer the newest policy when the user asks for current guidance</li>
+              <li>Use historically valid documents when the question asks about a past period</li>
+              <li>Store created, modified, effective, and expiration dates</li>
+              <li>Pass the reference date into the prompt so the model reasons temporally</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="grid-2">
+          <article class="card reveal">
+            <h3>Related production topics</h3>
+            <ul>
+              <li><strong>Metadata design:</strong> useful for filtering, auditing, and access control.</li>
+              <li><strong>Security and permissions:</strong> retrieval must respect who is allowed to see what.</li>
+              <li><strong>Reranking:</strong> improves the top few passages before they reach the model.</li>
+              <li><strong>Observability:</strong> log queries, retrieved chunks, outputs, latency, and failure modes.</li>
+              <li><strong>Guardrails:</strong> validation and fallback logic reduce unsupported answers.</li>
+              <li><strong>Agentic RAG:</strong> agents can iteratively search, refine, and call tools across multiple steps.</li>
+            </ul>
+          </article>
+
+          <article class="card reveal">
+            <h3>Common pitfalls</h3>
+            <ul>
+              <li>Poor chunking that fractures related facts</li>
+              <li>No lexical retrieval for IDs, dates, codes, and exact keywords</li>
+              <li>Too much context in the prompt instead of the best context</li>
+              <li>No reranking, causing irrelevant evidence to dominate</li>
+              <li>Weak metadata that blocks good filtering later</li>
+              <li>No evaluation loop, so failures stay hidden</li>
+              <li>Ignoring freshness and document versioning</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="callout reveal">
+          <h2 class="section-title" style="color: white; margin: 0; font-size: clamp(28px, 4vw, 42px);">A simple rule for better RAG</h2>
+          <p>
+            Treat RAG as an information system, not just a prompt pattern. Clean ingestion, smart chunking, strong retrieval, careful context assembly, and ongoing evaluation together create the user experience. When those pieces work well, the model becomes more trustworthy, current, and useful.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+  </script>
+
+
+</body></html>

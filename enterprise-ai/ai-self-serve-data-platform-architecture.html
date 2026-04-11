@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Self-Serve Data Platform Architecture for Data Mesh</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta content="A comprehensive reference architecture for a Self-Serve Data Platform supporting Data Mesh. Covers control plane, data plane, integration patterns, APIs, and operational runbooks." name="description"/>
+    <meta content="Data Mesh, Data Platform, Architecture, Self-Serve, Data Products, OpenAPI, AsyncAPI, OpenLineage, DataHub, Kubernetes, Terraform, Dagster, Airflow, Spark, Flink" name="keywords"/>
+
+    <!-- Tailwind CSS with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Highlight.js for Code Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Mermaid.js for Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js"></script>
+
+    <style>
+        /* Custom scrollbar for sidebar */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Smooth Details/Summary Accordion Animation */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary ~ * {
+            animation: sweep .3s ease-in-out;
+        }
+        @keyframes sweep {
+            0%    {opacity: 0; margin-top: -10px}
+            100%  {opacity: 1; margin-top: 0px}
+        }
+        
+        .toc-link.active {
+            color: #0284c7;
+            font-weight: 600;
+            border-left-color: #0284c7;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800 antialiased selection:bg-brand-100 selection:text-brand-900">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="h-6 w-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+                <h1 class="font-bold text-lg hidden sm:block">Self-Serve Data Platform Architecture</h1>
+            </div>
+            <a class="text-sm font-medium hover:text-brand-100 transition" href="#references">View References</a>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-8 py-8 relative">
+        
+        <!-- Sidebar / Table of Contents -->
+        <aside class="w-full md:w-64 flex-shrink-0">
+            <div class="sticky top-24 bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Contents</h3>
+                <nav class="flex flex-col space-y-2 text-sm text-slate-600" id="toc">
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#assumptions">Assumptions</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#executive-summary">Executive Summary</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#architecture-overview">Architecture Overview</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#platform-apis">Platform APIs</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#provisioning">Data Product Provisioning</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#iac-pipelines">IaC for Pipelines</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#idp-capabilities">IDP Capabilities</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#stack-options">Stack Options</a>
+                    <a class="toc-link border-l-2 border-transparent pl-3 hover:text-brand-600 hover:border-slate-300 transition-colors" href="#closing">Closing Perspective</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0 prose prose-slate prose-headings:text-slate-900 prose-h2:border-b prose-h2:pb-2 prose-h2:mb-6 prose-a:text-brand-600 max-w-none">
+            
+            <!-- Title Section -->
+            <div class="mb-12">
+                <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-4">Self-Serve Data Platform Architecture for Data Mesh Data Products</h1>
+                <p class="text-lg text-slate-600 leading-relaxed">A reference architecture blending internal developer platform (IDP) principles with data mesh paradigms to deliver scalable, governed, and self-serve data infrastructure.</p>
+            </div>
+
+            <section class="scroll-mt-24" id="assumptions">
+                <h2>Assumptions</h2>
+                <p>Because target scale, cloud provider, and budget were not specified, the recommendations below are designed to be portable across cloud and on‑prem, with “swap‑in” choices for managed vs. self‑hosted components.</p>
+                <ul>
+                    <li><strong>Baseline scenario:</strong> A mid-to-large enterprise data mesh: dozens of domains, hundreds of data products, mixed batch + streaming workloads, and a need for strong governance and discoverability without re‑centralizing delivery. This aligns to the “self‑serve data infrastructure as a platform” pillar described in mainstream data mesh guidance. [1]</li>
+                    <li><strong>Security assumptions:</strong> (a) centralized identity via OIDC/OAuth2, (b) least-privilege authorization at every layer, and (c) separation of control plane (platform APIs, policy, metadata) from data plane (compute/storage/stream). OIDC is explicitly defined as an authentication layer built on top of OAuth 2.0. [2]</li>
+                    <li><strong>Operational assumptions:</strong> Platform capabilities must be consumable in “X‑as‑a‑Service” mode (self‑serve), and the internal platform (IDP) should be treated as a product with curated experiences—consistent with platform engineering guidance. [3]</li>
+                </ul>
+            </section>
+
+            <section class="scroll-mt-24 mt-12" id="executive-summary">
+                <h2>Executive Summary</h2>
+                <p>A self-serve data platform for data mesh succeeds when it behaves like an internal developer platform: it offers a small number of paved paths that domains can adopt quickly (templates + golden paths), while the platform team centrally manages cross-cutting concerns (identity, policy, observability, cost, metadata/lineage). [4]</p>
+                
+                <h3>Control Plane Capabilities</h3>
+                <ul>
+                    <li>A <strong>Data Product Registry API</strong> (resource-oriented) plus <strong>contract-first specs</strong> using OpenAPI for request/response APIs and AsyncAPI for event-driven interfaces. [5]</li>
+                    <li>A <strong>Data Contract standard</strong> (ODCS) stored alongside code and validated in CI/CD, enabling automated governance checks. [6]</li>
+                    <li>A <strong>Provisioning service</strong> that turns product manifests into infrastructure via IaC (Terraform/Pulumi) and GitOps workflows (e.g., Argo CD). [7]</li>
+                </ul>
+
+                <h3>Data Plane Capabilities</h3>
+                <ul>
+                    <li><strong>Orchestration:</strong> Airflow and/or Dagster. Airflow for broad scheduling; Dagster for asset-centric, testable pipelines. [8]</li>
+                    <li><strong>Streaming:</strong> Kafka or Pulsar. Pulsar has explicit multi-tenancy; Kafka relies on ACLs. [9]</li>
+                    <li><strong>Lakehouse storage:</strong> Iceberg or Delta Lake. Both provide schema evolution and time travel/rollback primitives. [10]</li>
+                    <li><strong>Compute:</strong> Spark (batch + micro-batch) and/or Flink (stateful streaming). [11]</li>
+                </ul>
+
+                <h3>Metadata, Lineage, &amp; Observability</h3>
+                <p>A metadata platform (<strong>DataHub</strong> or Amundsen) plus <strong>OpenLineage</strong> as the interoperability layer for run-level lineage events. [12]</p>
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 my-6 rounded-r-lg text-amber-900">
+                    <p class="m-0 font-medium"><strong>Key Trade-off: Standardization vs. Autonomy</strong></p>
+                    <p class="m-0 text-sm mt-1">Too little standardization produces a “distributed swamp,” while too much creates bottlenecks. The practical solution is <em>“federated guardrails”</em>: enforce a small set of machine-checkable contracts while leaving implementation choice to domains where feasible. [13]</p>
+                </div>
+            </section>
+
+            <section class="scroll-mt-24 mt-12" id="architecture-overview">
+                <h2>Reference Architecture Overview</h2>
+                <p>A data mesh-aligned platform should map naturally to the four widely cited principles: domain-oriented ownership, data as a product, self-serve platform, and federated computational governance. [14] The key move is to implement “self-serve” primarily as <strong>APIs + paved workflows</strong>, not a ticket queue.</p>
+                
+                <div class="my-8 border rounded-xl overflow-hidden bg-slate-50 p-6 flex justify-center">
+                    <div class="mermaid">
+flowchart LR
+  subgraph DomainTeams[Domain data product teams]
+    Dev[Domain developers &amp; analytics engineers]
+    Repo[Data Product Repo\n(code + manifest + contracts)]
+  end
+  subgraph IDP[Internal Developer Platform]
+    Portal[Developer Portal\n(e.g., Backstage)]
+    Templates[Templates &amp; Golden Paths]
+  end
+  subgraph ControlPlane[Platform control plane]
+    DPR[Data Product Registry API]
+    Prov[Provisioning Orchestrator\n(IaC + GitOps)]
+    Policy[Policy Engine\n(RBAC/ABAC + approvals)]
+    Secrets[Secrets &amp; Key Mgmt]
+    Catalog[Metadata Catalog\n(DataHub/Amundsen)]
+  end
+  subgraph DataPlane[Platform data plane]
+    Orch[Orchestration\n(Airflow/Dagster)]
+    Stream[Streaming\n(Kafka/Pulsar)]
+    Compute[Compute\n(Spark/Flink)]
+    Lake[Lakehouse Storage\n(Iceberg/Delta)]
+  end
+  subgraph ObsPlane[Observability &amp; Lineage]
+    OTel[Telemetry\n(OpenTelemetry)]
+    OL[Lineage Events\n(OpenLineage)]
+    Monitor[Monitoring/Alerting]
+  end
+
+  Dev --&gt; Portal
+  Portal --&gt; Templates
+  Templates --&gt; Repo
+  Repo --&gt; Prov
+  Prov --&gt; Policy
+  Policy --&gt; Prov
+  Prov --&gt; Orch
+  Prov --&gt; Stream
+  Prov --&gt; Lake
+  Orch --&gt; Compute
+  Compute --&gt; Lake
+  Orch --&gt; OL
+  Compute --&gt; OL
+  OL --&gt; Catalog
+  OTel --&gt; Monitor
+  DPR --&gt; Catalog
+  Secrets --&gt; Prov
+  DPR --&gt; Prov
+  Portal --&gt; DPR
+                    </div>
+                </div>
+                
+                <p>This separation of planes is what makes self-service safe: the control plane exposes standardized interfaces, while the data plane scales independently with workload. [3]</p>
+            </section>
+
+            <section class="scroll-mt-24 mt-12" id="platform-apis">
+                <h2>Platform APIs for Data Products</h2>
+                <p>This section focuses on how the platform exposes “data product as a first-class resource” using stable APIs, consistent auth, and machine-checkable contracts.</p>
+                
+                <h3>Recommended Patterns</h3>
+                <ul>
+                    <li><strong>Contract-first specs:</strong> Use <strong>OpenAPI</strong> for synchronous APIs. Use <strong>AsyncAPI</strong> for event-driven interfaces. [18][19]</li>
+                    <li><strong>Versioning:</strong> Adopt <strong>Semantic Versioning</strong> for data product interfaces. [20]</li>
+                    <li><strong>AuthN/AuthZ:</strong> Use centralized identity via <strong>OpenID Connect</strong> (OIDC). Apply least privilege using RBAC at runtime layers. [2][22]</li>
+                </ul>
+
+                <h3>Example API Contracts</h3>
+                
+                <h4>Data Product Registry (OpenAPI)</h4>
+<pre><code class="language-yaml">openapi: 3.1.0
+info:
+  title: Data Product Registry API
+  version: 1.0.0
+paths:
+  /data-products:
+    post:
+      summary: Register a new data product
+      security: [{ oidc: [ "dpr.write" ] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DataProductCreate" }
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              schema: { type: string }
+  /data-products/{productId}/versions:
+    post:
+      summary: Publish a new version of a data product
+      security: [{ oidc: [ "dpr.write" ] }]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        "202":
+          description: Accepted for validation + provisioning
+components:
+  securitySchemes:
+    oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://idp.example.com/.well-known/openid-configuration
+  schemas:
+    DataProductCreate:
+      type: object
+      required: [name, domain, owner, description]
+      properties:
+        name: { type: string }
+        domain: { type: string }
+        owner: { type: string, description: "Group or team id" }
+        description: { type: string }</code></pre>
+
+                <h4>Streaming Interface (AsyncAPI)</h4>
+<pre><code class="language-yaml">asyncapi: 3.0.0
+info:
+  title: Orders Data Product Events
+  version: 1.2.0
+servers:
+  prod:
+    host: broker.prod.example:9092
+    protocol: kafka
+channels:
+  orders.created:
+    address: orders.created
+    messages:
+      OrdersCreated:
+        payload:
+          type: object
+          required: [order_id, created_at, customer_id]
+          properties:
+            order_id: { type: string }
+            created_at: { type: string, format: date-time }
+            customer_id: { type: string }
+operations:
+  publishOrdersCreated:
+    action: send
+    channel:
+      $ref: "#/channels/orders.created"</code></pre>
+
+                <h4>Data Contracts as "Product Constitution" (ODCS)</h4>
+<pre><code class="language-yaml">apiVersion: v3.1.0
+kind: DataContract
+id: orders
+name: Orders
+version: 1.2.0
+status: active
+schema:
+  - name: orders
+    columns:
+      - name: order_id
+        type: string
+        required: true
+      - name: created_at
+        type: timestamp
+        required: true
+quality:
+  - type: freshness
+    maxLagMinutes: 15
+terms:
+  - type: pii
+    classification: restricted</code></pre>
+
+                <!-- Interactive Runbooks (Platform APIs) -->
+                <div class="mt-8 space-y-4">
+                    <details class="group border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden open:ring-2 open:ring-brand-500/20 transition-all">
+                        <summary class="flex justify-between items-center cursor-pointer bg-slate-50 p-4 font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-brand-500 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                Runbook: Introducing a breaking change to a data product interface
+                            </div>
+                        </summary>
+                        <div class="p-5 border-t border-slate-100 text-sm text-slate-600 bg-white">
+                            <ol class="list-decimal list-inside space-y-2 marker:text-brand-500 marker:font-bold">
+                                <li>Classify the change using SemVer (breaking → MAJOR). [20]</li>
+                                <li>Update OpenAPI/AsyncAPI/ODCS in the product repo; create a new version folder (e.g., <code>contracts/2.0.0/</code>).</li>
+                                <li>CI performs contract checks:
+                                    <ul class="list-disc list-inside ml-4 mt-1">
+                                        <li>OpenAPI lint + backward compatibility check.</li>
+                                        <li>AsyncAPI validation + schema registry compatibility check. [26]</li>
+                                        <li>ODCS validation against the standard definition. [27]</li>
+                                    </ul>
+                                </li>
+                                <li>Provision parallel interfaces where feasible (new topic or table namespace).</li>
+                                <li>Publish deprecation notice in catalog with timelines and consumer impact analysis using lineage. [28]</li>
+                                <li>Monitor adoption; enforce retirement by policy after the deprecation window.</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <details class="group border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden open:ring-2 open:ring-brand-500/20 transition-all">
+                        <summary class="flex justify-between items-center cursor-pointer bg-slate-50 p-4 font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-brand-500 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                Runbook: API authentication incidents (token compromise)
+                            </div>
+                        </summary>
+                        <div class="p-5 border-t border-slate-100 text-sm text-slate-600 bg-white">
+                            <ol class="list-decimal list-inside space-y-2 marker:text-brand-500 marker:font-bold">
+                                <li>Revoke client credentials / rotate secrets in the central secrets system.</li>
+                                <li>Force re-issuance of access tokens; validate OIDC configuration and client registrations. [2]</li>
+                                <li>Audit platform API access logs; identify affected products and consumers.</li>
+                                <li>Post-incident: add policy requirements (shorter TTL, mandatory mTLS for service clients, tighter scopes).</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <section class="scroll-mt-24 mt-12" id="provisioning">
+                <h2>Data Product Provisioning</h2>
+                <p>To keep domains autonomous while preventing “snowflake infrastructure,” provisioning should be template-driven, policy-guarded, and declarative.</p>
+                
+                <div class="my-8 border rounded-xl overflow-hidden bg-slate-50 p-6 flex justify-center">
+                    <div class="mermaid">
+stateDiagram-v2
+  [*] --&gt; Draft
+  Draft --&gt; Proposed: Contracts + manifest submitted
+  Proposed --&gt; Provisioning: Policy checks pass
+  Provisioning --&gt; Active: Infra reconciled + first successful run
+  Active --&gt; Active: Minor/Patch updates
+  Active --&gt; Deprecated: Deprecation announced
+  Deprecated --&gt; Retired: Sunset + access removed
+  Proposed --&gt; Draft: Policy or contract rejected
+  Provisioning --&gt; Proposed: Provisioning failed (rollback)
+                    </div>
+                </div>
+
+                <h3>Example Backstage Scaffolder Template</h3>
+<pre><code class="language-yaml">apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: data-product-iceberg-batch
+spec:
+  owner: platform-team
+  type: data-product
+  parameters:
+    - title: Data Product Info
+      required: [name, domain, owner]
+      properties:
+        name: { type: string }
+        domain: { type: string }
+        owner: { type: string }
+  steps:
+    - id: fetch-base
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          domain: ${{ parameters.domain }}
+          owner: ${{ parameters.owner }}
+    - id: publish
+      action: publish:github
+      input:
+        repoUrl: github.com?repo=${{ parameters.name }}&amp;owner=${{ parameters.owner }}</code></pre>
+
+                <!-- Interactive Runbooks (Provisioning) -->
+                <div class="mt-8 space-y-4">
+                    <details class="group border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden open:ring-2 open:ring-brand-500/20 transition-all">
+                        <summary class="flex justify-between items-center cursor-pointer bg-slate-50 p-4 font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-brand-500 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                Runbook: Onboarding a new domain team
+                            </div>
+                        </summary>
+                        <div class="p-5 border-t border-slate-100 text-sm text-slate-600 bg-white">
+                            <ol class="list-decimal list-inside space-y-2 marker:text-brand-500 marker:font-bold">
+                                <li>Create domain identity groups in the IdP (OIDC provider) and map claims. [2]</li>
+                                <li>Allocate Kubernetes namespaces with namespace-scoped RBAC roles and quotas. [35]</li>
+                                <li>Allocate streaming tenancy (Pulsar tenant/namespace or Kafka ACLs/naming conventions). [36][37]</li>
+                                <li>Enable catalog write permissions for the domain (limited to its own products).</li>
+                                <li>Provide domain with Backstage template access and a standard “first product” walkthrough.</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <details class="group border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden open:ring-2 open:ring-brand-500/20 transition-all">
+                        <summary class="flex justify-between items-center cursor-pointer bg-slate-50 p-4 font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-brand-500 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                Runbook: Retiring a product
+                            </div>
+                        </summary>
+                        <div class="p-5 border-t border-slate-100 text-sm text-slate-600 bg-white">
+                            <ol class="list-decimal list-inside space-y-2 marker:text-brand-500 marker:font-bold">
+                                <li>Mark as Deprecated in registry; include sunset date.</li>
+                                <li>Use lineage to identify downstream dependencies. [28]</li>
+                                <li>Remove new access grants; maintain existing access until sunset.</li>
+                                <li>Archive runtime deployments (DAGs/jobs) and freeze tables/topics.</li>
+                                <li>Delete or cold-store data per retention policy; remove infra via IaC destroy/reconcile.</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <section class="scroll-mt-24 mt-12" id="iac-pipelines">
+                <h2>Infrastructure-as-Code for Pipelines</h2>
+                
+                <h3>Terraform Module Interface (Pseudo-code)</h3>
+<pre><code class="language-hcl">module "data_product_orders" {
+  source = "git::ssh://git.example.com/platform/iac-modules.git//data-product"
+  
+  product_id   = "orders"
+  domain       = "commerce"
+  environment  = "prod"
+  
+  # Streaming interface
+  kafka_topics = [
+    { name = "orders.created.v1", partitions = 24, retention_hours = 168 }
+  ]
+  
+  # Lakehouse interface
+  lake_tables = [
+    { name = "commerce.orders", format = "iceberg", partitioning = ["days(created_at)"] }
+  ]
+  
+  # Access policy hooks
+  owner_group = "grp-commerce-data"
+  pii_level   = "restricted"
+}</code></pre>
+
+                <h3>Pipeline Definitions</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <h4>Airflow DAG Pattern</h4>
+<pre><code class="language-python">with DAG("orders_daily", schedule="@daily") as dag:
+    extract = ExtractFromKafka(topic="orders.created.v1")
+    transform = SparkSubmit(job="orders_transform.py")
+    load = WriteIcebergTable(table="commerce.orders")
+    
+    extract &gt;&gt; transform &gt;&gt; load</code></pre>
+                    </div>
+                    <div>
+                        <h4>Dagster Asset Pattern</h4>
+<pre><code class="language-python">@assetdef orders_raw(kafka_resource):
+    return kafka_resource.read("orders.created.v1")
+
+@asset(deps=[orders_raw])
+def orders_iceberg(orders_raw, iceberg_io):
+    iceberg_io.write("commerce.orders", orders_raw)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="scroll-mt-24 mt-12" id="idp-capabilities">
+                <h2>Internal Developer Platform Capabilities</h2>
+                <p>A self-serve data platform becomes sustainable when it is delivered as an internal developer platform (IDP): portal UX + self-serve actions + guardrails + observability and cost controls.</p>
+                <ul>
+                    <li><strong>Developer portal:</strong> Backstage’s software templates scaffold components; catalog processes entities. [59]</li>
+                    <li><strong>RBAC enforcement:</strong> Close to execution surfaces (Kubernetes RBAC, Kafka ACLs). [35][37]</li>
+                    <li><strong>Observability:</strong> OpenTelemetry for traces, metrics, and logs. [60]</li>
+                    <li><strong>Cost controls:</strong> Showback/chargeback via namespace/label attribution (e.g., Kubecost). [61]</li>
+                </ul>
+
+                <div class="mt-8 space-y-4">
+                    <details class="group border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden open:ring-2 open:ring-brand-500/20 transition-all">
+                        <summary class="flex justify-between items-center cursor-pointer bg-slate-50 p-4 font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-brand-500 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                Runbook: Granting consumer access to a restricted data product
+                            </div>
+                        </summary>
+                        <div class="p-5 border-t border-slate-100 text-sm text-slate-600 bg-white">
+                            <ol class="list-decimal list-inside space-y-2 marker:text-brand-500 marker:font-bold">
+                                <li>Consumer requests access in the portal.</li>
+                                <li>Policy engine evaluates identity claims, product classification, and approvals.</li>
+                                <li>If approved, provisioning reconciles access controls (Kafka ACLs, Lakehouse RBAC).</li>
+                                <li>Catalog updates to reflect new access paths.</li>
+                                <li>Audit logs captured and retained.</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <section class="scroll-mt-24 mt-12" id="stack-options">
+                <h2>Integration &amp; Reference Stack Options</h2>
+                
+                <div class="my-8 border rounded-xl overflow-hidden bg-slate-50 p-6 flex justify-center overflow-x-auto">
+                    <div class="mermaid">
+erDiagram
+  DOMAIN ||--o{ DATA_PRODUCT : owns
+  DATA_PRODUCT ||--o{ PRODUCT_VERSION : has
+  PRODUCT_VERSION ||--o{ INTERFACE : exposes
+  INTERFACE ||--o{ DATASET : "table view"
+  INTERFACE ||--o{ STREAM : "topic/queue"
+  PRODUCT_VERSION ||--|| CONTRACT : governed_by
+  DATA_PRODUCT ||--|| TEAM : operated_by
+  DATASET ||--o{ LINEAGE_EDGE : participates_in
+  STREAM ||--o{ LINEAGE_EDGE : participates_in
+  
+  DOMAIN {
+    string domain_id
+    string name
+  }
+  TEAM {
+    string team_id
+    string idp_group
+  }
+  DATA_PRODUCT {
+    string product_id
+    string name
+    string lifecycle_state
+  }
+  PRODUCT_VERSION {
+    string version_semver
+    datetime published_at
+  }
+  INTERFACE {
+    string interface_type
+    string address
+  }
+  CONTRACT {
+    string contract_type
+    string location
+  }
+  DATASET {
+    string urn
+    string format
+  }
+  STREAM {
+    string topic
+    string protocol
+  }
+  LINEAGE_EDGE {
+    string upstream
+    string downstream
+  }
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto my-8">
+                    <table class="w-full text-left border-collapse min-w-max">
+                        <thead>
+                            <tr class="bg-slate-100 border-y border-slate-200 text-slate-700">
+                                <th class="py-3 px-4 font-semibold text-sm">Layer</th>
+                                <th class="py-3 px-4 font-semibold text-sm">Option</th>
+                                <th class="py-3 px-4 font-semibold text-sm">Maturity Signal</th>
+                                <th class="py-3 px-4 font-semibold text-sm">Scalability Posture</th>
+                                <th class="py-3 px-4 font-semibold text-sm">Cost Posture (Ops)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">Orchestration</td>
+                                <td class="py-3 px-4">Airflow</td>
+                                <td class="py-3 px-4 text-slate-600">Stable REST API, broad adoption</td>
+                                <td class="py-3 px-4 text-slate-600">Scales well; ops rise with DB tuning</td>
+                                <td class="py-3 px-4 text-slate-600">Medium–High</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">Orchestration</td>
+                                <td class="py-3 px-4">Dagster</td>
+                                <td class="py-3 px-4 text-slate-600">Asset-centric, lineage emphasis</td>
+                                <td class="py-3 px-4 text-slate-600">Scales well with asset modeling</td>
+                                <td class="py-3 px-4 text-slate-600">Medium</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">Streaming</td>
+                                <td class="py-3 px-4">Kafka</td>
+                                <td class="py-3 px-4 text-slate-600">Strong security primitives (ACLs)</td>
+                                <td class="py-3 px-4 text-slate-600">High throughput</td>
+                                <td class="py-3 px-4 text-slate-600">Medium–High</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">Streaming</td>
+                                <td class="py-3 px-4">Pulsar</td>
+                                <td class="py-3 px-4 text-slate-600">Explicit multi-tenancy model</td>
+                                <td class="py-3 px-4 text-slate-600">Designed for geo patterns</td>
+                                <td class="py-3 px-4 text-slate-600">Medium–High</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">Lakehouse</td>
+                                <td class="py-3 px-4">Iceberg</td>
+                                <td class="py-3 px-4 text-slate-600">Schema evolution, time travel</td>
+                                <td class="py-3 px-4 text-slate-600">Strong for very large tables</td>
+                                <td class="py-3 px-4 text-slate-600">Medium</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">Lakehouse</td>
+                                <td class="py-3 px-4">Delta Lake</td>
+                                <td class="py-3 px-4 text-slate-600">ACID transactions, scalable metadata</td>
+                                <td class="py-3 px-4 text-slate-600">Strong at scale (Spark-centric)</td>
+                                <td class="py-3 px-4 text-slate-600">Low–Medium</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">Metadata</td>
+                                <td class="py-3 px-4">DataHub</td>
+                                <td class="py-3 px-4 text-slate-600">GraphQL APIs, lineage APIs</td>
+                                <td class="py-3 px-4 text-slate-600">Scales as central metadata service</td>
+                                <td class="py-3 px-4 text-slate-600">Medium</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-3 px-4 font-medium">IDP Portal</td>
+                                <td class="py-3 px-4">Backstage</td>
+                                <td class="py-3 px-4 text-slate-600">Templates scaffold + catalog</td>
+                                <td class="py-3 px-4 text-slate-600">Scales as portal</td>
+                                <td class="py-3 px-4 text-slate-600">Medium</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="scroll-mt-24 mt-12 pb-12 border-b" id="closing">
+                <h2>Closing Perspective</h2>
+                <p>A self-serve data platform for data mesh is less about picking “the right tools” and more about achieving a consistent <strong>product operating model</strong>: machine-readable contracts, automated checks, declarative provisioning, standardized telemetry/lineage, and a portal that makes the paved path the easiest path. The cited ecosystem standards (OpenAPI, AsyncAPI, OpenLineage) and platform primitives (Terraform, Argo CD, Kubernetes RBAC, DataHub) exist precisely because scale demands automation and interoperability, and because manual governance does not scale. [84]</p>
+            </section>
+
+            <section class="scroll-mt-24 mt-12 text-sm text-slate-500" id="references">
+                <h3 class="text-slate-800 font-bold mb-4">Selected References</h3>
+                <ul class="space-y-2 break-all">
+                    <li>[1] Data Mesh Principles and Logical Architecture - Martin Fowler</li>
+                    <li>[3] CNCF Platforms White Paper | CNCF TAG App Delivery</li>
+                    <li>[5] OpenAPI Specification v3.1.0</li>
+                    <li>[6] Open Data Contract Standard (ODCS)</li>
+                    <li>[28] OpenLineage</li>
+                    <li>[29] Backstage Software Templates</li>
+                    <li>[30] Argo CD - Declarative GitOps CD</li>
+                    <li>[62] DataHub Components</li>
+                </ul>
+            </section>
+
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></main>
+    </div>
+
+    <script>
+        // Initialize highlight.js
+        hljs.highlightAll();
+
+        // Initialize Mermaid.js
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+
+        // ScrollSpy implementation for Sidebar ToC
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.toc-link');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '-20% 0px -70% 0px', // Trigger when section is near top
+                threshold: 0
+            };
+
+            const observerCallback = (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        
+                        // Remove active class from all links
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            link.classList.remove('border-brand-500');
+                            link.classList.remove('text-brand-600');
+                            link.classList.add('border-transparent');
+                        });
+
+                        // Add active class to corresponding link
+                        const activeLink = document.querySelector(`.toc-link[href="#${id}"]`);
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+                            activeLink.classList.remove('border-transparent');
+                            activeLink.classList.add('border-brand-500');
+                            activeLink.classList.add('text-brand-600');
+                        }
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(observerCallback, observerOptions);
+            sections.forEach(sec => observer.observe(sec));
+        });
+    </script>
+
+</body></html>

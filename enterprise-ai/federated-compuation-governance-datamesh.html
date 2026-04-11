@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Federated Computational Governance for Data Mesh</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta content="Comprehensive guide on Federated Computational Governance (FCG) for Data Mesh. Learn about operating models, reference architectures, policy-as-code, and best practices." name="description"/>
+    <meta content="Data Mesh, Federated Computational Governance, FCG, Policy as Code, Data Governance, Data Architecture, Open Policy Agent, Apache Ranger" name="keywords"/>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Mermaid.js for Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+
+    <style>
+        /* Custom styles to handle specific scroll behaviors and layout tweaks */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .mermaid { display: flex; justify-content: center; }
+        
+        /* Hide scrollbar for sidebar but allow scrolling */
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Top Header for Mobile -->
+    <div class="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-50 px-4 py-3 flex justify-between items-center">
+        <h1 class="font-bold text-slate-900 truncate pr-4 text-sm">FCG for Data Mesh</h1>
+        <button class="p-2 bg-slate-100 rounded-md text-slate-600 focus:outline-none" id="mobile-menu-btn">
+            <i data-lucide="menu" id="menu-icon-open"></i>
+            <i class="hidden" data-lucide="x" id="menu-icon-close"></i>
+        </button>
+    </div>
+
+    <div class="flex max-w-[1400px] mx-auto">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="fixed lg:sticky top-0 left-0 h-screen w-72 bg-white border-r border-slate-200 z-40 transform transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 pt-16 lg:pt-0 flex flex-col shadow-xl lg:shadow-none" id="sidebar">
+            <div class="p-6 hidden lg:block">
+                <h1 class="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                    Federated Computational Governance
+                </h1>
+                <p class="text-sm font-medium text-blue-600 mt-1">for Data Mesh</p>
+            </div>
+            
+            <nav class="sidebar-scroll flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                <a class="nav-link bg-blue-50 text-blue-700 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#executive-summary">
+                    <i class="text-blue-600 w-[18px] h-[18px]" data-lucide="book-open"></i> Executive Summary
+                </a>
+                <a class="nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#definitions">
+                    <i class="text-slate-400 w-[18px] h-[18px]" data-lucide="layers"></i> Definitions &amp; Scope
+                </a>
+                <a class="nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#challenges">
+                    <i class="text-slate-400 w-[18px] h-[18px]" data-lucide="alert-triangle"></i> Why It's Hard
+                </a>
+                <a class="nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#architecture">
+                    <i class="text-slate-400 w-[18px] h-[18px]" data-lucide="cpu"></i> Concepts &amp; Architecture
+                </a>
+                <a class="nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#workflows">
+                    <i class="text-slate-400 w-[18px] h-[18px]" data-lucide="workflow"></i> Workflows &amp; CI/CD
+                </a>
+                <a class="nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#technology">
+                    <i class="text-slate-400 w-[18px] h-[18px]" data-lucide="shield-check"></i> Technology Landscape
+                </a>
+                <a class="nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#operating-model">
+                    <i class="text-slate-400 w-[18px] h-[18px]" data-lucide="git-merge"></i> Operating Model
+                </a>
+                <a class="nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors" href="#best-practices">
+                    <i class="text-slate-400 w-[18px] h-[18px]" data-lucide="check-circle"></i> Best Practices &amp; KPIs
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 max-w-4xl px-6 py-24 lg:py-12 mx-auto overflow-x-hidden">
+            
+            <!-- Section: Executive Summary -->
+            <section class="mb-20 scroll-mt-24" id="executive-summary">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">Executive Summary</h2>
+                <div class="prose prose-slate max-w-none prose-p:text-slate-600 prose-p:leading-relaxed space-y-4">
+                    <p class="text-lg">
+                        <strong>Federated Computational Governance (FCG)</strong> is the mechanism that makes Data Mesh scale without collapsing into either chaos (too much autonomy) or bureaucracy (too much central control). In the Data Mesh framing, FCG is not "a governance team" or "a tool"—it is an operating model and technical execution model in which cross-domain policies are <strong>codified</strong> and <strong>automatically enforced</strong> via platform capabilities, while domains retain autonomy for local decisions. This is explicitly positioned as a shift from top‑down, human gatekeeping to a federated model with <strong>computational policies embedded in the mesh</strong>.
+                    </p>
+                    <p>
+                        FCG is among the hardest parts of Data Mesh because it must reconcile competing forces: fast, local decision‑making by domains versus enterprise‑wide interoperability, security, compliance, and shared semantics. Research and practitioner case studies repeatedly emphasize that decentralization creates a real risk of incompatible practices and re‑forming silos, and that the "right balance" between federated decentralization and common standards is non-trivial.
+                    </p>
+                    <p>
+                        A rigorous implementation of FCG typically converges on a <strong>policy architecture</strong> pattern (Policy Administration → Distribution → Decision → Enforcement → Audit) aligned with ABAC "PDP/PEP" concepts. NIST's ABAC guidance describes the use of a <strong>Policy Decision Point (PDP)</strong> to render authorization decisions and a <strong>Policy Enforcement Point (PEP)</strong> to enforce them; Data Mesh governance "computationalizes" many of these decisions (and related quality/metadata checks) so they run continuously and consistently across the mesh.
+                    </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-5 mt-6 rounded-r-lg">
+                        <p class="m-0 text-blue-900">
+                            <strong>The Governance Stack:</strong> Tools do not substitute for the governance model; instead, they form a stack. In practice, (1) a policy engine (e.g., Open Policy Agent), (2) data-plane enforcement systems (e.g., Apache Ranger, cloud-native catalogs like AWS Lake Formation or Databricks Unity Catalog, warehouse-native controls like Snowflake row/masking policies), and (3) metadata/stewardship/workflow platforms (e.g., DataHub, Collibra, Apache Atlas, OpenMetadata) each cover different parts of the lifecycle. Real-world implementations demonstrate both the value and the failure modes—especially tool fragmentation, policy drift, and manual steps that become bottlenecks.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Definitions -->
+            <section class="mb-20 scroll-mt-24" id="definitions">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-indigo-100 text-indigo-700 rounded-lg"><i data-lucide="layers"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900 m-0">Definitions and Scope</h2>
+                </div>
+                
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    Data Mesh is widely described as a socio-technical approach to managing and sharing analytical data at scale, organized around four interacting principles: domain-oriented ownership, data as a product, self-serve data platform, and federated computational governance.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-indigo-700 mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-sm">1</span>
+                            Federated
+                        </h3>
+                        <p class="text-sm text-slate-600">Decision-making and accountability are distributed across domains, not centralized in a single data governance function. Composed of domain representatives, platform, and SMEs.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-indigo-700 mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-sm">2</span>
+                            Computational
+                        </h3>
+                        <p class="text-sm text-slate-600">Governance is executed largely by codifying and automating policies at fine granularity via platform services, rather than manual reviews and approvals.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-indigo-700 mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-sm">3</span>
+                            Governance
+                        </h3>
+                        <p class="text-sm text-slate-600">Covers more than access control, spanning data quality, visibility, ownership, consistency, security, and compliance.</p>
+                    </div>
+                </div>
+
+                <p class="text-slate-600 mb-4 leading-relaxed">
+                    A defining Data Mesh detail is that "data as a product" introduces a "data quantum" that bundles structural elements necessary for sharing data—explicitly including <strong>policy</strong> alongside data, metadata, and code. This is crucial: FCG is not only mesh-level central policy; it is also about each data product carrying enforceable governance artifacts as part of its contract.
+                </p>
+                <p class="text-slate-600 leading-relaxed">
+                    A useful way to operationalize FCG is to map it to established access-control architectures like NIST SP 800‑162 (ABAC) describing a PDP to decide and a PEP to enforce, or XACML 3.0. In Data Mesh terms, <strong>FCG generalizes this idea beyond runtime authorization</strong>: the same "policy decision + enforcement" approach is applied to dataset onboarding gates, data contracts, tagging/classification requirements, quality assertions, lineage completeness, and cost guardrails.
+                </p>
+            </section>
+
+            <!-- Section: Why it's hard -->
+            <section class="mb-20 scroll-mt-24" id="challenges">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-rose-100 text-rose-700 rounded-lg"><i data-lucide="alert-triangle"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900 m-0">Why It's One of the Hardest Parts</h2>
+                </div>
+                
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    FCG is difficult because it sits at the intersection of organizational power distribution and hard technical realities:
+                </p>
+
+                <ul class="space-y-4">
+                    <li class="flex gap-4 p-4 rounded-lg bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex-shrink-0 mt-1"><i class="text-rose-400 w-[18px] h-[18px]" data-lucide="arrow-right"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">The core tension is structural</h4>
+                            <p class="text-slate-600 text-sm mt-1 leading-relaxed">Decentralization improves speed and domain fidelity, but increases the risk of incompatibility and silo formation. FCG is the principle that balances domain autonomy and agility with global interoperability of the mesh.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4 p-4 rounded-lg bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex-shrink-0 mt-1"><i class="text-rose-400 w-[18px] h-[18px]" data-lucide="arrow-right"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">Tooling heterogeneity makes 'compute' hard</h4>
+                            <p class="text-slate-600 text-sm mt-1 leading-relaxed">Domains often choose different storage engines, streaming platforms, orchestration tools, query engines, and BI tools; governance then must be enforced consistently across a moving landscape. No single tool covers all aspects required.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4 p-4 rounded-lg bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex-shrink-0 mt-1"><i class="text-rose-400 w-[18px] h-[18px]" data-lucide="arrow-right"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">'Federated' still requires central constraints</h4>
+                            <p class="text-slate-600 text-sm mt-1 leading-relaxed">Decentralized access control means domain teams decide who can consume their products, but the platform must also enable central functions (e.g., data protection) to prescribe, enforce, and review global access policies. You decentralize decisions while centralizing guardrails.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4 p-4 rounded-lg bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex-shrink-0 mt-1"><i class="text-rose-400 w-[18px] h-[18px]" data-lucide="arrow-right"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">Central governance can re-emerge as a bottleneck</h4>
+                            <p class="text-slate-600 text-sm mt-1 leading-relaxed">Central approvals can become bottlenecks unless carefully designed. Governance is socio-technical: mere technology is not enough, and major challenges include agreement/compliance in a dynamic policy environment.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4 p-4 rounded-lg bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex-shrink-0 mt-1"><i class="text-rose-400 w-[18px] h-[18px]" data-lucide="arrow-right"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">Even 'good' governance fails if the last mile is manual</h4>
+                            <p class="text-slate-600 text-sm mt-1 leading-relaxed">Early phases relying on manual token management might work for a pilot but become a bottleneck at scale—explicitly turning each manual step into a feature requirement for the platform.</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Section: Architecture -->
+            <section class="mb-20 scroll-mt-24" id="architecture">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-emerald-100 text-emerald-700 rounded-lg"><i data-lucide="cpu"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900 m-0">Concepts &amp; Reference Architectures</h2>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-slate-800 text-white p-5 rounded-xl">
+                        <h3 class="font-bold text-emerald-400 mb-2">Policy-as-code</h3>
+                        <p class="text-sm text-slate-300">The execution substrate. Open Policy Agent (OPA) explicitly frames itself as a general-purpose engine that lets you specify policy as code, decoupling decisions from application code via APIs.</p>
+                    </div>
+                    <div class="bg-slate-800 text-white p-5 rounded-xl">
+                        <h3 class="font-bold text-emerald-400 mb-2">Federated Councils</h3>
+                        <p class="text-sm text-slate-300">The governance team is federated across domain representatives, platform, and SMEs, creating incentives to maintain interoperability while preserving domain autonomy.</p>
+                    </div>
+                    <div class="bg-slate-800 text-white p-5 rounded-xl">
+                        <h3 class="font-bold text-emerald-400 mb-2">Automated Enforcement</h3>
+                        <p class="text-sm text-slate-300">Governance checks embedded into data product creation paths, deployment pipelines, query runtimes, and cross-domain interactions via platform services.</p>
+                    </div>
+                    <div class="bg-slate-800 text-white p-5 rounded-xl">
+                        <h3 class="font-bold text-emerald-400 mb-2">Policy Layering</h3>
+                        <p class="text-sm text-slate-300">Domain autonomy vs central control is achieved by defining a global baseline policy (often default deny) and allowing domain-level rules to override within bounds.</p>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-slate-900 mb-4 mt-10">Reference Architecture Patterns</h3>
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm mb-6">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-slate-900 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-4 w-1/4">Architecture Pattern</th>
+                                <th class="p-4 w-1/4">Decision &amp; Enforcement</th>
+                                <th class="p-4 w-1/4">When it fits best</th>
+                                <th class="p-4 w-1/4">Key risks / limitations</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="bg-white">
+                                <td class="p-4 font-medium text-slate-900">Embedded engine plugins (data-plane native)</td>
+                                <td class="p-4">In-process engine evaluation / Engine-specific PEPs</td>
+                                <td class="p-4">Strong, low-latency enforcement for SQL/streaming/storage</td>
+                                <td class="p-4">Fragmentation across engines; policy portability challenges</td>
+                            </tr>
+                            <tr class="bg-slate-50/50">
+                                <td class="p-4 font-medium text-slate-900">External PDP + PEP intercept (sidecar)</td>
+                                <td class="p-4">External PDP (OPA) / Envoy filter delegates decisions</td>
+                                <td class="p-4">Uniform policy logic across microservices/APIs</td>
+                                <td class="p-4">New runtime dependency; needs careful caching/perf design</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="p-4 font-medium text-slate-900">Central credential vending + tag policies</td>
+                                <td class="p-4">Central evaluation / Temp credentials enforce at storage</td>
+                                <td class="p-4">Cross-account/cloud-sharing; strong integration with IAM</td>
+                                <td class="p-4">Central service becomes choke point; identity hygiene required</td>
+                            </tr>
+                            <tr class="bg-slate-50/50">
+                                <td class="p-4 font-medium text-slate-900">Catalog-driven propagation</td>
+                                <td class="p-4">Policies compiled/pushed to systems; catalog is source of truth</td>
+                                <td class="p-4">Large orgs where "what data is this?" precedes access</td>
+                                <td class="p-4">Tagging quality becomes critical; lineage extraction costly</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="p-4 font-medium text-slate-900">Governance gateway</td>
+                                <td class="p-4">Gateway PDP evaluates / Gateway enforces</td>
+                                <td class="p-4">Early phases; when internal systems lack enforcement</td>
+                                <td class="p-4">Can become bottleneck; may need migration to native</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section: Workflows -->
+            <section class="mb-20 scroll-mt-24" id="workflows">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-amber-100 text-amber-700 rounded-lg"><i data-lucide="workflow"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900 m-0">Workflows &amp; CI/CD</h2>
+                </div>
+                
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    Below is a common access-flow sequence in a Data Mesh that combines domain autonomy, global guardrails, and computational enforcement. The design aligns with PDP/PEP ideas from ABAC.
+                </p>
+
+                <h4 class="font-bold text-slate-800 mb-2">Runtime Access with Federated Controls</h4>
+                <div class="my-8 p-6 bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto flex justify-center">
+                    <div class="mermaid text-sm">
+sequenceDiagram
+    autonumber
+    actor Consumer as Data Consumer
+    participant PEP as Policy Enforcement Point
+    participant PDP as Policy Decision Point
+    participant Catalog as Catalog/Metadata
+    participant Audit as Audit Log / SIEM
+    
+    Consumer-&gt;&gt;PEP: Request access (dataset, purpose, query)
+    PEP-&gt;&gt;Catalog: Fetch context (classification tags, owner, contract)
+    Catalog--&gt;&gt;PEP: Context attributes
+    PEP-&gt;&gt;PDP: AuthZ decision request (subject, action, resource, attr)
+    PDP--&gt;&gt;PEP: Decision + obligations (permit/deny, mask, limits)
+    PEP-&gt;&gt;Audit: Emit decision + inputs/metadata revision
+    alt Permit
+        PEP--&gt;&gt;Consumer: Results (filtered/masked)
+    else Deny
+        PEP--&gt;&gt;Consumer: Access denied (+ reason code)
+    end
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 my-6 leading-relaxed">
+                    In this workflow, "federated" manifests in who authors which policies (global baseline vs domain overlay) and who approves exceptions, while "computational" manifests in enforcement being built into the runtime and being auditable by default.
+                </p>
+
+                <h3 class="text-2xl font-bold text-slate-900 mb-4 mt-12">Policy Lifecycle and CI/CD Practices</h3>
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    FCG works only when policies behave like software: versioned, tested, deployed, monitored, and audited continuously. The workflow below is a pragmatic "policy factory" that supports federation.
+                </p>
+
+                <h4 class="font-bold text-slate-800 mb-2">GitOps-style Pipeline for FCG</h4>
+                <div class="my-8 p-6 bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto flex justify-center">
+                    <div class="mermaid text-sm">
+flowchart TD
+    A[Policy &amp; Contract Authoring<br/>Global baseline + Domain overlays] --&gt; B[Pull Request Review<br/>Council + Domain + SME]
+    B --&gt; C[CI: Lint + Unit Tests<br/>schema checks, testing]
+    C --&gt; D[CI: Integration Tests<br/>simulate requests, query plans]
+    D --&gt; E[Build Artifacts<br/>bundles / policy packages]
+    E --&gt; F[Sign + Publish<br/>artifact registry]
+    F --&gt; G[Distribute<br/>PDPs pull bundles / PEPs pull policies]
+    G --&gt; H[Enforce<br/>gateways, engines, pipelines]
+    H --&gt; I[Audit + Metrics<br/>Decision logs, access logs]
+    I -. Feedback Loop .-&gt; A
+    
+    style A fill:#e0f2fe,stroke:#0284c7,stroke-width:2px
+    style H fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mt-8">
+                    <div class="bg-white border border-slate-200 p-5 rounded-lg">
+                        <h4 class="font-bold text-slate-900 mb-2">Policy Interfaces &amp; Compatibility</h4>
+                        <p class="text-sm text-slate-600">Treat a policy package like an API; define input schemas and expected outputs, with deprecation windows for changes that break domain workflows.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 p-5 rounded-lg">
+                        <h4 class="font-bold text-slate-900 mb-2">Simulation Test Suites</h4>
+                        <p class="text-sm text-slate-600">Maintain recorded "golden" requests (access requests, query patterns) and replay them in CI against proposed policy changes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Technology Landscape -->
+            <section class="mb-20 scroll-mt-24" id="technology">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-cyan-100 text-cyan-700 rounded-lg"><i data-lucide="shield-check"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900 m-0">Technology Landscape &amp; Tools</h2>
+                </div>
+                
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    A practical mistake is to compare all governance tools as if they compete. In FCG, most tools are complementary, covering different layers: Policy engines (PDP), Data-plane frameworks (PEPs), and Metadata/Stewardship platforms.
+                </p>
+
+                <!-- Interactive Tabs for Matrices -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+                    <div class="flex border-b border-slate-200 bg-slate-50">
+                        <button class="flex-1 py-3 text-sm font-semibold transition-colors bg-white text-cyan-700 border-b-2 border-cyan-500 focus:outline-none" id="tab-policy">
+                            Policy Engines &amp; Enforcement
+                        </button>
+                        <button class="flex-1 py-3 text-sm font-semibold transition-colors text-slate-500 hover:text-slate-700 border-b-2 border-transparent focus:outline-none" id="tab-catalog">
+                            Catalog &amp; Workflow Platforms
+                        </button>
+                    </div>
+                    
+                    <div class="p-0 overflow-x-auto" id="content-policy">
+                        <table class="w-full text-left text-sm text-slate-600 min-w-[800px]">
+                            <thead class="bg-slate-50/50 text-slate-900 font-semibold border-b border-slate-100">
+                                <tr>
+                                    <th class="p-4 border-r border-slate-100 w-1/5">Capability</th>
+                                    <th class="p-4 w-1/5">OPA</th>
+                                    <th class="p-4 w-1/5">Apache Ranger</th>
+                                    <th class="p-4 w-1/5">AWS Lake Formation</th>
+                                    <th class="p-4 w-1/5">Databricks Unity Catalog</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Policy-as-code</td>
+                                    <td class="p-4">✓ (Rego, APIs)</td>
+                                    <td class="p-4">Partial (UI + APIs)</td>
+                                    <td class="p-4">Policy via LF-tags</td>
+                                    <td class="p-4">Central ABAC/tag + SQL masks</td>
+                                </tr>
+                                <tr class="bg-slate-50/30">
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Distribution</td>
+                                    <td class="p-4">Bundles (versioned)</td>
+                                    <td class="p-4">Admin pushes, plugins pull</td>
+                                    <td class="p-4">Central permissions</td>
+                                    <td class="p-4">Central within metastore</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Fine-grained</td>
+                                    <td class="p-4">Depends on integration</td>
+                                    <td class="p-4">✓ row-filters, masks, tags</td>
+                                    <td class="p-4">✓ fine-grained incl. TBAC</td>
+                                    <td class="p-4">✓ ABAC, row filters, masks</td>
+                                </tr>
+                                <tr class="bg-slate-50/30">
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Auditability</td>
+                                    <td class="p-4">Decision logs</td>
+                                    <td class="p-4">Centralized audit logs + UI</td>
+                                    <td class="p-4">AWS audit services</td>
+                                    <td class="p-4">Platform audit logging</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-0 overflow-x-auto hidden" id="content-catalog">
+                        <table class="w-full text-left text-sm text-slate-600 min-w-[800px]">
+                            <thead class="bg-slate-50/50 text-slate-900 font-semibold border-b border-slate-100">
+                                <tr>
+                                    <th class="p-4 border-r border-slate-100 w-1/5">Capability</th>
+                                    <th class="p-4 w-1/5">DataHub</th>
+                                    <th class="p-4 w-1/5">Collibra</th>
+                                    <th class="p-4 w-1/5">Apache Atlas</th>
+                                    <th class="p-4 w-1/5">OpenMetadata</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Domains</td>
+                                    <td class="p-4">Domains + ownership meta</td>
+                                    <td class="p-4">Org hierarchy (communities)</td>
+                                    <td class="p-4">Metadata catalog focus</td>
+                                    <td class="p-4">Platform metadata (RBAC)</td>
+                                </tr>
+                                <tr class="bg-slate-50/30">
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Glossary</td>
+                                    <td class="p-4">Git-managed ingestion</td>
+                                    <td class="p-4">Guided conceptual layers</td>
+                                    <td class="p-4">Terms + classifications</td>
+                                    <td class="p-4">Glossary capabilities</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Workflows</td>
+                                    <td class="p-4">Platform patterns</td>
+                                    <td class="p-4">Engine for auditable process</td>
+                                    <td class="p-4">Integrates with Ranger</td>
+                                    <td class="p-4">Admin-defined roles</td>
+                                </tr>
+                                <tr class="bg-slate-50/30">
+                                    <td class="p-4 font-medium text-slate-900 border-r border-slate-100">Data Contracts</td>
+                                    <td class="p-4">Assertions spec + compiler</td>
+                                    <td class="p-4">Supports governance process</td>
+                                    <td class="p-4">Governance metadata</td>
+                                    <td class="p-4">Quality integrations</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-slate-900 mb-3">Common Integration Patterns</h3>
+                <ul class="list-disc pl-6 space-y-2 text-slate-600">
+                    <li><strong>Catalog → tag propagation → enforcement:</strong> classifications created in catalog tooling drive tag-based policies.</li>
+                    <li><strong>Workflow-driven access requests:</strong> governance platforms orchestrate request flows while enforcement happens in the data plane.</li>
+                    <li><strong>Contracts and quality gates as policy:</strong> formalizing quality expectations as artifacts executed by DQ tools.</li>
+                </ul>
+            </section>
+
+            <!-- Section: Operating Model -->
+            <section class="mb-20 scroll-mt-24" id="operating-model">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-purple-100 text-purple-700 rounded-lg"><i data-lucide="git-merge"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900 m-0">Operating Model &amp; Case Studies</h2>
+                </div>
+                
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    A minimal, effective FCG structure usually includes a Federated Governance Council, Domain Product Owners, Data Stewards, and the Platform Product Team.
+                </p>
+
+                <div class="bg-purple-50 rounded-xl p-6 mb-8 border border-purple-100">
+                    <h3 class="text-xl font-bold text-purple-900 mb-4">Real-World Case Studies</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold text-slate-900">Saxo Bank: Catalog + Quality Platform</h4>
+                            <p class="text-sm text-slate-700 mt-1">Built an in-house "Data Workbench" powered by DataHub and Great Expectations to enable domains to publish products with light-touch governance. <em>Lesson:</em> Governance succeeds when ownership is explicit and self-service tooling replaces central bottlenecks.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-slate-900">Zalando: Governance at the External Boundary</h4>
+                            <p class="text-sm text-slate-700 mt-1">Managed partner sharing via Delta Sharing and Unity Catalog. Early phases relied on manual token management which became a bottleneck. <em>Lesson:</em> Partner sharing amplifies requirements; "compute" must include automated onboarding and credential lifecycle.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Common Failure Modes</h3>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 border border-slate-200 rounded-lg shadow-sm border-t-4 border-t-red-400">
+                        <h4 class="font-bold text-slate-900 mb-2">Federated without compute</h4>
+                        <p class="text-sm text-slate-600">Autonomy without scalable enforcement. Domains make local decisions, but policies aren't codified, leading to inconsistent classification and a return to tribal knowledge.</p>
+                    </div>
+                    <div class="bg-white p-5 border border-slate-200 rounded-lg shadow-sm border-t-4 border-t-red-400">
+                        <h4 class="font-bold text-slate-900 mb-2">Compute without federation</h4>
+                        <p class="text-sm text-slate-600">Central tooling becomes the new gatekeeper. A central team owns policy tooling and approvals, rebuilding ticket queues and stifling domain agility.</p>
+                    </div>
+                    <div class="bg-white p-5 border border-slate-200 rounded-lg shadow-sm border-t-4 border-t-amber-400">
+                        <h4 class="font-bold text-slate-900 mb-2">Semantic fragmentation</h4>
+                        <p class="text-sm text-slate-600">"Glossary drift" occurs when domains publish incompatible concepts without shared business definitions.</p>
+                    </div>
+                    <div class="bg-white p-5 border border-slate-200 rounded-lg shadow-sm border-t-4 border-t-amber-400">
+                        <h4 class="font-bold text-slate-900 mb-2">Tagging errors propagate</h4>
+                        <p class="text-sm text-slate-600">Errors in upstream classification propagate rapidly into enforcement decisions, breaking access control at scale.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Best Practices -->
+            <section class="mb-20 scroll-mt-24" id="best-practices">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-blue-100 text-blue-700 rounded-lg"><i data-lucide="check-circle"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900 m-0">Best Practices &amp; KPIs</h2>
+                </div>
+                
+                <ul class="space-y-4 mb-10">
+                    <li class="flex items-start gap-3">
+                        <i class="text-blue-500 mt-1 flex-shrink-0 w-[20px] h-[20px]" data-lucide="check-circle"></i>
+                        <p class="text-slate-600"><strong>Establish a two-tier model:</strong> A council sets global invariants, domains own implementation.</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="text-blue-500 mt-1 flex-shrink-0 w-[20px] h-[20px]" data-lucide="check-circle"></i>
+                        <p class="text-slate-600"><strong>Treat governance artifacts as code:</strong> Store policies and templates in version control with PR workflows.</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="text-blue-500 mt-1 flex-shrink-0 w-[20px] h-[20px]" data-lucide="check-circle"></i>
+                        <p class="text-slate-600"><strong>Standardize on a few "lanes":</strong> Pick 1-2 dominant architecture lanes first rather than a big-bang integration.</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="text-blue-500 mt-1 flex-shrink-0 w-[20px] h-[20px]" data-lucide="check-circle"></i>
+                        <p class="text-slate-600"><strong>Govern the tagging system:</strong> Use tag-based models, but treat tag changes as audited, reviewed events.</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="text-blue-500 mt-1 flex-shrink-0 w-[20px] h-[20px]" data-lucide="check-circle"></i>
+                        <p class="text-slate-600"><strong>Design exception handling as a product:</strong> Exceptions are inevitable; automate their approval to prevent bottlenecks.</p>
+                    </li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i class="text-slate-500 w-[20px] h-[20px]" data-lucide="trending-up"></i>
+                    Measurable KPIs
+                </h3>
+                
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-slate-900 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-4 w-1/3">KPI</th>
+                                <th class="p-4 w-1/3">How to Measure</th>
+                                <th class="p-4 w-1/3">Why it matters</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="bg-white">
+                                <td class="p-4 font-medium text-slate-900">Time-to-publish a product</td>
+                                <td class="p-4">Median time from "repo created" to "published"</td>
+                                <td class="p-4">Tests whether governance is a gatekeeper or accelerator</td>
+                            </tr>
+                            <tr class="bg-slate-50/50">
+                                <td class="p-4 font-medium text-slate-900">Policy automation coverage</td>
+                                <td class="p-4">% of controls enforced automatically</td>
+                                <td class="p-4">FCG depends on codified + automated policies</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="p-4 font-medium text-slate-900">Classification accuracy</td>
+                                <td class="p-4">% assets tagged properly; sampled correctness</td>
+                                <td class="p-4">Tag errors mis-govern access</td>
+                            </tr>
+                            <tr class="bg-slate-50/50">
+                                <td class="p-4 font-medium text-slate-900">Exception aging</td>
+                                <td class="p-4">Median age of exceptions; % expired</td>
+                                <td class="p-4">High exceptions imply misfit policies</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="p-4 font-medium text-slate-900">Governance lead time</td>
+                                <td class="p-4">Time to approve policy changes</td>
+                                <td class="p-4">Avoids re-centralizing governance</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-12 p-6 bg-slate-100 rounded-xl text-center">
+                    <h3 class="font-bold text-slate-900 mb-2">Migration Path Summary</h3>
+                    <p class="text-slate-600 text-sm max-w-2xl mx-auto">
+                        Start with observability-first governance. Introduce global standards as automated gates. Decentralize approval bandwidth via delegated admin. Layer in row/mask controls, and finally unify global intent via a policy abstraction layer.
+                    </p>
+                </div>
+            </section>
+
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></main>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Initialize Mermaid Diagrams
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+
+        // Mobile Menu Toggle Logic
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const iconOpen = document.getElementById('menu-icon-open');
+        const iconClose = document.getElementById('menu-icon-close');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+            iconOpen.classList.toggle('hidden');
+            iconClose.classList.toggle('hidden');
+        });
+
+        // Tab Switching Logic
+        const tabPolicy = document.getElementById('tab-policy');
+        const tabCatalog = document.getElementById('tab-catalog');
+        const contentPolicy = document.getElementById('content-policy');
+        const contentCatalog = document.getElementById('content-catalog');
+
+        function switchTab(activeTab) {
+            if (activeTab === 'policy') {
+                // Style tabs
+                tabPolicy.className = "flex-1 py-3 text-sm font-semibold transition-colors bg-white text-cyan-700 border-b-2 border-cyan-500 focus:outline-none";
+                tabCatalog.className = "flex-1 py-3 text-sm font-semibold transition-colors text-slate-500 hover:text-slate-700 border-b-2 border-transparent focus:outline-none";
+                // Show/hide content
+                contentPolicy.classList.remove('hidden');
+                contentCatalog.classList.add('hidden');
+            } else {
+                // Style tabs
+                tabCatalog.className = "flex-1 py-3 text-sm font-semibold transition-colors bg-white text-cyan-700 border-b-2 border-cyan-500 focus:outline-none";
+                tabPolicy.className = "flex-1 py-3 text-sm font-semibold transition-colors text-slate-500 hover:text-slate-700 border-b-2 border-transparent focus:outline-none";
+                // Show/hide content
+                contentCatalog.classList.remove('hidden');
+                contentPolicy.classList.add('hidden');
+            }
+        }
+
+        tabPolicy.addEventListener('click', () => switchTab('policy'));
+        tabCatalog.addEventListener('click', () => switchTab('catalog'));
+
+        // Scrollspy Navigation Logic
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let currentSection = 'executive-summary';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                // Offset calculation (approx nav header size + padding)
+                if (window.scrollY >= sectionTop - 120) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                // Reset styling for all links
+                link.className = "nav-link text-slate-600 hover:bg-slate-100 hover:text-slate-900 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors";
+                const icon = link.querySelector('i');
+                icon.classList.remove('text-blue-600');
+                icon.classList.add('text-slate-400');
+
+                // Apply active styling
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.className = "nav-link bg-blue-50 text-blue-700 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors";
+                    icon.classList.remove('text-slate-400');
+                    icon.classList.add('text-blue-600');
+                }
+            });
+        });
+
+        // Close mobile menu on nav link click
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) { // 1024px is Tailwind's 'lg' breakpoint
+                    sidebar.classList.add('-translate-x-full');
+                    iconOpen.classList.remove('hidden');
+                    iconClose.classList.add('hidden');
+                }
+            });
+        });
+
+    </script>
+
+</body></html>

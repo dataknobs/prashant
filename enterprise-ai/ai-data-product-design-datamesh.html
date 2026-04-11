@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="Explore the Data Product Design &amp; Lifecycle. An interactive guide to moving beyond traditional datasets to fully managed data products, covering data contracts, versioning, SLAs, discoverability, and domain boundaries." name="description"/>
+    <meta content="Data Product, Data Lifecycle, Data Contracts, Data Schemas, Data Versioning, SLAs, SLOs, Data Discoverability, Metadata Standards, Data Deprecation, Product Boundaries, Domain-Driven Design, Data Architecture" name="keywords"/>
+    <title>Data Product Design &amp; Lifecycle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        .interactive-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .domain-box {
+            mix-blend-mode: multiply;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased selection:bg-sky-200 selection:text-sky-900">
+
+    <!-- Chosen Palette: Warm Stone & Subtle Data Accents -->
+    <!-- Application Structure Plan: The SPA uses a top-down narrative flow, moving from the core concept (Paradigm Shift) into an interactive deep dive of the 5 lifecycle stages, and concluding with the advanced topic of boundaries. The central interactive element is a tabbed interface for the lifecycle stages, allowing users to explore each area without losing context. This structure was chosen because it breaks down the dense theoretical concepts into digestible, user-directed explorations accompanied by conceptual visualizations. -->
+    <!-- Visualization & Content Choices: 
+         1. Paradigm Shift (Goal: Inform/Compare) -> CSS Cards -> Hover interaction -> Highlights the transition from passive to active management.
+         2. Lifecycle Stages (Goal: Inform/Organize) -> Tabbed Navigation + Dynamic Chart.js -> Click to switch context -> Allows focused learning of each pillar.
+         3. Contracts (Goal: Detail) -> Radar Chart (Chart.js) -> Shows multi-faceted nature of data contracts.
+         4. Versioning (Goal: Change) -> Line Chart (Chart.js) -> Illustrates transition between versions over time.
+         5. SLAs (Goal: Inform) -> Doughnut Chart (Chart.js) -> Visualizes uptime guarantees.
+         6. Boundaries (Goal: Relationships) -> Overlapping CSS Flexbox divs -> Hover effects -> Conceptually represents domain intersections without SVG.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-stone-900 mb-4">Data Product Design &amp; Lifecycle</h1>
+            <p class="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
+                Moving beyond static "datasets" to fully managed, reliable, and discoverable data products. Explore the key areas required to treat data as a first-class product within your organization.
+            </p>
+        </header>
+
+        <section class="mb-20">
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-stone-800 mb-2">The Paradigm Shift</h2>
+                <p class="text-stone-600">Understanding the fundamental difference between traditional datasets and modern data products. A data product encapsulates the data with code, metadata, and infrastructure to ensure usability.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="interactive-card bg-white rounded-2xl p-8 border border-stone-200 shadow-sm flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-3xl mb-4 border border-stone-200">
+                        📄
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Traditional Dataset</h3>
+                    <ul class="text-stone-600 space-y-2 text-left w-full max-w-xs mx-auto">
+                        <li class="flex items-start"><span class="mr-2 text-stone-400">▹</span> Often dumped as a byproduct</li>
+                        <li class="flex items-start"><span class="mr-2 text-stone-400">▹</span> Unknown schema stability</li>
+                        <li class="flex items-start"><span class="mr-2 text-stone-400">▹</span> Best-effort reliability</li>
+                        <li class="flex items-start"><span class="mr-2 text-stone-400">▹</span> Hard to discover or trust</li>
+                    </ul>
+                </div>
+
+                <div class="interactive-card bg-white rounded-2xl p-8 border border-sky-200 shadow-sm flex flex-col items-center text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-400 to-indigo-500"></div>
+                    <div class="w-16 h-16 bg-sky-50 rounded-full flex items-center justify-center text-3xl mb-4 border border-sky-100">
+                        📦
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-sky-900">Managed Data Product</h3>
+                    <ul class="text-stone-600 space-y-2 text-left w-full max-w-xs mx-auto">
+                        <li class="flex items-start"><span class="mr-2 text-sky-500">✓</span> Designed for consumers</li>
+                        <li class="flex items-start"><span class="mr-2 text-sky-500">✓</span> Explicit contracts &amp; schemas</li>
+                        <li class="flex items-start"><span class="mr-2 text-sky-500">✓</span> Defined SLAs and SLOs</li>
+                        <li class="flex items-start"><span class="mr-2 text-sky-500">✓</span> Discoverable via catalog</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20 bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-stone-200">
+            <div class="mb-8 md:text-center">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">The 5 Key Areas of Lifecycle Management</h2>
+                <p class="text-stone-600 max-w-2xl mx-auto">Managing a data product requires active oversight across its entire lifespan. Select an area below to explore its conceptual impact and implementation details.</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-10" id="lifecycle-nav">
+                <button class="stage-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-sky-100 text-sky-800 border-2 border-sky-200" data-stage="0">Contracts &amp; Schemas</button>
+                <button class="stage-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-stone-100 text-stone-600 border-2 border-transparent hover:bg-stone-200" data-stage="1">Versioning</button>
+                <button class="stage-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-stone-100 text-stone-600 border-2 border-transparent hover:bg-stone-200" data-stage="2">SLAs &amp; SLOs</button>
+                <button class="stage-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-stone-100 text-stone-600 border-2 border-transparent hover:bg-stone-200" data-stage="3">Discoverability</button>
+                <button class="stage-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-stone-100 text-stone-600 border-2 border-transparent hover:bg-stone-200" data-stage="4">Deprecation</button>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-900 mb-4" id="stage-title">Data Product Contracts</h3>
+                    <div class="prose prose-stone max-w-none text-stone-600" id="stage-description">
+                        <p>A data contract is a formal agreement between data producers and consumers. It defines the structure, quality, and semantics of the data.</p>
+                        <p>Moving beyond just schema validation, true contracts encompass semantic meaning, freshness guarantees, and operational SLAs. When a contract breaks, the deployment should fail, preventing downstream corruption.</p>
+                    </div>
+                    <div class="mt-6 p-4 bg-stone-50 rounded-xl border border-stone-200" id="stage-takeaway">
+                        <strong class="text-stone-800">Key Takeaway:</strong> Treat schema changes as API changes.
+                    </div>
+                </div>
+                
+                <div class="w-full bg-stone-50 rounded-2xl p-4 border border-stone-100">
+                    <div class="chart-container">
+                        <canvas id="stageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <div class="bg-indigo-900 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden shadow-lg">
+                <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-indigo-800 opacity-50"></div>
+                <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-indigo-950 opacity-50"></div>
+                
+                <div class="relative z-10">
+                    <span class="inline-block py-1 px-3 rounded-full bg-indigo-800 text-indigo-200 text-xs font-bold uppercase tracking-wider mb-4">Advanced Topic</span>
+                    <h2 class="text-3xl font-bold mb-6">How do you define product boundaries?</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-10 items-center">
+                        <div>
+                            <p class="text-indigo-100 mb-4 leading-relaxed">
+                                Defining the boundary of a data product is critical to prevent monolithic data swamps. Boundaries are usually aligned with business domains (Domain-Driven Design).
+                            </p>
+                            <p class="text-indigo-100 mb-6 leading-relaxed">
+                                A product should represent a cohesive business concept (e.g., "Customer 360", "Daily Transactions", "Inventory State"). It should have a single owner responsible for its lifecycle.
+                            </p>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-indigo-800/50 p-4 rounded-xl border border-indigo-700">
+                                    <h4 class="font-semibold text-indigo-50 mb-1">Source-Aligned</h4>
+                                    <p class="text-sm text-indigo-200">Reflects operational systems directly. Highly accurate, but harder for general analysts to use without business logic.</p>
+                                </div>
+                                <div class="bg-indigo-800/50 p-4 rounded-xl border border-indigo-700">
+                                    <h4 class="font-semibold text-indigo-50 mb-1">Consumer-Aligned</h4>
+                                    <p class="text-sm text-indigo-200">Aggregated and modeled for specific analytical use cases. Easier to query, but requires maintenance of complex transformations.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col items-center justify-center h-full min-h-[300px]">
+                            <div class="relative w-full max-w-sm h-64 flex items-center justify-center">
+                                
+                                <div class="absolute w-40 h-40 bg-sky-400 rounded-full opacity-60 mix-blend-screen flex items-center justify-center transform -translate-x-12 -translate-y-8 hover:opacity-80 transition-opacity duration-300 cursor-help" title="Source Data (Operational Systems)">
+                                    <span class="text-indigo-950 font-bold text-sm bg-white/50 px-2 py-1 rounded backdrop-blur-sm">Source</span>
+                                </div>
+                                
+                                <div class="absolute w-40 h-40 bg-purple-400 rounded-full opacity-60 mix-blend-screen flex items-center justify-center transform translate-x-12 -translate-y-8 hover:opacity-80 transition-opacity duration-300 cursor-help" title="Business Logic &amp; Transformations">
+                                    <span class="text-indigo-950 font-bold text-sm bg-white/50 px-2 py-1 rounded backdrop-blur-sm">Logic</span>
+                                </div>
+                                
+                                <div class="absolute w-40 h-40 bg-emerald-400 rounded-full opacity-60 mix-blend-screen flex items-center justify-center transform translate-y-12 hover:opacity-80 transition-opacity duration-300 cursor-help" title="Consumer Use Cases (Dashboards, ML)">
+                                    <span class="text-indigo-950 font-bold text-sm bg-white/50 px-2 py-1 rounded backdrop-blur-sm">Consumers</span>
+                                </div>
+                                
+                                <div class="absolute z-10 pointer-events-none flex flex-col items-center text-center">
+                                    <div class="w-2 h-2 bg-white rounded-full mb-1"></div>
+                                    <span class="text-white font-bold tracking-widest text-sm drop-shadow-md">THE<br/>BOUNDARY</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-indigo-300 mt-4 text-center max-w-xs">The ideal data product sits at the intersection of accurate source data, applied business logic, and consumer needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const stageData = [
+            {
+                title: "Data Product Contracts & Schemas",
+                description: "<p>A data contract is a formal agreement between data producers and consumers. It defines the structure, quality, and semantics of the data.</p><p>Moving beyond just schema validation, true contracts encompass semantic meaning, freshness guarantees, and operational SLAs. When a contract breaks, the deployment should fail, preventing downstream corruption.</p>",
+                takeaway: "Treat schema changes as API changes. Never break consumers silently.",
+                chartConfig: {
+                    type: 'radar',
+                    data: {
+                        labels: ['Schema Enforcement', 'Data Quality Rules', 'Freshness SLA', 'Semantic Metadata', 'Access Policies'],
+                        datasets: [{
+                            label: 'Mature Data Product',
+                            data: [90, 85, 95, 80, 100],
+                            fill: true,
+                            backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                            borderColor: 'rgb(14, 165, 233)',
+                            pointBackgroundColor: 'rgb(14, 165, 233)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(14, 165, 233)'
+                        }, {
+                            label: 'Traditional Dataset',
+                            data: [40, 20, 30, 10, 50],
+                            fill: true,
+                            backgroundColor: 'rgba(168, 162, 158, 0.2)',
+                            borderColor: 'rgb(168, 162, 158)',
+                            pointBackgroundColor: 'rgb(168, 162, 158)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(168, 162, 158)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: { angleLines: { display: false }, suggestedMin: 0, suggestedMax: 100, ticks: { display: false } }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.raw + '% maturity'; } } }
+                        }
+                    }
+                }
+            },
+            {
+                title: "Versioning Strategy",
+                description: "<p>Just like software APIs, data products must be versioned. As business logic changes or schemas evolve, consumers need time to migrate.</p><p>Implementing Semantic Versioning (Major.Minor.Patch) for data helps communicate the impact of changes. Major versions indicate breaking schema changes, while minor versions represent additive, backward-compatible updates.</p>",
+                takeaway: "Maintain multiple versions simultaneously during migration periods.",
+                chartConfig: {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [
+                            {
+                                label: 'Version 1.0 Requests',
+                                data: [1000, 950, 800, 500, 200, 50, 0],
+                                borderColor: 'rgb(239, 68, 68)',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Version 2.0 Requests',
+                                data: [0, 0, 150, 600, 900, 1100, 1250],
+                                borderColor: 'rgb(16, 185, 129)',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'V1 to V2 Migration Timeline' }
+                        },
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Query Volume' } } }
+                    }
+                }
+            },
+            {
+                title: "SLAs and SLOs",
+                description: "<p>Service Level Agreements (SLAs) and Objectives (SLOs) quantify the reliability of your data. If data is a product, downtime has a measurable cost.</p><p>Key metrics usually include <strong>Freshness</strong> (how up-to-date is the data?), <strong>Completeness</strong> (are there missing rows?), and <strong>Availability</strong> (can the data be queried right now?).</p>",
+                takeaway: "Publish real-time data health dashboards so consumers know if they can trust the data today.",
+                chartConfig: {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Uptime (Met SLO)', 'Planned Maintenance', 'Unplanned Downtime'],
+                        datasets: [{
+                            data: [99.5, 0.4, 0.1],
+                            backgroundColor: [
+                                'rgb(16, 185, 129)',
+                                'rgb(251, 191, 36)',
+                                'rgb(239, 68, 68)'
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Target SLO: 99.9% Availability' }
+                        }
+                    }
+                }
+            },
+            {
+                title: "Discoverability & Metadata",
+                description: "<p>A product that cannot be found provides no value. Discoverability relies on rich, standardized metadata making the data searchable within an enterprise catalog.</p><p>Metadata isn't just technical schemas. It includes business definitions, tags, ownership information, lineage (where did this come from?), and sample queries to help users get started quickly.</p>",
+                takeaway: "Invest in a Data Catalog and enforce metadata completeness before publishing.",
+                chartConfig: {
+                    type: 'bar',
+                    data: {
+                        labels: ['Technical Schema', 'Business Context', 'Lineage Map', 'Data Steward ID', 'Sample Queries'],
+                        datasets: [{
+                            label: 'Impact on Search Ranking Score',
+                            data: [15, 35, 20, 10, 20],
+                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Factors Influencing Discoverability' }
+                        },
+                        scales: { y: { beginAtZero: true, max: 40, ticks: { callback: function(value){ return value + '%' } } } }
+                    }
+                }
+            },
+            {
+                title: "Lifecycle & Deprecation",
+                description: "<p>Every product has a sunset phase. Data products cannot live forever without becoming a maintenance burden and a source of confusion.</p><p>A clear deprecation policy involves communicating timelines, identifying downstream consumers via lineage graphs, assisting with migration paths, and finally archiving the physical assets to save compute and storage costs.</p>",
+                takeaway: "Do not delete data blindly. Communicate, monitor usage drops, then archive.",
+                chartConfig: {
+                    type: 'bar',
+                    data: {
+                        labels: ['Conception', 'Development', 'Active Usage', 'Maintenance', 'Deprecation Notice', 'Archived'],
+                        datasets: [{
+                            label: 'Value Provided vs Maintenance Cost',
+                            data: [10, 30, 100, 80, 20, 0],
+                            backgroundColor: [
+                                'rgba(156, 163, 175, 0.6)',
+                                'rgba(59, 130, 246, 0.6)',
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.6)',
+                                'rgba(239, 68, 68, 0.8)',
+                                'rgba(75, 85, 99, 0.4)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: function(context) { return 'Business Value Score: ' + context.raw; } } }
+                        },
+                        scales: { y: { beginAtZero: true, display: false } }
+                    }
+                }
+            }
+        ];
+
+        let currentChart = null;
+
+        function renderStage(index) {
+            const data = stageData[index];
+            
+            document.getElementById('stage-title').textContent = data.title;
+            document.getElementById('stage-description').innerHTML = data.description;
+            document.getElementById('stage-takeaway').innerHTML = `<strong class="text-stone-800">Key Takeaway:</strong> ${data.takeaway}`;
+
+            document.querySelectorAll('.stage-btn').forEach((btn, idx) => {
+                if (idx === parseInt(index)) {
+                    btn.className = 'stage-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-sky-100 text-sky-800 border-2 border-sky-200';
+                } else {
+                    btn.className = 'stage-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-stone-100 text-stone-600 border-2 border-transparent hover:bg-stone-200';
+                }
+            });
+
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            const ctx = document.getElementById('stageChart').getContext('2d');
+            
+            const config = JSON.parse(JSON.stringify(data.chartConfig));
+            
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#57534e';
+            
+            currentChart = new Chart(ctx, config);
+        }
+
+        document.querySelectorAll('.stage-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                renderStage(e.target.dataset.stage);
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderStage(0);
+        });
+
+    </script>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>

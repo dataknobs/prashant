@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Research Report: AI Agents for Insurance Onboarding</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom styles adhering to specific requirements */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* Mandatory Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px; /* Limits width on large screens */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px;
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 280px; /* Smaller height on mobile */
+            }
+        }
+
+        /* Hide scrollbar for clean look but keep functionality */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid #4f46e5; /* Indigo-600 */
+            color: #312e81; /* Indigo-900 */
+            font-weight: 600;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-slate-800 antialiased overflow-x-hidden">
+
+    <!-- Chosen Palette: Warm Neutrals with Indigo Accents (bg-stone-50, cards-white, text-slate-800, accents-indigo-600) -->
+    <!-- Application Structure Plan: A tabbed interface was chosen to segment the research findings logically. 
+         1. Executive Summary provides immediate high-level impact. 
+         2. Comparative Analysis allows deep dives into specific metrics (Before vs. After).
+         3. Technology Breakdown uses an interactive layout to explain specific AI features without overwhelming text.
+         This non-linear structure lets users digest the 'why', 'what', and 'how' at their own pace. -->
+    <!-- Visualization & Content Choices: 
+         - Goal: Compare impact -> Viz: Grouped Bar Chart (Chart.js) -> Interaction: Toggle metrics -> Library: Chart.js (NO SVG).
+         - Goal: Break down tech stack -> Viz: Doughnut Chart -> Interaction: Click segment to reveal details -> Library: Chart.js (NO SVG).
+         - Goal: Show process change -> Viz: HTML/CSS Timeline -> Interaction: Hover effects -> Method: DOM manipulation (NO SVG). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Header -->
+        <header class="mb-10 text-center md:text-left">
+            <h1 class="text-3xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">AI Agents in Insurance Onboarding</h1>
+            <p class="text-lg text-slate-600 max-w-3xl">An interactive research report analyzing the impact, technological breakdown, and implementation strategies for AI-driven customer acquisition in the insurance sector.</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex overflow-x-auto border-b border-stone-300 mb-8 pb-1 no-scrollbar">
+            <button class="tab-btn active px-4 py-2 text-slate-500 hover:text-slate-800 transition-colors whitespace-nowrap" data-target="exec-summary">Executive Summary</button>
+            <button class="tab-btn px-4 py-2 text-slate-500 hover:text-slate-800 transition-colors whitespace-nowrap" data-target="comparative-analysis">Impact Metrics</button>
+            <button class="tab-btn px-4 py-2 text-slate-500 hover:text-slate-800 transition-colors whitespace-nowrap" data-target="tech-breakdown">Technology Stack</button>
+            <button class="tab-btn px-4 py-2 text-slate-500 hover:text-slate-800 transition-colors whitespace-nowrap" data-target="implementation">Implementation</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="min-h-[500px]">
+
+            <!-- VIEW: Executive Summary -->
+            <section class="view-section fade-in block" id="exec-summary">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-2 text-slate-800">The Modern Onboarding Imperative</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        This section provides a high-level overview of why the insurance industry is pivoting towards AI agents. Traditional onboarding is fraught with manual data entry, resulting in high abandonment rates. Here, we outline the primary challenges and the overarching solution AI provides.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Key Stat Cards -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="text-3xl mb-2">👤</div> <!-- Unicode Icon -->
+                        <h3 class="text-sm font-medium text-slate-500 uppercase tracking-wide">Current Abandonment</h3>
+                        <div class="text-4xl font-bold text-slate-900 mt-2">35%</div>
+                        <p class="text-sm text-slate-500 mt-2">Of users drop out during traditional manual application processes.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="text-3xl mb-2">⏱️</div> <!-- Unicode Icon -->
+                        <h3 class="text-sm font-medium text-slate-500 uppercase tracking-wide">Avg. Time to Insure</h3>
+                        <div class="text-4xl font-bold text-slate-900 mt-2">14 Days</div>
+                        <p class="text-sm text-slate-500 mt-2">From initial quote request to policy issuance (industry average).</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 border-l-4 border-l-indigo-600">
+                        <div class="text-3xl mb-2">🤖</div> <!-- Unicode Icon -->
+                        <h3 class="text-sm font-medium text-indigo-600 uppercase tracking-wide">AI Projected Target</h3>
+                        <div class="text-4xl font-bold text-slate-900 mt-2">&lt; 2 Hrs</div>
+                        <p class="text-sm text-slate-500 mt-2">Goal for automated underwriting and AI-assisted data collection.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-semibold mb-4 text-slate-800">Core Findings</h3>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex items-start">
+                            <span class="text-indigo-600 mr-2 font-bold">✓</span>
+                            <div><strong>Conversational Data Collection:</strong> Replacing static forms with conversational AI agents reduces cognitive load on the applicant, increasing completion rates by an estimated 20%.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-indigo-600 mr-2 font-bold">✓</span>
+                            <div><strong>Instant Verification:</strong> Utilizing OCR (Optical Character Recognition) via mobile devices for ID and document scanning cuts manual review time by 80%.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-indigo-600 mr-2 font-bold">✓</span>
+                            <div><strong>Risk Assessment Acceleration:</strong> Preliminary risk models integrated into the chat interface allow for real-time triaging—straight-through processing for low-risk, flag for human review for high-risk.</div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- VIEW: Comparative Analysis -->
+            <section class="view-section hidden fade-in" id="comparative-analysis">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-2 text-slate-800">Quantifying the Impact</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        This interactive section compares traditional onboarding methods against AI-augmented processes. Use the buttons below the chart to switch between different key performance indicators (KPIs) to see the dramatic variance in time, cost, and user retention.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col items-center">
+                    
+                    <!-- Chart Controls -->
+                    <div class="flex space-x-2 mb-6 bg-stone-100 p-1 rounded-lg">
+                        <button class="metric-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow text-slate-800 transition-all" data-metric="time">Processing Time (Days)</button>
+                        <button class="metric-btn px-4 py-2 text-sm font-medium rounded-md text-slate-500 hover:text-slate-800 transition-all" data-metric="cost">Cost per Acquisition ($)</button>
+                        <button class="metric-btn px-4 py-2 text-sm font-medium rounded-md text-slate-500 hover:text-slate-800 transition-all" data-metric="dropoff">Abandonment Rate (%)</button>
+                    </div>
+
+                    <div class="w-full">
+                        <!-- MANDATORY CHART CONTAINER -->
+                        <div class="chart-container">
+                            <canvas id="impactChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <p class="mt-6 text-center text-slate-600 max-w-2xl italic" id="chart-insight">
+                        Select a metric above to view the comparative data.
+                    </p>
+                </div>
+            </section>
+
+            <!-- VIEW: Technology Stack -->
+            <section class="view-section hidden fade-in" id="tech-breakdown">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-2 text-slate-800">The Anatomy of an AI Agent</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        An "AI Agent" is not a single tool, but a constellation of technologies working in tandem. Click on the segments of the doughnut chart to explore the specific technologies utilized in modern insurance onboarding and their distinct functions.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    
+                    <div class="w-full">
+                         <!-- MANDATORY CHART CONTAINER -->
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="techChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-slate-400 mt-2">↑ Click a segment to view details</p>
+                    </div>
+
+                    <div class="p-6 bg-stone-50 rounded-lg border border-stone-200 h-full flex flex-col justify-center min-h-[250px] transition-all" id="tech-details-panel">
+                        <div class="text-4xl mb-4" id="tech-icon">🔍</div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2" id="tech-title">Select a Technology</h3>
+                        <p class="text-slate-600" id="tech-desc">Click on the chart to the left to explore the specific components that power AI-driven customer onboarding.</p>
+                        
+                        <div class="mt-4 pt-4 border-t border-stone-200 hidden" id="tech-stat-container">
+                            <span class="text-xs font-bold text-slate-500 uppercase">Impact Metric:</span>
+                            <span class="block text-lg font-semibold text-indigo-600 mt-1" id="tech-stat">--</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- VIEW: Implementation -->
+            <section class="view-section hidden fade-in" id="implementation">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-2 text-slate-800">Strategic Implementation Path</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        Transitioning to AI-driven onboarding requires a phased approach. This section outlines a recommended timeline, moving from initial legacy integration to a fully autonomous straight-through processing system.
+                    </p>
+                </div>
+
+                <!-- HTML/CSS Timeline (No SVG) -->
+                <div class="relative border-l-4 border-indigo-200 ml-4 md:ml-8 mt-10 space-y-12 pb-8">
+                    
+                    <!-- Phase 1 -->
+                    <div class="relative pl-8">
+                        <div class="absolute -left-3.5 top-0 w-6 h-6 bg-indigo-600 rounded-full border-4 border-white shadow"></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">Phase 1: Intelligent Augmentation (Months 1-3)</h3>
+                        <p class="text-slate-600 mb-3">Deploying AI to assist human agents rather than replace them. Focus on OCR for document ingestion and basic NLP chatbots for FAQs.</p>
+                        <div class="bg-white p-4 rounded border border-stone-200 inline-block text-sm">
+                            <strong class="text-slate-800">Key Deliverable:</strong> Automated data pre-fill for applications.
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="relative pl-8">
+                        <div class="absolute -left-3.5 top-0 w-6 h-6 bg-stone-300 rounded-full border-4 border-white shadow"></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">Phase 2: Conversational Intake (Months 4-8)</h3>
+                        <p class="text-slate-600 mb-3">Replacing static web forms with dynamic, conversational interfaces. The agent asks contextual questions based on previous answers, reducing form fatigue.</p>
+                        <div class="bg-white p-4 rounded border border-stone-200 inline-block text-sm">
+                            <strong class="text-slate-800">Key Deliverable:</strong> 50% reduction in application abandonment.
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="relative pl-8">
+                        <div class="absolute -left-3.5 top-0 w-6 h-6 bg-stone-300 rounded-full border-4 border-white shadow"></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">Phase 3: Automated Underwriting Integration (Months 9-12+)</h3>
+                        <p class="text-slate-600 mb-3">Connecting the AI frontend with backend pricing algorithms and external data sources (e.g., credit bureaus, driving records) for real-time risk assessment.</p>
+                        <div class="bg-white p-4 rounded border border-stone-200 inline-block text-sm">
+                            <strong class="text-slate-800">Key Deliverable:</strong> Straight-Through Processing (STP) for low-risk applicants.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-amber-50 p-6 rounded-lg border border-amber-200">
+                    <h4 class="font-bold text-amber-800 mb-2">⚠️ Key Risk Factors to Manage</h4>
+                    <ul class="list-disc list-inside text-amber-900 text-sm space-y-1">
+                        <li>Data Privacy (GDPR/CCPA compliance in data training).</li>
+                        <li>Algorithmic Bias in automated risk assessment.</li>
+                        <li>Integration complexities with legacy core insurance systems (Guidewire, Duck Creek).</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- DATA STORE ---
+            const reportData = {
+                metrics: {
+                    time: {
+                        label: 'Avg. Processing Time (Days)',
+                        traditional: 14,
+                        ai: 1.5,
+                        insight: "AI drastically reduces wait times by automating document verification and utilizing parallel processing for background checks, turning a two-week ordeal into an afternoon task."
+                    },
+                    cost: {
+                        label: 'Avg. Cost per Acquisition ($)',
+                        traditional: 125,
+                        ai: 45,
+                        insight: "By reducing human hours spent on manual data entry, error correction, and basic communication, the operational cost to onboard a new policyholder plummets."
+                    },
+                    dropoff: {
+                        label: 'Application Abandonment Rate (%)',
+                        traditional: 35,
+                        ai: 12,
+                        insight: "A conversational, guided UI prevents 'form fatigue'. Instant validation means users correct errors immediately rather than receiving an email days later."
+                    }
+                },
+                tech: [
+                    { label: 'Conversational UI (NLP)', value: 35, color: '#4f46e5', icon: '&#128172;', desc: 'Natural Language Processing allows the system to understand user intent, answer questions dynamically, and collect data through a chat interface rather than static forms.', stat: '+40% User Engagement' },
+                    { label: 'Optical Character Recognition', value: 25, color: '#3b82f6', icon: '&#128248;', desc: 'OCR technology extracts text from uploaded images (Driver Licenses, previous policy documents) instantly populating backend fields without manual entry.', stat: '98% Extraction Accuracy' },
+                    { label: 'Predictive Risk Models', value: 25, color: '#10b981', icon: '&#128200;', desc: 'Machine learning algorithms analyze applicant data against historical trends in real-time to generate preliminary risk scores before human review.', stat: 'Enables 60% STP' },
+                    { label: 'RPA (Integration)', value: 15, color: '#64748b', icon: '&#9881;&#65039;', desc: 'Robotic Process Automation acts as the glue, taking data collected by the AI agent and pushing it into legacy core insurance systems that lack modern APIs.', stat: 'Eliminates re-keying' }
+                ]
+            };
+
+            // --- NAVIGATION LOGIC ---
+            const tabs = document.querySelectorAll('.tab-btn');
+            const views = document.querySelectorAll('.view-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Update active tab style
+                    tabs.forEach(t => {
+                        t.classList.remove('active', 'text-slate-800', 'font-semibold');
+                        t.classList.add('text-slate-500');
+                    });
+                    tab.classList.add('active', 'text-slate-800', 'font-semibold');
+                    tab.classList.remove('text-slate-500');
+
+                    // Show target view
+                    const targetId = tab.getAttribute('data-target');
+                    views.forEach(view => {
+                        if(view.id === targetId) {
+                            view.classList.remove('hidden');
+                            view.classList.add('block');
+                        } else {
+                            view.classList.add('hidden');
+                            view.classList.remove('block');
+                        }
+                    });
+
+                    // Trigger chart renders if needed based on visibility
+                    if(targetId === 'comparative-analysis' && !impactChartInstance) {
+                        initImpactChart();
+                    }
+                    if(targetId === 'tech-breakdown' && !techChartInstance) {
+                        initTechChart();
+                    }
+                });
+            });
+
+            // --- CHART RENDERING (Chart.js) ---
+            
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b'; // slate-500
+            
+            // 1. Impact Chart (Bar)
+            let impactChartInstance = null;
+            const impactCanvas = document.getElementById('impactChart');
+            const insightText = document.getElementById('chart-insight');
+            const metricBtns = document.querySelectorAll('.metric-btn');
+
+            function initImpactChart(metricKey = 'time') {
+                const data = reportData.metrics[metricKey];
+                
+                if (impactChartInstance) {
+                    impactChartInstance.destroy();
+                }
+
+                insightText.textContent = data.insight;
+
+                impactChartInstance = new Chart(impactCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Traditional Process', 'AI-Augmented Process'],
+                        datasets: [{
+                            label: data.label,
+                            data: [data.traditional, data.ai],
+                            backgroundColor: [
+                                '#cbd5e1', // slate-300
+                                '#4f46e5'  // indigo-600
+                            ],
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, /* Crucial for container adherence */
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1e293b',
+                                padding: 12,
+                                titleFont: { size: 14 },
+                                bodyFont: { size: 16, weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f5f5f4' },
+                                border: { display: false }
+                            },
+                            x: {
+                                grid: { display: false },
+                                border: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Impact Chart Interaction
+            metricBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Styling
+                    metricBtns.forEach(b => {
+                        b.classList.remove('bg-white', 'shadow', 'text-slate-800');
+                        b.classList.add('text-slate-500');
+                    });
+                    e.target.classList.add('bg-white', 'shadow', 'text-slate-800');
+                    e.target.classList.remove('text-slate-500');
+
+                    // Update Data
+                    initImpactChart(e.target.getAttribute('data-metric'));
+                });
+            });
+
+
+            // 2. Tech Stack Chart (Doughnut)
+            let techChartInstance = null;
+            const techCanvas = document.getElementById('techChart');
+            
+            const techTitle = document.getElementById('tech-title');
+            const techDesc = document.getElementById('tech-desc');
+            const techIcon = document.getElementById('tech-icon');
+            const techStatContainer = document.getElementById('tech-stat-container');
+            const techStat = document.getElementById('tech-stat');
+
+            function initTechChart() {
+                techChartInstance = new Chart(techCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: reportData.tech.map(t => t.label),
+                        datasets: [{
+                            data: reportData.tech.map(t => t.value),
+                            backgroundColor: reportData.tech.map(t => t.color),
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, /* Crucial for container adherence */
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ' + context.label + ' (Relative Importance)';
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (event, elements, chart) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const selectedTech = reportData.tech[index];
+                                
+                                // Update DOM
+                                techTitle.textContent = selectedTech.label;
+                                techDesc.textContent = selectedTech.desc;
+                                techIcon.innerHTML = selectedTech.icon;
+                                techStat.textContent = selectedTech.stat;
+                                techStatContainer.classList.remove('hidden');
+                                
+                                // Visual feedback on chart
+                                const activeElements = chart.getActiveElements();
+                                chart.setActiveElements([{datasetIndex: 0, index: index}]);
+                                chart.update();
+                            } else {
+                                // Reset if clicked outside
+                                techTitle.textContent = "Select a Technology";
+                                techDesc.textContent = "Click on the chart to the left to explore the specific components that power AI-driven customer onboarding.";
+                                techIcon.innerHTML = "&#128269;";
+                                techStatContainer.classList.add('hidden');
+                                chart.setActiveElements([]);
+                                chart.update();
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Initial load (Exec summary is visible, charts initialized when tab clicked)
+        });
+    </script>
+
+</body></html>

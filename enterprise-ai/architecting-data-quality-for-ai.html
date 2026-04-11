@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Comprehensive Data Quality for AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .h-chart-sm { height: 300px; max-height: 350px; }
+        .h-chart-md { height: 400px; max-height: 450px; }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .dimension-btn.active {
+            background-color: #0d9488;
+            color: white;
+            border-color: #0d9488;
+        }
+        
+        .framework-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Chosen Palette: Slate (Background), Teal (Primary Accents), Blue (Secondary Accents) -->
+    <!-- Application Structure Plan: The SPA is structured into four main thematic sections. 1. Introduction: Establishes context. 2. Core Dimensions: An interactive explorer (Radar chart + buttons) allowing users to drill into the 6 pillars of data quality and their specific impacts on AI. 3. The Cost of Poor Quality: A comparative bar chart demonstrating the tangible degradation of AI model performance when data quality drops. 4. Building the Framework: An interactive, step-by-step methodology grid outlining how to operationalize data quality. This structure moves logically from "What is it?" to "Why it matters" to "How to fix it". -->
+    <!-- Visualization & Content Choices: 1. Dimensions Explorer -> Goal: Organize & Detail -> Viz: Chart.js Radar Chart + Interactive Text Panel -> Justification: Radar charts perfectly illustrate multi-dimensional scoring frameworks. 2. AI Impact Chart -> Goal: Compare -> Viz: Chart.js Grouped Bar Chart -> Justification: Clearly contrasts model accuracy across high/medium/low data quality tiers. 3. Implementation Framework -> Goal: Process Flow -> Viz: CSS Grid Interactive Cards -> Justification: Breaks down complex methodology into digestible, interactive steps without relying on external SVG/Mermaid diagrams. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl font-bold text-teal-400">⬢</span>
+                    <span class="font-bold text-xl tracking-tight">AI DataGov</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors" href="#dimensions">Dimensions</a>
+                        <a class="hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors" href="#impact">AI Impact</a>
+                        <a class="hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors" href="#framework">Implementation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-white border-b border-slate-200 py-12 md:py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Architecting <span class="text-teal-600">Data Quality</span> for Artificial Intelligence
+            </h1>
+            <p class="mt-4 max-w-2xl text-xl text-slate-500 mx-auto">
+                AI models are only as good as the data that feeds them. Explore the critical dimensions of data quality and learn how to build a comprehensive framework to ensure robust, unbiased, and accurate machine learning outcomes.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+
+        <section class="scroll-mt-20" id="dimensions">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">1. The Six Dimensions of Data Quality</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    Understanding the core dimensions of data quality is the first step toward building reliable AI. This interactive section allows you to explore each dimension, its definition, and its specific impact on machine learning models. Click the dimension buttons to filter the radar chart and reveal detailed insights.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 flex flex-col lg:flex-row gap-8 items-center">
+                
+                <div class="w-full lg:w-1/2">
+                    <div class="flex flex-wrap gap-2 mb-6" id="dimension-buttons">
+                    </div>
+                    
+                    <div class="chart-container h-chart-sm md:h-chart-md w-full max-w-md">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-1/2 bg-slate-50 rounded-xl p-6 border border-slate-100 min-h-[350px] flex flex-col justify-center">
+                    <div id="dimension-content">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-20" id="impact">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">2. The Impact of Data Degradation on AI</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    Why invest in data quality? This section quantifies the cost of poor data. The visualization below compares how different machine learning tasks—Classification, Forecasting, and NLP—perform when fed high-quality data versus degraded data. The drop in accuracy directly translates to business risk.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-slate-800">Model Accuracy by Data Quality Tier</h3>
+                    <div class="mt-4 md:mt-0 flex space-x-4">
+                        <button class="text-sm font-medium text-teal-600 hover:text-teal-800 underline" onclick="updateBarChart('classification')">Classification Models</button>
+                        <button class="text-sm font-medium text-teal-600 hover:text-teal-800 underline" onclick="updateBarChart('forecasting')">Time-Series Forecasting</button>
+                    </div>
+                </div>
+                
+                <div class="chart-container h-chart-sm md:h-chart-md w-full max-w-4xl">
+                    <canvas id="barChart"></canvas>
+                </div>
+                
+                <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-md">
+                    <p class="text-sm text-blue-800" id="impact-insight">
+                        <strong>Insight:</strong> In classification tasks, a drop from high to low data quality can result in up to a 35% decrease in predictive accuracy, leading to significant increases in false positives and negatives.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-20" id="framework">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">3. Building the Comprehensive Framework</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    Achieving high data quality is not a one-time project; it requires a systemic framework integrated directly into the MLOps pipeline. This section details the five critical stages of implementing robust data quality governance for enterprise AI.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div class="framework-step bg-white border border-slate-200 rounded-xl p-6 transition-all duration-300 cursor-pointer" onclick="showFrameworkDetail(1)">
+                    <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-xl font-bold mb-4">1</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Discovery &amp; Profiling</h3>
+                    <p class="text-slate-600 text-sm">Automated scanning of data sources to understand distributions, identify anomalies, and establish baseline quality metrics before data enters the ML pipeline.</p>
+                </div>
+
+                <div class="framework-step bg-white border border-slate-200 rounded-xl p-6 transition-all duration-300 cursor-pointer" onclick="showFrameworkDetail(2)">
+                    <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-xl font-bold mb-4">2</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Rule Definition</h3>
+                    <p class="text-slate-600 text-sm">Translating business and ML requirements into deterministic validation rules (e.g., age must be &gt; 0, status must be active/inactive).</p>
+                </div>
+
+                <div class="framework-step bg-white border border-slate-200 rounded-xl p-6 transition-all duration-300 cursor-pointer" onclick="showFrameworkDetail(3)">
+                    <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-xl font-bold mb-4">3</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Automated Remediation</h3>
+                    <p class="text-slate-600 text-sm">Implementing logic to handle dirty data dynamically: dropping rows, imputing missing values using median/mode, or flagging for human review.</p>
+                </div>
+
+                <div class="framework-step bg-white border border-slate-200 rounded-xl p-6 transition-all duration-300 cursor-pointer" onclick="showFrameworkDetail(4)">
+                    <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-xl font-bold mb-4">4</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Continuous Monitoring</h3>
+                    <p class="text-slate-600 text-sm">Setting up dashboards and alerts to track data drift and concept drift over time, ensuring the data fed to the model remains consistent with training data.</p>
+                </div>
+
+                <div class="framework-step bg-white border border-slate-200 rounded-xl p-6 transition-all duration-300 cursor-pointer md:col-span-2 lg:col-span-1" onclick="showFrameworkDetail(5)">
+                    <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-xl font-bold mb-4">5</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Data Governance</h3>
+                    <p class="text-slate-600 text-sm">Establishing roles (Data Stewards), access controls, and clear documentation (Data Dictionaries) to maintain long-term accountability.</p>
+                </div>
+
+            </div>
+
+            <div class="mt-8 bg-slate-800 text-white rounded-xl p-6 md:p-8 hidden relative overflow-hidden" id="framework-detail-container">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-teal-500 opacity-10 rounded-bl-full pointer-events-none"></div>
+                <h3 class="text-2xl font-bold text-teal-400 mb-4" id="fw-detail-title"></h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-2">The Challenge</h4>
+                        <p class="text-slate-300 text-sm leading-relaxed" id="fw-detail-challenge"></p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-2">AI specific Action</h4>
+                        <p class="text-slate-300 text-sm leading-relaxed" id="fw-detail-action"></p>
+                    </div>
+                </div>
+                <button class="mt-6 text-sm text-slate-400 hover:text-white transition-colors" onclick="document.getElementById('framework-detail-container').classList.add('hidden')">Close Details ✕</button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <script>
+        const dimensionsData = {
+            overview: {
+                title: "Select a Dimension",
+                desc: "Click on any of the dimensions above to understand its role in data quality and its specific consequences for AI models.",
+                aiImpact: "Without mastering all six dimensions, AI models are susceptible to bias, drift, and catastrophic failure in production environments.",
+                score: [85, 90, 75, 80, 95, 88] 
+            },
+            accuracy: {
+                title: "Accuracy",
+                desc: "The degree to which data correctly reflects the real-world object or event being described. It asks: Is the data correct and reliable?",
+                aiImpact: "Inaccurate data leads directly to 'Garbage In, Garbage Out' (GIGO). If an AI is trained on faulty financial records or incorrect medical diagnoses, its predictions will be fundamentally flawed, potentially leading to catastrophic real-world decisions.",
+                score: [100, 40, 40, 40, 40, 40]
+            },
+            completeness: {
+                title: "Completeness",
+                desc: "The proportion of stored data against the potential of 100% completeness. It asks: Are all required data points present?",
+                aiImpact: "Missing values cause models to lose critical context. If demographic data is incomplete, the AI might develop severe biases, heavily weighting the characteristics of the complete profiles while ignoring marginalized groups.",
+                score: [40, 100, 40, 40, 40, 40]
+            },
+            consistency: {
+                title: "Consistency",
+                desc: "Ensuring data values do not conflict across different systems or datasets. It asks: Is the data format and value the same everywhere?",
+                aiImpact: "Inconsistent labels (e.g., 'USA', 'US', 'United States') confuse machine learning algorithms during feature engineering. It forces the model to treat identical entities as different categories, diluting the predictive power of the feature.",
+                score: [40, 40, 100, 40, 40, 40]
+            },
+            timeliness: {
+                title: "Timeliness",
+                desc: "The degree to which data represents reality from the required point in time. It asks: Is the data up-to-date?",
+                aiImpact: "AI models trained on stale data suffer from 'Concept Drift'. A predictive maintenance model trained on machinery sensor data from three years ago will fail to predict breakdowns caused by newer, age-related mechanical wear patterns.",
+                score: [40, 40, 40, 100, 40, 40]
+            },
+            validity: {
+                title: "Validity",
+                desc: "Data conforms to the syntax (format, type, range) of its definition. It asks: Does the data follow the established rules?",
+                aiImpact: "Invalid data (like a string of text in a numerical age field) will crash automated ML pipelines during training or inference. It requires extensive error-handling and slows down continuous integration/continuous deployment (CI/CD) of models.",
+                score: [40, 40, 40, 40, 100, 40]
+            },
+            uniqueness: {
+                title: "Uniqueness",
+                desc: "Ensuring that no entity is recorded more than once within the dataset. It asks: Are there duplicates?",
+                aiImpact: "Duplicate records artificially inflate the importance of specific data points during model training. If a specific customer's purchase history is duplicated 10 times, the AI will overfit to that specific user's behavior, ruining generalization.",
+                score: [40, 40, 40, 40, 40, 100]
+            }
+        };
+
+        const frameworkDetails = {
+            1: {
+                title: "Step 1: Discovery & Profiling",
+                challenge: "Enterprise data lakes often resemble data swamps. Analysts spend 80% of their time finding and understanding the data, not modeling it. Hidden anomalies and skewed distributions are common.",
+                action: "Utilize automated data profiling tools before data ingestion. Generate statistical summaries (mean, median, standard deviation, null counts) automatically. Use these profiles to establish baseline expectations for the training datasets."
+            },
+            2: {
+                title: "Step 2: Rule Definition",
+                challenge: "Without explicit rules, 'quality' is subjective. What a marketing team considers acceptable data might be completely unusable for a precise deep learning pricing algorithm.",
+                action: "Create declarative quality constraints (e.g., using frameworks like Great Expectations). Define absolute bounds, expected schema structures, and acceptable categorical values tailored to the specific tolerance of the ML model being built."
+            },
+            3: {
+                title: "Step 3: Automated Remediation",
+                challenge: "Manual data cleaning is unscalable for continuous AI pipelines. Waiting for a human to fix a broken pipeline leads to model staleness and lost revenue.",
+                action: "Implement logic gates in the data engineering pipeline. If data fails validation rules, automatically trigger pre-defined remediation strategies: quarantine the data, apply mean imputation, or gracefully degrade the model's reliance on that specific feature."
+            },
+            4: {
+                title: "Step 4: Continuous Monitoring",
+                challenge: "A model that is highly accurate on day one will degrade as real-world data changes (Data Drift). Training data quality does not guarantee inference data quality.",
+                action: "Deploy live monitoring agents on incoming inference data. Calculate metrics like Population Stability Index (PSI) to compare live data distributions against the original training data. Trigger automated retraining if drift exceeds thresholds."
+            },
+            5: {
+                title: "Step 5: Data Governance",
+                challenge: "Technological solutions fail without human accountability. Unclear ownership leads to finger-pointing when an AI makes a disastrous recommendation due to bad data.",
+                action: "Establish a Data Governance council. Assign clear 'Data Stewards' who own specific domains. Ensure every feature used in a model is cataloged in a data dictionary, detailing its lineage, quality score, and the steward responsible for it."
+            }
+        };
+
+        let radarChartInstance = null;
+        let barChartInstance = null;
+
+        const dimLabels = ['Accuracy', 'Completeness', 'Consistency', 'Timeliness', 'Validity', 'Uniqueness'];
+
+        function initRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: dimLabels,
+                    datasets: [{
+                        label: 'Quality Score Profile',
+                        data: dimensionsData.overview.score,
+                        backgroundColor: 'rgba(13, 148, 136, 0.2)',
+                        borderColor: 'rgba(13, 148, 136, 1)',
+                        pointBackgroundColor: 'rgba(13, 148, 136, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(13, 148, 136, 1)',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: {
+                                font: { size: 12, family: "'Segoe UI', sans-serif" },
+                                color: '#334155'
+                            },
+                            ticks: {
+                                display: false,
+                                min: 0,
+                                max: 100
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + '% Focus';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createDimensionButtons() {
+            const container = document.getElementById('dimension-buttons');
+            
+            const overviewBtn = document.createElement('button');
+            overviewBtn.className = 'dimension-btn active px-4 py-2 text-sm font-medium rounded-full border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none';
+            overviewBtn.innerText = 'Overview';
+            overviewBtn.onclick = () => selectDimension('overview', overviewBtn);
+            container.appendChild(overviewBtn);
+
+            dimLabels.forEach(label => {
+                const key = label.toLowerCase();
+                const btn = document.createElement('button');
+                btn.className = 'dimension-btn px-4 py-2 text-sm font-medium rounded-full border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none';
+                btn.innerText = label;
+                btn.onclick = () => selectDimension(key, btn);
+                container.appendChild(btn);
+            });
+            
+            updateDimensionContent('overview');
+        }
+
+        function selectDimension(key, clickedBtn) {
+            document.querySelectorAll('.dimension-btn').forEach(btn => btn.classList.remove('active', 'bg-teal-600', 'text-white', 'border-teal-600'));
+            
+            clickedBtn.classList.add('active');
+            
+            updateDimensionContent(key);
+            
+            if(radarChartInstance) {
+                radarChartInstance.data.datasets[0].data = dimensionsData[key].score;
+                
+                if(key === 'overview') {
+                    radarChartInstance.data.datasets[0].backgroundColor = 'rgba(13, 148, 136, 0.2)';
+                    radarChartInstance.data.datasets[0].borderColor = 'rgba(13, 148, 136, 1)';
+                    radarChartInstance.data.datasets[0].pointBackgroundColor = 'rgba(13, 148, 136, 1)';
+                } else {
+                    radarChartInstance.data.datasets[0].backgroundColor = 'rgba(37, 99, 235, 0.3)'; 
+                    radarChartInstance.data.datasets[0].borderColor = 'rgba(37, 99, 235, 1)';
+                    radarChartInstance.data.datasets[0].pointBackgroundColor = 'rgba(37, 99, 235, 1)';
+                }
+                
+                radarChartInstance.update();
+            }
+        }
+
+        function updateDimensionContent(key) {
+            const data = dimensionsData[key];
+            const container = document.getElementById('dimension-content');
+            
+            container.innerHTML = `
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-2 h-8 ${key === 'overview' ? 'bg-teal-500' : 'bg-blue-500'} rounded-full"></div>
+                    <h3 class="text-2xl font-bold text-slate-900">${data.title}</h3>
+                </div>
+                <p class="text-slate-600 mb-6 font-medium">${data.desc}</p>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm relative">
+                    <span class="absolute -top-3 left-4 bg-slate-800 text-white text-xs font-bold px-2 py-1 rounded">AI Impact</span>
+                    <p class="text-slate-700 text-sm mt-2">${data.aiImpact}</p>
+                </div>
+            `;
+        }
+
+        const barChartData = {
+            classification: {
+                labels: ['High Quality Data', 'Medium Quality (Missing Values)', 'Low Quality (Inconsistent/Noisy)'],
+                datasets: [
+                    {
+                        label: 'Model Accuracy (%)',
+                        data: [94.5, 82.1, 59.3],
+                        backgroundColor: ['rgba(13, 148, 136, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                        borderColor: ['rgb(13, 148, 136)', 'rgb(245, 158, 11)', 'rgb(239, 68, 68)'],
+                        borderWidth: 1
+                    }
+                ],
+                insight: "<strong>Insight:</strong> In classification tasks, a drop from high to low data quality can result in up to a 35% decrease in predictive accuracy, leading to significant increases in false positives and negatives."
+            },
+            forecasting: {
+                labels: ['Clean Historical Data', 'Data with Missing Timestamps', 'Data with Unhandled Outliers'],
+                datasets: [
+                    {
+                        label: 'Mean Absolute Error (Lower is Better)',
+                        data: [12.4, 28.7, 54.2],
+                        backgroundColor: ['rgba(13, 148, 136, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                        borderColor: ['rgb(13, 148, 136)', 'rgb(245, 158, 11)', 'rgb(239, 68, 68)'],
+                        borderWidth: 1
+                    }
+                ],
+                insight: "<strong>Insight:</strong> For time-series forecasting, unhandled outliers and missing timestamps drastically increase error rates. The model learns the noise rather than the underlying trend, destroying forecasting reliability."
+            }
+        }
+
+        function initBarChart() {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: barChartData.classification,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            title: {
+                                display: true,
+                                text: 'Performance Metric',
+                                font: { weight: 'bold' }
+                            }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateBarChart(scenario) {
+            if(barChartInstance) {
+                barChartInstance.data = barChartData[scenario];
+                
+                if(scenario === 'forecasting') {
+                     barChartInstance.options.scales.y.title.text = 'Error Rate (Lower is Better)';
+                } else {
+                     barChartInstance.options.scales.y.title.text = 'Accuracy % (Higher is Better)';
+                }
+                
+                barChartInstance.update();
+                document.getElementById('impact-insight').innerHTML = barChartData[scenario].insight;
+            }
+        }
+
+        function showFrameworkDetail(stepNumber) {
+            const data = frameworkDetails[stepNumber];
+            document.getElementById('fw-detail-title').innerText = data.title;
+            document.getElementById('fw-detail-challenge').innerText = data.challenge;
+            document.getElementById('fw-detail-action').innerText = data.action;
+            
+            const container = document.getElementById('framework-detail-container');
+            container.classList.remove('hidden');
+            
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initRadarChart();
+            createDimensionButtons();
+            initBarChart();
+        });
+    </script>
+
+</body></html>

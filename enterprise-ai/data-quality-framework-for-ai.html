@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <!-- SEO Meta Tags -->
+    <meta content="Comprehensive framework for Data Quality in AI and Machine Learning systems. Covers core dimensions, metrics, MLOps governance, architecture design, and ecosystem tooling." name="description"/>
+    <meta content="Data Quality, AI Systems, Machine Learning, MLOps, Data Governance, AI Framework, Data Quality Metrics, EU AI Act, AI Compliance, Data Lineage" name="keywords"/>
+    
+    <title>Data Quality for AI Systems: Dimensions, Framework Design, Metrics, Governance, and Tooling</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#3b82f6',
+                        dark: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Mermaid JS for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        .toc-link { transition: color 0.2s; }
+        .toc-link:hover { color: #2563eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                    <span class="ml-2 font-bold text-xl text-dark truncate">AI Data Quality Framework</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+        
+        <!-- Sidebar Navigation (TOC) -->
+        <aside class="w-full md:w-1/4 shrink-0 hidden md:block">
+            <div class="sticky top-24 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Table of Contents</h3>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li><a class="toc-link font-medium" href="#executive-summary">Executive Summary</a></li>
+                    <li><a class="toc-link font-medium" href="#assumptions-scope">Assumptions &amp; Scope</a></li>
+                    <li><a class="toc-link font-medium" href="#canonical-dimensions">Canonical Dimensions</a></li>
+                    <li><a class="toc-link font-medium" href="#ai-specific-dimensions">AI-Specific Application</a></li>
+                    <li><a class="toc-link font-medium" href="#metrics-thresholds">Metrics &amp; Thresholds</a></li>
+                    <li><a class="toc-link font-medium" href="#governance">Governance &amp; Lifecycle</a></li>
+                    <li><a class="toc-link font-medium" href="#tooling">Tools &amp; Platforms</a></li>
+                    <li><a class="toc-link font-medium" href="#templates">Templates &amp; Artifacts</a></li>
+                    <li><a class="toc-link font-medium" href="#roadmap">Implementation Roadmap</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="w-full md:w-3/4 space-y-12 bg-white p-8 rounded-lg shadow-sm border border-gray-100">
+            
+            <!-- Header -->
+            <header class="border-b border-gray-200 pb-8">
+                <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">Data Quality for AI Systems</h1>
+                <p class="text-xl text-gray-500">Dimensions, Framework Design, Metrics, Governance, and Tooling</p>
+            </header>
+
+            <!-- Executive Summary -->
+            <section class="space-y-4" id="executive-summary">
+                <h2 class="text-2xl font-bold text-gray-900">Executive Summary</h2>
+                <p class="text-gray-700 leading-relaxed">
+                    Data quality (DQ) is not a single metric; it is a structured set of dimensions that collectively determine whether data is <em>fit for use</em> for a specific purpose. A widely-cited consumer-centric definition is “data that are fit for use by data consumers,” with “fitness for use” explicitly emphasized as the organizing principle for selecting and prioritizing dimensions and controls. [1] In practice, organizations converge on a “core” set (accuracy, completeness, consistency, timeliness, validity, uniqueness), but standards and frameworks expand beyond this set—especially for AI—to include credibility, traceability, accessibility/security, documentation, lineage/provenance, and societal-risk properties such as fairness and representativeness. [2]
+                </p>
+                <div class="bg-blue-50 border-l-4 border-primary p-4 my-6">
+                    <h4 class="font-bold text-primary mb-2">How AI/ML differs from Traditional Analytics:</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li><strong>Small systematic errors</strong> (label noise, sampling bias, leakage, skew, drift) can produce large downstream model harms and degrade “trustworthiness.” NIST explicitly highlights that AI systems may be trained on data that changes over time in “significantly and unexpectedly” ways. [3]</li>
+                        <li><strong>Regulators increasingly connect AI outcomes to dataset quality.</strong> The EU AI Act includes requirements for high-risk AI systems that training/validation/testing datasets be relevant, sufficiently representative, and free of errors and complete. [4]</li>
+                        <li>A robust AI DQ program must cover <strong>data, labels, features, and model behavior</strong> as an integrated lifecycle.</li>
+                    </ul>
+                </div>
+                <p class="text-gray-700 leading-relaxed">
+                    A comprehensive DQ framework for AI should be built as a <strong>management system + engineering system</strong>: a management system that defines dimensions, ownership, policies, SLAs, risk acceptance, audit evidence, and escalation pathways [5]; and an engineering system that implements data contracts, validation "quality gates," automated monitoring, and remediation workflows integrated into MLOps.
+                </p>
+            </section>
+
+            <!-- Assumptions and Scope -->
+            <section class="space-y-4" id="assumptions-scope">
+                <h2 class="text-2xl font-bold text-gray-900">Assumptions and Scope</h2>
+                <p class="text-gray-700 leading-relaxed">
+                    This report assumes organizational size, industry, and budget are unspecified. The framework is adaptable to mid-size to large organizations with multiple data domains and production ML use, and regulated or high-impact contexts. Where concrete numeric thresholds are suggested, treat them as <em>starting points</em> to be calibrated to risk tolerance, model criticality, and cost of errors. [6]
+                </p>
+                <p class="text-gray-700 font-semibold mt-4">Scope includes:</p>
+                <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                    <li>Data quality dimensions and AI/ML operationalization</li>
+                    <li>Metrics/KPIs, profiling, validation, monitoring, and remediation</li>
+                    <li>Governance processes (roles, policies, SLAs)</li>
+                    <li>Pipeline/MLOps integration</li>
+                    <li>Auditability/compliance mapping</li>
+                    <li>Tools (open-source and commercial) with a comparative table</li>
+                </ul>
+            </section>
+
+            <!-- Canonical Dimensions -->
+            <section class="space-y-4" id="canonical-dimensions">
+                <h2 class="text-2xl font-bold text-gray-900">Canonical Data Quality Dimensions and Definitions</h2>
+                <p class="text-gray-700 leading-relaxed">There is no single universal standard for DQ dimensions, but several sources anchor common practice:</p>
+                <ul class="space-y-4 text-gray-700 mt-4">
+                    <li class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                        <strong>Wang &amp; Strong (1996)</strong>: Defines data quality as <em>fitness for use</em> and organizes 15 dimensions into four categories: Intrinsic (accuracy, objectivity, believability, reputation), Contextual (value-added, relevancy, timeliness, completeness), Representational, and Accessibility. [10]
+                    </li>
+                    <li class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                        <strong>ISO/IEC 25012</strong>: Categorizes 15 characteristics across inherent and system-dependent views, including Accuracy, Completeness, Consistency, Credibility, Currentness, Accessibility, Compliance, Confidentiality, Efficiency, Precision, Traceability, Understandability, Availability, Portability, Recoverability. [11] [12]
+                    </li>
+                    <li class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                        <strong>DAMA-DMBOK2</strong>: Standardizes a practical 9-dimension list: Accuracy, Validity, Completeness, Integrity, Uniqueness/Deduplication, Timeliness, Reasonableness, Consistency, and Currency. [13]
+                    </li>
+                    <li class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                        <strong>The "Core Six"</strong>: Widely used for operational programs: accuracy, completeness, consistency, timeliness, validity, uniqueness. [14]
+                    </li>
+                </ul>
+            </section>
+
+            <!-- AI-Specific Application -->
+            <section class="space-y-6" id="ai-specific-dimensions">
+                <h2 class="text-2xl font-bold text-gray-900">Reconciling Traditional DQ with AI-Specific Dimensions</h2>
+                <p class="text-gray-700">AI/ML systems require elevating dimensions often treated as "metadata quality" into first-class DQ dimensions:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="border border-gray-200 p-5 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg text-primary mb-2">Lineage, Provenance &amp; Traceability</h3>
+                        <p class="text-sm text-gray-600">Answers: where did data come from, how was it transformed? Critical for reproducibility, regulatory review, and root cause analysis. (W3C PROV-O, ISO/IEC 25012) [15] [16]</p>
+                    </div>
+                    <div class="border border-gray-200 p-5 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg text-primary mb-2">Bias, Fairness &amp; Representativeness</h3>
+                        <p class="text-sm text-gray-600">Dataset quality is ethically and legally linked to representativeness and bias controls. The EU AI Act requires high-risk AI datasets to be relevant and representative. [17]</p>
+                    </div>
+                    <div class="border border-gray-200 p-5 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg text-primary mb-2">Explainability &amp; Interpretability</h3>
+                        <p class="text-sm text-gray-600">NIST AI RMF trustworthiness characteristic. Supported by feature transparency, explainer availability, and documentation like Model Cards. [3] [18]</p>
+                    </div>
+                    <div class="border border-gray-200 p-5 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg text-primary mb-2">Accuracy (AI Context)</h3>
+                        <p class="text-sm text-gray-600">Extends to <em>label correctness</em> and <em>feature correctness</em>. Model accuracy means yielding correct predictions within declared operating conditions. [19] [20]</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Metrics and Thresholds -->
+            <section class="space-y-4" id="metrics-thresholds">
+                <h2 class="text-2xl font-bold text-gray-900">Metrics, KPIs, Thresholds, and Technical Methods</h2>
+                <p class="text-gray-700">A practical KPI system should align to your taxonomy, the AI lifecycle (ingestion → deployment), and a gating model (hard vs. soft gates). Thresholds must be tuned by domain.</p>
+                
+                <div class="overflow-x-auto rounded-lg border border-gray-200 mt-6 shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Dimension</th>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Dataset Metrics</th>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Model/ML Metrics</th>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Threshold Patterns</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-gray-900">Accuracy</td>
+                                <td class="px-6 py-4 text-gray-600">Sampled field verification error rate; label audit pass rate</td>
+                                <td class="px-6 py-4 text-gray-600">Grounded evaluation on gold set; error by cohort</td>
+                                <td class="px-6 py-4 text-gray-600">Critical fields: ≤0.1–0.5% verified error; labels: ≥98–99% audit pass</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-gray-900">Completeness</td>
+                                <td class="px-6 py-4 text-gray-600">% non-null for critical fields; entity coverage; label coverage</td>
+                                <td class="px-6 py-4 text-gray-600">Performance by cohort; missingness sensitivity</td>
+                                <td class="px-6 py-4 text-gray-600">Critical fields: ≥99% non-null; protected cohorts meet sample size</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-gray-900">Consistency</td>
+                                <td class="px-6 py-4 text-gray-600">Constraint violation rate; label contradiction rate</td>
+                                <td class="px-6 py-4 text-gray-600">Prediction stability; training-serving skew</td>
+                                <td class="px-6 py-4 text-gray-600">Constraint violations: near 0; skew alerts trigger on drift</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-gray-900">Timeliness</td>
+                                <td class="px-6 py-4 text-gray-600">Freshness: event_time-to-availability; staleness</td>
+                                <td class="px-6 py-4 text-gray-600">Drift metrics over time; performance decay</td>
+                                <td class="px-6 py-4 text-gray-600">SLA: e.g., 95% of records available within X hours</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-gray-900">Validity</td>
+                                <td class="px-6 py-4 text-gray-600">Schema conformance; domain/enum checks</td>
+                                <td class="px-6 py-4 text-gray-600">OOD rate; invalid input rejection rate</td>
+                                <td class="px-6 py-4 text-gray-600">Schema validity 100% at gates; domain violations near 0</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-gray-900">Bias/Fairness</td>
+                                <td class="px-6 py-4 text-gray-600">Representation parity vs target population</td>
+                                <td class="px-6 py-4 text-gray-600">Demographic parity ratio/diff; equalized odds</td>
+                                <td class="px-6 py-4 text-gray-600">e.g., demographic parity ratio ≥0.8 (if using 4/5ths rule)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Governance and Architecture -->
+            <section class="space-y-6" id="governance">
+                <h2 class="text-2xl font-bold text-gray-900">Governance, Operating Model, and Lifecycle Integration</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Operating Roles</h3>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
+                            <li><strong>Data Owner:</strong> Accountable for business meaning, quality targets, risk.</li>
+                            <li><strong>Data Steward:</strong> Day-to-day DQ monitoring, triage, remediation.</li>
+                            <li><strong>Platform Owner:</strong> Technical controls, platform reliability.</li>
+                            <li><strong>ML/Model Owner:</strong> Model quality, monitoring, downstream impact.</li>
+                            <li><strong>Risk/Compliance &amp; Security:</strong> Audit evidence, privacy, regulation alignment.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Policies &amp; SLAs</h3>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
+                            <li><strong>Critical Data Elements (CDE):</strong> Identifies high-impact fields requiring strict thresholds.</li>
+                            <li><strong>Data Contracts:</strong> Schema, invariants, freshness encoded as "DQ as code".</li>
+                            <li><strong>Model Release Gating:</strong> Requires dataset documentation, lineage, and fairness evaluation.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold mb-4">Pipeline and Lifecycle Integration Architecture</h3>
+                    <p class="text-gray-700 mb-4 text-sm">The key design principle: DQ checks must be embedded <em>where defects are cheapest to fix</em>, and must generate <em>audit evidence</em>.</p>
+                    
+                    <!-- Mermaid Diagram -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-inner overflow-x-auto">
+                        <pre class="mermaid">flowchart LR
+    subgraph Sources[Data Sources]
+        A1[Operational DBs]
+        A2[Event Streams]
+        A3[Files / External]
+        A4[Labeling]
+    end
+    subgraph Ingest[Ingest &amp; Raw]
+        B1[Ingestion Jobs]
+        B2[Contracts]
+        B3[Raw Storage]
+        B4[Baselines]
+    end
+    subgraph Transform[Transform]
+        C1[ETL/ELT]
+        C2[DQ Unit Tests]
+        C3[Curated Tables]
+        C4[Lineage Emission]
+    end
+    subgraph Features[Features]
+        D1[Pipelines]
+        D2[Feature Store]
+        D3[Dataset Builder]
+    end
+    subgraph Train[Train &amp; Eval]
+        E1[Versioning]
+        E2[Training]
+        E3[Eval: Perf+Fairness]
+        E4[Model Cards]
+    end
+    subgraph Deploy[Deploy &amp; Run]
+        F1[Model Registry]
+        F2[Serving]
+        F3[Runtime Logging]
+    end
+    subgraph Monitor[Monitor &amp; Remediate]
+        G1[Data/Feature Drift]
+        G2[Model Monitor]
+        G3[Incident Triage]
+        G4[Remediation]
+    end
+    Sources --&gt; Ingest --&gt; Transform --&gt; Features --&gt; Train --&gt; Deploy --&gt; Monitor
+    Monitor --&gt;|feedback| Sources
+                        </pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tooling -->
+            <section class="space-y-4" id="tooling">
+                <h2 class="text-2xl font-bold text-gray-900">Tools and Platforms for AI Data Quality</h2>
+                <p class="text-gray-700">The ecosystem spans testing, lineage, observability, annotation, and fairness. Below is a selected comparative view.</p>
+                
+                <div class="overflow-x-auto rounded-lg border border-gray-200 mt-4 shadow-sm">
+                    <table class="min-w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-gray-50 text-gray-700 uppercase">
+                            <tr>
+                                <th class="px-4 py-3 border-b">Tool / Platform</th>
+                                <th class="px-4 py-3 border-b">Category</th>
+                                <th class="px-4 py-3 border-b">Strengths</th>
+                                <th class="px-4 py-3 border-b">License / Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white text-gray-600">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-900">Great Expectations</td>
+                                <td class="px-4 py-3">DQ testing / validation</td>
+                                <td class="px-4 py-3 truncate max-w-xs">Expressive "Expectations", docs generation</td>
+                                <td class="px-4 py-3">OSS / Vendor SaaS</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-900">Soda Core</td>
+                                <td class="px-4 py-3">DQ testing + contracts</td>
+                                <td class="px-4 py-3 truncate max-w-xs">YAML-based checks, easy embedding</td>
+                                <td class="px-4 py-3">OSS / SaaS option</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-900">TFDV</td>
+                                <td class="px-4 py-3">ML data validation</td>
+                                <td class="px-4 py-3 truncate max-w-xs">Schema inference, drift/skew detection</td>
+                                <td class="px-4 py-3">OSS Free</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-900">OpenLineage / Marquez</td>
+                                <td class="px-4 py-3">Lineage standard &amp; backend</td>
+                                <td class="px-4 py-3 truncate max-w-xs">Standard API/events; metadata visualization</td>
+                                <td class="px-4 py-3">OSS Free</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-900">Fairlearn / AIF360</td>
+                                <td class="px-4 py-3">Fairness / Bias</td>
+                                <td class="px-4 py-3 truncate max-w-xs">Common fairness metrics + mitigation</td>
+                                <td class="px-4 py-3">OSS Free</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-900">Label Studio</td>
+                                <td class="px-4 py-3">Data labeling</td>
+                                <td class="px-4 py-3 truncate max-w-xs">Multi-type annotation (text, CV, audio)</td>
+                                <td class="px-4 py-3">OSS / Enterprise</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-900">Feast</td>
+                                <td class="px-4 py-3">Feature Store</td>
+                                <td class="px-4 py-3 truncate max-w-xs">Point-in-time correct joins, skew reduction</td>
+                                <td class="px-4 py-3">OSS Free</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Templates -->
+            <section class="space-y-6" id="templates">
+                <h2 class="text-2xl font-bold text-gray-900">Templates and Implementation Artifacts</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Dashboard Layout -->
+                    <div class="bg-gray-50 border border-gray-200 p-5 rounded-lg">
+                        <h3 class="font-bold text-lg mb-3">KPI Dashboard Layout Template</h3>
+                        <ul class="text-sm space-y-3 text-gray-700">
+                            <li><strong>Header:</strong> Trust score (by asset), SLA status.</li>
+                            <li><strong>Freshness:</strong> SLO compliance, late jobs, time-to-detect.</li>
+                            <li><strong>Core DQ:</strong> Completeness, Validity, Uniqueness, Consistency trends.</li>
+                            <li><strong>ML-Specific:</strong> Drift summary, training-serving skew, label health (IAA).</li>
+                            <li><strong>Fairness:</strong> Demographic parity, subgroup performance slices.</li>
+                            <li><strong>Lineage:</strong> Impact radius, upstream/downstream changes.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Remediation Playbook -->
+                    <div class="bg-gray-50 border border-gray-200 p-5 rounded-lg">
+                        <h3 class="font-bold text-lg mb-3">Remediation Playbook Template</h3>
+                        <ul class="text-sm space-y-3 text-gray-700">
+                            <li><strong>Detection:</strong> Triggers (schema change, drift), Evidence captured.</li>
+                            <li><strong>Triage:</strong> Assign severity (Sev-1 to Sev-3), Identify owner, Containment strategy.</li>
+                            <li><strong>Root Cause Analysis:</strong> Isolate via lineage (upstream vs transformation vs shift).</li>
+                            <li><strong>Remediation:</strong> Fix-at-source priority, backfill strategy.</li>
+                            <li><strong>Closure:</strong> Re-run validation, Postmortem, Update contracts/datasheets.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Roadmap -->
+            <section class="space-y-4" id="roadmap">
+                <h2 class="text-2xl font-bold text-gray-900">Prioritized Next Steps &amp; Implementation Roadmap</h2>
+                <p class="text-gray-700">Establish foundations before scaling automation. Pick two pilot data products and one "golden" model. Implement end-to-end controls and standard "DQ as code" patterns.</p>
+                
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-inner mt-6 overflow-x-auto">
+                    <pre class="mermaid">gantt
+    title AI Data Quality Framework Rollout (6–12 months)
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b
+    
+    section Foundations
+    Define DQ taxonomy + risk tiers           :a1, 2026-03-17, 21d
+    Select pilots + critical datasets         :a2, after a1, 14d
+    Define governance (owners/SLAs)           :a3, after a1, 28d
+    
+    section Build Control Baseline
+    Data contracts + schema rules             :b1, after a2, 30d
+    Implement DQ test suites (core dims)      :b2, after b1, 45d
+    Implement lineage collection + viewer     :b3, after b1, 45d
+    
+    section ML-Specific
+    Train/serving skew + drift checks         :c1, after b2, 30d
+    Label QA (IAA, gold sets, adjudication)   :c2, after b2, 45d
+    Fairness + representativeness reporting   :c3, after c1, 45d
+    
+    section Operate &amp; Scale
+    Monitoring + alert routing + runbooks     :d1, after b3, 30d
+    Remediation workflow + incident reviews   :d2, after d1, 45d
+    Expand to additional domains              :d3, after d2, 90d
+    
+    section Audit Readiness
+    Evidence retention + audit packets        :e1, after d1, 60d
+    Policy review vs AI Act / privacy needs   :e2, after e1, 45d
+                    </pre>
+                </div>
+            </section>
+            
+            <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+        </main>
+    </div>
+
+
+</body></html>

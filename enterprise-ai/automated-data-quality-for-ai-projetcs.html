@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Automated Data Quality for AI Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutral Slate & Data Teal -->
+    <!-- Application Structure Plan: The SPA is structured into four sequential, thematic sections to guide the user from problem identification to solution mechanics and finally to business value. 
+         1. 'The Cost of Poor Data' establishes the baseline urgency (Why care?).
+         2. 'The 6 Dimensions of DQ' breaks down what data quality actually means in an AI context.
+         3. 'The Automated Pipeline' explains how modern solutions work interactively.
+         4. 'Business Impact' quantifies the results. 
+         This linear narrative approach combined with non-linear exploration within sections allows users to grasp high-level concepts or drill into specifics, optimizing cognitive load and comprehension without mirroring a dry PDF report structure. -->
+    <!-- Visualization & Content Choices: 
+         - Cost Curve (Line Chart): Shows exponential cost growth. Interaction: Hover tooltips. Justification: Line charts best illustrate progression over stages. Library: Chart.js.
+         - DQ Dimensions (Radar Chart): Compares Manual vs. Auto across 6 axes. Interaction: Clickable dimension buttons update explanatory text. Justification: Radar charts are ideal for multi-variable capability comparisons. Library: Chart.js.
+         - Pipeline Steps (Interactive UI Flow): HTML/Tailwind timeline. Interaction: Clicking a node changes the detailed readout. Justification: Breaks down complex processes into digestible chunks. Library: Vanilla JS + HTML.
+         - Impact ROI (Bar Chart): Compares metrics "Before" and "After". Interaction: Toggle buttons change the metric category (Time vs Cost). Justification: Bar charts provide the clearest comparative magnitude. Library: Chart.js.
+         - CONFIRMING: NO SVG or Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc; 
+            color: #334155; 
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh; 
+            max-height: 450px;
+            min-height: 300px;
+        }
+
+        .pipeline-step.active {
+            border-color: #0ea5e9;
+            background-color: #f0f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .pipeline-step {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .dimension-btn.active {
+            background-color: #0ea5e9;
+            color: white;
+            border-color: #0ea5e9;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sky-200 selection:text-sky-900">
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🧠</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">AI Data Quality Report</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                    <a class="hover:text-sky-600 transition-colors" href="#crisis">The Crisis</a>
+                    <a class="hover:text-sky-600 transition-colors" href="#dimensions">Dimensions</a>
+                    <a class="hover:text-sky-600 transition-colors" href="#pipeline">Automated Pipeline</a>
+                    <a class="hover:text-sky-600 transition-colors" href="#impact">Business ROI</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-slate-900 text-white py-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">
+                Automated Data Quality for <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-400">AI-Driven Data Products</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed">
+                An interactive exploration of how automated anomaly detection, continuous profiling, and programmatic validation are securing the foundational data layer for modern Machine Learning and Generative AI applications.
+            </p>
+            <div class="flex justify-center gap-4">
+                <a class="bg-sky-500 hover:bg-sky-400 text-white px-6 py-3 rounded-md font-semibold transition-colors shadow-lg shadow-sky-500/30" href="#crisis">
+                    Explore the Data ⬇
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+
+        <section class="scroll-mt-24" id="crisis">
+            <div class="max-w-3xl mx-auto text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">The AI Data Quality Crisis</h2>
+                <p class="text-slate-600 leading-relaxed text-left md:text-center">
+                    This section illustrates the foundational problem driving the need for automation. In AI engineering, the 1-10-100 rule is amplified. Fixing a data error at the ingestion stage is trivial; allowing that same anomaly to poison a model training run or reach a production inference endpoint incurs exponential costs in compute, debugging time, and reputational damage. The interactive line chart below visualizes this compounding cost. Hover over the nodes to see the cost multipliers.
+                </p>
+            </div>
+            
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
+                            <h3 class="font-bold text-red-900 mb-1">The "Garbage In" Multiplier</h3>
+                            <p class="text-sm text-red-800">Model drift and hallucinations are often symptoms of upstream data pipelines silently failing. Traditional manual spot-checks cannot scale to the volume of AI data products.</p>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-600">
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-500 mt-0.5">■</span>
+                                <strong>Ingestion:</strong> Easy to isolate and drop bad rows.
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-500 mt-0.5">■</span>
+                                <strong>Transformation:</strong> Requires pipeline rollbacks.
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-500 mt-0.5">■</span>
+                                <strong>Training:</strong> Wastes expensive GPU hours.
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-500 mt-0.5">■</span>
+                                <strong>Production:</strong> Leads to biased AI outputs and user churn.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <div class="chart-container">
+                            <canvas id="costChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-24" id="dimensions">
+            <div class="max-w-3xl mx-auto text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">The 6 Dimensions of AI Data Quality</h2>
+                <p class="text-slate-600 leading-relaxed text-left md:text-center">
+                    Data quality is not a single metric, but a composite of several critical dimensions. For AI models to function reliably, data must score highly across all axes simultaneously. This section allows you to compare the coverage of legacy manual processes against modern automated tools. Interact with the radar chart by clicking the dimension buttons to explore specific definitions and see why automation drastically expands the polygon of data reliability.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="flex flex-col h-full justify-center">
+                        <h3 class="text-xl font-bold mb-4">Explore the Dimensions</h3>
+                        <div class="flex flex-wrap gap-2 mb-6" id="dimension-buttons">
+                            <button class="dimension-btn active border border-slate-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors" data-dim="Accuracy">Accuracy</button>
+                            <button class="dimension-btn border border-slate-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors" data-dim="Completeness">Completeness</button>
+                            <button class="dimension-btn border border-slate-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors" data-dim="Timeliness">Timeliness</button>
+                            <button class="dimension-btn border border-slate-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors" data-dim="Consistency">Consistency</button>
+                            <button class="dimension-btn border border-slate-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors" data-dim="Validity">Validity</button>
+                            <button class="dimension-btn border border-slate-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors" data-dim="Uniqueness">Uniqueness</button>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 min-h-[160px]" id="dimension-content">
+                            <h4 class="font-bold text-lg text-sky-700 mb-2 flex items-center gap-2" id="dim-title">
+                                🎯 Accuracy
+                            </h4>
+                            <p class="text-slate-600 text-sm leading-relaxed" id="dim-desc">
+                                Defines how closely the data matches real-world entities. For AI, inaccurate features lead directly to skewed weights. Automated DQ uses historical distribution profiling to instantly flag anomalous values that deviate from expected bounds.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-24" id="pipeline">
+            <div class="max-w-3xl mx-auto text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">The Automated DQ Pipeline</h2>
+                <p class="text-slate-600 leading-relaxed text-left md:text-center">
+                    How do we actually achieve this at scale? This interactive diagram deconstructs the automated data quality pipeline. Instead of running ad-hoc SQL queries, modern teams implement continuous monitoring architecture. Click through the operational stages below to understand the mechanics, inputs, and outputs of each phase in securing data for downstream AI consumption.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 border-b border-slate-100 text-center bg-slate-50">
+                    <div class="pipeline-step active p-6 cursor-pointer border-b-2 border-transparent md:border-b-0 md:border-r" onclick="updatePipeline(0)">
+                        <div class="text-3xl mb-2">🔍</div>
+                        <h3 class="font-bold text-slate-800">1. Profiling</h3>
+                    </div>
+                    <div class="pipeline-step p-6 cursor-pointer border-b-2 border-transparent md:border-b-0 md:border-r" onclick="updatePipeline(1)">
+                        <div class="text-3xl mb-2">⚙️</div>
+                        <h3 class="font-bold text-slate-800">2. Validation</h3>
+                    </div>
+                    <div class="pipeline-step p-6 cursor-pointer border-b-2 border-transparent" onclick="updatePipeline(2)">
+                        <div class="text-3xl mb-2">🚨</div>
+                        <h3 class="font-bold text-slate-800">3. Alerting &amp; Triage</h3>
+                    </div>
+                </div>
+                
+                <div class="p-8 lg:p-12">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center" id="pipeline-details">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-24 mb-24" id="impact">
+            <div class="max-w-3xl mx-auto text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Business Impact &amp; ROI</h2>
+                <p class="text-slate-600 leading-relaxed text-left md:text-center">
+                    Implementing automated data quality is not just a technical exercise; it drives measurable business outcomes. This interactive dashboard quantifies the return on investment. By toggling between 'Operational Metrics' (time saved, incidents) and 'AI Performance Metrics' (model accuracy, drift), you can visualize the stark contrast between manual ad-hoc methods and a fully automated data observability framework.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                    <h3 class="font-bold text-xl text-slate-800" id="roi-title">Operational Efficiency</h3>
+                    <div class="bg-slate-100 p-1 rounded-lg flex space-x-1">
+                        <button class="px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-sky-700" id="btn-ops" onclick="updateROI('ops')">Operational Metrics</button>
+                        <button class="px-4 py-2 text-sm font-medium rounded-md text-slate-600 hover:text-slate-800" id="btn-ai" onclick="updateROI('ai')">AI Performance Metrics</button>
+                    </div>
+                </div>
+                
+                <div class="chart-container relative">
+                    <canvas id="roiChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/complaint-management/">Complaint Management</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/stock-assistant/">Stocks Assistant</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/define/">Define</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build/">Build</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evaluate/">Evaluate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/validate/">Validate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/which-database-to-use/">Database Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/evolution/">Evolution of Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/graph-db/">Graph DB</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/guide/">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/ai-compliance/">AI For Compliance in Data Product</a></li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language model</a>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai/executives/">GenAI -For Executives</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/">GenAI</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/visual-guide.html">LLM Visual Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/generativeai/toon/">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-product-experiment-framework.html">Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-products-development-life-cycle.html">Life Cycle of DP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agents/architecture-evolution/">AI Agent Architecture Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai/supply-chain/">Supply Chain</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <script>
+        const chartColors = {
+            primary: 'rgba(14, 165, 233, 1)', 
+            primaryBg: 'rgba(14, 165, 233, 0.2)',
+            secondary: 'rgba(20, 184, 166, 1)', 
+            secondaryBg: 'rgba(20, 184, 166, 0.2)',
+            danger: 'rgba(239, 68, 68, 1)',
+            slate: 'rgba(100, 116, 139, 1)',
+            slateBg: 'rgba(100, 116, 139, 0.2)'
+        };
+
+        const globalOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: 'Inter' } }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleFont: { family: 'Inter', size: 14 },
+                    bodyFont: { family: 'Inter', size: 13 },
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            }
+        };
+
+        const ctxCost = document.getElementById('costChart').getContext('2d');
+        new Chart(ctxCost, {
+            type: 'line',
+            data: {
+                labels: ['Ingestion', 'Transformation', 'Model Training', 'Production Inference'],
+                datasets: [{
+                    label: 'Cost to Remediate 1 Data Error ($)',
+                    data: [1, 10, 100, 1000],
+                    borderColor: chartColors.danger,
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: chartColors.danger,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                ...globalOptions,
+                scales: {
+                    y: {
+                        type: 'logarithmic',
+                        title: { display: true, text: 'Logarithmic Cost Scale ($)' },
+                        ticks: { callback: function(value) { return '$' + value; } }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        const ctxRadar = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['Accuracy', 'Completeness', 'Timeliness', 'Consistency', 'Validity', 'Uniqueness'],
+                datasets: [
+                    {
+                        label: 'Automated AI-Driven DQ',
+                        data: [95, 98, 99, 94, 98, 100],
+                        borderColor: chartColors.primary,
+                        backgroundColor: chartColors.primaryBg,
+                        borderWidth: 2,
+                        pointBackgroundColor: chartColors.primary
+                    },
+                    {
+                        label: 'Legacy Manual DQ',
+                        data: [60, 40, 30, 70, 65, 80],
+                        borderColor: chartColors.slate,
+                        backgroundColor: chartColors.slateBg,
+                        borderWidth: 2,
+                        pointBackgroundColor: chartColors.slate
+                    }
+                ]
+            },
+            options: {
+                ...globalOptions,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0,0,0,0.1)' },
+                        grid: { color: 'rgba(0,0,0,0.1)' },
+                        pointLabels: { font: { family: 'Inter', size: 12 } },
+                        ticks: { display: false, min: 0, max: 100 }
+                    }
+                }
+            }
+        });
+
+        const dimensionData = {
+            'Accuracy': { icon: '🎯', text: 'Defines how closely the data matches real-world entities. For AI, inaccurate features lead directly to skewed weights. Automated DQ uses historical distribution profiling to instantly flag anomalous values that deviate from expected bounds.' },
+            'Completeness': { icon: '🧩', text: 'Ensures no required data is missing. Null values in training data can crash pipelines or bias models. Automation continuously checks fill rates across millions of rows, alerting before incomplete data reaches the feature store.' },
+            'Timeliness': { icon: '⏱️', text: 'Refers to the freshness of data. Real-time AI needs up-to-the-second data. Automated monitors track "volume updates" and "freshness SLAs", triggering alerts if pipelines stall or data arrives late.' },
+            'Consistency': { icon: '⚖️', text: 'Data must be consistent across different systems. Automation runs cross-system reconciliations, ensuring that a user ID in the CRM matches the structure and existence of that ID in the behavioral event stream.' },
+            'Validity': { icon: '✅', text: 'Checks if data conforms to defined formats (e.g., valid emails, correct categorical strings). Machine learning models automatically infer schemas and regex patterns, instantly catching schema drift without manual rule updates.' },
+            'Uniqueness': { icon: '✨', text: 'Prevents duplicated records. Duplicate data in training sets artificially inflates the importance of certain features. Automated uniqueness checks ensure primary keys and specific composite keys remain truly unique.' }
+        };
+
+        document.querySelectorAll('.dimension-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.dimension-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-sky-500', 'text-white', 'border-sky-500');
+                    b.classList.add('hover:bg-slate-50', 'text-slate-700');
+                });
+                
+                const currentBtn = e.target;
+                currentBtn.classList.remove('hover:bg-slate-50', 'text-slate-700');
+                currentBtn.classList.add('active', 'bg-sky-500', 'text-white', 'border-sky-500');
+
+                const dim = currentBtn.getAttribute('data-dim');
+                const data = dimensionData[dim];
+                
+                const titleEl = document.getElementById('dim-title');
+                const descEl = document.getElementById('dim-desc');
+                
+                titleEl.innerHTML = `${data.icon} ${dim}`;
+                descEl.style.opacity = 0;
+                
+                setTimeout(() => {
+                    descEl.innerHTML = data.text;
+                    descEl.style.transition = 'opacity 0.3s ease';
+                    descEl.style.opacity = 1;
+                }, 150);
+            });
+        });
+
+        const pipelineData = [
+            {
+                title: 'Continuous Data Profiling',
+                bg: 'bg-sky-50',
+                text: 'As data ingests into the warehouse or data lake, the system automatically computes statistical profiles (min, max, mean, null rate, string lengths, distinct counts) for every column without requiring manual SQL. This creates a baseline "fingerprint" of healthy data.',
+                bullets: ['100% table coverage', 'Automatic schema inference', 'Zero-configuration baseline creation']
+            },
+            {
+                title: 'Machine Learning Validation',
+                bg: 'bg-teal-50',
+                text: 'Instead of brittle static thresholds (e.g., "revenue > 0"), the system uses unsupervised ML to understand seasonality and trends. It automatically generates dynamic rules. If an anomaly occurs (e.g., 30% drop in row count, unexpected categorical value), it is flagged immediately.',
+                bullets: ['Dynamic thresholds vs static rules', 'Detects unknown-unknowns', 'Adapts to data drift automatically']
+            },
+            {
+                title: 'Incident Alerting & Root Cause',
+                bg: 'bg-indigo-50',
+                text: 'When a data quality incident is detected, an alert is routed to the data owners via Slack/Teams. The system provides column-level lineage and automated root-cause analysis, highlighting exactly which dbt model or upstream source caused the anomaly, drastically reducing MTTR.',
+                bullets: ['Data lineage integration', 'Automated root-cause analysis', 'Prevents bad data hitting AI models']
+            }
+        ];
+
+        function updatePipeline(index) {
+            document.querySelectorAll('.pipeline-step').forEach((el, i) => {
+                if(i === index) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+
+            const data = pipelineData[index];
+            const container = document.getElementById('pipeline-details');
+            
+            container.style.opacity = 0;
+            
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="${data.bg} p-6 md:p-8 rounded-xl border border-slate-100 h-full">
+                        <h4 class="text-2xl font-bold text-slate-800 mb-4">${data.title}</h4>
+                        <p class="text-slate-600 mb-6 leading-relaxed">${data.text}</p>
+                        <ul class="space-y-2">
+                            ${data.bullets.map(b => `<li class="flex items-center gap-2 text-sm font-medium text-slate-700"><span class="text-sky-500">✓</span> ${b}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="hidden lg:flex items-center justify-center p-8 bg-slate-50 rounded-xl border border-slate-100 h-full min-h-[250px] relative">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                             <div class="text-6xl mb-4">${index === 0 ? '📊' : index === 1 ? '🧠' : '📉'}</div>
+                             <div class="text-sm font-mono tracking-widest text-slate-500 uppercase">${index === 0 ? 'Generating Profiles...' : index === 1 ? 'Running ML Models...' : 'Dispatching Webhooks...'}</div>
+                        </div>
+                    </div>
+                `;
+                container.style.transition = 'opacity 0.3s ease';
+                container.style.opacity = 1;
+            }, 200);
+        }
+        
+        updatePipeline(0);
+
+        const roiDatasets = {
+            ops: {
+                labels: ['Time Spent Firefighting (Hrs/Wk)', 'Time to Resolve Incident (Hrs)', 'Data Pipeline Uptime (%)', 'False Positive Alerts (%)'],
+                title: 'Operational Efficiency',
+                manual: [25, 18, 85, 45],
+                auto: [4, 2, 99.9, 5]
+            },
+            ai: {
+                labels: ['Model Rollbacks (Per Month)', 'Feature Drift Detection (Days)', 'Data Eng. Time on AI Features (%)', 'AI Model Confidence Score'],
+                title: 'AI Performance Metrics',
+                manual: [4, 14, 20, 72],
+                auto: [0, 0.5, 85, 96]
+            }
+        };
+
+        const ctxRoi = document.getElementById('roiChart').getContext('2d');
+        let roiChart = new Chart(ctxRoi, {
+            type: 'bar',
+            data: {
+                labels: roiDatasets.ops.labels,
+                datasets: [
+                    {
+                        label: 'Manual DQ Process',
+                        data: roiDatasets.ops.manual,
+                        backgroundColor: chartColors.slateBg,
+                        borderColor: chartColors.slate,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Automated DQ Pipeline',
+                        data: roiDatasets.ops.auto,
+                        backgroundColor: chartColors.primary,
+                        borderColor: chartColors.primary,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                ...globalOptions,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            callback: function(value) {
+                                let label = this.getLabelForValue(value);
+                                if (label.length > 20) {
+                                    return label.match(/.{1,20}(\s|$)/g);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateROI(type) {
+            document.getElementById('btn-ops').className = type === 'ops' ? 'px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-sky-700' : 'px-4 py-2 text-sm font-medium rounded-md text-slate-600 hover:text-slate-800 transition';
+            document.getElementById('btn-ai').className = type === 'ai' ? 'px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-sky-700' : 'px-4 py-2 text-sm font-medium rounded-md text-slate-600 hover:text-slate-800 transition';
+            
+            document.getElementById('roi-title').innerText = roiDatasets[type].title;
+
+            roiChart.data.labels = roiDatasets[type].labels;
+            roiChart.data.datasets[0].data = roiDatasets[type].manual;
+            roiChart.data.datasets[1].data = roiDatasets[type].auto;
+            roiChart.update();
+        }
+
+    </script>
+
+</body></html>
