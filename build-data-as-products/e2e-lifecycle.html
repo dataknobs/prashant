@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" data-related-json="folder-pages.json" data-related-keywords="data product ai genai" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="The visual guide to the Data Product Lifecycle. Use Slides and tutorial to Llearn to define, build, evaluate, and validate data products using the DATSIS framework, readiness checklists, and fit assessments." name="description"/>
+    <meta content="data product, visual guide, slides, data mesh, data lifecycle, DATSIS, data governance, data product manager, signal validity, user utility, data quality metrics, product thinking" name="keywords"/>
+    <title>Data Product Visual Guide</title>
+<link href="/css-scripts/related-articles-noimage.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfbf7; /* Warm neutral background */
+            color: #1f2937;
+            scroll-behavior: smooth;
+        }
+
+        /* Chart Container Styling */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        /* Interactive Elements */
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #4f46e5;
+        }
+        
+        /* Section Dividers */
+        .section-divider {
+            border-top: 1px solid #e5e7eb;
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100 backdrop-blur-md bg-opacity-90">
+        <div class="border-b border-gray-100 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="h-11 flex items-center justify-center lg:justify-start gap-4 sm:gap-6 overflow-x-auto whitespace-nowrap text-sm font-medium text-gray-600">
+                    <a class="hover:text-indigo-600 transition-colors" href="/">Home</a>
+                    <a class="hover:text-indigo-600 transition-colors" href="/where-to-start-data-product.html">Where to Start</a>
+                    <a class="hover:text-indigo-600 transition-colors" href="/genai/executives/">GenAI</a>
+                    <a class="hover:text-indigo-600 transition-colors" href="/ai-agents/">Agentic AI</a>
+                    <a class="hover:text-indigo-600 transition-colors" href="/graph-db/">Graph Search</a>
+					<a class="hover:text-indigo-600 transition-colors" href="/search/">Search</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <!-- <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">DP</div> -->
+                        <span class="font-bold text-xl text-gray-800">Data Product - Lifecycle Framework and E2E Guide</span>
+                    </div>
+                </div>
+                <div class="hidden lg:flex sm:items-center sm:space-x-6">
+                    <button class="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium" onclick="scrollToSection('define')">1. Define</button>
+                    <button class="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium" onclick="scrollToSection('build')">2. Build</button>
+                    <button class="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium" onclick="scrollToSection('evaluate')">3. Evaluate</button>
+                    <button class="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium" onclick="scrollToSection('validate')">4. Validate</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-white pb-12 pt-10 px-4 sm:px-6 lg:px-8 border-b border-gray-200">
+        <div class="max-w-4xl mx-auto text-center">
+            <span class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-50 rounded-full">End-to-End Framework</span>
+            <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                The Data Product <span class="text-indigo-600">Lifecycle</span>
+            </h1>
+            <p class="mt-5 max-w-2xl mx-auto text-xl text-gray-500">
+                A Visual Guide to Defining, Building, Evaluating, and Validating data products in the modern data mesh. See Guide with <a href="guide/">Slides</a>
+            </p>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        
+        <!-- ========================================== -->
+        <!-- SECTION 1: DEFINE (From data-product-define) -->
+        <!-- ========================================== -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50" id="define">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-900">1. Define &amp; Paradigm Shift</h2>
+                    <p class="text-gray-600 mt-2">Moving from "Data as Asset" to "Data as Product".</p>
+                </div>
+
+                <!-- Toggle UI -->
+                <div class="flex justify-center mb-8">
+                    <div class="relative inline-flex items-center cursor-pointer group" onclick="toggleMindset()">
+                        <span class="mr-3 text-lg font-semibold text-gray-900 transition-colors" id="label-project">Project Mindset</span>
+                        <div class="w-14 h-7 bg-gray-200 rounded-full relative">
+                             <div class="absolute top-1 left-1 bg-indigo-600 w-5 h-5 rounded-full transition-all duration-300" id="toggle-ball"></div>
+                        </div>
+                        <span class="ml-3 text-lg font-medium text-gray-500 transition-colors" id="label-product">Product Mindset</span>
+                    </div>
+                </div>
+
+                <!-- Mindset Content -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-5xl mx-auto transition-all duration-500 border border-gray-100 mb-16" id="mindset-content">
+                    <!-- Injected via JS -->
+                </div>
+
+                 <!-- DATSIS Framework (Updated with Validation Pillars) -->
+                 <div class="mb-12 mt-16">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Core Characteristics (DATSIS)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="datsis-grid">
+                        <!-- Injected via JS -->
+                    </div>
+                    <div class="mt-8 p-6 bg-indigo-50 rounded-xl border border-indigo-100 hidden" id="datsis-detail">
+                        <!-- Detail view -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: BUILD (From data-product-build) -->
+        <!-- ========================================== -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200" id="build">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-900">2. Build Lifecycle &amp; Team</h2>
+                    <p class="text-gray-600 mt-2">The rigorous engineering process and the squad required to execute it.</p>
+                </div>
+
+                <!-- Lifecycle Interactive -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
+                    <div class="lg:col-span-4 flex flex-col gap-2" id="lifecycle-tabs">
+                        <!-- Generated JS Tabs -->
+                    </div>
+                    <div class="lg:col-span-8 bg-gray-50 p-8 rounded-xl border border-gray-200" id="lifecycle-detail">
+                        <!-- Generated Content -->
+                    </div>
+                </div>
+
+                <!-- Team & Roles -->
+                <div class="bg-indigo-50 rounded-2xl p-8 border border-indigo-100">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold text-indigo-900 mb-4">The Data Product Squad</h3>
+                            <p class="text-indigo-800 mb-6">A successful data product requires a cross-functional team. Compare the skill distributions below.</p>
+                            
+                            <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white p-2 mb-4" id="role-selector" onchange="renderTeamChart(this.value)">
+                                <option value="pm">Data Product Manager</option>
+                                <option value="ds">Data Scientist</option>
+                                <option value="eng">Data Engineer</option>
+                            </select>
+                            
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-bold text-gray-800 mb-2">Role Focus:</h4>
+                                <p class="text-sm text-gray-600" id="role-desc">Select a role to see details.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm h-[350px]">
+                            <canvas id="teamChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 3: EVALUATE (From data-product-evaluate) -->
+        <!-- ========================================== -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 border-t border-gray-200" id="evaluate">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-900">3. Evaluate Fit &amp; Utility</h2>
+                    <p class="text-gray-600 mt-2">Before scaling, evaluate the product against Signal Validity and User Utility.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <!-- Signal Validity -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg text-teal-700 mb-4">Criterion 1: Signal Validity</h3>
+                        <p class="text-sm text-gray-600 mb-4">Does the algorithm extract a real signal from the noise? Adjust efficacy to simulate.</p>
+                        
+                        <input class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600 mb-4" id="algo-slider" max="100" min="0" type="range" value="50"/>
+                        
+                        <div class="h-[200px] w-full">
+                            <canvas id="signalChart"></canvas>
+                        </div>
+                        <div class="mt-2 flex justify-between text-sm font-bold text-teal-800">
+                            <span>Noise</span>
+                            <span id="signal-score-val">50/100</span>
+                            <span>Signal</span>
+                        </div>
+                    </div>
+
+                    <!-- User Utility -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg text-indigo-700 mb-4">Criterion 2: User Utility</h3>
+                        <p class="text-sm text-gray-600 mb-4">Does it solve a real problem? Select utility drivers.</p>
+                        
+                        <div class="grid grid-cols-2 gap-2 mb-4" id="utility-checklist">
+                            <!-- JS Generated -->
+                        </div>
+                        
+                        <div class="h-[20px] w-full bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-600 transition-all duration-500" id="utility-bar" style="width: 0%"></div>
+                        </div>
+                        <div class="mt-2 text-right text-sm font-bold text-indigo-800" id="utility-score-val">0/100</div>
+                    </div>
+                </div>
+
+                <!-- Decision Matrix / Fit -->
+                <div class="bg-gray-800 rounded-xl p-8 text-white">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Product Fit Assessment</h3>
+                            <p class="text-gray-400 mb-6">Based on the Signal and Utility scores above, here is the recommendation.</p>
+                            <div class="p-6 bg-gray-700 rounded-lg border-l-4 border-gray-500" id="recommendation-box">
+                                <h4 class="font-bold text-lg mb-1" id="rec-title">ADJUST INPUTS</h4>
+                                <p class="text-sm text-gray-300" id="rec-desc">Interact with the tools above to get a strategic recommendation.</p>
+                            </div>
+                        </div>
+                        <div class="h-[250px]">
+                            <canvas id="decisionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 4: VALIDATE (From data-product-validation) -->
+        <!-- ========================================== -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200" id="validate">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-900">4. Validate &amp; Readiness</h2>
+                    <p class="text-gray-600 mt-2">Ensuring the product is Trustworthy, Consumable, and Discoverable before launch.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                    <!-- Validation Pillars (Explicit Request) -->
+                    <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                        <div class="text-3xl mb-3">💎</div>
+                        <h3 class="font-bold text-orange-900 mb-2">Trustworthy</h3>
+                        <p class="text-sm text-orange-800">Data must be accurate, consistent, and reliable. Validated via SLAs and automated quality tests.</p>
+                    </div>
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <div class="text-3xl mb-3">📦</div>
+                        <h3 class="font-bold text-blue-900 mb-2">Consumable</h3>
+                        <p class="text-sm text-blue-800">Products must have clear contracts, schemas, and documentation. Validated via access tests.</p>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-xl border border-green-100">
+                        <div class="text-3xl mb-3">🔭</div>
+                        <h3 class="font-bold text-green-900 mb-2">Discoverable</h3>
+                        <p class="text-sm text-green-800">Metadata and cataloging make the product easy to find. Validated via catalog registration.</p>
+                    </div>
+                </div>
+
+                <!-- Validation Lifecycle Flow -->
+                <div class="mb-16">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">The Validation Lifecycle</h3>
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <button class="flex-1 p-4 rounded-lg border border-gray-200 hover:border-orange-500 bg-gray-50 text-center transition-all val-step-btn active" data-step="design" onclick="renderValidationStep('design')">
+                            <span class="block text-2xl mb-1">📐</span>
+                            <span class="font-bold">Design Contract</span>
+                        </button>
+                        <button class="flex-1 p-4 rounded-lg border border-gray-200 hover:border-orange-500 bg-gray-50 text-center transition-all val-step-btn" data-step="build" onclick="renderValidationStep('build')">
+                            <span class="block text-2xl mb-1">🏗️</span>
+                            <span class="font-bold">Build &amp; Test</span>
+                        </button>
+                        <button class="flex-1 p-4 rounded-lg border border-gray-200 hover:border-orange-500 bg-gray-50 text-center transition-all val-step-btn" data-step="run" onclick="renderValidationStep('run')">
+                            <span class="block text-2xl mb-1">⚙️</span>
+                            <span class="font-bold">Run &amp; Monitor</span>
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm" id="validation-content">
+                        <!-- Content -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Readiness Assessment -->
+                    <div class="bg-gray-900 rounded-xl p-8 text-white">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold">Readiness Checklist</h3>
+                            <div class="text-2xl font-bold text-orange-400" id="readiness-score">0%</div>
+                        </div>
+                        <div class="space-y-3" id="readiness-list">
+                            <!-- JS Checklist -->
+                        </div>
+                    </div>
+
+                    <!-- Quality Metrics Radar -->
+                    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Quality Metrics</h3>
+                        <div class="h-[300px]">
+                            <canvas id="qualityRadarChart"></canvas>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button class="text-sm text-indigo-600 hover:underline" onclick="randomizeRadar()">Simulate Audit Audit</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+      <div data-heading="Related Articles" data-intro="Explore more guides and technology articles." data-limit="4" id="related-articles-root"></div>
+	 <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // === GLOBAL STATE ===
+        const state = {
+            mindset: 'project',
+            currentArchetype: 'source',
+            validationStep: 'design',
+            signalScore: 50,
+            utilityScore: 0,
+            readinessItems: [
+                { id: 'r1', text: 'Clear Business Owner defined', checked: false },
+                { id: 'r2', text: 'SLA (Freshness/Quality) documented', checked: false },
+                { id: 'r3', text: 'Schema validation enforced in pipeline', checked: false },
+                { id: 'r4', text: 'PII/Sensitive data tagged', checked: false },
+                { id: 'r5', text: 'Data lineage is mapped', checked: false },
+                { id: 'r6', text: 'Access control mechanism in place', checked: false }
+            ],
+            utilityDrivers: {
+                'pain': { label: 'Solves Pain Point', value: 30, active: false },
+                'workflow': { label: 'Fits Workflow', value: 20, active: false },
+                'time': { label: 'Saves Time', value: 20, active: false },
+                'trust': { label: 'Trustable Source', value: 30, active: false }
+            }
+        };
+
+        // === DATA DEFINITIONS ===
+
+        const mindsetData = {
+            project: {
+                title: "Project Mindset",
+                features: [
+                    { icon: "⚙️", title: "Goal", text: "Deliver specific report one time." },
+                    { icon: "🔒", title: "Access", text: "Siloed. Ticket-based access." }
+                ]
+            },
+            product: {
+                title: "Product Mindset",
+                features: [
+                    { icon: "🎯", title: "Goal", text: "Serve multiple consumers over time." },
+                    { icon: "🔓", title: "Access", text: "Self-serve via APIs/Catalog." }
+                ]
+            }
+        };
+
+        const datsisData = [
+            { L: "D", W: "Discoverable", T: "Registered in Catalog (Amundsen/Collibra)", C: "bg-blue-50 border-blue-200" },
+            { L: "A", W: "Addressable", T: "Unique Endpoint (S3/Snowflake URI)", C: "bg-green-50 border-green-200" },
+            { L: "T", W: "Trustworthy", T: "SLOs defined & monitored", C: "bg-orange-50 border-orange-200" },
+            { L: "S", W: "Self-describing", T: "Documentation & Schemas embedded", C: "bg-purple-50 border-purple-200" },
+            { L: "I", W: "Interoperable", T: "Global IDs & Standards", C: "bg-red-50 border-red-200" },
+            { L: "S", W: "Secure", T: "RBAC & Access Policies", C: "bg-indigo-50 border-indigo-200" }
+        ];
+
+        const lifecycleData = {
+            ideation: { title: "1. Discovery", content: "Identify user pain points. Don't build just because you have data. In the discovery phase, the team identifies the problem to solve, understands user needs, evaluates available data, and defines success metrics. The focus is on validating that a meaningful opportunity exists and that data can realistically power the solution" },
+            design: { title: "2. Design", content: "During design, the team defines the data product experience, data architecture, metrics framework, and technical approach. This includes outlining how the data signal will be generated and how users will interact with it. Define APIs, Schemas, and SLAs before writing code." },
+            build: { title: "3. Build", content: " In this phase, the team focuses on building a meaningful data signal that delivers real value and making it usable for the end user. The goal is not just to process data, but to extract insights or predictions that are accurate, relevant, and actionable. This requires significant experimentation—testing different data sources, feature engineering approaches, model techniques, and thresholds to determine what truly works.  Then Build Engineering pipelines, CI/CD, and Unit Tests." },
+            launch: { title: "4. Launch", content: "Go-to-market, training, and documentation. Launch involves deploying the product to users, monitoring performance, ensuring system stability, and gathering early feedback. The goal is to validate real-world impact against defined success metrics" },
+            iterate: { title: "5. Iterate", content: "Monitor usage metrics and refine based on feedback - In the iterate phase, the team continuously improves the product based on user feedback, data insights, and performance results. Enhancements to the data signal, user experience, and scalability drive long-term success." }
+        };
+
+        const teamData = {
+            pm: { data: [90, 40, 50, 80, 95, 85], desc: "The Data PM focuses on Business Acumen, Communication, and User Needs." },
+            ds: { data: [40, 60, 95, 30, 50, 40], desc: "The Data Scientist focuses on Statistics, ML, and Algorithms." },
+            eng: { data: [30, 95, 40, 20, 40, 50], desc: "The Data Engineer focuses on Pipeline Stability, Architecture, and Scale." }
+        };
+
+        const validationContent = {
+            design: "<strong>Design Phase:</strong> Define the contract. What does 'Good' look like? Set SLAs for freshness and completeness.",
+            build: "<strong>Build Phase:</strong> Add unit tests for transformations and integration tests for pipelines. CI/CD is mandatory.",
+            run: "<strong>Run Phase:</strong> Monitor for Data Drift and Anomaly Detection. Alert on SLA breaches immediately."
+        };
+
+        // === CHART INSTANCES ===
+        let teamChart, signalChart, decisionChart, qualityRadar;
+
+        // === INITIALIZATION ===
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMindset();
+            renderDatsis();
+            renderLifecycle();
+            initCharts();
+            renderUtilityChecklist();
+            updateEvaluation();
+            renderValidationStep('design');
+            renderReadiness();
+        });
+
+        // === SECTION 1: DEFINE LOGIC ===
+        function toggleMindset() {
+            state.mindset = state.mindset === 'project' ? 'product' : 'project';
+            const ball = document.getElementById('toggle-ball');
+            
+            if (state.mindset === 'product') {
+                ball.style.transform = 'translateX(100%)';
+                document.getElementById('label-product').classList.add('text-indigo-900', 'font-bold');
+                document.getElementById('label-project').classList.remove('text-gray-900', 'font-bold');
+            } else {
+                ball.style.transform = 'translateX(0)';
+                document.getElementById('label-project').classList.add('text-gray-900', 'font-bold');
+                document.getElementById('label-product').classList.remove('text-indigo-900', 'font-bold');
+            }
+            renderMindset();
+        }
+
+        function renderMindset() {
+            const data = mindsetData[state.mindset];
+            const container = document.getElementById('mindset-content');
+            
+            container.innerHTML = `
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="md:w-1/3 p-8 ${state.mindset === 'product' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-white'} flex flex-col justify-center items-center text-center">
+                        <h3 class="text-3xl font-bold mb-2">${data.title}</h3>
+                    </div>
+                    <div class="md:w-2/3 p-8 bg-white">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            ${data.features.map(f => `
+                                <div class="flex items-start">
+                                    <span class="text-2xl mr-3">${f.icon}</span>
+                                    <div>
+                                        <h4 class="font-bold text-sm uppercase tracking-wide text-gray-500">${f.title}</h4>
+                                        <p class="text-base font-medium mt-1 text-gray-800">${f.text}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDatsis() {
+            const grid = document.getElementById('datsis-grid');
+            grid.innerHTML = datsisData.map(item => `
+                <div class="p-6 rounded-xl border ${item.C} flex items-center gap-4 bg-white bg-opacity-60">
+                    <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm font-bold text-xl text-gray-800">
+                        ${item.L}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-gray-800">${item.W}</h3>
+                        <p class="text-xs text-gray-500">${item.T}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // === SECTION 2: BUILD LOGIC ===
+        function renderLifecycle() {
+            const tabs = document.getElementById('lifecycle-tabs');
+            const keys = Object.keys(lifecycleData);
+            
+            tabs.innerHTML = keys.map((key, index) => `
+                <button onclick="updateLifecycle('${key}')" class="p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors ${index === 0 ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}" id="tab-${key}">
+                    <span class="font-bold text-gray-800 block">${lifecycleData[key].title}</span>
+                </button>
+            `).join('');
+
+            updateLifecycle('ideation');
+        }
+
+        function updateLifecycle(key) {
+            // Update tabs
+            document.querySelectorAll('#lifecycle-tabs button').forEach(b => {
+                b.classList.remove('border-indigo-500', 'bg-indigo-50');
+                b.classList.add('border-gray-200');
+            });
+            document.getElementById(`tab-${key}`).classList.remove('border-gray-200');
+            document.getElementById(`tab-${key}`).classList.add('border-indigo-500', 'bg-indigo-50');
+
+            // Update Content
+            const detail = document.getElementById('lifecycle-detail');
+            detail.innerHTML = `
+                <h3 class="text-2xl font-bold text-indigo-900 mb-4">${lifecycleData[key].title}</h3>
+                <p class="text-lg text-gray-700 leading-relaxed">${lifecycleData[key].content}</p>
+            `;
+        }
+
+        function renderTeamChart(role) {
+            document.getElementById('role-selector').value = role;
+            document.getElementById('role-desc').innerText = teamData[role].desc;
+            
+            teamChart.data.datasets[0].data = teamData[role].data;
+            teamChart.data.datasets[0].label = role.toUpperCase();
+            teamChart.update();
+        }
+
+        // === SECTION 3: EVALUATE LOGIC ===
+        function updateSignal(val) {
+            state.signalScore = parseInt(val);
+            document.getElementById('signal-score-val').innerText = `${val}/100`;
+            
+            // Update Signal Chart
+            const labels = Array.from({length: 50}, (_, i) => i);
+            const newData = labels.map(x => {
+                const signal = Math.sin(x * 0.2) * 10;
+                const noiseFactor = (100 - val) / 100 * 15;
+                return signal + ((Math.random() - 0.5) * 2 * noiseFactor);
+            });
+            
+            signalChart.data.datasets[0].data = newData;
+            signalChart.update();
+            updateEvaluation();
+        }
+
+        function renderUtilityChecklist() {
+            const container = document.getElementById('utility-checklist');
+            container.innerHTML = Object.keys(state.utilityDrivers).map(key => `
+                <div onclick="toggleUtility('${key}')" class="cursor-pointer p-3 rounded border ${state.utilityDrivers[key].active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'} text-xs font-bold text-center transition-colors">
+                    ${state.utilityDrivers[key].label}
+                </div>
+            `).join('');
+            
+            // Calculate Score
+            let total = 0;
+            Object.values(state.utilityDrivers).forEach(d => { if(d.active) total += d.value; });
+            state.utilityScore = total;
+            
+            document.getElementById('utility-score-val').innerText = `${total}/100`;
+            document.getElementById('utility-bar').style.width = `${total}%`;
+            
+            updateEvaluation();
+        }
+
+        function toggleUtility(key) {
+            state.utilityDrivers[key].active = !state.utilityDrivers[key].active;
+            renderUtilityChecklist();
+        }
+
+        function updateEvaluation() {
+            const tech = state.signalScore;
+            const util = state.utilityScore;
+            
+            // Update Scatter Plot
+            decisionChart.data.datasets[0].data = [{x: tech, y: util}];
+            
+            // Determine Zone Color
+            let color = '#fbbf24'; // yellow
+            if (tech > 60 && util > 60) color = '#34d399'; // green
+            if (tech < 40 && util < 40) color = '#f87171'; // red
+            
+            decisionChart.data.datasets[0].backgroundColor = color;
+            decisionChart.update();
+
+            // Recommendation Text
+            const titleEl = document.getElementById('rec-title');
+            const descEl = document.getElementById('rec-desc');
+            const box = document.getElementById('recommendation-box');
+            
+            box.classList.remove('border-emerald-500', 'border-red-500', 'border-amber-500', 'border-gray-500');
+
+            if (tech > 60 && util > 60) {
+                titleEl.innerText = "GO: SCALE PRODUCT";
+                descEl.innerText = "Strong signal and high utility. Ready for production.";
+                box.classList.add('border-emerald-500');
+            } else if (tech < 40 && util < 40) {
+                titleEl.innerText = "NO GO: DISCARD";
+                descEl.innerText = "Weak signal and no user value. Do not build.";
+                box.classList.add('border-red-500');
+            } else if (tech > 60) {
+                titleEl.innerText = "PAUSE: FIND USERS";
+                descEl.innerText = "Great tech, but no one needs it yet. Focus on UX.";
+                box.classList.add('border-amber-500');
+            } else {
+                titleEl.innerText = "PAUSE: R&D NEEDED";
+                descEl.innerText = "Users want it, but the tech isn't ready.";
+                box.classList.add('border-amber-500');
+            }
+        }
+
+        // === SECTION 4: VALIDATE LOGIC ===
+        function renderValidationStep(step) {
+            // UI Update
+            document.querySelectorAll('.val-step-btn').forEach(b => {
+                b.classList.remove('border-orange-500', 'bg-orange-50');
+                b.classList.add('border-gray-200', 'bg-gray-50');
+            });
+            const btn = document.querySelector(`button[data-step="${step}"]`);
+            if(btn) {
+                btn.classList.remove('border-gray-200', 'bg-gray-50');
+                btn.classList.add('border-orange-500', 'bg-orange-50');
+            }
+            
+            document.getElementById('validation-content').innerHTML = `
+                <p class="text-gray-700 text-lg">${validationContent[step]}</p>
+            `;
+        }
+
+        function renderReadiness() {
+            const list = document.getElementById('readiness-list');
+            list.innerHTML = state.readinessItems.map((item, idx) => `
+                <div onclick="toggleReadiness(${idx})" class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-800 transition-colors">
+                    <div class="w-5 h-5 rounded border ${item.checked ? 'bg-green-500 border-green-500' : 'border-gray-500'} flex items-center justify-center">
+                        ${item.checked ? '✓' : ''}
+                    </div>
+                    <span class="${item.checked ? 'text-green-200' : 'text-gray-400'} text-sm">${item.text}</span>
+                </div>
+            `).join('');
+
+            const count = state.readinessItems.filter(i => i.checked).length;
+            const score = Math.round((count / state.readinessItems.length) * 100);
+            document.getElementById('readiness-score').innerText = `${score}%`;
+        }
+
+        function toggleReadiness(index) {
+            state.readinessItems[index].checked = !state.readinessItems[index].checked;
+            renderReadiness();
+        }
+
+        function randomizeRadar() {
+            const newData = Array.from({length: 6}, () => Math.floor(Math.random() * 50) + 50);
+            qualityRadar.data.datasets[0].data = newData;
+            qualityRadar.update();
+        }
+
+
+        // === CHARTS INIT ===
+        function initCharts() {
+            // 1. Team Radar Chart
+            const teamCtx = document.getElementById('teamChart').getContext('2d');
+            teamChart = new Chart(teamCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Business', 'Data Eng', 'Stats/ML', 'UX', 'Comms', 'Project Mgmt'],
+                    datasets: [{
+                        label: 'Data Product Manager',
+                        data: teamData.pm.data,
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: '#4f46e5',
+                        pointBackgroundColor: '#4f46e5'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            suggestedMin: 0, suggestedMax: 100,
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 2. Signal Chart (Line)
+            const signalCtx = document.getElementById('signalChart').getContext('2d');
+            signalChart = new Chart(signalCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 50}, (_, i) => i),
+                    datasets: [{
+                        label: 'Signal Output',
+                        data: [],
+                        borderColor: '#0d9488',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { min: -15, max: 15, display: false } }
+                }
+            });
+
+            // 3. Decision Matrix (Scatter)
+            const decisionCtx = document.getElementById('decisionChart').getContext('2d');
+            decisionChart = new Chart(decisionCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        data: [{x: 50, y: 0}],
+                        backgroundColor: '#fbbf24',
+                        pointRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { min: 0, max: 100, title: {display: true, text: 'Tech Validity (Signal)', color: '#9ca3af'}, grid: {color: '#374151'} },
+                        y: { min: 0, max: 100, title: {display: true, text: 'User Utility (Value)', color: '#9ca3af'}, grid: {color: '#374151'} }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // 4. Quality Radar
+            const qualCtx = document.getElementById('qualityRadarChart').getContext('2d');
+            qualityRadar = new Chart(qualCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Accuracy', 'Completeness', 'Consistency', 'Timeliness', 'Validity', 'Uniqueness'],
+                    datasets: [{
+                        label: 'Current Score',
+                        data: [80, 75, 90, 60, 85, 95],
+                        backgroundColor: 'rgba(234, 88, 12, 0.2)',
+                        borderColor: '#ea580c',
+                        pointBackgroundColor: '#ea580c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { suggestedMin: 0, suggestedMax: 100, grid: { color: '#e5e7eb' }, pointLabels: { font: { size: 10 } } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Init listeners and data AFTER all charts are created
+            updateSignal(50);
+            document.getElementById('algo-slider').addEventListener('input', (e) => updateSignal(e.target.value));
+        }
+
+        // === UTILS ===
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            const offset = 80; 
+            const bodyRect = document.body.getBoundingClientRect().top;
+            const elementRect = el.getBoundingClientRect().top;
+            const elementPosition = elementRect - bodyRect;
+            const offsetPosition = elementPosition - offset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        }
+    </script>
+ <script src="/css-scripts/related-articles-noimage.js"></script>
+
+</body></html>
