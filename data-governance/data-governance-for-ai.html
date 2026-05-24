@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Report: Data Governance for AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is designed as a thematic, single-page journey to guide users from foundational concepts to practical implementation of AI data governance. It begins with an engaging introduction with key statistics. The core of the app is the 'Pillars of Governance' section, using interactive cards for discoverability. This leads to an 'Interactive Framework Explorer' which serves as a central dashboard. Users can select a governance pillar, which dynamically updates a Chart.js visualization showing associated challenges and a text area displaying actionable implementation steps. This structure was chosen because it breaks down a complex topic into digestible, interconnected parts, promoting exploration and understanding rather than linear reading. The user flow is intuitive: learn the concepts (pillars), then explore their practical application and challenges (framework explorer). A sticky navigation facilitates easy movement between these logically sequenced sections. -->
+    <!-- Visualization & Content Choices: 1. Key Statistics (Introduction) -> Goal: Inform/Engage -> Viz: Dynamic number counters -> Interaction: Animate on load -> Justification: Grabs user attention immediately. -> Method: HTML/JS. 2. Pillars of Governance -> Goal: Organize/Inform -> Viz: Interactive Cards -> Interaction: Click to select and filter dashboard -> Justification: Intuitive way to present core concepts. -> Method: HTML/Tailwind/JS. 3. AI Governance Framework -> Goal: Explain Process -> Viz: Cyclical Diagram -> Interaction: Hover to see details -> Justification: Visualizes the continuous nature of governance. -> Method: HTML/Tailwind/JS. 4. Governance Challenges -> Goal: Compare/Analyze -> Viz: Doughnut Chart -> Interaction: Updates based on selected pillar -> Justification: Shows the proportion of challenges related to each area effectively. -> Library: Chart.js/Canvas. 5. Implementation Steps -> Goal: Actionable Guidance -> Viz: Dynamic Text Block -> Interaction: Updates based on selected pillar -> Justification: Provides direct, practical information tied to user's selection. -> Method: HTML/JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #333D4B;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #C86B52;
+            border-bottom-color: #C86B52;
+        }
+        .pillar-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .pillar-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .pillar-card.selected {
+            transform: translateY(-5px);
+            box-shadow: 0 0 0 2px #C86B52;
+            background-color: #FFFBF7;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .framework-step {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+         .framework-step:hover .framework-step-content {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">AI Data Governance</h1>
+            <div class="hidden md:flex space-x-8">
+                <a class="nav-link active" href="#introduction">Introduction</a>
+                <a class="nav-link" href="#pillars">Pillars</a>
+                <a class="nav-link" href="#framework">Framework</a>
+                <a class="nav-link" href="#explorer">Explorer</a>
+            </div>
+             <button class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" id="mobile-menu-button">
+                <span class="block w-6 h-0.5 bg-gray-700"></span>
+                <span class="block w-6 h-0.5 bg-gray-700 mt-1"></span>
+                <span class="block w-6 h-0.5 bg-gray-700 mt-1"></span>
+            </button>
+        </nav>
+        <div class="hidden md:hidden px-6 pb-4" id="mobile-menu">
+             <a class="block py-2 nav-link mobile-nav-link" href="#introduction">Introduction</a>
+             <a class="block py-2 nav-link mobile-nav-link" href="#pillars">Pillars</a>
+             <a class="block py-2 nav-link mobile-nav-link" href="#framework">Framework</a>
+             <a class="block py-2 nav-link mobile-nav-link" href="#explorer">Explorer</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section class="text-center min-h-[60vh] flex flex-col justify-center items-center" id="introduction">
+            <h2 class="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 mb-4">Unlocking AI's Potential with Robust Data Governance</h2>
+            <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                Effective data governance is the bedrock of trustworthy, ethical, and high-performing AI systems. It ensures that data is managed securely, ethically, and in compliance with regulations throughout the entire AI lifecycle, from data acquisition to model deployment.
+            </p>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="text-5xl font-bold text-[#C86B52]" data-target="85">0</p>
+                    <p class="text-gray-600 mt-2">of CEOs believe GenAI will significantly change their business</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="text-5xl font-bold text-[#C86B52]" data-target="70">0</p>
+                    <p class="text-gray-600 mt-2">of organizations cite data quality and management as a top AI barrier</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="text-5xl font-bold text-[#C86B52]" data-target="4.2">0</p>
+                    <p class="text-gray-600 mt-2">Trillion dollars estimated annual value created by AI and analytics</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16" id="pillars">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900">The Core Pillars of AI Data Governance</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                    A strong AI governance framework is built on several key pillars. These principles work together to create a comprehensive system for managing data responsibly. Click on a pillar in the section below to explore its challenges and implementation details in the interactive explorer.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" id="pillar-cards-container">
+            </div>
+        </section>
+
+        <section class="py-16 bg-white rounded-lg shadow-lg" id="framework">
+            <div class="text-center mb-12 px-6">
+                <h2 class="text-3xl font-bold text-gray-900">An Iterative Governance Framework</h2>
+                 <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                    Implementing AI data governance is not a one-time project but a continuous, iterative cycle. This framework outlines the key stages organizations must perpetually engage in to maintain robust governance. Hover over each step to learn more about its purpose.
+                </p>
+            </div>
+            <div class="relative flex flex-wrap items-center justify-center gap-4 px-6">
+                <div class="relative w-[300px] h-[300px] md:w-[450px] md:h-[450px]" id="framework-diagram-container">
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 mt-16" id="explorer">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900">Interactive Framework Explorer</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                    This interactive dashboard allows you to explore the relationship between governance pillars, their common challenges, and practical implementation steps. Select a pillar from the cards above to begin.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg border border-gray-100">
+                    <h3 class="text-xl font-semibold text-center text-gray-800 mb-4" id="chart-title">Top Challenges</h3>
+                    <div class="chart-container">
+                        <canvas id="challengesChart"></canvas>
+                    </div>
+                     <p class="text-center text-gray-500 mt-4" id="chart-helper-text">Select a pillar above to see associated challenges.</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg border border-gray-100 min-h-[400px]">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" id="details-title">Implementation Steps</h3>
+                    <div class="text-gray-700 space-y-3" id="details-content">
+                       <p>Please select a governance pillar to view detailed implementation guidance and best practices.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-first-ai-security.html">Data First Ai Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-agentic-ai.html">Data Governance For Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai-info.html">Data Governance For Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai.html">Data Governance For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-llm.html">Data Governance For Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant copy.html">Data Lineage Ai Assitant Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant.html">Data Lineage Ai Assitant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai-interactive.html">Data Lineage For Ai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai.html">Data Lineage For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info copy.html">Data Lineage Info Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info.html">Data Lineage Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage.html">Data Lineage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant-info.html">Privacy Ai Assistant Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant.html">Privacy Ai Assistant</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+    <!--
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2025 AI Data Governance Report. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">This interactive report is for informational purposes only.</p>
+        </div>
+    </footer>
+
+    -->
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const pillarData = {
+            'Data Quality & Management': {
+                icon: '✔️',
+                description: 'Ensuring data is accurate, complete, and consistent for training reliable AI models.',
+                chartData: {
+                    labels: ['Inaccurate Data', 'Incomplete Datasets', 'Data Drift', 'Poor Lineage'],
+                    data: [35, 30, 20, 15],
+                    backgroundColor: ['#E57373', '#81C784', '#64B5F6', '#FFD54F'],
+                },
+                details: `
+                    <ul>
+                        <li class="mb-2"><strong>Automated Validation:</strong> Implement data validation pipelines to automatically check for anomalies, missing values, and inconsistencies.</li>
+                        <li class="mb-2"><strong>Data Lineage Tracking:</strong> Use tools to track data from its source to the model, ensuring transparency and traceability.</li>
+                        <li class="mb-2"><strong>Version Control:</strong> Apply version control principles (like DVC) to datasets to manage changes and ensure reproducibility.</li>
+                        <li><strong>Monitoring for Drift:</strong> Continuously monitor data distributions to detect concept and data drift post-deployment.</li>
+                    </ul>`
+            },
+            'Security & Privacy': {
+                icon: '🔒',
+                description: 'Protecting data from unauthorized access and ensuring compliance with privacy regulations.',
+                chartData: {
+                    labels: ['Data Breaches', 'Insider Threats', 'Anonymization Failure', 'Compliance Risk'],
+                    data: [40, 25, 20, 15],
+                    backgroundColor: ['#F06292', '#7986CB', '#4FC3F7', '#AED581'],
+                },
+                details: `
+                    <ul>
+                        <li class="mb-2"><strong>Encryption:</strong> Encrypt data both at rest and in transit to protect against unauthorized access.</li>
+                        <li class="mb-2"><strong>Access Control:</strong> Implement role-based access control (RBAC) to ensure users can only access data necessary for their roles.</li>
+                        <li class="mb-2"><strong>Privacy-Enhancing Technologies (PETs):</strong> Utilize techniques like differential privacy and federated learning to train models without exposing raw sensitive data.</li>
+                        <li><strong>Regular Audits:</strong> Conduct regular security audits and penetration testing to identify and mitigate vulnerabilities.</li>
+                    </ul>`
+            },
+            'Ethics & Fairness': {
+                icon: '⚖️',
+                description: 'Mitigating bias in AI models and ensuring that AI systems make fair and equitable decisions.',
+                chartData: {
+                    labels: ['Algorithmic Bias', 'Lack of Transparency', 'Unfair Outcomes', 'Accountability Gaps'],
+                    data: [45, 25, 20, 10],
+                    backgroundColor: ['#FF8A65', '#BA68C8', '#4DD0E1', '#FFF176'],
+                },
+                details: `
+                    <ul>
+                        <li class="mb-2"><strong>Bias Detection Tools:</strong> Use specialized toolkits (e.g., AIF360, Fairlearn) to audit datasets and models for statistical biases.</li>
+                        <li class="mb-2"><strong>Diverse Data Sourcing:</strong> Actively source training data that is representative of the diverse populations the AI will impact.</li>
+                        <li class="mb-2"><strong>Explainable AI (XAI):</strong> Implement XAI techniques like SHAP and LIME to make model decisions more interpretable and transparent.</li>
+                        <li><strong>Human-in-the-Loop:</strong> Establish processes for human review of high-stakes AI decisions to ensure fairness and provide accountability.</li>
+                    </ul>`
+            },
+            'Compliance & Accountability': {
+                icon: '📜',
+                description: 'Adhering to legal and regulatory standards (like GDPR, AI Act) and defining clear ownership.',
+                chartData: {
+                    labels: ['Regulatory Uncertainty', 'Audit Trail Gaps', 'Lack of Ownership', 'Cross-border Data Rules'],
+                    data: [30, 30, 25, 15],
+                    backgroundColor: ['#9575CD', '#4DB6AC', '#FFB74D', '#A1887F'],
+                },
+                details: `
+                    <ul>
+                        <li class="mb-2"><strong>Regulatory Monitoring:</strong> Establish a process to stay updated on evolving AI regulations in relevant jurisdictions.</li>
+                        <li class="mb-2"><strong>Model & Data Cards:</strong> Create documentation (e.g., Model Cards, Data Sheets for Datasets) that outlines model purpose, limitations, and data provenance.</li>
+                        <li class="mb-2"><strong>Governance Council:</strong> Form a cross-functional AI governance council to define policies, assign ownership, and oversee compliance.</li>
+                        <li><strong>Impact Assessments:</strong> Conduct regular AI impact assessments to identify and mitigate potential legal, ethical, and societal risks.</li>
+                    </ul>`
+            }
+        };
+
+        const frameworkData = [
+            { name: "Define Policies", description: "Establish clear rules for data handling, quality, security, and ethical use specific to AI." },
+            { name: "Discover & Classify", description: "Identify and inventory data assets, classifying them based on sensitivity and relevance." },
+            { name: "Implement Controls", description: "Apply technical and procedural controls for security, access, and quality enforcement." },
+            { name: "Monitor & Audit", description: "Continuously track data usage, model performance, and compliance with policies." },
+            { name: "Remediate & Improve", description: "Address issues found during monitoring and refine policies and controls accordingly." },
+        ];
+
+        let challengesChart;
+        let activePillar = null;
+
+        const initPillarCards = () => {
+            const container = document.getElementById('pillar-cards-container');
+            Object.keys(pillarData).forEach(pillarName => {
+                const data = pillarData[pillarName];
+                const card = document.createElement('div');
+                card.className = 'pillar-card bg-white p-6 rounded-lg shadow-md border border-gray-100 cursor-pointer';
+                card.dataset.pillar = pillarName;
+                card.innerHTML = `
+                    <div class="text-3xl mb-4">${data.icon}</div>
+                    <h3 class="text-lg font-semibold text-gray-800">${pillarName}</h3>
+                    <p class="text-gray-600 mt-2 text-sm">${data.description}</p>
+                `;
+                card.addEventListener('click', () => selectPillar(pillarName, card));
+                container.appendChild(card);
+            });
+        };
+
+        const initFrameworkDiagram = () => {
+            const container = document.getElementById('framework-diagram-container');
+            const numSteps = frameworkData.length;
+            const radius = container.clientWidth / 2.5; 
+            const centerX = container.clientWidth / 2;
+            const centerY = container.clientHeight / 2;
+
+            frameworkData.forEach((step, i) => {
+                const angle = (i / numSteps) * 2 * Math.PI - (Math.PI / 2);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+
+                const stepEl = document.createElement('div');
+                stepEl.className = 'framework-step absolute flex items-center justify-center w-24 h-24 md:w-32 md:h-32 rounded-full bg-white shadow-lg text-center cursor-default border-2 border-[#C86B52]';
+                stepEl.style.left = `${x - (stepEl.clientWidth / 1.5)}px`;
+                stepEl.style.top = `${y - (stepEl.clientHeight / 1.5)}px`;
+
+                stepEl.innerHTML = `
+                    <span class="font-semibold text-sm md:text-base text-gray-800 p-2">${step.name}</span>
+                    <div class="framework-step-content absolute inset-0 bg-gray-800/90 text-white p-3 rounded-full flex items-center justify-center opacity-0 transition-opacity duration-300">
+                        <p class="text-xs md:text-sm">${step.description}</p>
+                    </div>
+                `;
+                container.appendChild(stepEl);
+            });
+        };
+
+        const selectPillar = (pillarName, cardElement) => {
+            activePillar = pillarName;
+            document.querySelectorAll('.pillar-card').forEach(card => card.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            
+            updateDashboard(pillarName);
+
+            const explorerSection = document.getElementById('explorer');
+            explorerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        
+        const updateDashboard = (pillarName) => {
+            const data = pillarData[pillarName];
+            if (!data) return;
+
+            document.getElementById('chart-title').innerText = `Top Challenges in ${pillarName}`;
+            document.getElementById('details-title').innerText = `Implementation: ${pillarName}`;
+            document.getElementById('details-content').innerHTML = data.details;
+            document.getElementById('chart-helper-text').style.display = 'none';
+
+            if (challengesChart) {
+                challengesChart.data.labels = data.chartData.labels;
+                challengesChart.data.datasets[0].data = data.chartData.data;
+                challengesChart.data.datasets[0].backgroundColor = data.chartData.backgroundColor;
+                challengesChart.update();
+            } else {
+                initChart(data.chartData);
+            }
+        };
+
+        const initChart = (initialData = {}) => {
+            const ctx = document.getElementById('challengesChart').getContext('2d');
+            challengesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: initialData.labels || [],
+                    datasets: [{
+                        label: 'Challenges',
+                        data: initialData.data || [],
+                        backgroundColor: initialData.backgroundColor || [],
+                        borderColor: '#FDFBF8',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        };
+        
+        const animateCounters = () => {
+            const counters = document.querySelectorAll('[data-target]');
+            const speed = 200;
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const updateCount = () => {
+                            const target = +counter.getAttribute('data-target');
+                            const count = +counter.innerText;
+                            const isFloat = target % 1 !== 0;
+
+                            const inc = target / speed;
+
+                            if (count < target) {
+                                let newCount = count + inc;
+                                if (isFloat) {
+                                    counter.innerText = newCount.toFixed(1);
+                                } else {
+                                    counter.innerText = Math.ceil(newCount);
+                                }
+                                setTimeout(updateCount, 10);
+                            } else {
+                                counter.innerText = target;
+                            }
+                        };
+                        updateCount();
+                        observer.unobserve(counter);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            counters.forEach(counter => observer.observe(counter));
+        };
+        
+        const setupNavigation = () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => observer.observe(section));
+        };
+
+        const setupMobileMenu = () => {
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+            menuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        };
+        
+        initPillarCards();
+        initFrameworkDiagram();
+        initChart();
+        animateCounters();
+        setupNavigation();
+        setupMobileMenu();
+    });
+    </script>
+
+
+</body></html>

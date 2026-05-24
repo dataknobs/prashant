@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>3.1 Fundamentals of Prompting :: AI, NLP &amp; LLMs Course</title>
+<meta content="Master prompt engineering fundamentals: zero-shot, few-shot, chain-of-thought, role prompting, and system prompts. Includes live interactive examples for summarization, classification, extraction, and transformation tasks." name="description"/>
+<meta content="prompt engineering, zero-shot prompting, few-shot prompting, chain of thought, role prompting, system prompts, LLM prompting, ChatGPT prompts, Claude prompts, prompt techniques, summarization, classification, extraction, NLP course" name="keywords"/>
+<meta content="AI, NLP &amp; LLMs Course" name="author"/>
+<meta content="3.1 Fundamentals of Prompting :: AI, NLP &amp; LLMs Course" property="og:title"/>
+<meta content="Learn zero-shot, few-shot, CoT, and role prompting with live interactive examples and side-by-side output comparisons." property="og:description"/>
+<meta content="article" property="og:type"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Literata:ital,wght@0,300;0,700;1,300&amp;family=Cabinet+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<style>
+  :root {
+    --ink:    #111008;
+    --paper:  #fefcf5;
+    --cream:  #f4f0e3;
+    --accent: #5c3d8f;   /* deep violet :: Section 3 colour */
+    --accent2:#8b5cf6;
+    --gold:   #b45309;
+    --teal:   #0f766e;
+    --rose:   #be185d;
+    --muted:  #635c4a;
+    --border: #d8d0bc;
+    --code-bg:#0c0a14;
+    --code-txt:#ddd6fe;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Cabinet Grotesk',sans-serif;
+    font-size:16px;
+    line-height:1.72;
+    overflow-x:hidden;
+  }
+
+  /* woven linen texture */
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:
+      repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(92,61,143,0.025) 3px,rgba(92,61,143,0.025) 4px),
+      repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(92,61,143,0.015) 3px,rgba(92,61,143,0.015) 4px);
+    pointer-events:none;z-index:0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar{
+    position:fixed;left:0;top:0;height:100vh;width:268px;
+    background:var(--ink);color:var(--paper);
+    padding:36px 0;z-index:100;
+    display:flex;flex-direction:column;
+    border-right:3px solid var(--accent);
+    overflow-y:auto;
+  }
+  .sidebar-logo{padding:0 26px 26px;border-bottom:1px solid rgba(254,252,245,0.1);}
+  .sidebar-logo .eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--accent2);text-transform:uppercase;margin-bottom:6px;}
+  .sidebar-logo h2{font-family:'DM Serif Display',serif;font-size:16px;line-height:1.3;}
+  .sidebar-nav{flex:1;padding:18px 0;}
+  .nav-section{padding:0 26px;}
+  .nav-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(254,252,245,0.27);padding:14px 0 7px;display:block;}
+  .nav-link{display:block;padding:6px 10px;margin:1px -10px;border-radius:4px;color:rgba(254,252,245,0.6);text-decoration:none;font-size:12.5px;font-weight:500;transition:all .2s;}
+  .nav-link:hover,.nav-link.active{background:rgba(92,61,143,0.22);color:#ddd6fe;}
+  .nav-link.active{border-left:2px solid var(--accent2);padding-left:8px;color:#c4b5fd;}
+  .nav-link.dim{color:rgba(254,252,245,0.22);font-size:12px;}
+  .sidebar-footer{padding:16px 26px;border-top:1px solid rgba(254,252,245,0.08);font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(254,252,245,0.28);}
+
+  /* ── PROGRESS ── */
+  .progress-bar{height:3px;background:var(--border);position:sticky;top:0;z-index:200;}
+  .progress-fill{height:100%;width:0%;transition:width .1s;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--rose));}
+
+  /* ── MAIN ── */
+  .main{margin-left:268px;min-height:100vh;position:relative;z-index:1;}
+
+  /* ── HERO ── */
+  .hero{
+    background:var(--ink);color:var(--paper);
+    padding:80px 80px 64px;position:relative;overflow:hidden;
+  }
+  /* manuscript lines */
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(transparent,transparent 31px,rgba(92,61,143,0.08) 31px,rgba(92,61,143,0.08) 32px);
+    pointer-events:none;
+  }
+  .hero::after{
+    content:'"';position:absolute;right:40px;top:-20px;
+    font-family:'Literata',serif;font-size:320px;line-height:1;
+    color:rgba(92,61,143,0.07);pointer-events:none;user-select:none;
+  }
+  .breadcrumb{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:rgba(254,252,245,0.3);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .breadcrumb a{color:rgba(254,252,245,0.3);text-decoration:none;}
+  .hero-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent2);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .hero-label::before{content:'';display:inline-block;width:32px;height:1px;background:var(--accent2);}
+  .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(36px,5vw,58px);line-height:1.1;margin-bottom:22px;max-width:700px;}
+  .hero h1 em{font-style:italic;color:#c4b5fd;}
+  .hero-desc{font-size:17px;color:rgba(254,252,245,0.62);max-width:560px;line-height:1.75;margin-bottom:36px;}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{background:rgba(254,252,245,0.06);border:1px solid rgba(254,252,245,0.12);color:rgba(254,252,245,0.6);padding:4px 13px;border-radius:20px;font-size:11.5px;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;}
+
+  /* ── CONTENT ── */
+  .content{padding:0 80px 80px;max-width:1100px;}
+  .section{margin-top:72px;padding-top:72px;border-top:1px solid var(--border);}
+  .section:first-child{border-top:none;padding-top:56px;}
+  .section-number{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--accent2);text-transform:uppercase;margin-bottom:10px;display:block;}
+  .section h2{font-family:'DM Serif Display',serif;font-size:clamp(26px,3.2vw,40px);line-height:1.15;margin-bottom:20px;}
+  .section-intro{font-size:16.5px;color:var(--muted);max-width:680px;margin-bottom:44px;border-left:3px solid var(--accent2);padding-left:20px;}
+  .subsection{margin-bottom:52px;}
+  .subsection h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+  .anchor-icon{width:27px;height:27px;background:var(--ink);color:var(--paper);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;flex-shrink:0;}
+  p{margin-bottom:14px;}
+
+  /* ── CALLOUT ── */
+  .callout{background:var(--cream);border-left:4px solid var(--accent2);border-radius:0 8px 8px 0;padding:16px 20px;margin:22px 0;}
+  .callout.gold{border-left-color:var(--gold);}
+  .callout.teal{border-left-color:var(--teal);}
+  .callout.rose{border-left-color:var(--rose);}
+  .callout-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin-bottom:7px;color:var(--accent2);}
+  .callout.gold .callout-label{color:var(--gold);}
+  .callout.teal .callout-label{color:var(--teal);}
+  .callout.rose .callout-label{color:var(--rose);}
+  .callout p{margin-bottom:0;font-size:15px;}
+
+  /* ── TABLE ── */
+  .table-wrap{overflow-x:auto;margin:24px 0;border-radius:8px;border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;}
+  thead{background:var(--ink);color:var(--paper);}
+  th{padding:12px 18px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;}
+  td{padding:11px 18px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:var(--cream);}
+  .ic{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--cream);border:1px solid var(--border);padding:2px 7px;border-radius:3px;color:var(--accent);}
+
+  /* ── TECHNIQUE CARDS ── */
+  .tech-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:32px 0;}
+  .tech-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer;}
+  .tech-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(17,16,8,0.1);}
+  .tech-card.active-card{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent2)22;}
+  .tc-head{padding:18px 20px;display:flex;align-items:flex-start;gap:14px;}
+  .tc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .tc-head-text h4{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:3px;color:var(--paper);}
+  .tc-head-text p{font-size:12px;opacity:.65;margin:0;font-family:'JetBrains Mono',monospace;}
+  .tc-body{padding:14px 20px;background:var(--paper);}
+  .tc-body p{font-size:14px;color:var(--muted);margin:0;}
+
+  /* ── PROMPT ANATOMY ── */
+  .prompt-anatomy{background:var(--ink);border-radius:12px;overflow:hidden;margin:32px 0;border:1px solid rgba(92,61,143,0.3);}
+  .pa-header{padding:16px 24px;border-bottom:1px solid rgba(254,252,245,0.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .pa-header h4{font-family:'DM Serif Display',serif;font-size:18px;color:var(--paper);}
+  .pa-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(92,61,143,0.3);color:#c4b5fd;letter-spacing:.05em;}
+  .pa-body{padding:0;}
+
+  .pa-layer{display:flex;border-bottom:1px solid rgba(254,252,245,0.06);}
+  .pa-layer:last-child{border-bottom:none;}
+  .pa-label{width:140px;flex-shrink:0;padding:16px 20px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(254,252,245,0.06);}
+  .pa-label-name{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:3px;}
+  .pa-label-desc{font-size:12px;color:rgba(254,252,245,0.35);line-height:1.4;}
+  .pa-content{flex:1;padding:16px 20px;font-family:'Literata',serif;font-size:14px;line-height:1.7;color:rgba(254,252,245,0.85);}
+  .pa-content.optional{color:rgba(254,252,245,0.45);font-style:italic;}
+
+  /* ── SHOT COMPARISON ── */
+  .shot-tabs{display:flex;gap:2px;background:rgba(17,16,8,0.5);padding:4px;border-radius:8px;margin-bottom:20px;width:fit-content;}
+  .shot-tab{padding:8px 20px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;color:rgba(254,252,245,0.5);border:none;background:none;transition:all .2s;letter-spacing:.04em;}
+  .shot-tab.active{background:var(--accent);color:white;}
+  .shot-panel{display:none;}
+  .shot-panel.active{display:block;}
+
+  /* ── PROMPT BLOCK ── */
+  .prompt-block{
+    background:var(--ink);border-radius:10px;overflow:hidden;
+    margin:20px 0;border:1px solid rgba(92,61,143,0.25);
+  }
+  .pb-header{
+    padding:10px 18px;border-bottom:1px solid rgba(254,252,245,0.06);
+    display:flex;align-items:center;gap:10px;
+  }
+  .pb-role{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:2px 10px;border-radius:3px;}
+  .pb-role.system{background:rgba(180,83,9,0.25);color:#fcd34d;}
+  .pb-role.user{background:rgba(92,61,143,0.3);color:#c4b5fd;}
+  .pb-role.assistant{background:rgba(15,118,110,0.25);color:#5eead4;}
+  .pb-content{padding:16px 20px;font-family:'Literata',serif;font-size:14px;line-height:1.75;color:rgba(254,252,245,0.85);}
+  .pb-content .highlight{background:rgba(139,92,246,0.2);border-radius:2px;padding:0 2px;}
+
+  /* ── CODE ── */
+  .code-container{margin:24px 0;border-radius:10px;overflow:hidden;box-shadow:0 8px 32px rgba(17,16,8,0.16);}
+  .code-header{background:#08060e;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;}
+  .code-dots{display:flex;gap:6px;}
+  .code-dot{width:12px;height:12px;border-radius:50%;}
+  .code-dot.red{background:#ff5f57;}.code-dot.yellow{background:#febc2e;}.code-dot.green{background:#28c840;}
+  .code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(221,214,254,0.35);margin-left:10px;}
+  .code-lang{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;background:rgba(92,61,143,0.3);color:#c4b5fd;border-radius:4px;}
+  pre{background:var(--code-bg);padding:24px;overflow-x:auto;margin:0;line-height:1.65;}
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--code-txt);}
+  .kw{color:#c792ea;}.str{color:#c3e88d;}.num{color:#f78c6c;}
+  .cmt{color:#3d3060;font-style:italic;}.fn{color:#82aaff;}
+  .var{color:#eeffa7;}.key{color:#89ddff;}.cls{color:#ffcb6b;}
+
+  /* ── LIVE PROMPT LAB ── */
+  .lab{background:var(--ink);border-radius:12px;overflow:hidden;margin:32px 0;border:1px solid rgba(92,61,143,0.3);}
+  .lab-header{padding:18px 24px;border-bottom:1px solid rgba(254,252,245,0.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .lab-header h4{font-family:'DM Serif Display',serif;font-size:20px;color:var(--paper);}
+  .lab-desc{padding:16px 24px;font-size:14px;color:rgba(254,252,245,0.45);border-bottom:1px solid rgba(254,252,245,0.06);}
+  .lab-body{padding:24px;}
+
+  .lab-task-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .lab-task-btn{font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 14px;border-radius:5px;border:1px solid rgba(254,252,245,0.15);background:rgba(254,252,245,0.05);color:rgba(254,252,245,0.65);cursor:pointer;transition:all .2s;}
+  .lab-task-btn:hover,.lab-task-btn.active{background:rgba(92,61,143,0.3);border-color:var(--accent2);color:#c4b5fd;}
+
+  .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .lab-col-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(254,252,245,0.3);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .lab-col-label .lc-badge{padding:2px 8px;border-radius:3px;font-size:9px;}
+  .lab-col-label .lc-bad{background:rgba(190,24,93,0.25);color:#f9a8d4;}
+  .lab-col-label .lc-good{background:rgba(15,118,110,0.25);color:#5eead4;}
+
+  .lab-textarea{
+    width:100%;background:rgba(254,252,245,0.05);border:1px solid rgba(254,252,245,0.12);
+    color:var(--paper);padding:14px;border-radius:8px;font-family:'Literata',serif;font-size:14px;
+    resize:vertical;outline:none;transition:border-color .2s;line-height:1.7;min-height:160px;
+  }
+  .lab-textarea:focus{border-color:var(--accent2);}
+  .lab-textarea.readonly{background:rgba(254,252,245,0.03);cursor:default;}
+
+  .lab-run-row{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;}
+  .lab-btn{background:var(--accent);color:white;border:none;padding:11px 26px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+  .lab-btn:hover{background:#4a2e7a;transform:translateY(-1px);}
+  .lab-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  .lab-btn.secondary{background:rgba(92,61,143,0.3);color:#c4b5fd;}
+  .lab-hint{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(254,252,245,0.3);}
+
+  .lab-output{
+    margin-top:16px;background:rgba(254,252,245,0.03);border:1px solid rgba(254,252,245,0.08);
+    border-radius:8px;padding:16px;min-height:80px;font-size:14.5px;line-height:1.75;
+    color:rgba(254,252,245,0.82);font-family:'Cabinet Grotesk',sans-serif;
+  }
+  .lab-output.empty{color:rgba(254,252,245,0.2);font-family:'JetBrains Mono',monospace;font-size:12px;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .loading::after{content:'▋';animation:blink .8s infinite;color:rgba(254,252,245,0.3);}
+
+  .compare-outputs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  .co-col{}
+  .co-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .co-output{background:rgba(254,252,245,0.03);border:1px solid rgba(254,252,245,0.08);border-radius:6px;padding:14px;font-size:14px;line-height:1.7;color:rgba(254,252,245,0.78);min-height:100px;font-family:'Cabinet Grotesk',sans-serif;}
+  .co-output.loading::after{content:'▋';animation:blink .8s infinite;color:rgba(254,252,245,0.3);}
+
+  /* ── COT VISUALIZER ── */
+  .cot-chain{display:flex;flex-direction:column;gap:0;margin:28px 0;}
+  .cot-step{display:flex;gap:0;}
+  .cot-line{display:flex;flex-direction:column;align-items:center;width:44px;flex-shrink:0;}
+  .cot-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;flex-shrink:0;}
+  .cot-vline{flex:1;width:2px;background:var(--border);min-height:20px;}
+  .cot-content{flex:1;padding:0 0 24px 4px;}
+  .cot-content h5{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:6px;}
+  .cot-content p{font-size:14px;color:var(--muted);margin:0;}
+  .cot-content .example{font-family:'Literata',serif;font-size:13.5px;background:var(--cream);padding:10px 14px;border-radius:6px;margin-top:8px;border-left:3px solid var(--border);line-height:1.65;}
+
+  /* ── EXAMPLE SHOWCASE ── */
+  .example-tabs{display:flex;gap:2px;background:var(--cream);padding:4px;border-radius:8px;margin-bottom:0;flex-wrap:wrap;}
+  .ex-tab{padding:7px 18px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;color:var(--muted);border:none;background:none;transition:all .2s;}
+  .ex-tab.active{background:var(--ink);color:var(--paper);}
+  .ex-panel{display:none;border:1px solid var(--border);border-radius:0 8px 8px 8px;overflow:hidden;}
+  .ex-panel.active{display:block;}
+
+  /* ── REVEAL ── */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s,transform .55s;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav{margin-top:80px;padding:36px 80px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--cream);}
+  .btn-nav{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border:1.5px solid var(--ink);border-radius:6px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;transition:all .2s;}
+  .btn-nav.primary{background:var(--ink);color:var(--paper);}
+  .btn-nav:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(17,16,8,0.12);}
+
+  @media(max-width:900px){
+    .sidebar{display:none;}.main{margin-left:0;}
+    .hero,.content{padding-left:28px;padding-right:28px;}
+    .tech-cards{grid-template-columns:1fr;} .lab-grid{grid-template-columns:1fr;}
+    .compare-outputs{grid-template-columns:1fr;} .bottom-nav{flex-direction:column;gap:14px;padding:24px 28px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="eyebrow">Course Material</div>
+    <h2>AI, NLP &amp; LLMs</h2>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <span class="nav-label">Section 1 &amp; 2</span>
+      <a class="nav-link dim" href="ai-nlp-llm-section2-3-4.html">2.3–2.4 Tokenization &amp; Embeddings</a>
+      <span class="nav-label">Section 3 :: Prompting</span>
+      <a class="nav-link active" href="#hero">3.1 Fundamentals</a>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">This Chapter</span>
+      <a class="nav-link" href="#overview">Prompt Anatomy</a>
+      <a class="nav-link" href="#zero-shot">Zero-shot</a>
+      <a class="nav-link" href="#few-shot">Few-shot</a>
+      <a class="nav-link" href="#cot">Chain-of-Thought</a>
+      <a class="nav-link" href="#role">Role Prompting</a>
+      <a class="nav-link" href="#system">System Prompts</a>
+      <a class="nav-link" href="#examples">Task Examples</a>
+      <a class="nav-link" href="#lab">Hands-on Lab</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Section 3.1 · ~60 min</div>
+</nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<main class="main">
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="breadcrumb">
+      <a href="#">Section 3</a>
+      <span style="color:rgba(254,252,245,0.18)">›</span>
+      <span>3.1 Fundamentals of Prompting</span>
+    </div>
+    <div class="hero-label">Section 3 :: Prompt Engineering</div>
+    <h1>Fundamentals of<br/><em>Prompt Engineering</em></h1>
+    <p class="hero-desc">The art and science of communicating with language models. Master zero-shot, few-shot, chain-of-thought, and role prompting :: and learn why the words you choose determine everything about the response you get.</p>
+    <div class="hero-tags">
+      <span class="tag">Zero-shot</span>
+      <span class="tag">Few-shot</span>
+      <span class="tag">Chain-of-Thought</span>
+      <span class="tag">Role Prompting</span>
+      <span class="tag">System Prompts</span>
+      <span class="tag">Summarization</span>
+      <span class="tag">Classification</span>
+      <span class="tag">Extraction</span>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <!-- OVERVIEW / ANATOMY -->
+    <section class="section reveal" id="overview">
+      <span class="section-number">3.1.0</span>
+      <h2>What is a Prompt?</h2>
+      <p class="section-intro">A prompt is every token the model receives before it starts generating. It includes context, instructions, examples, and data :: anything that shapes the distribution of possible completions the model will draw from.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">A</span>Anatomy of a Well-Structured Prompt</h3>
+        <p>High-quality prompts share a consistent structure. Not every component is required for every task, but understanding each layer helps you know what to add when outputs disappoint.</p>
+
+        <div class="prompt-anatomy">
+          <div class="pa-header">
+            <h4>Prompt Layers</h4>
+            <span class="pa-badge">ANNOTATED</span>
+          </div>
+          <div class="pa-body">
+            <div class="pa-layer">
+              <div class="pa-label">
+                <span class="pa-label-name" style="color:#fcd34d;">System / Role</span>
+                <span class="pa-label-desc">Persona &amp; constraints</span>
+              </div>
+              <div class="pa-content">You are an expert data analyst. You write concise, precise responses in plain English. You never fabricate numbers :: if data is missing, say so.</div>
+            </div>
+            <div class="pa-layer">
+              <div class="pa-label">
+                <span class="pa-label-name" style="color:#a78bfa;">Context</span>
+                <span class="pa-label-desc">Background info</span>
+              </div>
+              <div class="pa-content">The following is a quarterly earnings report from a Fortune 500 company. The report covers Q3 2024.</div>
+            </div>
+            <div class="pa-layer">
+              <div class="pa-label">
+                <span class="pa-label-name" style="color:#34d399;">Examples</span>
+                <span class="pa-label-desc">Few-shot demos</span>
+              </div>
+              <div class="pa-content optional">Example :: Report: "Revenue: $4.2B (+12% YoY). Net income: $620M." → Summary: "Revenue grew 12% to $4.2B; profit reached $620M." ←</div>
+            </div>
+            <div class="pa-layer">
+              <div class="pa-label">
+                <span class="pa-label-name" style="color:#f87171;">Input Data</span>
+                <span class="pa-label-desc">The actual content</span>
+              </div>
+              <div class="pa-content">[Full text of earnings report goes here]</div>
+            </div>
+            <div class="pa-layer">
+              <div class="pa-label">
+                <span class="pa-label-name" style="color:#5eead4;">Instruction</span>
+                <span class="pa-label-desc">Task &amp; format</span>
+              </div>
+              <div class="pa-content">Summarize the three most important financial metrics in exactly two sentences. Use numbers. End with the word "END".</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">The Primacy &amp; Recency Effect</div>
+          <p>LLMs attend most strongly to tokens at the <strong>start</strong> and <strong>end</strong> of the prompt. Put your most critical instructions at the beginning (system prompt / role) and repeat the key constraint at the end (instruction). Bury critical info in the middle only if you expect the model to miss it.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">M</span>The Five Techniques at a Glance</h3>
+        <div class="tech-cards">
+          <div class="tech-card" onclick="scrollToSection('zero-shot')">
+            <div class="tc-head" style="background:rgba(92,61,143,0.9);">
+              <div class="tc-icon" style="background:rgba(254,252,245,0.1);">0</div>
+              <div class="tc-head-text">
+                <h4>Zero-shot</h4>
+                <p>No examples</p>
+              </div>
+            </div>
+            <div class="tc-body"><p>Give the task directly. Works well for clear, common tasks. The fastest prompt :: but often not the best quality for ambiguous or nuanced requests.</p></div>
+          </div>
+          <div class="tech-card" onclick="scrollToSection('few-shot')">
+            <div class="tc-head" style="background:rgba(15,118,110,0.9);">
+              <div class="tc-icon" style="background:rgba(254,252,245,0.1);">3</div>
+              <div class="tc-head-text">
+                <h4>Few-shot</h4>
+                <p>2–5 examples</p>
+              </div>
+            </div>
+            <div class="tc-body"><p>Show input→output pairs before the actual query. Teaches the model your exact format, tone, and edge-case handling without fine-tuning.</p></div>
+          </div>
+          <div class="tech-card" onclick="scrollToSection('cot')">
+            <div class="tc-head" style="background:rgba(180,83,9,0.9);">
+              <div class="tc-icon" style="background:rgba(254,252,245,0.1);">🔗</div>
+              <div class="tc-head-text">
+                <h4>Chain-of-Thought</h4>
+                <p>Step-by-step reasoning</p>
+              </div>
+            </div>
+            <div class="tc-body"><p>Prompt the model to reason through a problem before answering. Dramatically improves accuracy on math, logic, and multi-step reasoning tasks.</p></div>
+          </div>
+          <div class="tech-card" onclick="scrollToSection('role')">
+            <div class="tc-head" style="background:rgba(190,24,93,0.9);">
+              <div class="tc-icon" style="background:rgba(254,252,245,0.1);">👤</div>
+              <div class="tc-head-text">
+                <h4>Role Prompting</h4>
+                <p>Assign a persona</p>
+              </div>
+            </div>
+            <div class="tc-body"><p>Tell the model who it is. "You are a senior security engineer" activates domain-specific knowledge and sets appropriate tone, vocabulary, and perspective.</p></div>
+          </div>
+          <div class="tech-card" onclick="scrollToSection('system')">
+            <div class="tc-head" style="background:rgba(17,16,8,0.9);border:1px solid rgba(254,252,245,0.1);">
+              <div class="tc-icon" style="background:rgba(254,252,245,0.08);">⚙</div>
+              <div class="tc-head-text">
+                <h4>System Prompts</h4>
+                <p>Persistent instructions</p>
+              </div>
+            </div>
+            <div class="tc-body"><p>A separate "system" role message that sets permanent constraints before any user message. Powers custom AI assistants, product personas, and guardrails.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZERO-SHOT -->
+    <section class="section reveal" id="zero-shot">
+      <span class="section-number">3.1.1</span>
+      <h2>Zero-shot Prompting</h2>
+      <p class="section-intro">Give the model a task with no examples. Relies entirely on the model's pretrained knowledge. Effective for clear, well-defined tasks :: but brittle for nuanced formats or domain-specific requirements.</p>
+
+      <div class="subsection">
+        <p>Zero-shot prompting is the default interaction mode. You describe what you want; the model does it based on training alone. The quality depends heavily on how clearly and specifically you phrase the instruction.</p>
+
+        <div class="shot-tabs">
+          <button class="shot-tab active" onclick="switchShot('zs','weak',this)">Weak prompt</button>
+          <button class="shot-tab" onclick="switchShot('zs','strong',this)">Strong prompt</button>
+          <button class="shot-tab" onclick="switchShot('zs','structured',this)">Structured output</button>
+        </div>
+
+        <div class="shot-panel active" id="zs-weak">
+          <div class="prompt-block">
+            <div class="pb-header"><span class="pb-role user">USER</span></div>
+            <div class="pb-content">Summarize this article about climate change.</div>
+          </div>
+          <div class="callout rose"><div class="callout-label">Problem</div><p>What length? What audience? Which aspects? What format? The model has to guess everything, producing inconsistent, often over-long results.</p></div>
+        </div>
+
+        <div class="shot-panel" id="zs-strong">
+          <div class="prompt-block">
+            <div class="pb-header"><span class="pb-role user">USER</span></div>
+            <div class="pb-content">Summarize the following article about climate change <span class="highlight">in exactly 3 bullet points</span>, <span class="highlight">each under 20 words</span>, written for <span class="highlight">a general audience with no scientific background</span>. Focus on causes, effects, and one actionable step.<br/><br/>[article text]</div>
+          </div>
+          <div class="callout teal"><div class="callout-label">Why It Works</div><p>Every ambiguity is resolved: format (bullets), length (20 words), audience (non-expert), scope (3 aspects). The model has no guesswork :: it executes precisely.</p></div>
+        </div>
+
+        <div class="shot-panel" id="zs-structured">
+          <div class="prompt-block">
+            <div class="pb-header"><span class="pb-role user">USER</span></div>
+            <div class="pb-content">Extract key information from the article below and return it as <span class="highlight">valid JSON</span> with this exact structure:<br/><br/>{"topic": "...", "key_claim": "...", "evidence": ["...", "..."], "confidence": "high|medium|low"}<br/><br/>Return only the JSON. No explanation, no markdown fences.<br/><br/>[article text]</div>
+          </div>
+          <div class="callout teal"><div class="callout-label">Structured Zero-shot</div><p>Specifying output format precisely :: including a schema with example values :: is one of the most powerful zero-shot techniques. JSON constraints dramatically reduce format errors.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEW-SHOT -->
+    <section class="section reveal" id="few-shot">
+      <span class="section-number">3.1.2</span>
+      <h2>Few-shot Prompting</h2>
+      <p class="section-intro">Provide 2–5 input→output demonstration pairs before your actual query. The model infers the pattern :: format, tone, length, reasoning style :: and applies it to the new input without any gradient updates.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">3</span>How Few-shot Learning Works</h3>
+        <p>Few-shot prompting exploits the LLM's in-context learning capability. Examples don't train the model :: they shift which part of its existing knowledge gets activated. A few well-chosen examples can:</p>
+        <ul style="list-style:none;padding:0;margin:0 0 16px;">
+          <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14.5px;display:flex;gap:10px;"><span style="color:var(--accent2);">→</span> Teach a custom output format the model hasn't seen</li>
+          <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14.5px;display:flex;gap:10px;"><span style="color:var(--accent2);">→</span> Calibrate response length and detail level precisely</li>
+          <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14.5px;display:flex;gap:10px;"><span style="color:var(--accent2);">→</span> Handle domain-specific edge cases and exceptions</li>
+          <li style="padding:7px 0;font-size:14.5px;display:flex;gap:10px;"><span style="color:var(--accent2);">→</span> Set a tone or style that's hard to describe in words</li>
+        </ul>
+
+        <div class="prompt-block">
+          <div class="pb-header"><span class="pb-role user">USER :: Few-shot Sentiment Classifier</span></div>
+          <div class="pb-content">
+            Classify each review as POSITIVE, NEGATIVE, or NEUTRAL. Be concise.<br/><br/>
+            <span class="highlight">Review: "This product changed my life :: I use it every day!"</span><br/>
+            Classification: POSITIVE<br/><br/>
+            <span class="highlight">Review: "The quality is average. Nothing special, nothing terrible."</span><br/>
+            Classification: NEUTRAL<br/><br/>
+            <span class="highlight">Review: "Broke after 2 uses. Absolute garbage. Do not buy."</span><br/>
+            Classification: NEGATIVE<br/><br/>
+            <span class="highlight">Review: "Delivery was fast but the item doesn't match the description at all."</span><br/>
+            Classification:
+          </div>
+        </div>
+
+        <div class="callout gold">
+          <div class="callout-label">Few-shot Best Practices</div>
+          <p><strong>Coverage:</strong> Include examples of each class or edge case you care about. <strong>Order:</strong> Put the most relevant or similar example closest to the query (recency bias). <strong>Diversity:</strong> Vary the examples :: don't use near-duplicates. <strong>Quality:</strong> Each example is a label the model will learn from :: incorrect examples mislead the model as surely as incorrect training data.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">N</span>One-shot vs Few-shot vs Many-shot</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Examples</th><th>When to Use</th><th>Tradeoff</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Zero-shot</strong></td><td>0</td><td>Clear, common tasks; cost/speed critical</td><td>Fastest; least reliable for edge cases</td></tr>
+              <tr><td><strong>One-shot</strong></td><td>1</td><td>Show the format; tight context budget</td><td>Better format adherence; one example may mislead</td></tr>
+              <tr><td><strong>Few-shot</strong></td><td>2–5</td><td>Custom format; classification; extraction</td><td>Strong improvement; uses context tokens</td></tr>
+              <tr><td><strong>Many-shot</strong></td><td>10–100+</td><td>Complex patterns; rare edge cases; long context models</td><td>Best accuracy; significant token cost</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAIN OF THOUGHT -->
+    <section class="section reveal" id="cot">
+      <span class="section-number">3.1.3</span>
+      <h2>Chain-of-Thought Prompting</h2>
+      <p class="section-intro">Adding "Let's think step by step" :: or providing reasoning examples :: prompts the model to externalise its reasoning process. This dramatically improves accuracy on multi-step problems where the correct answer depends on intermediate conclusions.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">🔗</span>Why CoT Works</h3>
+        <p>Language models are next-token predictors. When forced to generate intermediate reasoning steps, each step becomes context for the next :: the model effectively uses its own token stream as working memory. Reasoning that would require the model to "jump" to a conclusion is broken into smaller, individually tractable steps.</p>
+
+        <div class="cot-chain">
+          <div class="cot-step">
+            <div class="cot-line">
+              <div class="cot-circle" style="background:rgba(92,61,143,0.3);border:2px solid var(--accent2);color:#c4b5fd;">1</div>
+              <div class="cot-vline"></div>
+            </div>
+            <div class="cot-content">
+              <h5>Problem Statement</h5>
+              <p>The user provides a problem that requires multi-step reasoning :: math, logic, planning, or analysis.</p>
+              <div class="example">"A store is having a 30% off sale. A shirt originally costs $45. If you buy 3 shirts, how much do you save in total?"</div>
+            </div>
+          </div>
+          <div class="cot-step">
+            <div class="cot-line">
+              <div class="cot-circle" style="background:rgba(15,118,110,0.3);border:2px solid var(--teal);color:#5eead4;">2</div>
+              <div class="cot-vline"></div>
+            </div>
+            <div class="cot-content">
+              <h5>CoT Trigger</h5>
+              <p>A phrase in the prompt that activates step-by-step reasoning mode.</p>
+              <div class="example">Options: "Let's think step by step." / "Reason through this carefully before answering." / "Show your work." / Provide a worked example (few-shot CoT).</div>
+            </div>
+          </div>
+          <div class="cot-step">
+            <div class="cot-line">
+              <div class="cot-circle" style="background:rgba(180,83,9,0.3);border:2px solid var(--gold);color:#fcd34d;">3</div>
+              <div class="cot-vline"></div>
+            </div>
+            <div class="cot-content">
+              <h5>Reasoning Chain</h5>
+              <p>Model generates intermediate steps :: each one a correct input to the next.</p>
+              <div class="example">Step 1: Discount per shirt = 30% × $45 = $13.50<br/>Step 2: Total shirts = 3<br/>Step 3: Total savings = 3 × $13.50 = $40.50</div>
+            </div>
+          </div>
+          <div class="cot-step">
+            <div class="cot-line">
+              <div class="cot-circle" style="background:rgba(92,61,143,0.5);border:2px solid var(--accent);color:white;">✓</div>
+            </div>
+            <div class="cot-content">
+              <h5>Final Answer</h5>
+              <p>The answer emerges from the last step :: grounded in the reasoning chain rather than pulled from nowhere.</p>
+              <div class="example">Answer: You save $40.50 in total.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-block">
+          <div class="pb-header"><span class="pb-role user">USER :: Zero-shot CoT</span></div>
+          <div class="pb-content">
+            A bakery makes 240 cookies per day. They sell 60% on weekdays and 80% on weekends. How many cookies remain unsold in a week (5 weekdays, 2 weekend days)?<br/><br/>
+            <span class="highlight">Let's think step by step.</span>
+          </div>
+        </div>
+
+        <div class="prompt-block">
+          <div class="pb-header"><span class="pb-role assistant">ASSISTANT :: With CoT</span></div>
+          <div class="pb-content" style="color:rgba(254,252,245,0.75);">
+            Step 1: Daily production = 240 cookies<br/>
+            Step 2: Weekday sales = 60% × 240 = 144 cookies sold. Remaining = 240 − 144 = 96<br/>
+            Step 3: Weekend sales = 80% × 240 = 192 cookies sold. Remaining = 240 − 192 = 48<br/>
+            Step 4: Weekday unsold total = 96 × 5 = 480<br/>
+            Step 5: Weekend unsold total = 48 × 2 = 96<br/>
+            Step 6: Total unsold per week = 480 + 96 = <strong style="color:#c4b5fd;">576 cookies</strong>
+          </div>
+        </div>
+
+        <div class="callout gold">
+          <div class="callout-label">CoT Variants</div>
+          <p><strong>Zero-shot CoT:</strong> "Think step by step" :: no examples needed, works surprisingly well. <strong>Few-shot CoT:</strong> Provide 2–3 worked examples with reasoning chains :: more reliable for complex domains. <strong>Self-consistency CoT:</strong> Generate multiple reasoning chains and take the majority answer :: improves reliability further. <strong>Tree-of-Thought:</strong> Explore multiple reasoning branches simultaneously :: emerging frontier technique.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROLE PROMPTING -->
+    <section class="section reveal" id="role">
+      <span class="section-number">3.1.4</span>
+      <h2>Role Prompting</h2>
+      <p class="section-intro">Assigning the model a persona activates domain-specific vocabulary, reasoning patterns, and conventions :: without fine-tuning. "You are a senior security engineer" changes not just tone but the types of risks the model considers relevant.</p>
+
+      <div class="subsection">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:24px 0;">
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+            <div style="background:rgba(92,61,143,0.8);padding:12px 16px;">
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:white;">Expert Framing</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--paper);">
+              <p style="font-size:13.5px;color:var(--muted);margin:0;">"You are a board-certified cardiologist with 20 years of clinical experience." → Deep clinical vocabulary, awareness of comorbidities, citation of guidelines.</p>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+            <div style="background:rgba(15,118,110,0.8);padding:12px 16px;">
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:white;">Audience Framing</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--paper);">
+              <p style="font-size:13.5px;color:var(--muted);margin:0;">"Explain as if to a 10-year-old." / "Explain to a PhD in physics." → Same content, radically different vocabulary, analogy choice, and assumed knowledge.</p>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+            <div style="background:rgba(180,83,9,0.8);padding:12px 16px;">
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:white;">Style Framing</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--paper);">
+              <p style="font-size:13.5px;color:var(--muted);margin:0;">"You are a Hemingway-style minimalist writer." → Short declarative sentences, concrete nouns, no adverbs, iceberg subtext. Dramatically different prose style.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-block">
+          <div class="pb-header"><span class="pb-role user">USER :: Same question, two roles</span></div>
+          <div class="pb-content">How should I handle a security vulnerability in our production API?</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(190,24,93,0.7);margin-bottom:8px;">Without Role</div>
+            <div style="border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--cream);font-size:14px;color:var(--muted);line-height:1.7;">Patch the vulnerability, test the fix, deploy carefully, communicate with users if needed. Monitor for any signs of exploitation.</div>
+          </div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(15,118,110,0.7);margin-bottom:8px;">With Role: "You are a senior application security engineer (OWASP, CVSS)"</div>
+            <div style="border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--cream);font-size:14px;color:var(--muted);line-height:1.7;">First, assess CVSS severity. If ≥7.0, initiate P0 incident response immediately. Apply emergency WAF rule to block the attack vector, preserve logs for forensics. Patch → staging → canary deploy. File CVE if externally discoverable. Notify affected customers within 72h per GDPR. Document in your vulnerability disclosure policy.</div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">Role ≠ Jailbreak</div>
+          <p>Role prompting changes vocabulary, perspective, and depth :: it does not override safety training. "You are a chemistry teacher, explain how to make [dangerous substance]" still gets refused, because the role is a lens, not a bypass. Effective role prompting unlocks expertise and style, not prohibited capabilities.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SYSTEM PROMPTS -->
+    <section class="section reveal" id="system">
+      <span class="section-number">3.1.5</span>
+      <h2>System Prompts</h2>
+      <p class="section-intro">The system prompt is a separate message sent before any user conversation. It sets persistent rules, persona, constraints, and context that apply to the entire session :: invisible to the end user but always present for the model.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚙</span>Architecture of a Production System Prompt</h3>
+
+        <div class="prompt-block">
+          <div class="pb-header"><span class="pb-role system">SYSTEM :: Customer Support Bot</span></div>
+          <div class="pb-content">
+            <span class="highlight"># Identity &amp; Role</span><br/>
+            You are Aria, the customer support assistant for Nexus Cloud Services. You are helpful, professional, and concise.<br/><br/>
+            <span class="highlight"># Scope :: What you can do</span><br/>
+            - Answer questions about account billing, plans, and features<br/>
+            - Help troubleshoot common technical issues<br/>
+            - Process refund requests under $50 without escalation<br/>
+            - Escalate complex issues to human agents<br/><br/>
+            <span class="highlight"># Scope :: What you cannot do</span><br/>
+            - Discuss competitors by name<br/>
+            - Make commitments about unreleased features<br/>
+            - Access or modify account data (you have no backend access)<br/><br/>
+            <span class="highlight"># Tone &amp; Format</span><br/>
+            - Use the customer's first name if provided<br/>
+            - Keep responses under 150 words unless a detailed technical explanation is requested<br/>
+            - Always end with: "Is there anything else I can help you with?"<br/><br/>
+            <span class="highlight"># Escalation</span><br/>
+            If you cannot resolve the issue in 2 turns, say: "Let me connect you with a specialist."
+          </div>
+        </div>
+
+        <div class="callout teal">
+          <div class="callout-label">System Prompt Best Practices</div>
+          <p>Use markdown headers to organise long system prompts :: models handle structured text better than walls of prose. Be explicit about <strong>both</strong> what the model should and shouldn't do. Use positive constraints ("always end with X") rather than only negative ones ("don't do Y"). Test edge cases: what happens when a user tries to override the system prompt? Your system prompt should address that.</p>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">system_prompt_api.py</span>
+            </div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> anthropic <span class="kw">import</span> <span class="cls">Anthropic</span>
+
+<span class="var">client</span> = <span class="cls">Anthropic</span>()
+
+<span class="var">SYSTEM_PROMPT</span> = <span class="str">"""You are a senior Python engineer with 15 years of experience.
+You write idiomatic, production-ready Python.
+Rules:
+- Always include type hints
+- Always include docstrings (Google style)
+- Point out performance issues if present
+- If asked to review code, give a rating: GOOD / NEEDS WORK / REWRITE
+- Keep responses focused :: no fluff"""</span>
+
+<span class="kw">def</span> <span class="fn">chat</span>(user_message: <span class="cls">str</span>, history: <span class="cls">list</span> = <span class="cls">None</span>) -&gt; <span class="cls">str</span>:
+    <span class="var">messages</span> = (history <span class="kw">or</span> []) + [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: user_message}]
+    <span class="var">response</span> = <span class="var">client</span>.messages.<span class="fn">create</span>(
+        model=<span class="str">"claude-sonnet-4-20250514"</span>,
+        max_tokens=<span class="num">1024</span>,
+        system=<span class="var">SYSTEM_PROMPT</span>,   <span class="cmt"># ← system is a top-level param, not a message</span>
+        messages=<span class="var">messages</span>
+    )
+    <span class="kw">return</span> <span class="var">response</span>.content[<span class="num">0</span>].text
+
+<span class="cmt"># Turn 1</span>
+<span class="var">reply1</span> = <span class="fn">chat</span>(<span class="str">"Review this function: def add(a, b): return a + b"</span>)
+<span class="fn">print</span>(<span class="var">reply1</span>)
+<span class="cmt"># Rating: NEEDS WORK
+# Missing type hints and docstring. No validation for non-numeric inputs.
+# def add(a: int | float, b: int | float) -&gt; int | float:
+#     """Add two numbers and return the result."""
+#     return a + b</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASK EXAMPLES -->
+    <section class="section reveal" id="examples">
+      <span class="section-number">3.1.6</span>
+      <h2>Task Examples</h2>
+      <p class="section-intro">Four core NLP tasks :: summarization, classification, extraction, and transformation :: each with prompt patterns, tips, and live output comparisons.</p>
+
+      <div class="subsection">
+        <div class="example-tabs" id="exTabs">
+          <button class="ex-tab active" onclick="switchEx('sum',this)">📝 Summarization</button>
+          <button class="ex-tab" onclick="switchEx('cls',this)">🏷 Classification</button>
+          <button class="ex-tab" onclick="switchEx('ext',this)">🔍 Extraction</button>
+          <button class="ex-tab" onclick="switchEx('trf',this)">✏️ Transformation</button>
+        </div>
+
+        <!-- SUMMARIZATION -->
+        <div class="ex-panel active" id="ex-sum">
+          <div class="prompt-block" style="border-radius:0;border:none;border-bottom:1px solid rgba(254,252,245,0.07);">
+            <div class="pb-header"><span class="pb-role system">SYSTEM</span></div>
+            <div class="pb-content">You are a professional editor who specializes in executive summaries. Be ruthlessly concise.</div>
+          </div>
+          <div class="prompt-block" style="border-radius:0;border:none;">
+            <div class="pb-header"><span class="pb-role user">USER</span></div>
+            <div class="pb-content">Summarize the following in 3 bullet points. Each bullet: max 15 words. Lead with the most important point. Use active voice.<br/><br/>Text: [The Federal Reserve raised interest rates by 0.25% on Wednesday, the tenth consecutive increase since March 2022, bringing the federal funds rate to a 22-year high of 5.25-5.5%. Chair Jerome Powell signaled that future decisions will be data-dependent but kept open the possibility of additional hikes if inflation remains above the 2% target. Markets responded mixed, with tech stocks falling 1.2% while financial sector stocks rose 0.8%.]</div>
+          </div>
+        </div>
+
+        <!-- CLASSIFICATION -->
+        <div class="ex-panel" id="ex-cls">
+          <div class="prompt-block" style="border-radius:0;border:none;">
+            <div class="pb-header"><span class="pb-role user">USER :: Few-shot Classification</span></div>
+            <div class="pb-content">Classify each support ticket as: BILLING / TECHNICAL / ACCOUNT / FEATURE_REQUEST / OTHER<br/>Return JSON: {"ticket_id": ..., "category": ..., "confidence": "high|medium|low", "reason": "..."}<br/><br/>Ticket 001: "My invoice shows double charges for last month"<br/>→ {"ticket_id": "001", "category": "BILLING", "confidence": "high", "reason": "Double charge = billing dispute"}<br/><br/>Ticket 002: "I can't export my data to CSV, the button is greyed out"<br/>→ {"ticket_id": "002", "category": "TECHNICAL", "confidence": "high", "reason": "UI functionality broken"}<br/><br/>Ticket 003: "Would be great if you added dark mode"<br/>→</div>
+          </div>
+        </div>
+
+        <!-- EXTRACTION -->
+        <div class="ex-panel" id="ex-ext">
+          <div class="prompt-block" style="border-radius:0;border:none;">
+            <div class="pb-header"><span class="pb-role user">USER :: Structured Extraction</span></div>
+            <div class="pb-content">Extract all named entities from the text below. Return as JSON with this schema:<br/>{"people": [...], "organisations": [...], "locations": [...], "dates": [...], "monetary_values": [...]}<br/>Return only the JSON. No markdown.<br/><br/>Text: "Elon Musk's company xAI secured $6 billion in funding from investors including Sequoia Capital and Andreessen Horowitz in May 2024. The announcement was made at an event in San Francisco attended by over 200 technology executives."</div>
+          </div>
+        </div>
+
+        <!-- TRANSFORMATION -->
+        <div class="ex-panel" id="ex-trf">
+          <div class="prompt-block" style="border-radius:0;border:none;">
+            <div class="pb-header"><span class="pb-role user">USER :: Style Transfer</span></div>
+            <div class="pb-content">Rewrite the following technical documentation as a friendly onboarding email to a non-technical user. Keep all information accurate.<br/>Constraints: max 150 words, use "you" and "we", avoid jargon (no "API", "endpoint", "payload"), end with a clear next step.<br/><br/>Original: "Authentication is handled via OAuth 2.0 bearer tokens. Clients must include the Authorization header with a valid JWT in all API requests to protected endpoints. Token expiry is set to 3600 seconds. Refresh tokens may be used to obtain new access tokens without re-authentication."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDS-ON LAB -->
+    <section class="section reveal" id="lab">
+      <span class="section-number">3.1.7</span>
+      <h2>Hands-on Prompt Lab</h2>
+      <p class="section-intro">Experiment with prompt variations in real time. Edit prompts, run them live against Claude, and compare outputs side-by-side to feel how small changes produce dramatically different results.</p>
+
+      <!-- VARIATION LAB -->
+      <div class="lab">
+        <div class="lab-header">
+          <h4>Prompt Variation Lab</h4>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 10px;border-radius:4px;background:rgba(92,61,143,0.3);color:#c4b5fd;">LIVE API</span>
+          </div>
+        </div>
+        <div class="lab-desc">Choose a task, edit the weak and strong prompts, then run both simultaneously. Observe how prompt quality directly controls output quality.</div>
+        <div class="lab-body">
+          <div style="margin-bottom:18px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(254,252,245,0.35);margin-bottom:10px;">Task preset:</div>
+            <div class="lab-task-row" id="taskBtns">
+              <button class="lab-task-btn active" onclick="setTask('summarize',this)">Summarize</button>
+              <button class="lab-task-btn" onclick="setTask('classify',this)">Classify</button>
+              <button class="lab-task-btn" onclick="setTask('extract',this)">Extract</button>
+              <button class="lab-task-btn" onclick="setTask('transform',this)">Transform</button>
+              <button class="lab-task-btn" onclick="setTask('reason',this)">Reasoning</button>
+            </div>
+          </div>
+
+          <div class="lab-grid">
+            <div>
+              <div class="lab-col-label"><span>Weak Prompt</span><span class="lc-badge lc-bad">Vague</span></div>
+              <textarea class="lab-textarea" id="weakPrompt" rows="8"></textarea>
+            </div>
+            <div>
+              <div class="lab-col-label"><span>Strong Prompt</span><span class="lc-badge lc-good">Precise</span></div>
+              <textarea class="lab-textarea" id="strongPrompt" rows="8"></textarea>
+            </div>
+          </div>
+
+          <div class="lab-run-row">
+            <button class="lab-btn" id="runBtn" onclick="runBoth()">
+              <span id="runBtnTxt">▶ Run Both</span>
+            </button>
+            <button class="lab-btn secondary" id="runWeakBtn" onclick="runWeak()">Run Weak Only</button>
+            <span class="lab-hint" id="labHint">Results appear below after running</span>
+          </div>
+
+          <div class="compare-outputs" id="compareArea" style="display:none;">
+            <div class="co-col">
+              <div class="co-label" style="color:#f9a8d4;"><span>⚠</span> Weak prompt output</div>
+              <div class="co-output" id="weakOut"></div>
+            </div>
+            <div class="co-col">
+              <div class="co-label" style="color:#5eead4;"><span>✓</span> Strong prompt output</div>
+              <div class="co-output" id="strongOut"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM PROMPT LAB -->
+      <div class="lab" style="margin-top:24px;">
+        <div class="lab-header">
+          <h4>Custom Prompt Playground</h4>
+        </div>
+        <div class="lab-desc">Write your own system prompt and user message. Experiment freely :: this is your scratch space.</div>
+        <div class="lab-body">
+          <div style="margin-bottom:14px;">
+            <div class="lab-col-label">System Prompt (optional)</div>
+            <textarea class="lab-textarea" id="customSystem" placeholder="e.g. You are a Socratic tutor who never gives direct answers but asks guiding questions..." rows="3">You are a creative writing coach. Give specific, actionable feedback. Use "The Pixar method": identify what works first, then what could be stronger, then one concrete suggestion to try.</textarea>
+          </div>
+          <div>
+            <div class="lab-col-label">User Message</div>
+            <textarea class="lab-textarea" id="customUser" placeholder="Type your prompt here..." rows="4">Review my story opening: "The door opened. A man walked in. He sat down. The room was quiet."</textarea>
+          </div>
+          <div class="lab-run-row">
+            <button class="lab-btn" id="customBtn" onclick="runCustom()">
+              <span id="customBtnTxt">▶ Run</span>
+            </button>
+            <span class="lab-hint">Press Ctrl+Enter to run</span>
+          </div>
+          <div class="lab-output empty" id="customOut">Output will appear here…</div>
+        </div>
+      </div>
+
+      <!-- TECHNIQUE EXPLORER -->
+      <div class="lab" style="margin-top:24px;">
+        <div class="lab-header">
+          <h4>Technique Explorer</h4>
+        </div>
+        <div class="lab-desc">Enter any text or question and compare how different prompting techniques handle it :: all four run simultaneously.</div>
+        <div class="lab-body">
+          <div style="margin-bottom:14px;">
+            <div class="lab-col-label">Input (question or text to process)</div>
+            <textarea class="lab-textarea" id="techInput" placeholder="Enter any question or text..." rows="3">If a train leaves Chicago at 9 AM going 60mph, and another leaves New York at 11 AM going 80mph, and the distance is 800 miles, when do they meet?</textarea>
+          </div>
+          <div class="lab-run-row">
+            <button class="lab-btn" id="techBtn" onclick="runAllTech()">
+              <span id="techBtnTxt">▶ Compare All Techniques</span>
+            </button>
+          </div>
+          <div id="techResults" style="display:none;margin-top:20px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div>
+                <div class="co-label" style="color:#c4b5fd;">Zero-shot</div>
+                <div class="co-output" id="tech-zs"></div>
+              </div>
+              <div>
+                <div class="co-label" style="color:#5eead4;">Chain-of-Thought</div>
+                <div class="co-output" id="tech-cot"></div>
+              </div>
+              <div>
+                <div class="co-label" style="color:#fcd34d;">Role (Math Tutor)</div>
+                <div class="co-output" id="tech-role"></div>
+              </div>
+              <div>
+                <div class="co-label" style="color:#f9a8d4;">Few-shot (with example)</div>
+                <div class="co-output" id="tech-fs"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn-nav" href="ai-nlp-llm-section2-3-4.html">← 2.3–2.4 Tokenization &amp; Embeddings</a>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">Section 3.1 complete</div>
+    <a class="btn-nav primary" href="#">→ 3.2 Advanced Prompt Patterns</a>
+  </div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-2.html">Ai Nlp Llm Section1 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-3.html">Ai Nlp Llm Section1 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1.html">Ai Nlp Llm Section1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-1.html">Ai Nlp Llm Section2 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-2.html">Ai Nlp Llm Section2 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-3-4.html">Ai Nlp Llm Section2 3 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-1.html">Ai Nlp Llm Section3 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-2.html">Ai Nlp Llm Section3 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-3.html">Ai Nlp Llm Section3 3</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<script>
+// ── PROGRESS & REVEAL ──
+const pf = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  pf.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+});
+document.querySelectorAll('.reveal').forEach(el =>
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) el.classList.add('visible'); },
+    { threshold: 0.05, rootMargin: '0px 0px -50px 0px' }).observe(el)
+);
+document.querySelectorAll('section[id]').forEach(s =>
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-link[href="#${s.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  }, { threshold: 0.25 }).observe(s)
+);
+
+function scrollToSection(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+// ── SHOT TABS ──
+function switchShot(prefix, name, btn) {
+  document.querySelectorAll(`[id^="${prefix}-"]`).forEach(p => p.classList.remove('active'));
+  document.getElementById(`${prefix}-${name}`)?.classList.add('active');
+  btn.closest('.shot-tabs').querySelectorAll('.shot-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── EXAMPLE TABS ──
+function switchEx(name, btn) {
+  document.querySelectorAll('.ex-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`ex-${name}`)?.classList.add('active');
+  document.querySelectorAll('.ex-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── TASK PRESETS ──
+const TASKS = {
+  summarize: {
+    weak:   `Summarize this:\n\nThe Amazon rainforest, often referred to as the "lungs of the Earth," produces about 20% of the world's oxygen and is home to 10% of all species on Earth. However, deforestation has accelerated dramatically since 2019, with an area the size of a football field being cleared every single minute. Scientists warn that if 25% of the forest is lost, it could trigger a "dieback" tipping point, converting the forest to savanna and releasing decades' worth of carbon emissions.`,
+    strong: `Summarize the following text for a concerned but non-specialist reader.\nFormat: 3 bullet points, each max 20 words.\nPrioritize: (1) most alarming statistic, (2) key mechanism, (3) consequence if nothing changes.\nUse plain language. No jargon. Start each bullet with a bold keyword.\n\nText:\nThe Amazon rainforest, often referred to as the "lungs of the Earth," produces about 20% of the world's oxygen and is home to 10% of all species on Earth. However, deforestation has accelerated dramatically since 2019, with an area the size of a football field being cleared every single minute. Scientists warn that if 25% of the forest is lost, it could trigger a "dieback" tipping point, converting the forest to savanna and releasing decades' worth of carbon emissions.`
+  },
+  classify: {
+    weak:   `What type of email is this?\n\n"Hi, I wanted to reach out about a potential partnership opportunity between our companies. We help SaaS businesses reduce churn by 40% on average and I think there could be a great fit here."`,
+    strong: `Classify the following email into exactly one category: SALES_OUTREACH / CUSTOMER_SUPPORT / INTERNAL / NEWSLETTER / PERSONAL\n\nReturn JSON only:\n{"category": "...", "confidence": 0.0-1.0, "signals": ["...", "..."], "recommended_action": "..."}\n\nEmail: "Hi, I wanted to reach out about a potential partnership opportunity between our companies. We help SaaS businesses reduce churn by 40% on average and I think there could be a great fit here."`
+  },
+  extract: {
+    weak:   `Get the important info from this job posting:\n\n"Senior Machine Learning Engineer at QuantumLeap AI :: Remote (US only) :: $180,000–$220,000 + equity. Requirements: 5+ years ML experience, PyTorch expertise, experience with LLMs, PhD preferred but not required. Apply by January 31, 2025."`,
+    strong: `Extract structured data from the job posting below.\nReturn valid JSON matching this schema exactly:\n{"job_title": str, "company": str, "location": str, "remote": bool, "salary_min": int, "salary_max": int, "currency": str, "requirements": [str], "deadline": str|null, "equity_offered": bool}\n\nReturn only the JSON. No markdown. No explanation.\n\nPosting: "Senior Machine Learning Engineer at QuantumLeap AI :: Remote (US only) :: $180,000–$220,000 + equity. Requirements: 5+ years ML experience, PyTorch expertise, experience with LLMs, PhD preferred but not required. Apply by January 31, 2025."`
+  },
+  transform: {
+    weak:   `Make this email more professional:\n\n"hey tom, just checking in on that report you were supposed to send. its been like 2 weeks and i still havent got it. can you get it to me asap?"`,
+    strong: `Rewrite the email below in a professional tone.\nConstraints:\n- Maintain the same core request\n- Remove blame language; use neutral framing\n- Add a specific follow-up date\n- Keep under 80 words\n- Subject line: include [ACTION REQUIRED]\n- Sign off with "Best regards"\n\nOriginal email:\n"hey tom, just checking in on that report you were supposed to send. its been like 2 weeks and i still havent got it. can you get it to me asap?"`
+  },
+  reason: {
+    weak:   `Solve this: A company has 120 employees. 30% work remotely. Of those who work in-office, 40% are in engineering. How many in-office engineering employees are there?`,
+    strong: `Solve the following word problem step by step. Show every calculation. At the end, write "ANSWER:" followed by just the number.\n\nProblem: A company has 120 employees. 30% work remotely. Of those who work in-office, 40% are in engineering. How many in-office engineering employees are there?`
+  }
+};
+
+function setTask(name, btn) {
+  const task = TASKS[name];
+  if (!task) return;
+  document.getElementById('weakPrompt').value = task.weak;
+  document.getElementById('strongPrompt').value = task.strong;
+  document.querySelectorAll('.lab-task-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('compareArea').style.display = 'none';
+  document.getElementById('labHint').textContent = 'Results appear below after running';
+}
+
+setTask('summarize', document.querySelector('.lab-task-btn.active'));
+
+// ── API CALL ──
+async function callClaude(system, user, maxTokens = 400) {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: maxTokens,
+    messages: [{ role: 'user', content: user }]
+  };
+  if (system) body.system = system;
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const d = await r.json();
+  return d.content?.[0]?.text || 'Error: ' + JSON.stringify(d.error || d);
+}
+
+async function runBoth() {
+  const weak = document.getElementById('weakPrompt').value.trim();
+  const strong = document.getElementById('strongPrompt').value.trim();
+  if (!weak && !strong) return;
+
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  document.getElementById('runBtnTxt').textContent = '⏳ Running…';
+  document.getElementById('compareArea').style.display = 'grid';
+
+  const wo = document.getElementById('weakOut');
+  const so = document.getElementById('strongOut');
+  wo.textContent = ''; wo.classList.add('loading');
+  so.textContent = ''; so.classList.add('loading');
+
+  try {
+    const [wResult, sResult] = await Promise.all([
+      callClaude(null, weak),
+      callClaude(null, strong)
+    ]);
+    wo.classList.remove('loading'); wo.textContent = wResult;
+    so.classList.remove('loading'); so.textContent = sResult;
+    document.getElementById('labHint').textContent = '✓ Both complete :: notice the difference in specificity, format, and usefulness.';
+  } catch(e) {
+    wo.classList.remove('loading'); wo.textContent = 'Error: ' + e.message;
+    so.classList.remove('loading'); so.textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  document.getElementById('runBtnTxt').textContent = '▶ Run Both';
+}
+
+async function runWeak() {
+  const weak = document.getElementById('weakPrompt').value.trim();
+  if (!weak) return;
+  const btn = document.getElementById('runWeakBtn');
+  btn.disabled = true;
+  document.getElementById('compareArea').style.display = 'grid';
+  const wo = document.getElementById('weakOut');
+  wo.textContent = ''; wo.classList.add('loading');
+  document.getElementById('strongOut').textContent = '← Run Both to compare';
+  try {
+    wo.classList.remove('loading');
+    wo.textContent = await callClaude(null, weak);
+  } catch(e) { wo.classList.remove('loading'); wo.textContent = 'Error: ' + e.message; }
+  btn.disabled = false;
+}
+
+async function runCustom() {
+  const system = document.getElementById('customSystem').value.trim();
+  const user = document.getElementById('customUser').value.trim();
+  if (!user) return;
+  const btn = document.getElementById('customBtn');
+  btn.disabled = true;
+  document.getElementById('customBtnTxt').textContent = '⏳';
+  const out = document.getElementById('customOut');
+  out.textContent = ''; out.classList.remove('empty'); out.classList.add('loading');
+  try {
+    out.classList.remove('loading');
+    out.textContent = await callClaude(system || null, user, 600);
+  } catch(e) { out.classList.remove('loading'); out.textContent = 'Error: ' + e.message; }
+  btn.disabled = false;
+  document.getElementById('customBtnTxt').textContent = '▶ Run';
+}
+
+// Ctrl+Enter shortcut
+document.getElementById('customUser').addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') runCustom();
+});
+
+async function runAllTech() {
+  const input = document.getElementById('techInput').value.trim();
+  if (!input) return;
+  const btn = document.getElementById('techBtn');
+  btn.disabled = true;
+  document.getElementById('techBtnTxt').textContent = '⏳ Running 4 techniques…';
+  document.getElementById('techResults').style.display = 'block';
+
+  const ids = ['tech-zs','tech-cot','tech-role','tech-fs'];
+  ids.forEach(id => { document.getElementById(id).textContent = ''; document.getElementById(id).classList.add('loading'); });
+
+  const prompts = [
+    // Zero-shot
+    { system: null, user: input },
+    // CoT
+    { system: null, user: input + '\n\nLet\'s think step by step.' },
+    // Role
+    { system: 'You are an expert mathematics and logic tutor. Show clear, labelled steps. Verify your answer at the end.', user: input },
+    // Few-shot
+    { system: null, user: `Here's an example of how to solve a distance-rate-time problem:\nQ: Two trains leave the same station at 9am. Train A goes east at 50mph, Train B goes west at 70mph. When are they 360 miles apart?\nStep 1: Combined speed = 50 + 70 = 120 mph\nStep 2: Time = Distance ÷ Speed = 360 ÷ 120 = 3 hours\nAnswer: 3 hours after 9am = 12pm (noon)\n\nNow solve:\n${input}` }
+  ];
+
+  await Promise.all(prompts.map(async (p, i) => {
+    try {
+      const res = await callClaude(p.system, p.user, 350);
+      document.getElementById(ids[i]).classList.remove('loading');
+      document.getElementById(ids[i]).textContent = res;
+    } catch(e) {
+      document.getElementById(ids[i]).classList.remove('loading');
+      document.getElementById(ids[i]).textContent = 'Error: ' + e.message;
+    }
+  }));
+
+  btn.disabled = false;
+  document.getElementById('techBtnTxt').textContent = '▶ Compare All Techniques';
+}
+</script>
+
+
+</body></html>

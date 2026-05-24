@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Beyond Model Security: The Data-First Imperative</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutrals & Strategic Accents -->
+    <!-- Background: Warm Stone/Paper (bg-stone-50) for a report feel. -->
+    <!-- Text: Slate 800 for readability. -->
+    <!-- Accents: Teal (Data Security) vs. Rose (Risk/Threats) vs. Gray (Traditional Infra). -->
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9; /* stone-50 */
+            color: #1c1917; /* stone-900 */
+        }
+
+        h1, h2, h3, .serif-font {
+            font-family: 'Merriweather', serif;
+        }
+
+        /* Chart Container Styling - Mandatory Requirement */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%; /* Controlled by parent grid/flex */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        .nav-active {
+            border-bottom: 2px solid #0d9488; /* teal-600 */
+            color: #0f766e; /* teal-700 */
+            font-weight: 600;
+        }
+
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom Scrollbar for internal overflow elements */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Application Structure Plan:
+         1. Header/Nav: Quick orientation.
+         2. Hero Section: The Thesis Statement.
+         3. The Security Gap (Interactive Comparison): Visualizing "Model Security" vs "Data Security".
+         4. The AI Lifecycle Analysis: Split into "Modeling (Training)" and "Inference".
+         5. Solution Framework: DSPM & DDR interactive cards.
+         Rationale: The structure moves from the "Why" (the problem) to the "Where" (lifecycle analysis) to the "How" (solution), facilitating a logical narrative flow.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-xl font-bold text-stone-800 tracking-tight serif-font">Data<span class="text-teal-600">First</span> AI</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <button class="border-transparent text-stone-500 hover:border-stone-300 hover:text-stone-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" onclick="navTo('section-gap')">The Gap</button>
+                        <button class="border-transparent text-stone-500 hover:border-stone-300 hover:text-stone-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" onclick="navTo('section-lifecycle')">Lifecycle Risks</button>
+                        <button class="border-transparent text-stone-500 hover:border-stone-300 hover:text-stone-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" onclick="navTo('section-solution')">Strategic Shift</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        
+        <!-- Hero Section -->
+        <div class="bg-stone-100 py-12 sm:py-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-stone-900 mb-6">
+                    Why "Security AI" is Not Enough
+                </h1>
+                <p class="text-xl text-stone-600 max-w-2xl mx-auto mb-8">
+                    Protecting the model is secondary. The critical vulnerability lies in the <span class="font-bold text-teal-700">data</span> powering the AI.
+                </p>
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-rose-500 text-left mx-auto max-w-3xl">
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">Critical Insight</h3>
+                    <p class="text-stone-600">
+                        Traditional security focuses on the perimeter (firewalls) or the application (AppSec). In the era of AI, the <strong>Data is the Application</strong>. If you secure the model endpoint but fail to govern the training data or RAG (Retrieval-Augmented Generation) context, you are fundamentally exposed.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: The Security Gap (Analysis) -->
+        <section class="py-16 bg-white" id="section-gap">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+                    
+                    <!-- Text Context -->
+                    <div class="lg:col-span-4 mb-8 lg:mb-0">
+                        <h2 class="text-3xl font-bold text-stone-900 mb-4">The Investment vs. Risk Gap</h2>
+                        <p class="text-stone-600 mb-6 leading-relaxed">
+                            Organizations are pouring money into "AI Security" tools that act as firewalls for prompts. However, the actual breach mechanics often bypass these layers entirely by exploiting the underlying data integrity.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-stone-50 p-4 rounded-md cursor-pointer hover:bg-stone-100 transition" onclick="updateGapChart('traditional')">
+                                <h4 class="font-bold text-stone-800">1. The Traditional Approach</h4>
+                                <p class="text-sm text-stone-500">Focus: Network, Endpoint, Identity. Data is treated as a static asset.</p>
+                            </div>
+                            <div class="bg-teal-50 p-4 rounded-md border border-teal-100 cursor-pointer hover:bg-teal-100 transition" onclick="updateGapChart('reality')">
+                                <h4 class="font-bold text-teal-800">2. The AI Reality</h4>
+                                <p class="text-sm text-teal-700">Focus: Unstructured data lakes, vector databases, and inference contexts.</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-stone-400 mt-4 italic">Click the cards above to compare risk profiles.</p>
+                    </div>
+
+                    <!-- Visualization -->
+                    <!-- Visualization & Content Choices: 
+                         Goal: Compare. 
+                         Method: Radar Chart (Chart.js). 
+                         Justification: A radar chart effectively shows the skew/imbalance between where security effort goes vs. where the actual AI risks reside.
+                    -->
+                    <div class="lg:col-span-8 bg-stone-50 rounded-xl p-6 border border-stone-200">
+                        <div class="mb-4 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-stone-800">Risk Vector Analysis</h3>
+                            <span class="px-3 py-1 bg-stone-200 text-stone-700 text-xs rounded-full font-bold" id="gap-chart-label">Select a View</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="gapChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Lifecycle Analysis (Modeling vs Inference) -->
+        <section class="py-16 bg-stone-50" id="section-lifecycle">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-stone-900">The Two Battlegrounds</h2>
+                    <p class="mt-4 text-stone-600 max-w-2xl mx-auto">
+                        We must decouple "AI Security" into two distinct data disciplines: <span class="font-semibold">Modeling (Training)</span> and <span class="font-semibold">Inference (Usage)</span>.
+                    </p>
+                </div>
+
+                <!-- Toggle for View -->
+                <div class="flex justify-center mb-10">
+                    <div class="bg-white p-1 rounded-lg border border-stone-200 inline-flex">
+                        <button class="px-6 py-2 rounded-md text-sm font-medium bg-teal-600 text-white shadow-sm transition-colors" id="btn-modeling" onclick="switchLifecycle('modeling')">Phase 1: Modeling &amp; Training</button>
+                        <button class="px-6 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors" id="btn-inference" onclick="switchLifecycle('inference')">Phase 2: Inference &amp; RAG</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    
+                    <!-- Dynamic Text Content -->
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-stone-200 h-full flex flex-col justify-center" id="lifecycle-content">
+                        <!-- Content injected via JS -->
+                    </div>
+
+                    <!-- Dynamic Chart -->
+                    <!-- Visualization & Content Choices:
+                         Goal: Inform/Relationships.
+                         Method: Bar Chart (Horizontal).
+                         Justification: Listing specific data risks (e.g., Poisoning, Leakage) and quantifying their severity helps the user understand the specific nature of the threat in each phase.
+                    -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="chart-container">
+                            <canvas id="lifecycleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: The Solution Framework (Information Architecture) -->
+        <section class="py-16 bg-white" id="section-solution">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10 border-b border-stone-200 pb-5">
+                    <h2 class="text-3xl font-bold text-stone-900">The Path Forward: Data-Centric Security</h2>
+                    <p class="mt-2 text-stone-600">
+                        Shift focus from guarding the perimeter to governing the asset.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    
+                    <!-- Card 1 -->
+                    <div class="interactive-card bg-stone-50 p-6 rounded-lg border border-stone-100">
+                        <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mb-4 text-teal-700 font-bold text-xl">1</div>
+                        <h3 class="text-xl font-bold text-stone-900 mb-2">Discovery &amp; Classification</h3>
+                        <p class="text-sm text-stone-600 mb-4">You cannot secure what you cannot see. AI training data is often unstructured (PDFs, Wikis, Slacks).</p>
+                        <ul class="text-sm text-stone-500 list-disc list-inside space-y-1">
+                            <li>Scan Shadow AI Datastores</li>
+                            <li>Classify PII/IP within Unstructured Text</li>
+                            <li>Map Data Lineage to Models</li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="interactive-card bg-stone-50 p-6 rounded-lg border border-stone-100">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4 text-indigo-700 font-bold text-xl">2</div>
+                        <h3 class="text-xl font-bold text-stone-900 mb-2">Modeling Governance</h3>
+                        <p class="text-sm text-stone-600 mb-4">Ensure the "Food Quality" of the AI. Prevent sensitive data from being baked into the model weights.</p>
+                        <ul class="text-sm text-stone-500 list-disc list-inside space-y-1">
+                            <li>Sanitize Training Sets</li>
+                            <li>Detect Data Poisoning Attempts</li>
+                            <li>Copyright/IP Filtering</li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="interactive-card bg-stone-50 p-6 rounded-lg border border-stone-100">
+                        <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mb-4 text-rose-700 font-bold text-xl">3</div>
+                        <h3 class="text-xl font-bold text-stone-900 mb-2">Inference Controls</h3>
+                        <p class="text-sm text-stone-600 mb-4">Control what the AI retrieves and outputs in real-time (RAG Security).</p>
+                        <ul class="text-sm text-stone-500 list-disc list-inside space-y-1">
+                            <li>Context Awareness Filtering</li>
+                            <li>Prompt Injection Detection</li>
+                            <li>Dynamic Access Control (RBAC for AI)</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- Simulation/Interaction Area -->
+                <div class="mt-12 bg-stone-900 rounded-xl p-8 text-white">
+                    <div class="md:flex items-center justify-between">
+                        <div class="mb-6 md:mb-0 md:mr-8">
+                            <h3 class="text-2xl font-bold text-white mb-2">Assess Your Posture</h3>
+                            <p class="text-stone-400">Select your current focus to see the coverage gap.</p>
+                        </div>
+                        <div class="flex space-x-2">
+                             <select class="bg-stone-800 border-none text-white p-3 rounded-lg focus:ring-2 focus:ring-teal-500" id="assessment-select">
+                                <option value="network">Focus: Network Security</option>
+                                <option value="app">Focus: App Security</option>
+                                <option value="data">Focus: Data Security</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-stone-800 rounded-lg border border-stone-700">
+                        <p class="text-lg font-mono text-teal-400" id="assessment-result">
+                            &gt; Select a focus area above to analyze...
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-first-ai-security.html">Data First Ai Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-agentic-ai.html">Data Governance For Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai-info.html">Data Governance For Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai.html">Data Governance For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-llm.html">Data Governance For Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant copy.html">Data Lineage Ai Assitant Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant.html">Data Lineage Ai Assitant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai-interactive.html">Data Lineage For Ai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai.html">Data Lineage For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info copy.html">Data Lineage Info Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info.html">Data Lineage Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage.html">Data Lineage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant-info.html">Privacy Ai Assistant Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant.html">Privacy Ai Assistant</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            gapView: 'traditional', // 'traditional' or 'reality'
+            lifecyclePhase: 'modeling' // 'modeling' or 'inference'
+        };
+
+        // --- Data Store ---
+        const contentData = {
+            modeling: {
+                title: "Phase 1: Modeling & Training Risks",
+                body: "When you build a model, the data becomes the code. If sensitive PII, trade secrets, or copyrighted material enters the training pipeline, it becomes permanently embedded in the model's weights. You cannot 'delete' a record from a trained model easily; you often have to retrain from scratch.",
+                highlight: "The Risk: Data leakage via model inversion and IP infringement.",
+                chartData: [85, 70, 40, 20, 10], // High data focus
+                chartLabels: ['Training Data Poisoning', 'PII Embedding', 'Copyright Violation', 'Model Theft', 'Endpoint Attack']
+            },
+            inference: {
+                title: "Phase 2: Inference & RAG Risks",
+                body: "In Retrieval-Augmented Generation (RAG), the AI fetches real-time enterprise data to answer queries. Without granular data access controls, an intern asking 'What are the CEO's bonuses?' might get an accurate answer extracted from a restricted PDF.",
+                highlight: "The Risk: Bypass of Access Control Lists (ACLs) and Data Exfiltration.",
+                chartData: [90, 80, 65, 30, 25], // High inference focus
+                chartLabels: ['Prompt Injection', 'RAG Data Leakage', 'Hallucination', 'Denial of Service', 'API Breach']
+            }
+        };
+
+        // --- Chart Initialization ---
+        let gapChartInstance = null;
+        let lifecycleChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGapChart();
+            initLifecycleChart();
+            renderLifecycleContent('modeling'); // Initial Load
+            
+            // Event Listener for Assessment Dropdown
+            document.getElementById('assessment-select').addEventListener('change', (e) => {
+                updateAssessment(e.target.value);
+            });
+        });
+
+        // --- Navigation Logic ---
+        function navTo(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Section 1: Gap Chart Logic ---
+        function initGapChart() {
+            const ctx = document.getElementById('gapChart').getContext('2d');
+            
+            const data = {
+                labels: ['Endpoint Security', 'Network Firewall', 'Data Classification', 'Inference Monitoring', 'Training Governance'],
+                datasets: [{
+                    label: 'Investment Level',
+                    data: [90, 85, 30, 20, 10], // Traditional view
+                    fill: true,
+                    backgroundColor: 'rgba(148, 163, 184, 0.2)', // Slate
+                    borderColor: 'rgb(148, 163, 184)',
+                    pointBackgroundColor: 'rgb(148, 163, 184)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(148, 163, 184)'
+                }, {
+                    label: 'Actual Risk Source',
+                    data: [10, 15, 95, 85, 90], // Reality view
+                    fill: true,
+                    backgroundColor: 'rgba(13, 148, 136, 0.2)', // Teal
+                    borderColor: 'rgb(13, 148, 136)',
+                    pointBackgroundColor: 'rgb(13, 148, 136)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(13, 148, 136)'
+                }]
+            };
+
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: { borderWidth: 3 }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false } // clean look
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                },
+            };
+
+            gapChartInstance = new Chart(ctx, config);
+        }
+
+        function updateGapChart(view) {
+            state.gapView = view;
+            const label = document.getElementById('gap-chart-label');
+            
+            // We highlight specific datasets based on selection, though radar shows both for comparison.
+            // Interaction: Fade out the less relevant dataset to emphasize the point.
+            
+            if (view === 'traditional') {
+                gapChartInstance.data.datasets[0].backgroundColor = 'rgba(148, 163, 184, 0.6)'; // Highlight traditional
+                gapChartInstance.data.datasets[1].backgroundColor = 'rgba(13, 148, 136, 0.05)'; // Fade reality
+                label.innerText = "View: Current Spend";
+                label.className = "px-3 py-1 bg-slate-200 text-slate-700 text-xs rounded-full font-bold";
+            } else {
+                gapChartInstance.data.datasets[0].backgroundColor = 'rgba(148, 163, 184, 0.05)'; // Fade traditional
+                gapChartInstance.data.datasets[1].backgroundColor = 'rgba(13, 148, 136, 0.6)'; // Highlight reality
+                label.innerText = "View: Threat Reality";
+                label.className = "px-3 py-1 bg-teal-100 text-teal-800 text-xs rounded-full font-bold";
+            }
+            gapChartInstance.update();
+        }
+
+
+        // --- Section 2: Lifecycle Chart Logic ---
+        function initLifecycleChart() {
+            const ctx = document.getElementById('lifecycleChart').getContext('2d');
+            
+            lifecycleChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: contentData.modeling.chartLabels,
+                    datasets: [{
+                        label: 'Risk Severity Score (1-100)',
+                        data: contentData.modeling.chartData,
+                        backgroundColor: [
+                            'rgba(225, 29, 72, 0.8)', // Rose
+                            'rgba(225, 29, 72, 0.6)',
+                            'rgba(225, 29, 72, 0.4)',
+                            'rgba(148, 163, 184, 0.4)', // Gray for low risk
+                            'rgba(148, 163, 184, 0.4)'
+                        ],
+                        borderColor: 'rgba(225, 29, 72, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal Bar
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        function switchLifecycle(phase) {
+            // Update Buttons
+            const btnMod = document.getElementById('btn-modeling');
+            const btnInf = document.getElementById('btn-inference');
+            
+            if (phase === 'modeling') {
+                btnMod.className = "px-6 py-2 rounded-md text-sm font-medium bg-teal-600 text-white shadow-sm transition-colors";
+                btnInf.className = "px-6 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors";
+            } else {
+                btnInf.className = "px-6 py-2 rounded-md text-sm font-medium bg-rose-600 text-white shadow-sm transition-colors";
+                btnMod.className = "px-6 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors";
+            }
+
+            // Update Text Content
+            renderLifecycleContent(phase);
+
+            // Update Chart
+            const data = contentData[phase];
+            lifecycleChartInstance.data.labels = data.chartLabels;
+            lifecycleChartInstance.data.datasets[0].data = data.chartData;
+            
+            // Change color scheme based on phase
+            const colorBase = phase === 'modeling' ? '225, 29, 72' : '79, 70, 229'; // Rose vs Indigo
+            lifecycleChartInstance.data.datasets[0].backgroundColor = data.chartData.map(val => 
+                val > 50 ? `rgba(${colorBase}, 0.8)` : `rgba(148, 163, 184, 0.4)`
+            );
+            lifecycleChartInstance.data.datasets[0].borderColor = `rgba(${colorBase}, 1)`;
+            
+            lifecycleChartInstance.update();
+        }
+
+        function renderLifecycleContent(phase) {
+            const container = document.getElementById('lifecycle-content');
+            const data = contentData[phase];
+            
+            // Fade out effect could go here, but doing direct replacement for simplicity
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold text-stone-800 mb-4 animate-fade-in">${data.title}</h3>
+                <p class="text-stone-600 mb-6 leading-relaxed text-lg">${data.body}</p>
+                <div class="bg-stone-50 border-l-4 border-${phase === 'modeling' ? 'rose' : 'indigo'}-500 p-4">
+                    <p class="font-bold text-stone-800">Critical Failure Point:</p>
+                    <p class="text-stone-600 italic">${data.highlight}</p>
+                </div>
+            `;
+        }
+
+        // --- Assessment Logic ---
+        function updateAssessment(focus) {
+            const resultBox = document.getElementById('assessment-result');
+            let text = "";
+
+            if (focus === 'network') {
+                text = "> Analysis: CRITICAL GAP. Network tools cannot inspect vector embeddings or prevent training on sensitive PDFs. Your AI model is vulnerable to data poisoning.";
+            } else if (focus === 'app') {
+                text = "> Analysis: MODERATE GAP. AppSec handles APIs, but fails to distinguish between safe and unsafe data contexts in RAG. PII leakage highly likely.";
+            } else if (focus === 'data') {
+                text = "> Analysis: OPTIMAL STRATEGY. By governing the data itself, you protect the model at the source (training) and the sink (inference).";
+            }
+
+            resultBox.innerHTML = text;
+            resultBox.className = "text-lg font-mono " + (focus === 'data' ? "text-teal-400" : "text-rose-400");
+        }
+
+    </script>
+
+</body></html>

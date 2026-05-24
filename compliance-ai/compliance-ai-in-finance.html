@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="Interactive dashboard exploring the impact of Generative AI and Autonomous Agents on financial compliance, including use cases, ROI calculators, and governance frameworks." name="description"/>
+    <meta content="Generative AI, Financial Compliance, AI Agents, RegTech, Anti-Money Laundering, KYC, Governance, Risk Management, FinTech Dashboard" name="keywords"/>
+    <title>GenAI in Financial Compliance | Interactive Report</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+
+    <!-- Chosen Palette: Trusted Neutral
+         Background: Stone-50 (#fafaf9) - Warm, calm base.
+         Primary Text: Slate-800 (#1e293b) - High contrast, professional.
+         Accent Primary: Indigo-600 (#4f46e5) - Tech/Innovation.
+         Accent Secondary: Emerald-600 (#059669) - Success/Compliance/Money.
+    -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-bg': '#fafaf9',
+                        'brand-dark': '#1e293b',
+                        'brand-primary': '#4f46e5',
+                        'brand-secondary': '#059669',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Application Structure Plan:
+           1. Sidebar Navigation: Persistent access to 4 main views.
+           2. Dynamic Content Area: JavaScript swaps content without reload.
+           3. View 1 (Overview): High-level context + Interactive ROI Calculator.
+           4. View 2 (Use Cases): Filterable grid showing specific applications.
+           5. View 3 (Agent Analysis): Radar chart comparing efficacy.
+           6. View 4 (Governance): Interactive layer model for risk.
+           
+           Why this structure?
+           It moves from "The Why" (Overview) to "The What" (Use Cases) to "The How" (Agents/Governance),
+           allowing users to digest complex financial tech concepts in layers.
+        */
+
+        body {
+            background-color: #fafaf9; /* stone-50 */
+            color: #1e293b; /* slate-800 */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Chart Container Styling Rules (Strict Adherence) */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%; /* Parent controls width, usually grid col */
+            height: 350px;
+            max-height: 400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        /* Card Hover Effects */
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Navigation Active State */
+        .nav-item.active {
+            background-color: #e2e8f0;
+            color: #4f46e5;
+            border-right: 4px solid #4f46e5;
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden text-sm md:text-base">
+
+    <!-- Visualization & Content Choices:
+         1. Overview: Bar Chart for 'Cost of Compliance' - Inform goal.
+         2. Overview: Interactive ROI Calculator (Input -> Dynamic Text) - Engagement goal.
+         3. Use Cases: Filterable Grid - Organize goal.
+         4. Agent Analysis: Radar Chart (Spider Web) - Compare goal (Human vs Agent).
+         5. Governance: Flexbox Flow Diagram - Relationships goal.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-20 md:w-64 bg-white border-r border-stone-200 flex-shrink-0 flex flex-col justify-between z-20 shadow-sm">
+        <div>
+            <div class="p-6 flex items-center justify-center md:justify-start gap-3 border-b border-stone-100">
+                <div class="w-8 h-8 rounded bg-brand-primary flex items-center justify-center text-white font-bold">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <span class="hidden md:block font-bold text-lg tracking-tight text-slate-800">CompAI<span class="text-brand-primary">.gen</span></span>
+            </div>
+
+            <nav class="mt-6 flex flex-col gap-2 px-2">
+                <button class="nav-item active flex items-center gap-4 px-4 py-3 text-slate-600 hover:bg-stone-100 rounded-lg transition-colors group" id="nav-overview" onclick="router('overview')">
+                    <i class="fa-solid fa-chart-line w-5 text-center group-hover:text-brand-primary"></i>
+                    <span class="hidden md:block font-medium">Executive Overview</span>
+                </button>
+                <button class="nav-item flex items-center gap-4 px-4 py-3 text-slate-600 hover:bg-stone-100 rounded-lg transition-colors group" id="nav-usecases" onclick="router('usecases')">
+                    <i class="fa-solid fa-briefcase w-5 text-center group-hover:text-brand-primary"></i>
+                    <span class="hidden md:block font-medium">Use Case Lab</span>
+                </button>
+                <button class="nav-item flex items-center gap-4 px-4 py-3 text-slate-600 hover:bg-stone-100 rounded-lg transition-colors group" id="nav-agents" onclick="router('agents')">
+                    <i class="fa-solid fa-robot w-5 text-center group-hover:text-brand-primary"></i>
+                    <span class="hidden md:block font-medium">Agent Impact</span>
+                </button>
+                <button class="nav-item flex items-center gap-4 px-4 py-3 text-slate-600 hover:bg-stone-100 rounded-lg transition-colors group" id="nav-governance" onclick="router('governance')">
+                    <i class="fa-solid fa-scale-balanced w-5 text-center group-hover:text-brand-primary"></i>
+                    <span class="hidden md:block font-medium">Governance &amp; Risk</span>
+                </button>
+            </nav>
+        </div>
+        
+        <div class="p-4 border-t border-stone-100 hidden md:block">
+            <div class="bg-indigo-50 rounded-lg p-4">
+                <p class="text-xs text-indigo-800 font-semibold mb-1">Source Report Status</p>
+                <p class="text-xs text-indigo-600">Analysis: Complete<br/>Data: Q4 2024 Estimates</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto bg-stone-50 relative" id="main-content">
+        <!-- Content injected via JS -->
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/compliance-ai/compliance-ai-in-finance-use-cases.html">Compliance Ai In Finance Use Cases</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/compliance-ai/compliance-ai-in-finance.html">Compliance Ai In Finance</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State Management ---
+        const state = {
+            currentView: 'overview',
+            roiInputs: {
+                teamSize: 20,
+                avgSalary: 120000,
+                efficiencyGain: 0.35 // 35% default
+            },
+            radarMetric: 'sar' // 'sar' or 'policy'
+        };
+
+        // --- Data Store ---
+        const dataStore = {
+            overview: {
+                title: "The Compliance Inflection Point",
+                intro: "The financial sector faces an unprecedented volume of regulatory change. Traditional linear workflows are failing to keep pace with cost and complexity. This dashboard explores how Generative AI and Autonomous Agents are shifting the paradigm from 'reactive checking' to 'proactive intelligence'.",
+                stats: [
+                    { label: "Cost Reduction", value: "30-50%", icon: "fa-arrow-trend-down", color: "text-emerald-600" },
+                    { label: "False Positives", value: "-60%", icon: "fa-filter", color: "text-brand-primary" },
+                    { label: "Doc Processing", value: "10x Faster", icon: "fa-bolt", color: "text-amber-500" }
+                ]
+            },
+            useCases: [
+                {
+                    id: 'aml',
+                    category: 'Financial Crime',
+                    title: 'AML Narrative Generation',
+                    icon: 'fa-file-invoice-dollar',
+                    desc: 'Automating the drafting of Suspicious Activity Reports (SARs) by synthesizing transaction data, KYC profiles, and news.',
+                    impact: 'Reduces report writing time from 2 hours to 15 minutes.',
+                    status: 'High Maturity'
+                },
+                {
+                    id: 'reg',
+                    category: 'Regulatory Change',
+                    title: 'Regulatory Horizon Scanning',
+                    icon: 'fa-globe',
+                    desc: 'Agents scan global regulatory bodies daily, mapping new rules to internal policies and flagging gaps automatically.',
+                    impact: 'Near real-time compliance vs. monthly manual reviews.',
+                    status: 'Medium Maturity'
+                },
+                {
+                    id: 'comm',
+                    category: 'Surveillance',
+                    title: 'Contextual Surveillance',
+                    icon: 'fa-eye',
+                    desc: 'Analyzing voice and chat communications for intent, sentiment, and code words, reducing noise compared to keyword matching.',
+                    impact: '90% reduction in false alerts for trade surveillance.',
+                    status: 'High Maturity'
+                },
+                {
+                    id: 'policy',
+                    category: 'Governance',
+                    title: 'Policy Chatbot "Oracle"',
+                    icon: 'fa-book-open',
+                    desc: 'Internal RAG-based bot answering employee compliance questions instantly, linking directly to policy clauses.',
+                    impact: 'Self-service compliance reduces advisory team load by 40%.',
+                    status: 'High Maturity'
+                }
+            ]
+        };
+
+        // --- Core Functions ---
+
+        function init() {
+            router('overview');
+        }
+
+        function router(viewName) {
+            state.currentView = viewName;
+            
+            // Update Nav UI
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-stone-100', 'text-brand-primary', 'border-r-4', 'border-brand-primary');
+                if (el.id === `nav-${viewName}`) {
+                    el.classList.add('active');
+                }
+            });
+
+            const main = document.getElementById('main-content');
+            main.innerHTML = ''; // Clear current content
+            main.classList.remove('fade-in');
+            void main.offsetWidth; // Trigger reflow
+            main.classList.add('fade-in');
+
+            // Render Views
+            switch(viewName) {
+                case 'overview':
+                    renderOverview(main);
+                    break;
+                case 'usecases':
+                    renderUseCases(main);
+                    break;
+                case 'agents':
+                    renderAgents(main);
+                    break;
+                case 'governance':
+                    renderGovernance(main);
+                    break;
+            }
+        }
+
+        // --- Render: Overview ---
+        function renderOverview(container) {
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto p-6 md:p-10 space-y-10">
+                    <!-- Hero Section -->
+                    <header class="space-y-4">
+                        <h1 class="text-3xl md:text-4xl font-bold text-slate-800">${dataStore.overview.title}</h1>
+                        <p class="text-lg text-slate-600 leading-relaxed max-w-3xl border-l-4 border-brand-primary pl-4">
+                            ${dataStore.overview.intro}
+                        </p>
+                    </header>
+
+                    <!-- Key Metrics Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${dataStore.overview.stats.map(stat => `
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex items-center justify-between">
+                                <div>
+                                    <p class="text-slate-500 text-sm font-medium uppercase tracking-wider">${stat.label}</p>
+                                    <p class="text-3xl font-bold ${stat.color} mt-1">${stat.value}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-stone-50 flex items-center justify-center text-xl text-slate-400">
+                                    <i class="fa-solid ${stat.icon}"></i>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Split Layout: Chart & Calculator -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <!-- Chart Section -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2">The Compliance Gap</h3>
+                            <p class="text-sm text-slate-500 mb-6">Comparing regulatory volume vs. capacity.</p>
+                            <div class="chart-container">
+                                <canvas id="overviewChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- ROI Calculator -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2">GenAI Efficiency Estimator</h3>
+                            <p class="text-sm text-slate-500 mb-6">Estimate potential savings based on team size.</p>
+                            
+                            <div class="space-y-6 flex-1">
+                                <div>
+                                    <label class="flex justify-between text-sm font-medium text-slate-700 mb-2">
+                                        <span>Compliance Team Size</span>
+                                        <span id="label-team-size" class="text-brand-primary font-bold">20</span>
+                                    </label>
+                                    <input type="range" min="5" max="200" value="20" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" id="input-team-size">
+                                </div>
+
+                                <div>
+                                    <label class="flex justify-between text-sm font-medium text-slate-700 mb-2">
+                                        <span>Avg. Fully Loaded Cost ($)</span>
+                                        <span id="label-salary" class="text-brand-primary font-bold">120k</span>
+                                    </label>
+                                    <input type="range" min="50000" max="250000" step="10000" value="120000" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" id="input-salary">
+                                </div>
+
+                                <div class="mt-8 p-4 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
+                                    <p class="text-sm text-emerald-800 font-medium">Potential Annual Efficiency Savings</p>
+                                    <p class="text-3xl font-bold text-emerald-600 mt-2" id="roi-result">$840,000</p>
+                                    <p class="text-xs text-emerald-700 mt-1 opacity-75">Based on 35% productivity gain</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Init Chart
+            const ctx = document.getElementById('overviewChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024 (Est)'],
+                    datasets: [
+                        {
+                            label: 'Regulatory Updates Volume',
+                            data: [100, 140, 195, 260, 350], // Trend data
+                            backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                            borderRadius: 4,
+                            order: 2
+                        },
+                        {
+                            label: 'Staffing Capacity (Indexed)',
+                            data: [100, 105, 110, 112, 115],
+                            type: 'line',
+                            borderColor: '#059669',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Init Calculator Logic
+            const teamInput = document.getElementById('input-team-size');
+            const salaryInput = document.getElementById('input-salary');
+            
+            function updateROI() {
+                const team = parseInt(teamInput.value);
+                const salary = parseInt(salaryInput.value);
+                state.roiInputs.teamSize = team;
+                state.roiInputs.avgSalary = salary;
+                
+                document.getElementById('label-team-size').innerText = team;
+                document.getElementById('label-salary').innerText = (salary / 1000) + 'k';
+                
+                const savings = (team * salary) * state.roiInputs.efficiencyGain;
+                document.getElementById('roi-result').innerText = '$' + savings.toLocaleString(undefined, {maximumFractionDigits: 0});
+            }
+
+            teamInput.addEventListener('input', updateROI);
+            salaryInput.addEventListener('input', updateROI);
+        }
+
+        // --- Render: Use Case Lab ---
+        function renderUseCases(container) {
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto p-6 md:p-10 space-y-8">
+                    <header>
+                        <h2 class="text-3xl font-bold text-slate-800">Use Case Lab</h2>
+                        <p class="text-slate-600 mt-2 max-w-3xl">Explore high-impact applications of GenAI in compliance. Filter by domain to see specific operational improvements.</p>
+                    </header>
+
+                    <!-- Filter Controls -->
+                    <div class="flex flex-wrap gap-2 pb-4 border-b border-stone-200">
+                        <button onclick="filterUseCases('all')" class="filter-btn px-4 py-2 rounded-full bg-slate-800 text-white text-sm font-medium transition hover:bg-slate-700">All</button>
+                        <button onclick="filterUseCases('Financial Crime')" class="filter-btn px-4 py-2 rounded-full bg-white text-slate-600 border border-stone-300 text-sm font-medium transition hover:border-brand-primary hover:text-brand-primary">Financial Crime</button>
+                        <button onclick="filterUseCases('Regulatory Change')" class="filter-btn px-4 py-2 rounded-full bg-white text-slate-600 border border-stone-300 text-sm font-medium transition hover:border-brand-primary hover:text-brand-primary">Regulatory Change</button>
+                        <button onclick="filterUseCases('Surveillance')" class="filter-btn px-4 py-2 rounded-full bg-white text-slate-600 border border-stone-300 text-sm font-medium transition hover:border-brand-primary hover:text-brand-primary">Surveillance</button>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" id="use-case-grid">
+                        <!-- Cards injected here -->
+                    </div>
+                </div>
+            `;
+            renderUseCaseGrid('all');
+        }
+
+        function filterUseCases(category) {
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.innerText === category || (category === 'all' && btn.innerText === 'All')) {
+                    btn.classList.remove('bg-white', 'text-slate-600', 'border-stone-300');
+                    btn.classList.add('bg-slate-800', 'text-white', 'border-transparent');
+                } else {
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-stone-300');
+                    btn.classList.remove('bg-slate-800', 'text-white', 'border-transparent');
+                }
+            });
+            renderUseCaseGrid(category);
+        }
+
+        function renderUseCaseGrid(filter) {
+            const grid = document.getElementById('use-case-grid');
+            grid.innerHTML = '';
+            
+            const filteredData = filter === 'all' 
+                ? dataStore.useCases 
+                : dataStore.useCases.filter(item => item.category === filter);
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'interactive-card bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col';
+                card.innerHTML = `
+                    <div class="p-6 flex-1">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full uppercase tracking-wide">${item.category}</span>
+                            <i class="fa-solid ${item.icon} text-slate-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">${item.title}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-4">${item.desc}</p>
+                        
+                        <div class="bg-emerald-50 border-l-4 border-emerald-500 p-3 rounded-r-md">
+                            <p class="text-xs text-emerald-800 font-semibold">Impact Highlight:</p>
+                            <p class="text-sm text-emerald-700">${item.impact}</p>
+                        </div>
+                    </div>
+                    <div class="bg-stone-50 px-6 py-3 border-t border-stone-100 flex justify-between items-center">
+                        <span class="text-xs font-medium text-slate-500">Readiness: ${item.status}</span>
+                        <button class="text-brand-primary text-sm font-semibold hover:underline">View Workflow &rarr;</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- Render: Agents Analysis ---
+        function renderAgents(container) {
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto p-6 md:p-10 space-y-10">
+                    <header>
+                        <h2 class="text-3xl font-bold text-slate-800">Agent vs. Human Performance</h2>
+                        <p class="text-slate-600 mt-2 max-w-3xl">AI Agents move beyond simple text generation to performing actions. This chart compares capabilities across different operational models.</p>
+                    </header>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        <!-- Controls -->
+                        <div class="lg:col-span-1 space-y-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                                <h3 class="font-bold text-slate-800 mb-4">Select Task Scenario</h3>
+                                <div class="space-y-3">
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${state.radarMetric === 'sar' ? 'border-brand-primary bg-indigo-50' : 'border-stone-200 hover:bg-stone-50'}" onclick="updateRadar('sar')">
+                                        <input type="radio" name="radar-task" class="hidden" ${state.radarMetric === 'sar' ? 'checked' : ''}>
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-file-pen"></i></div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">Drafting SARs</p>
+                                            <p class="text-xs text-slate-500">High volume, template heavy</p>
+                                        </div>
+                                    </label>
+
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${state.radarMetric === 'policy' ? 'border-brand-primary bg-indigo-50' : 'border-stone-200 hover:bg-stone-50'}" onclick="updateRadar('policy')">
+                                        <input type="radio" name="radar-task" class="hidden" ${state.radarMetric === 'policy' ? 'checked' : ''}>
+                                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-scale-balanced"></i></div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">Policy Mapping</p>
+                                            <p class="text-xs text-slate-500">Complex logic, nuance required</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="bg-indigo-900 text-white p-6 rounded-xl shadow-lg">
+                                <h4 class="font-bold mb-2"><i class="fa-solid fa-robot mr-2"></i>What is an Agent?</h4>
+                                <p class="text-indigo-200 text-sm leading-relaxed">Unlike a standard chatbot that just gives answers, an <strong>AI Agent</strong> has access to tools. It can search a database, perform a calculation, and draft an email, all autonomously to achieve a goal.</p>
+                            </div>
+                        </div>
+
+                        <!-- Radar Chart -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">Capability Matrix</h3>
+                            <div class="chart-container h-[400px]"> <!-- Explicit height for radar -->
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            initRadarChart();
+        }
+
+        let radarChartInstance = null;
+
+        function initRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const dataConfig = {
+                sar: {
+                    human: [4, 9, 3, 8, 2], // Quality, Ethics, Speed, Context, Cost(High=Low Score)
+                    copilot: [7, 9, 7, 8, 5],
+                    agent: [8, 7, 10, 6, 9] 
+                },
+                policy: {
+                    human: [9, 10, 2, 10, 2],
+                    copilot: [8, 9, 6, 9, 5],
+                    agent: [6, 6, 9, 5, 9]
+                }
+            };
+
+            const activeData = dataConfig[state.radarMetric];
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Output Quality', 'Ethical Judgment', 'Speed/Scale', 'Context Awareness', 'Cost Efficiency'],
+                    datasets: [
+                        {
+                            label: 'Human Only',
+                            data: activeData.human,
+                            fill: true,
+                            backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                            borderColor: '#94a3b8',
+                            pointBackgroundColor: '#94a3b8',
+                            pointBorderColor: '#fff',
+                        },
+                        {
+                            label: 'Human + AI Copilot',
+                            data: activeData.copilot,
+                            fill: true,
+                            backgroundColor: 'rgba(5, 150, 105, 0.2)',
+                            borderColor: '#059669', // Emerald
+                            pointBackgroundColor: '#059669',
+                            pointBorderColor: '#fff',
+                        },
+                        {
+                            label: 'Autonomous Agent',
+                            data: activeData.agent,
+                            fill: true,
+                            backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                            borderColor: '#4f46e5', // Indigo
+                            pointBackgroundColor: '#4f46e5',
+                            pointBorderColor: '#fff',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e2e8f0' },
+                            grid: { color: '#e2e8f0' },
+                            pointLabels: {
+                                font: { size: 12, family: 'Inter' },
+                                color: '#475569'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function updateRadar(metric) {
+            state.radarMetric = metric;
+            const dataConfig = {
+                sar: {
+                    human: [4, 9, 3, 8, 2],
+                    copilot: [7, 9, 7, 8, 5],
+                    agent: [8, 7, 10, 6, 9] 
+                },
+                policy: {
+                    human: [9, 10, 2, 10, 2],
+                    copilot: [8, 9, 6, 9, 5],
+                    agent: [6, 6, 9, 5, 9]
+                }
+            };
+            
+            const newData = dataConfig[metric];
+            radarChartInstance.data.datasets[0].data = newData.human;
+            radarChartInstance.data.datasets[1].data = newData.copilot;
+            radarChartInstance.data.datasets[2].data = newData.agent;
+            radarChartInstance.update();
+
+            // Rerender controls to show active state
+            renderAgents(document.getElementById('main-content'));
+        }
+
+        // --- Render: Governance Framework ---
+        function renderGovernance(container) {
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto p-6 md:p-10 space-y-10">
+                    <header>
+                        <h2 class="text-3xl font-bold text-slate-800">The "Human in the Loop" Defense</h2>
+                        <p class="text-slate-600 mt-2 max-w-3xl">Implementing GenAI in finance requires a robust governance framework to mitigate hallucinations and bias. Explore the layers of defense below.</p>
+                    </header>
+
+                    <!-- Interactive Layer Diagram (HTML/Flex) -->
+                    <div class="flex flex-col gap-4 relative">
+                        <!-- Connecting Line Background -->
+                        <div class="absolute left-8 top-0 bottom-0 w-1 bg-stone-200 -z-10 hidden md:block"></div>
+
+                        <!-- Layer 1 -->
+                        <div class="group relative pl-0 md:pl-20 transition-all duration-300">
+                            <div class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-200 rounded-full items-center justify-center text-slate-500 font-bold z-10 border-4 border-stone-50 group-hover:bg-brand-primary group-hover:text-white transition-colors">1</div>
+                            
+                            <div class="bg-white p-6 rounded-xl border-l-4 border-slate-300 shadow-sm hover:border-brand-primary hover:shadow-md cursor-default transition-all">
+                                <h3 class="text-lg font-bold text-slate-800 mb-2">Input Guardrails</h3>
+                                <p class="text-sm text-slate-600">Filters that sanitize user inputs before they reach the model. Prevents prompt injection and ensures query relevance.</p>
+                                <div class="mt-3 flex gap-2">
+                                    <span class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">PII Redaction</span>
+                                    <span class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">Topic Restrictions</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Layer 2 -->
+                        <div class="group relative pl-0 md:pl-20 transition-all duration-300">
+                            <div class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-200 rounded-full items-center justify-center text-slate-500 font-bold z-10 border-4 border-stone-50 group-hover:bg-brand-primary group-hover:text-white transition-colors">2</div>
+                            
+                            <div class="bg-white p-6 rounded-xl border-l-4 border-slate-300 shadow-sm hover:border-brand-primary hover:shadow-md cursor-default transition-all">
+                                <h3 class="text-lg font-bold text-slate-800 mb-2">Model Layer (RAG)</h3>
+                                <p class="text-sm text-slate-600">Retrieval-Augmented Generation restricts the AI to trusted internal documents only. It cites sources for every claim, reducing hallucinations.</p>
+                                <div class="mt-3 flex gap-2">
+                                    <span class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">Source Attribution</span>
+                                    <span class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">Vector Database</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Layer 3 -->
+                        <div class="group relative pl-0 md:pl-20 transition-all duration-300">
+                            <div class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-200 rounded-full items-center justify-center text-slate-500 font-bold z-10 border-4 border-stone-50 group-hover:bg-brand-primary group-hover:text-white transition-colors">3</div>
+                            
+                            <div class="bg-white p-6 rounded-xl border-l-4 border-emerald-500 shadow-sm hover:shadow-md cursor-default transition-all">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-lg font-bold text-slate-800 mb-2">Human Validation</h3>
+                                    <i class="fa-solid fa-user-check text-emerald-500 text-xl"></i>
+                                </div>
+                                <p class="text-sm text-slate-600">The critical step. Compliance officers review high-risk outputs (e.g., SAR filings) before finalization. The AI acts as a drafter, not an approver.</p>
+                            </div>
+                        </div>
+
+                         <!-- Layer 4 -->
+                         <div class="group relative pl-0 md:pl-20 transition-all duration-300">
+                            <div class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-200 rounded-full items-center justify-center text-slate-500 font-bold z-10 border-4 border-stone-50 group-hover:bg-brand-primary group-hover:text-white transition-colors">4</div>
+                            
+                            <div class="bg-white p-6 rounded-xl border-l-4 border-slate-300 shadow-sm hover:border-brand-primary hover:shadow-md cursor-default transition-all">
+                                <h3 class="text-lg font-bold text-slate-800 mb-2">Audit & Feedback Loop</h3>
+                                <p class="text-sm text-slate-600">Every interaction is logged. User corrections (e.g., editing a draft) are used to fine-tune future model performance.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-4">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-1"></i>
+                        <div>
+                            <h4 class="font-bold text-amber-800 text-sm">Critical Warning</h4>
+                            <p class="text-amber-700 text-sm mt-1">Regulators (SEC, FCA) have emphasized that "AI did it" is not a defense. Senior Management Function (SMF) holders remain accountable for all AI outputs.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+
+</body></html>

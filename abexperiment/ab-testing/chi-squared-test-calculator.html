@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Chi-Square Explorer &amp; Analyst</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js (Optional but included if needed, though Chart.js is primary here) -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    
+    <!-- Placeholder Comments -->
+    <!-- Chosen Palette: Warm Neutrals & Academic Slate (Background: #FDFBF7, Primary: #475569, Accent: #D97706) -->
+    <!-- Application Structure Plan: 
+         1. Header: Clean navigation.
+         2. Concept Lab: Educational module with interactive definition cards and a live Chi-Square distribution graph (Chart.js) to teach Degrees of Freedom.
+         3. The Analyst (Calculator): Dynamic matrix input (default 2x2 for Sample 1 vs Sample 2). Generates 'Expected' tables, Chi-Square stat, P-Value, and visualizes Observed vs Expected data.
+         4. Confidence & Effect Size: Specifically for 2x2 data, calculates Difference of Proportions and 95% Confidence Intervals (Z-method) to satisfy the "Confidence Interval" requirement.
+         5. Footer: Simple credits.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Distribution Graph (Chart.js Line): Goal -> Visualize theoretical probability. Interaction -> Slider for Degrees of Freedom.
+         2. Matrix Input (HTML Grid): Goal -> Data entry. Interaction -> Dynamic rows/cols.
+         3. Result Charts (Chart.js Bar): Goal -> Compare Observed vs Expected counts. Interaction -> Hover for exact values.
+         4. Textual Analysis: Goal -> Interpret P-value automatically.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <style>
+        /* Custom styles for chart containers as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Max width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        /* Matrix Input Styling */
+        .matrix-input {
+            transition: all 0.2s;
+        }
+        .matrix-input:focus {
+            outline: 2px solid #D97706; /* Amber-600 */
+            background-color: #FFFBEB;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-[#FDFBF7] text-slate-800 font-sans leading-relaxed">
+
+    <!-- Navigation -->
+    <nav class="bg-slate-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl text-amber-500">χ²</span>
+                <h1 class="text-xl font-bold tracking-wide">Chi-Square Analyst</h1>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm font-medium">
+                <a class="hover:text-amber-400 transition" href="#concept-lab">Concepts</a>
+                <a class="hover:text-amber-400 transition" href="#calculator-section">Calculator</a>
+                <a class="hover:text-amber-400 transition" href="#advanced-stats">Confidence Intervals</a>
+            </div>
+            <button class="md:hidden bg-amber-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider" onclick="document.getElementById('calculator-section').scrollIntoView()">
+                Start Calc
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="container mx-auto px-4 py-12 text-center max-w-3xl">
+            <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Master the Chi-Square Test</h2>
+            <p class="text-lg text-slate-600 mb-8">
+                An interactive toolkit for comparing categorical data, analyzing sample independence, and calculating confidence intervals for proportions.
+            </p>
+            <div class="flex justify-center gap-4">
+                <button class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition transform hover:-translate-y-0.5" onclick="scrollToSection('calculator-section')">
+                    Open Calculator
+                </button>
+                <button class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-6 py-3 rounded-lg font-semibold shadow-sm transition" onclick="scrollToSection('concept-lab')">
+                    Learn Theory
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container mx-auto px-4 py-8 space-y-16">
+
+        <!-- SECTION 1: CONCEPT LAB -->
+        <section class="scroll-mt-24" id="concept-lab">
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 border-l-4 border-amber-500 pl-4 mb-2">Concept Lab</h3>
+                <p class="text-slate-600">
+                    Before calculating, understand the mechanics. The Chi-Square ($\chi^2$) test measures how expectations compare to actual observed data. 
+                    Use the interactive graph below to see how the "Degrees of Freedom" ($df$) changes the probability distribution.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Interactive Chart -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-slate-700">The Chi-Square Distribution</h4>
+                        <div class="text-sm bg-slate-100 px-3 py-1 rounded text-slate-600">
+                            Current df: <span class="font-bold text-amber-600" id="df-display">3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+
+                    <div class="mt-6 flex items-center space-x-4">
+                        <label class="text-sm font-semibold text-slate-600">Adjust Degrees of Freedom ($df$):</label>
+                        <input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-600" id="df-slider" max="20" min="1" type="range" value="3"/>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 italic">
+                        Notice how lower $df$ curves skew heavily to the left, while higher $df$ curves become more symmetrical (normal-like).
+                    </p>
+                </div>
+
+                <!-- Key Concepts Cards -->
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:border-amber-300 transition group cursor-default">
+                        <h5 class="font-bold text-slate-800 group-hover:text-amber-600 transition">Null Hypothesis ($H_0$)</h5>
+                        <p class="text-sm text-slate-600 mt-2">
+                            Assumes there is <strong class="text-slate-800">no relationship</strong> between the variables. Any difference is due to chance.
+                        </p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:border-amber-300 transition group cursor-default">
+                        <h5 class="font-bold text-slate-800 group-hover:text-amber-600 transition">The Statistic</h5>
+                        <p class="text-sm text-slate-600 mt-2 font-mono bg-slate-50 p-2 rounded border border-slate-100">
+                            $\chi^2 = \sum \frac{(O - E)^2}{E}$
+                        </p>
+                        <p class="text-xs text-slate-500 mt-2">
+                            Sum of (Observed - Expected)² divided by Expected.
+                        </p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:border-amber-300 transition group cursor-default">
+                        <h5 class="font-bold text-slate-800 group-hover:text-amber-600 transition">P-Value</h5>
+                        <p class="text-sm text-slate-600 mt-2">
+                            The probability of seeing these results if $H_0$ were true. <br/>
+                            <span class="text-amber-600 font-bold">P &lt; 0.05</span> usually means "Significant".
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CALCULATOR -->
+        <section class="scroll-mt-24" id="calculator-section">
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 border-l-4 border-amber-500 pl-4 mb-2">The Analyst (Test of Independence)</h3>
+                <p class="text-slate-600 max-w-4xl">
+                    Enter your raw count data below. This tool is perfect for analyzing <strong>Sample 1 vs Sample 2</strong> scenarios (e.g., Treatment vs Control outcomes).
+                    It will automatically calculate the "Expected" values based on row/column totals.
+                </p>
+            </div>
+
+            <!-- Configuration -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+                <div class="flex flex-wrap gap-6 items-center border-b border-slate-100 pb-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Rows (Groups)</label>
+                        <select class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-24 p-2.5" id="rows-select">
+                            <option selected="" value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Cols (Outcomes)</label>
+                        <select class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-24 p-2.5" id="cols-select">
+                            <option selected="" value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                         <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Significance Level ($\alpha$)</label>
+                         <select class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-24 p-2.5" id="alpha-select">
+                            <option value="0.01">0.01</option>
+                            <option selected="" value="0.05">0.05</option>
+                            <option value="0.10">0.10</option>
+                        </select>
+                    </div>
+                    <div class="ml-auto">
+                        <button class="text-slate-500 hover:text-amber-600 text-sm font-medium underline" onclick="resetCalculator()">
+                            Reset Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Matrix -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-500">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-3 rounded-tl-lg">Group / Outcome</th>
+                                <!-- Dynamic Headers will be injected here -->
+                                <th class="px-4 py-3 bg-slate-200 text-slate-600 text-right rounded-tr-lg w-24">Totals</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-body">
+                            <!-- Dynamic Inputs -->
+                        </tbody>
+                        <tfoot class="font-bold text-slate-700 bg-slate-50" id="matrix-footer">
+                            <!-- Dynamic Column Totals -->
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button class="bg-amber-600 hover:bg-amber-700 text-white text-lg px-8 py-3 rounded-lg font-bold shadow-lg shadow-amber-600/20 transition transform hover:-translate-y-1" onclick="calculateChiSquare()">
+                        Run Analysis
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Panel (Hidden by default) -->
+            <div class="hidden space-y-8 animate-fade-in" id="results-panel">
+                
+                <!-- Main Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-800 text-white p-5 rounded-lg shadow-md">
+                        <p class="text-xs uppercase tracking-widest text-slate-400">Chi-Square Statistic</p>
+                        <p class="text-3xl font-mono font-bold text-amber-400 mt-1" id="res-stat">--</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-slate-500">P-Value</p>
+                        <p class="text-3xl font-mono font-bold text-slate-800 mt-1" id="res-p">--</p>
+                        <p class="text-xs text-slate-400 mt-1" id="res-sig-text">--</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-slate-500">Degrees of Freedom</p>
+                        <p class="text-3xl font-mono font-bold text-slate-800 mt-1" id="res-df">--</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm border-l-4" id="res-conclusion-box">
+                        <p class="text-xs uppercase tracking-widest text-slate-500">Conclusion</p>
+                        <p class="text-lg font-bold text-slate-800 mt-1 leading-tight" id="res-conclusion">--</p>
+                    </div>
+                </div>
+
+                <!-- Visualization of Results -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Expected Values Table -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h4 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2">Expected Frequencies</h4>
+                        <p class="text-sm text-slate-500 mb-4">Values expected if groups were identical ($H_0$ is true).</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-center text-slate-600">
+                                <thead class="bg-slate-50 text-xs uppercase">
+                                    <tr id="expected-head"></tr>
+                                </thead>
+                                <tbody class="font-mono text-xs" id="expected-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Observed vs Expected Chart -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h4 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2">Observed vs. Expected</h4>
+                        <div class="chart-container">
+                            <canvas id="resultsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ADVANCED CONFIDENCE INTERVALS (2x2 Only) -->
+        <section class="scroll-mt-24 hidden" id="advanced-stats">
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 border-l-4 border-emerald-500 pl-4 mb-2">Confidence Interval Analysis</h3>
+                <p class="text-slate-600">
+                    For a 2x2 design (e.g., Sample 1 vs Sample 2, Success vs Failure), we can go deeper than the Chi-Square. 
+                    This section calculates the <strong>Difference in Proportions</strong> and its <strong>95% Confidence Interval</strong>.
+                </p>
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-100 p-6 rounded-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold text-emerald-800 mb-2">Comparison of Proportions</h4>
+                        <ul class="space-y-3 text-sm text-emerald-900">
+                            <li class="flex justify-between border-b border-emerald-200 pb-1">
+                                <span>Sample 1 Rate ($p_1$):</span>
+                                <span class="font-mono font-bold" id="ci-p1">--</span>
+                            </li>
+                            <li class="flex justify-between border-b border-emerald-200 pb-1">
+                                <span>Sample 2 Rate ($p_2$):</span>
+                                <span class="font-mono font-bold" id="ci-p2">--</span>
+                            </li>
+                            <li class="flex justify-between pt-1">
+                                <span>Difference ($p_1 - p_2$):</span>
+                                <span class="font-mono font-bold" id="ci-diff">--</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-emerald-800 mb-2">95% Confidence Interval</h4>
+                        <div class="flex items-center justify-center h-24 bg-white rounded-lg border border-emerald-200 shadow-inner">
+                            <span class="text-2xl font-mono text-slate-700" id="ci-result">[ -- , -- ]</span>
+                        </div>
+                        <p class="text-xs text-emerald-700 mt-2 text-center">
+                            If this interval does not include 0, the difference is statistically significant at 95%.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-overview-of-test.html">Ab Test Overview Of Test</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-sample-size-calculator.html">Ab Test Sample Size Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-for-ai.html">Ab Testing For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-stats-guide.html">Ab Testing Stats Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-texting-for-ai.html">Ab Texting For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/asociation-to-understanding.html">Asociation To Understanding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/causal-inference-2.html">Causal Inference 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/chi-squared-test-calculator.html">Chi Squared Test Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing-info.html">Evolution Of Ab Testing Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing.html">Evolution Of Ab Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/observationstudy-fieldexperiment-abtesting.html">Observationstudy Fieldexperiment Abtesting</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/research-methodology.html">Research Methodology</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/two-sample-t-test-analyzer.html">Two Sample T Test Analyzer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- STATE MANAGEMENT ---
+        const state = {
+            rows: 2,
+            cols: 2,
+            alpha: 0.05,
+            data: [[10, 20], [20, 10]], // Default dummy data
+            charts: {
+                dist: null,
+                results: null
+            }
+        };
+
+        // --- UTILITY FUNCTIONS ---
+
+        // Gamma function approximation for Chi-Square CDF
+        // Source: Numerical Recipes / JS adaptations of Lanczos approximation
+        function logGamma(z) {
+            const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+            let x = z;
+            let y = z;
+            let tmp = x + 5.5;
+            tmp -= (x + 0.5) * Math.log(tmp);
+            let ser = 1.000000000190015;
+            for (let j = 0; j < 6; j++) ser += c[j] / ++y;
+            return -tmp + Math.log(2.5066282746310005 * ser / x);
+        }
+
+        function gammainc(a, x) {
+            let gln = logGamma(a);
+            let sum, del, ap;
+            if (x < a + 1.0) {
+                ap = a;
+                del = sum = 1.0 / a;
+                for (let n = 1; n <= 100; n++) {
+                    ++ap;
+                    del *= x / ap;
+                    sum += del;
+                    if (Math.abs(del) < Math.abs(sum) * 3.0e-7) return sum * Math.exp(-x + a * Math.log(x) - gln);
+                }
+            } else {
+                let b = x + 1.0 - a;
+                let c = 1.0 / 1.0e-30;
+                let d = 1.0 / b;
+                let h = d;
+                let an;
+                for (let i = 1; i <= 100; i++) {
+                    an = -i * (i - a);
+                    b += 2.0;
+                    d = an * d + b;
+                    if (Math.abs(d) < 1.0e-30) d = 1.0e-30;
+                    c = b + an / c;
+                    if (Math.abs(c) < 1.0e-30) c = 1.0e-30;
+                    d = 1.0 / d;
+                    del = d * c;
+                    h *= del;
+                    if (Math.abs(del - 1.0) < 3.0e-7) break;
+                }
+                return 1.0 - h * Math.exp(-x + a * Math.log(x) - gln);
+            }
+            return 0.0;
+        }
+
+        function chiSquareCDF(x, k) {
+            if (x <= 0 || k <= 0) return 0;
+            return gammainc(k / 2.0, x / 2.0);
+        }
+
+        function getPValue(stat, df) {
+            // P-value is the area to the right, so 1 - CDF
+            const p = 1 - chiSquareCDF(stat, df);
+            return p < 0 ? 0 : p; // clamp
+        }
+
+        // --- DOM MANIPULATION & LOGIC ---
+
+        function init() {
+            renderDistributionChart();
+            generateMatrixTable();
+            attachListeners();
+        }
+
+        function attachListeners() {
+            document.getElementById('rows-select').addEventListener('change', (e) => {
+                state.rows = parseInt(e.target.value);
+                generateMatrixTable();
+            });
+            document.getElementById('cols-select').addEventListener('change', (e) => {
+                state.cols = parseInt(e.target.value);
+                generateMatrixTable();
+            });
+            document.getElementById('alpha-select').addEventListener('change', (e) => {
+                state.alpha = parseFloat(e.target.value);
+            });
+            
+            const dfSlider = document.getElementById('df-slider');
+            dfSlider.addEventListener('input', (e) => {
+                const df = parseInt(e.target.value);
+                document.getElementById('df-display').innerText = df;
+                updateDistributionChart(df);
+            });
+        }
+
+        function generateMatrixTable() {
+            const tbody = document.getElementById('matrix-body');
+            const theadRow = document.querySelector('#calculator-section thead tr');
+            const tfootRow = document.getElementById('matrix-footer');
+            
+            // Clear existing headers/footer dynamic parts
+            // Keep first and last headers
+            const baseHeaders = [`<th class="px-4 py-3 rounded-tl-lg bg-slate-100 text-slate-700">Group / Outcome</th>`];
+            for(let c=1; c<=state.cols; c++) {
+                baseHeaders.push(`<th class="px-4 py-3 bg-slate-100 text-slate-700 font-bold">Outcome ${c}</th>`);
+            }
+            baseHeaders.push(`<th class="px-4 py-3 bg-slate-200 text-slate-600 text-right rounded-tr-lg w-24">Totals</th>`);
+            theadRow.innerHTML = baseHeaders.join('');
+
+            // Generate Body
+            let bodyHTML = '';
+            for(let r=1; r<=state.rows; r++) {
+                bodyHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                    <td class="px-4 py-3 font-medium text-slate-700 bg-slate-50">Sample ${r}</td>`;
+                
+                for(let c=1; c<=state.cols; c++) {
+                    // Try to preserve data if resizing
+                    const val = (state.data[r-1] && state.data[r-1][c-1]) ? state.data[r-1][c-1] : 0;
+                    bodyHTML += `
+                        <td class="px-2 py-2">
+                            <input type="number" min="0" value="${val}" data-row="${r-1}" data-col="${c-1}" 
+                            class="matrix-input w-full bg-white border border-slate-300 rounded px-3 py-2 text-right font-mono text-slate-800"
+                            onchange="updateMatrixData(this)">
+                        </td>
+                    `;
+                }
+                bodyHTML += `<td class="px-4 py-3 text-right font-bold text-slate-600" id="row-total-${r-1}">0</td></tr>`;
+            }
+            tbody.innerHTML = bodyHTML;
+
+            // Generate Footer
+            let footerHTML = `<td class="px-4 py-3 bg-slate-100">Totals</td>`;
+            for(let c=1; c<=state.cols; c++) {
+                footerHTML += `<td class="px-4 py-3 text-right bg-slate-100" id="col-total-${c-1}">0</td>`;
+            }
+            footerHTML += `<td class="px-4 py-3 text-right bg-slate-200 text-slate-800" id="grand-total">0</td>`;
+            tfootRow.innerHTML = footerHTML;
+
+            // Initialize underlying data structure if dimensions changed
+            const newData = [];
+            for(let r=0; r<state.rows; r++){
+                const row = [];
+                for(let c=0; c<state.cols; c++){
+                    row.push(0);
+                }
+                newData.push(row);
+            }
+            state.data = newData;
+            calculateTotals(); // Initial calc to zero out
+        }
+
+        function updateMatrixData(input) {
+            const r = parseInt(input.dataset.row);
+            const c = parseInt(input.dataset.col);
+            state.data[r][c] = parseFloat(input.value) || 0;
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            let grandTotal = 0;
+            const rowTotals = new Array(state.rows).fill(0);
+            const colTotals = new Array(state.cols).fill(0);
+
+            for(let r=0; r<state.rows; r++) {
+                for(let c=0; c<state.cols; c++) {
+                    const val = state.data[r][c];
+                    rowTotals[r] += val;
+                    colTotals[c] += val;
+                    grandTotal += val;
+                }
+                document.getElementById(`row-total-${r}`).innerText = rowTotals[r];
+            }
+
+            for(let c=0; c<state.cols; c++) {
+                document.getElementById(`col-total-${c}`).innerText = colTotals[c];
+            }
+            document.getElementById('grand-total').innerText = grandTotal;
+
+            return { rowTotals, colTotals, grandTotal };
+        }
+
+        function resetCalculator() {
+            generateMatrixTable();
+            document.getElementById('results-panel').classList.add('hidden');
+            document.getElementById('advanced-stats').classList.add('hidden');
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- CORE CALCULATION LOGIC ---
+
+        function calculateChiSquare() {
+            const { rowTotals, colTotals, grandTotal } = calculateTotals();
+            
+            if (grandTotal === 0) {
+                alert("Please enter data into the table.");
+                return;
+            }
+
+            let chiSquareStat = 0;
+            const expectedMatrix = [];
+            const labels = [];
+            const observedFlat = [];
+            const expectedFlat = [];
+
+            // Calculate Expected & ChiSquare
+            for(let r=0; r<state.rows; r++) {
+                const expectedRow = [];
+                for(let c=0; c<state.cols; c++) {
+                    const expected = (rowTotals[r] * colTotals[c]) / grandTotal;
+                    expectedRow.push(expected);
+                    
+                    const observed = state.data[r][c];
+                    if (expected > 0) {
+                        chiSquareStat += Math.pow(observed - expected, 2) / expected;
+                    }
+
+                    // For Charts
+                    labels.push(`S${r+1}-Out${c+1}`);
+                    observedFlat.push(observed);
+                    expectedFlat.push(expected.toFixed(2));
+                }
+                expectedMatrix.push(expectedRow);
+            }
+
+            const df = (state.rows - 1) * (state.cols - 1);
+            const pValue = getPValue(chiSquareStat, df);
+
+            // UI Updates
+            document.getElementById('results-panel').classList.remove('hidden');
+            document.getElementById('res-stat').innerText = chiSquareStat.toFixed(3);
+            document.getElementById('res-df').innerText = df;
+            
+            const pValDisplay = pValue < 0.0001 ? "< 0.0001" : pValue.toFixed(4);
+            document.getElementById('res-p').innerText = pValDisplay;
+
+            const conclusionBox = document.getElementById('res-conclusion-box');
+            const conclusionText = document.getElementById('res-conclusion');
+            const sigText = document.getElementById('res-sig-text');
+
+            if (pValue < state.alpha) {
+                conclusionBox.className = "bg-green-50 p-5 rounded-lg border border-green-200 shadow-sm border-l-4 border-green-500";
+                conclusionText.innerText = "Statistically Significant";
+                conclusionText.className = "text-lg font-bold text-green-800 mt-1 leading-tight";
+                sigText.innerText = `P-value is less than α (${state.alpha}). Reject H₀.`;
+            } else {
+                conclusionBox.className = "bg-slate-50 p-5 rounded-lg border border-slate-200 shadow-sm border-l-4 border-slate-400";
+                conclusionText.innerText = "Not Significant";
+                conclusionText.className = "text-lg font-bold text-slate-700 mt-1 leading-tight";
+                sigText.innerText = `P-value is greater than α (${state.alpha}). Fail to reject H₀.`;
+            }
+
+            renderExpectedTable(expectedMatrix);
+            renderResultsChart(labels, observedFlat, expectedFlat);
+
+            // Check for 2x2 specific analysis
+            const advSection = document.getElementById('advanced-stats');
+            if (state.rows === 2 && state.cols === 2) {
+                advSection.classList.remove('hidden');
+                calculateConfidenceInterval(rowTotals);
+            } else {
+                advSection.classList.add('hidden');
+            }
+            
+            // Scroll to results
+            setTimeout(() => {
+                document.getElementById('results-panel').scrollIntoView({behavior: 'smooth', block: 'start'});
+            }, 100);
+        }
+
+        function calculateConfidenceInterval(rowTotals) {
+            // Assuming Col 1 is "Success" / "Event of Interest"
+            // p1 = data[0][0] / rowTotals[0]
+            // p2 = data[1][0] / rowTotals[1]
+
+            const n1 = rowTotals[0];
+            const n2 = rowTotals[1];
+            
+            if (n1 === 0 || n2 === 0) return;
+
+            const x1 = state.data[0][0];
+            const x2 = state.data[1][0];
+
+            const p1 = x1 / n1;
+            const p2 = x2 / n2;
+
+            const diff = p1 - p2;
+            const se = Math.sqrt( (p1*(1-p1)/n1) + (p2*(1-p2)/n2) );
+            
+            // Z for 95% is 1.96
+            const margin = 1.96 * se;
+            const lower = diff - margin;
+            const upper = diff + margin;
+
+            document.getElementById('ci-p1').innerText = (p1 * 100).toFixed(1) + '%';
+            document.getElementById('ci-p2').innerText = (p2 * 100).toFixed(1) + '%';
+            document.getElementById('ci-diff').innerText = (diff * 100).toFixed(1) + '%';
+            document.getElementById('ci-result').innerText = `[ ${(lower*100).toFixed(1)}%, ${(upper*100).toFixed(1)}% ]`;
+        }
+
+        function renderExpectedTable(matrix) {
+            const thead = document.getElementById('expected-head');
+            const tbody = document.getElementById('expected-body');
+            
+            // Header
+            let headHTML = '<th class="px-2 py-1"></th>';
+            for(let c=0; c<state.cols; c++) headHTML += `<th class="px-2 py-1">Out ${c+1}</th>`;
+            thead.innerHTML = headHTML;
+
+            // Body
+            let bodyHTML = '';
+            for(let r=0; r<state.rows; r++) {
+                bodyHTML += `<tr class="border-b border-slate-100"><td class="font-bold text-slate-500 bg-slate-50">S${r+1}</td>`;
+                for(let c=0; c<state.cols; c++) {
+                    bodyHTML += `<td class="px-2 py-2">${matrix[r][c].toFixed(1)}</td>`;
+                }
+                bodyHTML += '</tr>';
+            }
+            tbody.innerHTML = bodyHTML;
+        }
+
+        // --- CHARTS ---
+
+        function renderDistributionChart() {
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            
+            // Generate data points for df=3 initially
+            const dataPoints = generateChiData(3);
+
+            state.charts.dist = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dataPoints.labels,
+                    datasets: [{
+                        label: 'Probability Density',
+                        data: dataPoints.data,
+                        borderColor: '#D97706', // Amber 600
+                        backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true, mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Chi-Square Value' },
+                            grid: { display: false }
+                        },
+                        y: { 
+                            display: false 
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDistributionChart(df) {
+            const points = generateChiData(df);
+            state.charts.dist.data.labels = points.labels;
+            state.charts.dist.data.datasets[0].data = points.data;
+            state.charts.dist.update();
+        }
+
+        function generateChiData(df) {
+            const labels = [];
+            const data = [];
+            // Chi Square PDF formula
+            // f(x) = (1 / (2^(k/2) * Gamma(k/2))) * x^(k/2 - 1) * e^(-x/2)
+            const constant = 1 / (Math.pow(2, df/2) * Math.exp(logGamma(df/2)));
+            
+            for(let x=0.1; x<=20; x+=0.2) {
+                labels.push(x.toFixed(1));
+                const y = constant * Math.pow(x, (df/2)-1) * Math.exp(-x/2);
+                data.push(y);
+            }
+            return { labels, data };
+        }
+
+        function renderResultsChart(labels, observed, expected) {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            
+            if(state.charts.results) {
+                state.charts.results.destroy();
+            }
+
+            state.charts.results = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Observed',
+                            data: observed,
+                            backgroundColor: '#475569', // Slate 600
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Expected',
+                            data: expected,
+                            backgroundColor: '#CBD5E1', // Slate 300
+                            borderRadius: 4,
+                            borderWidth: 1,
+                            borderColor: '#94A3B8'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // --- INIT ---
+        window.onload = init;
+
+    </script>
+
+</body></html>

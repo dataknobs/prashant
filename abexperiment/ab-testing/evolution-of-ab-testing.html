@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Evolution of A/B Testing: An Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Slate & Sky Blue -->
+    <!-- Application Structure Plan: A single-page application with a sticky top navigation bar for easy access to four thematic sections: (1) Fundamentals, (2) Toolkit Explorer, (3) The LLM Revolution, and (4) Testing for NLP. This structure was chosen to break down a complex, multi-faceted topic into digestible, user-selectable modules. Instead of a linear report, this allows users—from beginners to experts—to navigate directly to their area of interest. Key interactions include interactive filtering of tools by feature, a simulated LLM text-generation demo, and dynamic charts that update based on user selections. The flow encourages exploration rather than passive reading, making the information more engaging and memorable. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: A/B Testing Process -> Goal: Inform -> Viz/Presentation: HTML/CSS diagram -> Interaction: Hover effects to highlight steps -> Justification: A simple, clear visual is best for explaining a core process. -> Library/Method: Tailwind CSS.
+        2. Report Info: Common A/B testing tool features -> Goal: Compare/Organize -> Viz/Presentation: Bar Chart & Filterable Cards -> Interaction: Clicking feature buttons filters the tool cards and updates the chart. -> Justification: Allows users to actively compare tools based on features they care about. -> Library/Method: Chart.js, Vanilla JS.
+        3. Report Info: Impact of LLMs on variation creation -> Goal: Engage/Inform -> Viz/Presentation: Doughnut Chart & Simulated text generator -> Interaction: User input triggers simulated LLM output. -> Justification: Demonstrates the power of LLMs in a hands-on way. The chart quantifies the shift in effort. -> Library/Method: Chart.js, Vanilla JS.
+        4. Report Info: Metrics for NLP vs. Web A/B testing -> Goal: Compare -> Viz/Presentation: Grouped Bar Chart -> Interaction: Tooltips on hover explain each metric. -> Justification: Directly contrasts the two domains, highlighting the unique challenges of testing conversational AI. -> Library/Method: Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active {
+            color: #0ea5e9;
+            border-bottom-color: #0ea5e9;
+        }
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-slate-800">The Evolution of A/B Testing</h1>
+                </div>
+                <nav class="hidden md:flex md:space-x-8">
+                    <a class="nav-link text-slate-500 hover:text-sky-500 border-b-2 border-transparent pb-1" href="#fundamentals">Fundamentals</a>
+                    <a class="nav-link text-slate-500 hover:text-sky-500 border-b-2 border-transparent pb-1" href="#toolkit">Toolkit</a>
+                    <a class="nav-link text-slate-500 hover:text-sky-500 border-b-2 border-transparent pb-1" href="#llm-revolution">LLM Revolution</a>
+                    <a class="nav-link text-slate-500 hover:text-sky-500 border-b-2 border-transparent pb-1" href="#nlp-testing">NLP Testing</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <section class="section-fade-in space-y-8 scroll-mt-20" id="fundamentals">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Fundamentals of A/B Testing</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">This section introduces the core concepts of A/B testing, a method of comparing two versions of a webpage or app against each other to determine which one performs better. It's a fundamental practice for data-driven optimization, allowing businesses to make smarter decisions and improve user experience based on empirical evidence rather than intuition.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
+                <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center">The A/B Testing Workflow</h3>
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 md:space-x-4">
+                    <div class="flex items-center flex-col text-center w-48 transition-transform duration-300 hover:scale-105">
+                        <div class="bg-sky-100 text-sky-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">1</div>
+                        <h4 class="font-semibold mt-3">Hypothesize</h4>
+                        <p class="text-sm text-slate-500">Identify a problem and form a testable idea for improvement.</p>
+                    </div>
+                    <div class="text-slate-300 text-2xl hidden md:block">→</div>
+                    <div class="flex items-center flex-col text-center w-48 transition-transform duration-300 hover:scale-105">
+                        <div class="bg-sky-100 text-sky-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">2</div>
+                        <h4 class="font-semibold mt-3">Create Variants</h4>
+                        <p class="text-sm text-slate-500">Design and build a 'challenger' (Version B) to test against the 'control' (Version A).</p>
+                    </div>
+                    <div class="text-slate-300 text-2xl hidden md:block">→</div>
+                    <div class="flex items-center flex-col text-center w-48 transition-transform duration-300 hover:scale-105">
+                        <div class="bg-sky-100 text-sky-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">3</div>
+                        <h4 class="font-semibold mt-3">Run Experiment</h4>
+                        <p class="text-sm text-slate-500">Split traffic between variants and collect data on key metrics.</p>
+                    </div>
+                    <div class="text-slate-300 text-2xl hidden md:block">→</div>
+                    <div class="flex items-center flex-col text-center w-48 transition-transform duration-300 hover:scale-105">
+                        <div class="bg-sky-100 text-sky-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">4</div>
+                        <h4 class="font-semibold mt-3">Analyze Results</h4>
+                        <p class="text-sm text-slate-500">Determine statistical significance and declare a winner to implement.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-fade-in space-y-8 mt-20 scroll-mt-20" id="toolkit">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">The Modern A/B Testing Toolkit</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Explore the landscape of modern A/B testing platforms. This section provides an interactive comparison of leading tools and their core capabilities. By filtering by feature, you can see how different platforms stack up and understand the key functionalities, from visual editors that simplify test creation to advanced audience segmentation for targeted experiments.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
+                <h3 class="text-xl font-semibold text-slate-800 mb-2">Filter by Feature</h3>
+                <div class="flex flex-wrap gap-2 mb-6" id="feature-buttons">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tool-cards">
+                </div>
+            </div>
+        </section>
+
+        <section class="section-fade-in space-y-8 mt-20 scroll-mt-20" id="llm-revolution">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">The LLM Revolution in Testing</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Large Language Models (LLMs) are transforming A/B testing from a manual process to an automated, AI-driven strategy. This section explores how LLMs accelerate idea generation, automate the creation of numerous test variants, and enable personalization at an unprecedented scale. Engage with the interactive demo to see how AI can generate creative alternatives in seconds.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4">AI-Powered Variation Generation</h3>
+                    <p class="text-slate-600 mb-4">Enter a headline and see how an LLM can instantly generate multiple creative variations for testing.</p>
+                    <div class="space-y-4">
+                        <input class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500" id="llm-input" placeholder="e.g., Shop Our New Collection" type="text"/>
+                        <button class="w-full bg-sky-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-sky-600 transition-colors" id="llm-generate-btn">Generate Variations</button>
+                        <div class="mt-4 space-y-3 text-sm" id="llm-output">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200 flex flex-col">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4 text-center">Shift in Experimentation Effort</h3>
+                    <div class="chart-container flex-grow">
+                        <canvas id="llmImpactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-fade-in space-y-8 mt-20 scroll-mt-20" id="nlp-testing">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">A/B Testing for NLP Interfaces</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Testing conversational AI like chatbots and voice assistants presents unique challenges. Traditional web metrics are insufficient. This section contrasts standard A/B testing metrics with those crucial for evaluating NLP interfaces, highlighting the shift in focus from clicks to conversation quality, user satisfaction, and task completion.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
+                <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center">Comparing Key Metrics: Web vs. NLP</h3>
+                <div class="chart-container">
+                    <canvas id="metricsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-overview-of-test.html">Ab Test Overview Of Test</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-sample-size-calculator.html">Ab Test Sample Size Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-for-ai.html">Ab Testing For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-stats-guide.html">Ab Testing Stats Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-texting-for-ai.html">Ab Texting For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/asociation-to-understanding.html">Asociation To Understanding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/causal-inference-2.html">Causal Inference 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/chi-squared-test-calculator.html">Chi Squared Test Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing-info.html">Evolution Of Ab Testing Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing.html">Evolution Of Ab Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/observationstudy-fieldexperiment-abtesting.html">Observationstudy Fieldexperiment Abtesting</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/research-methodology.html">Research Methodology</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/two-sample-t-test-analyzer.html">Two Sample T Test Analyzer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const toolData = {
+                features: [
+                    "Visual Editor", "Audience Segmentation", "Multivariate Testing", "Server-Side Testing", "AI/ML Features"
+                ],
+                tools: [
+                    { name: "Google Optimize", features: ["Visual Editor", "Audience Segmentation"], desc: "A free and widely-used tool integrated with Google Analytics, great for beginners." },
+                    { name: "Optimizely", features: ["Visual Editor", "Audience Segmentation", "Multivariate Testing", "Server-Side Testing", "AI/ML Features"], desc: "An enterprise-level platform with a full suite of powerful testing and personalization tools." },
+                    { name: "VWO", features: ["Visual Editor", "Audience Segmentation", "Multivariate Testing", "Server-Side Testing"], desc: "A comprehensive optimization platform known for its ease of use and strong support." },
+                    { name: "Adobe Target", features: ["Visual Editor", "Audience Segmentation", "Multivariate Testing", "Server-Side Testing", "AI/ML Features"], desc: "A powerful tool within the Adobe ecosystem, focusing on AI-driven personalization." },
+                    { name: "LaunchDarkly", features: ["Audience Segmentation", "Server-Side Testing"], desc: "A feature management platform primarily focused on server-side testing and rollouts for developers." },
+                    { name: "Statsig", features: ["Audience Segmentation", "Server-Side Testing", "AI/ML Features"], desc: "A modern experimentation platform built for product teams, with strong data analysis capabilities." }
+                ]
+            };
+
+            const featureButtonsContainer = document.getElementById('feature-buttons');
+            const toolCardsContainer = document.getElementById('tool-cards');
+            let activeFilter = 'All';
+
+            const allFeatures = ["All", ...toolData.features];
+            allFeatures.forEach(feature => {
+                const button = document.createElement('button');
+                button.textContent = feature;
+                button.dataset.feature = feature;
+                button.className = `px-3 py-1 text-sm font-medium rounded-full border transition-colors ${feature === 'All' ? 'bg-sky-500 text-white border-sky-500' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`;
+                featureButtonsContainer.appendChild(button);
+            });
+
+            const renderCards = () => {
+                toolCardsContainer.innerHTML = '';
+                const filteredTools = activeFilter === 'All'
+                    ? toolData.tools
+                    : toolData.tools.filter(tool => tool.features.includes(activeFilter));
+
+                filteredTools.forEach(tool => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-50 border border-slate-200 p-6 rounded-lg transition-transform duration-300 hover:shadow-lg hover:-translate-y-1';
+                    let featuresHTML = tool.features.map(f => `<span class="bg-sky-100 text-sky-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${f}</span>`).join('');
+                    card.innerHTML = `
+                        <h4 class="text-lg font-bold text-slate-800">${tool.name}</h4>
+                        <p class="text-sm text-slate-600 mt-2 mb-4 h-10">${tool.desc}</p>
+                        <div class="flex flex-wrap gap-2">${featuresHTML}</div>
+                    `;
+                    toolCardsContainer.appendChild(card);
+                });
+            };
+
+            featureButtonsContainer.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    activeFilter = e.target.dataset.feature;
+                    document.querySelectorAll('#feature-buttons button').forEach(btn => {
+                        btn.className = `px-3 py-1 text-sm font-medium rounded-full border transition-colors ${btn.dataset.feature === activeFilter ? 'bg-sky-500 text-white border-sky-500' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}`;
+                    });
+                    renderCards();
+                }
+            });
+
+            renderCards();
+
+            const llmInput = document.getElementById('llm-input');
+            const llmGenerateBtn = document.getElementById('llm-generate-btn');
+            const llmOutput = document.getElementById('llm-output');
+            
+            const generateVariations = () => {
+                const baseText = llmInput.value.trim() || "Shop Our New Collection";
+                const variations = [
+                    `Discover the Latest Arrivals: ${baseText.replace('Shop ', '')}`,
+                    `Unveiling: The New ${baseText.replace('Shop Our ', '')}`,
+                    `Your Style Upgrade Awaits: Explore the New Collection`,
+                    `Fresh Drops Daily: ${baseText}`,
+                    `Be the First to Experience Our New Collection`
+                ];
+                
+                llmOutput.innerHTML = '<p class="text-slate-500 animate-pulse">Generating...</p>';
+                
+                setTimeout(() => {
+                    llmOutput.innerHTML = '';
+                    variations.forEach(v => {
+                        const p = document.createElement('div');
+                        p.className = 'bg-slate-100 p-3 rounded-md text-slate-700';
+                        p.textContent = v;
+                        llmOutput.appendChild(p);
+                    });
+                }, 800);
+            };
+
+            llmGenerateBtn.addEventListener('click', generateVariations);
+            llmInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    generateVariations();
+                }
+            });
+
+            const llmImpactCtx = document.getElementById('llmImpactChart').getContext('2d');
+            const llmImpactChart = new Chart(llmImpactCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Idea Generation & Hypothesis', 'Variant Creation & Development', 'Analysis & Implementation'],
+                    datasets: [{
+                        label: 'Traditional Effort',
+                        data: [25, 50, 25],
+                        backgroundColor: ['#e0f2fe', '#bae6fd', '#7dd3fc'],
+                        borderColor: '#f8fafc',
+                        borderWidth: 4,
+                    }, {
+                        label: 'LLM-Powered Effort',
+                        data: [35, 20, 45],
+                        backgroundColor: ['#0c4a6e', '#075985', '#0369a1'],
+                        borderColor: '#f8fafc',
+                        borderWidth: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+            const metricsChart = new Chart(metricsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['User Engagement', 'Conversion', 'User Understanding', 'Satisfaction'],
+                    datasets: [
+                        {
+                            label: 'Traditional Web',
+                            data: [90, 85, 40, 50],
+                            backgroundColor: '#7dd3fc',
+                            borderColor: '#38bdf8',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'NLP Interface',
+                            data: [70, 60, 95, 90],
+                            backgroundColor: '#0ea5e9',
+                            borderColor: '#0284c7',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Relative Importance'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: (context) => {
+                                    const metric = context[0].label;
+                                    const examples = {
+                                        'User Engagement': 'Web: Clicks, Scroll Depth | NLP: Turns per Session, Interaction Rate',
+                                        'Conversion': 'Web: Sign-ups, Purchases | NLP: Task Completion Rate, Goal Achievement',
+                                        'User Understanding': 'Web: Bounce Rate, Time on Page | NLP: Fallback Rate, Intent Recognition Accuracy',
+                                        'Satisfaction': 'Web: Surveys, Repeat Visits | NLP: Sentiment Analysis, Explicit Feedback (thumbs up/down)'
+                                    };
+                                    return `${metric}\n${examples[metric] || ''}`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+        });
+    </script>
+
+
+
+</body></html>

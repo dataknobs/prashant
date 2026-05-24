@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Enterprise GenAI Data Lineage Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Chart Container Styling Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px; /* Constrain width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Custom Scrollbar for text panels */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .active-step {
+            border-color: #0f766e;
+            background-color: #f0fdfa;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Chosen Palette: Teal & Slate (Trust, Data, Professionalism). Warm Neutral Background. -->
+    <!-- Application Structure Plan: 
+        1. Executive Context: A top-level summary of the "Circular Data Problem" in Enterprise GenAI.
+        2. The Lineage Lifecycle (Interactive Flow): A 4-step interactive diagram (Source -> Prompt -> Generation -> Re-ingestion) that reveals metadata requirements at each stage.
+        3. Strategic Analysis (Dashboard): Visualizing the risk of "Model Collapse" without lineage via Chart.js, and a composition analysis of generated artifacts.
+        4. Solution Simulator: A functional mock-up where the user acts as the "Engine," generating a record to see how the JSON Lineage Tag is constructed dynamically. 
+        5. Implementation Roadmap: Checklist for IT/Data teams.
+        Rationale: This structure moves from conceptual understanding (The Problem) to visual evidence (The Data) to practical application (The Solution), mirroring a technical proposal flow.
+    -->
+    <!-- Visualization & Content Choices:
+        1. Lifecycle Flow: HTML Grid + JS Interaction. Goal: Organize/Inform. Justification: Complex process needs step-by-step breakdown.
+        2. Model Drift Chart: Chart.js Line Chart. Goal: Compare/Change. Justification: Shows the negative impact over time (Synthetic vs. Organic data).
+        3. Artifact Composition: Chart.js Doughnut. Goal: Inform/Proportions. Justification: Shows how an artifact is a mix of Enterprise Data + Prompt + Hallucination.
+        4. Lineage Logger: Dynamic HTML/JS. Goal: Inform/Wow. Justification: Demystifies the abstract concept of "Lineage" by showing the actual metadata schema.
+        Confirming NO SVG, NO Mermaid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-teal-700">DataLineage<span class="font-light text-slate-600">.ai</span></span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <button class="text-slate-600 hover:text-teal-700 font-medium transition" onclick="scrollToSection('context')">Context</button>
+                    <button class="text-slate-600 hover:text-teal-700 font-medium transition" onclick="scrollToSection('lifecycle')">Lifecycle Flow</button>
+                    <button class="text-slate-600 hover:text-teal-700 font-medium transition" onclick="scrollToSection('analysis')">Risk Analysis</button>
+                    <button class="px-4 py-2 rounded-md bg-teal-600 text-white hover:bg-teal-700 transition font-medium" onclick="scrollToSection('simulation')">Try Simulator</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- Section 1: Context & Problem Statement -->
+        <section class="space-y-6" id="context">
+            <div class="text-center max-w-3xl mx-auto">
+                <h1 class="text-4xl font-bold text-slate-900 tracking-tight mb-4">The Recursive Data Challenge</h1>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    As enterprises integrate Generative AI to create marketing proposals, slides, and web content, a critical data governance challenge emerges. 
+                    When these <strong>generated artifacts</strong> are saved back into the content management system (CMS), they risk becoming 
+                    "ground truth" for future AI models. Without a robust lineage system, this feedback loop dilutes data quality and obscures provenance.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6 mt-8">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="text-teal-600 text-3xl mb-3">➜</div>
+                    <h3 class="font-bold text-lg mb-2">Input Provenance</h3>
+                    <p class="text-sm text-slate-600">Identifying exactly which slices of secure enterprise data (RAG) were used to answer a specific user prompt.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="text-teal-600 text-3xl mb-3">⚙</div>
+                    <h3 class="font-bold text-lg mb-2">Process Tracking</h3>
+                    <p class="text-sm text-slate-600">Logging the specific model version, temperature, and system prompt used during generation.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="text-teal-600 text-3xl mb-3">↻</div>
+                    <h3 class="font-bold text-lg mb-2">Recursive Labeling</h3>
+                    <p class="text-sm text-slate-600">Tagging output artifacts as "Synthetic" or "Hybrid" before they re-enter the data lake.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Interactive Lineage Lifecycle -->
+        <section class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" id="lifecycle">
+            <div class="p-8 border-b border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800">Interactive Lineage Architecture</h2>
+                <p class="mt-2 text-slate-600">
+                    Click through the four stages of the content generation lifecycle to understand the specific metadata that must be captured at each step to maintain a clean data lineage. This ensures that when artifacts return to the system, their origin is transparent.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2">
+                <!-- Left: The Visual Flow -->
+                <div class="p-8 bg-slate-50 flex flex-col justify-center space-y-6">
+                    
+                    <!-- Step 1 -->
+                    <div class="step-card p-5 rounded-lg border-2 border-slate-200 cursor-pointer transition active-step" id="step-1" onclick="updateLifecycle(1)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-blue-100 text-blue-700 p-2 rounded-lg font-bold">🗂</div>
+                                <h3 class="font-bold text-slate-700">1. Enterprise Data Source</h3>
+                            </div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Origin</span>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="text-center text-slate-400 text-xl">↓</div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card p-5 rounded-lg border-2 border-slate-200 bg-white cursor-pointer hover:border-teal-300 transition" id="step-2" onclick="updateLifecycle(2)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-purple-100 text-purple-700 p-2 rounded-lg font-bold">👤</div>
+                                <h3 class="font-bold text-slate-700">2. User Context &amp; Prompt</h3>
+                            </div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Trigger</span>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="text-center text-slate-400 text-xl">↓</div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card p-5 rounded-lg border-2 border-slate-200 bg-white cursor-pointer hover:border-teal-300 transition" id="step-3" onclick="updateLifecycle(3)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-amber-100 text-amber-700 p-2 rounded-lg font-bold">⚡</div>
+                                <h3 class="font-bold text-slate-700">3. Generation Engine</h3>
+                            </div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Process</span>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="text-center text-slate-400 text-xl">↓</div>
+
+                    <!-- Step 4 -->
+                    <div class="step-card p-5 rounded-lg border-2 border-slate-200 bg-white cursor-pointer hover:border-teal-300 transition" id="step-4" onclick="updateLifecycle(4)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-green-100 text-green-700 p-2 rounded-lg font-bold">📄</div>
+                                <h3 class="font-bold text-slate-700">4. Artifact Re-ingestion</h3>
+                            </div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Loop</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right: The Metadata Detail Panel -->
+                <div class="p-8 border-l border-slate-100 bg-white flex flex-col h-full">
+                    <div class="mb-4" id="detail-header">
+                        <span class="text-teal-600 font-bold tracking-wide uppercase text-xs">Metadata Protocol</span>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-1" id="detail-title">Enterprise Data Source</h3>
+                    </div>
+                    
+                    <div class="flex-grow prose prose-slate">
+                        <p class="text-slate-600 mb-6" id="detail-desc">
+                            This is the trusted layer. When data is retrieved (RAG), we must log exactly which document chunks were accessed to ground the generation.
+                        </p>
+                        
+                        <div class="bg-slate-50 rounded-lg border border-slate-200 p-4">
+                            <h4 class="font-bold text-slate-700 text-sm mb-3 border-b border-slate-200 pb-2">Required Lineage Tags (JSON)</h4>
+                            <pre class="text-xs text-slate-600 font-mono whitespace-pre-wrap" id="detail-json">{
+  "source_id": "doc_88291",
+  "vector_chunk_ids": ["v_102", "v_103"],
+  "data_classification": "Internal_Confidential",
+  "last_verified": "2023-10-27"
+}</pre>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-bold text-slate-700 text-sm mb-2">Why this matters:</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1" id="detail-points">
+                                <li>Ensures citations can be verified.</li>
+                                <li>Prevents confidential data leaks into public prompts.</li>
+                                <li>Establishes the "Truth Anchor."</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Risk Analysis Dashboard -->
+        <section class="grid lg:grid-cols-2 gap-8" id="analysis">
+            <!-- Chart 1: Model Collapse Risk -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-800">Synthetic Data Contamination</h3>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Without lineage tags, future models train on past hallucinations. This chart compares model accuracy over 5 retraining cycles with and without "Synthetic" labeling.
+                    </p>
+                </div>
+                <!-- Chart Container (Strictly styled) -->
+                <div class="chart-container">
+                    <canvas id="driftChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Artifact Composition -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-800">Proposal Composition Analysis</h3>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Lineage allows us to analyze what percentage of a generated proposal comes from verified enterprise data versus the model's creative interpolation.
+                    </p>
+                </div>
+                <!-- Chart Container (Strictly styled) -->
+                <div class="chart-container">
+                    <canvas id="compositionChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Solution Simulator -->
+        <section class="bg-slate-900 rounded-2xl text-white overflow-hidden shadow-xl" id="simulation">
+            <div class="p-8 md:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Lineage Generator Simulator</h2>
+                        <p class="text-slate-400 mt-2">Generate a mock artifact and view the generated "Data DNA" tag.</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 px-3 py-1 bg-teal-900 text-teal-300 text-xs font-bold rounded-full border border-teal-700">
+                        Live Preview
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Input -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-slate-300">Enterprise Data Source</label>
+                        <select class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-teal-500 text-white" id="sim-source">
+                            <option value="Q3_Financials_Verified">Q3 Financial Report (Verified)</option>
+                            <option value="Product_Roadmap_Draft">Product Roadmap (Draft)</option>
+                            <option value="Competitor_Analysis_2024">Competitor Analysis 2024</option>
+                        </select>
+
+                        <label class="block text-sm font-medium text-slate-300">User Prompt Intent</label>
+                        <input class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-teal-500 text-white" id="sim-prompt" type="text" value="Create a summary slide for the sales team"/>
+
+                        <button class="w-full mt-4 bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-md transition flex justify-center items-center shadow-lg shadow-teal-900/50" onclick="runSimulation()">
+                            <span>Generate Artifact &amp; Tag</span>
+                        </button>
+                    </div>
+
+                    <!-- Output Preview -->
+                    <div class="bg-white text-slate-800 rounded-lg p-6 relative">
+                        <div class="absolute top-2 right-2 text-xs font-bold text-slate-400">PREVIEW</div>
+                        <h4 class="font-bold border-b border-slate-200 pb-2 mb-2">Generated Slide Content</h4>
+                        <div class="text-sm space-y-2 opacity-50" id="sim-output-content">
+                            <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                            <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+                            <div class="h-4 bg-slate-200 rounded w-full"></div>
+                        </div>
+                        <div class="hidden text-sm space-y-2" id="sim-output-real">
+                            <p class="font-semibold text-teal-700">Q3 Performance Summary</p>
+                            <p>Revenue exceeded targets by 15% driven by enterprise adoption.</p>
+                            <p class="text-xs text-slate-500 italic mt-4">Source: Q3 Financials • Generated by AI-Model-v4</p>
+                        </div>
+                    </div>
+
+                    <!-- JSON Result -->
+                    <div class="bg-black rounded-lg p-4 font-mono text-xs text-green-400 overflow-auto custom-scrollbar border border-slate-700 h-64 relative">
+                        <div class="absolute top-2 right-2 text-xs font-bold text-slate-600">LINEAGE.JSON</div>
+                        <pre id="sim-json">// Click Generate to see the lineage tag...</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-first-ai-security.html">Data First Ai Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-agentic-ai.html">Data Governance For Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai-info.html">Data Governance For Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai.html">Data Governance For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-llm.html">Data Governance For Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant copy.html">Data Lineage Ai Assitant Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant.html">Data Lineage Ai Assitant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai-interactive.html">Data Lineage For Ai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai.html">Data Lineage For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info copy.html">Data Lineage Info Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info.html">Data Lineage Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage.html">Data Lineage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant-info.html">Privacy Ai Assistant Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant.html">Privacy Ai Assistant</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State Management ---
+        const appState = {
+            activeStep: 1,
+            simulationCount: 0
+        };
+
+        // --- Data for Interactions ---
+        const lifecycleData = {
+            1: {
+                title: "Enterprise Data Source",
+                desc: "This is the trusted layer. When data is retrieved (RAG), we must log exactly which document chunks were accessed to ground the generation.",
+                json: `{\n  "source_id": "doc_88291",\n  "vector_chunk_ids": ["v_102", "v_103"],\n  "classification": "Internal_Confidential",\n  "last_verified": "2023-10-27"\n}`,
+                points: ["Ensures citations can be verified.", "Prevents confidential data leaks.", "Establishes the 'Truth Anchor'."]
+            },
+            2: {
+                title: "User Context & Prompt",
+                desc: "The prompt captures the intent. We must link the resulting artifact to the specific user request and their role to establish authorization context.",
+                json: `{\n  "user_id": "u_sales_44",\n  "prompt_hash": "sha256_7a9f...",\n  "intent": "sales_enablement",\n  "timestamp": "2025-11-27T14:30:00Z"\n}`,
+                points: ["Tracks who requested the content.", "Allows auditing of prompt patterns.", "Links output to business intent."]
+            },
+            3: {
+                title: "Generation Engine",
+                desc: "The 'Black Box'. We record the model version, temperature, and specific system prompts used. This is crucial for debugging hallucinations later.",
+                json: `{\n  "model_version": "gpt-4-turbo-1106",\n  "temperature": 0.7,\n  "system_prompt_id": "sys_sales_v2",\n  "execution_time_ms": 1450\n}`,
+                points: ["Version control for AI logic.", "Helps identify model drift.", "Reproducibility of results."]
+            },
+            4: {
+                title: "Artifact Re-ingestion (Loop)",
+                desc: "The critical step. The generated file is saved with a 'Synthetic' meta-tag. Future indexing pipelines must read this tag to weight this data lower than human-verified data.",
+                json: `{\n  "artifact_id": "slide_gen_99",\n  "is_synthetic": true,\n  "confidence_score": 0.89,\n  "parent_sources": ["doc_88291"],\n  "human_reviewed": false\n}`,
+                points: ["Prevents model collapse.", "Allows filtering synthetic data.", "Creates a traceable graph of derivative works."]
+            }
+        };
+
+        // --- Interaction: Lifecycle Flow ---
+        function updateLifecycle(step) {
+            appState.activeStep = step;
+            
+            // Visual updates
+            document.querySelectorAll('.step-card').forEach(el => {
+                el.classList.remove('active-step', 'bg-teal-50', 'border-teal-500');
+                el.classList.add('bg-white', 'border-slate-200');
+            });
+
+            const activeCard = document.getElementById(`step-${step}`);
+            activeCard.classList.remove('bg-white', 'border-slate-200');
+            activeCard.classList.add('active-step', 'border-teal-600'); // Note: active-step class handles bg color in CSS
+
+            // Content updates with animation
+            const titleEl = document.getElementById('detail-title');
+            const descEl = document.getElementById('detail-desc');
+            const jsonEl = document.getElementById('detail-json');
+            const pointsEl = document.getElementById('detail-points');
+
+            // Fade out
+            titleEl.style.opacity = 0;
+            descEl.style.opacity = 0;
+            
+            setTimeout(() => {
+                const data = lifecycleData[step];
+                titleEl.textContent = data.title;
+                descEl.textContent = data.desc;
+                jsonEl.textContent = data.json;
+                
+                // Rebuild list
+                pointsEl.innerHTML = '';
+                data.points.forEach(pt => {
+                    const li = document.createElement('li');
+                    li.textContent = pt;
+                    pointsEl.appendChild(li);
+                });
+
+                // Fade in
+                titleEl.style.opacity = 1;
+                descEl.style.opacity = 1;
+            }, 200);
+        }
+
+        // --- Interaction: Simulator ---
+        function runSimulation() {
+            const source = document.getElementById('sim-source').value;
+            const prompt = document.getElementById('sim-prompt').value;
+            const outputReal = document.getElementById('sim-output-real');
+            const outputGhost = document.getElementById('sim-output-content');
+            const jsonBox = document.getElementById('sim-json');
+
+            // Show loading state
+            jsonBox.textContent = "// Generating lineage signature...";
+            jsonBox.classList.add('animate-pulse');
+
+            setTimeout(() => {
+                jsonBox.classList.remove('animate-pulse');
+                
+                // Show "Real" output
+                outputGhost.classList.add('hidden');
+                outputReal.classList.remove('hidden');
+
+                // Generate dynamic UUIDs
+                const artUUID = 'art_' + Math.floor(Math.random() * 10000);
+                const time = new Date().toISOString();
+
+                const lineageTag = {
+                    "meta_version": "1.2",
+                    "artifact_id": artUUID,
+                    "provenance": {
+                        "created_at": time,
+                        "created_by": "user_session_web",
+                        "tool": "SalesGen_App_v1"
+                    },
+                    "genealogy": {
+                        "parents": [source],
+                        "generation_prompt_hash": "h_" + Math.floor(Math.random() * 999999),
+                        "model": "Enterprise-LLM-v3"
+                    },
+                    "governance": {
+                        "is_synthetic": true,
+                        "requires_human_verification": true,
+                        "data_sensitivity": "Confidential"
+                    }
+                };
+
+                // Typewriter effect for JSON
+                jsonBox.textContent = JSON.stringify(lineageTag, null, 2);
+                
+                appState.simulationCount++;
+            }, 800);
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Visualization Implementation (Chart.js) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Drift/Risk Chart
+            const ctxDrift = document.getElementById('driftChart').getContext('2d');
+            new Chart(ctxDrift, {
+                type: 'line',
+                data: {
+                    labels: ['Cycle 1', 'Cycle 2', 'Cycle 3', 'Cycle 4', 'Cycle 5'],
+                    datasets: [
+                        {
+                            label: 'Model Accuracy (With Lineage Tracking)',
+                            data: [98, 97.5, 98.2, 97.8, 98.5],
+                            borderColor: '#0d9488', // Teal 600
+                            backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Model Accuracy (Unchecked Feedback Loop)',
+                            data: [98, 92, 85, 76, 64],
+                            borderColor: '#ef4444', // Red 500
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            borderDash: [5, 5],
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Critical for container responsiveness
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 50,
+                            title: { display: true, text: 'Data Quality / Accuracy Score' },
+                            grid: { borderDash: [2, 2] }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Composition Chart
+            const ctxComp = document.getElementById('compositionChart').getContext('2d');
+            new Chart(ctxComp, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Verified Enterprise Data', 'Model Interpolation (Hallucination Risk)', 'User Prompt Context'],
+                    datasets: [{
+                        data: [65, 15, 20],
+                        backgroundColor: [
+                            '#0f766e', // Teal 700 (Safe)
+                            '#fbbf24', // Amber 400 (Risk)
+                            '#64748b'  // Slate 500 (Context)
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20 } },
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body></html>

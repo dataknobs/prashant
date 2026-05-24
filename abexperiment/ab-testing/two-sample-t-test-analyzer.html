@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    
+    <!-- SEO Meta Tags -->
+    <meta content="Calculate two-sample t-test results instantly with this interactive tool. Visualize means, confidence intervals, and t-distributions while learning the statistical steps behind p-values and significance." name="description"/>
+    <meta content="two sample t-test calculator, t-test interpretation, statistical significance calculator, p-value visualization, welch t-test, statistics education, hypothesis testing tool, AB testing stats" name="keywords"/>
+    <meta content="Statistical Explorer" name="author"/>
+
+    <title>Interactive Two-Sample T-Test Explorer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jStat for Statistical Calculations -->
+    <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+
+    <!-- Chosen Palette: Warm Neutrals (Stone) with Intellectual Blue/Teal Accents -->
+    <!-- 
+        Background: bg-stone-50
+        Surface: bg-white
+        Text: text-stone-800, text-stone-600
+        Primary Action: bg-teal-600
+        Secondary/Highlight: text-indigo-600
+        Borders: border-stone-200
+    -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9; /* stone-50 */
+            color: #292524; /* stone-800 */
+        }
+
+        /* Chart Container Styling as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Scrollbar for data inputs */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #d6d3d1; 
+            border-radius: 4px;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #0d9488; /* teal-600 */
+            color: #0f766e; /* teal-700 */
+            font-weight: 600;
+        }
+        .tab-inactive {
+            color: #78716c; /* stone-500 */
+        }
+        .tab-inactive:hover {
+            color: #44403c; /* stone-700 */
+        }
+    </style>
+
+    <!-- Application Structure Plan: 
+         1. Header: Clear title and purpose.
+         2. Main Control Panel (Left Column on Desktop): Input fields for two samples, config (alpha, tails, var).
+         3. Dynamic Dashboard (Right Column on Desktop): 
+            - Summary Stats Grid (Immediate feedback).
+            - Results Banner (Hypothesis conclusion).
+            - Tabs for Visuals (Comparison, Distribution) vs. Theory (Step-by-step).
+         4. Educational Overlay: The 'Theory' tab interprets the SPECIFIC data entered to show calculations.
+         Why: Separation of input and output allows users to tweak numbers and see immediate visual/numerical changes without scrolling. 
+    -->
+    
+    <!-- Visualization & Content Choices:
+         1. Group Comparison (Bar Chart + Error Bars): Goal -> Compare Means/CI. Method -> Chart.js Floating Bars.
+         2. T-Distribution (Line Chart): Goal -> Visualize P-value context. Method -> Chart.js Line with fill.
+         3. Educational Text: Goal -> Explain methodology. Method -> Dynamic HTML updating with variables.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header Section -->
+        <header class="text-center md:text-left mb-8 border-b border-stone-200 pb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-stone-800 tracking-tight">Two-Sample T-Test Analyzer</h1>
+            <p class="mt-2 text-stone-600 max-w-3xl">
+                Compare the means of two independent groups to determine if there is a statistically significant difference. 
+                Enter your data below to generate calculations, confidence intervals, and visualizations.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-3">
+                <button class="px-3 py-1.5 text-sm bg-stone-200 hover:bg-stone-300 rounded text-stone-700 transition-colors" onclick="loadScenario('medical')">Load: Drug Efficacy Trial</button>
+                <button class="px-3 py-1.5 text-sm bg-stone-200 hover:bg-stone-300 rounded text-stone-700 transition-colors" onclick="loadScenario('marketing')">Load: A/B Marketing Test</button>
+                <button class="px-3 py-1.5 text-sm border border-stone-300 hover:bg-stone-100 rounded text-stone-600 transition-colors" onclick="clearData()">Reset</button>
+            </div>
+        </header>
+
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT COLUMN: Inputs & Configuration -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- Introduction to Input -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200">
+                    <h2 class="text-lg font-semibold text-stone-800 mb-3">Data Input</h2>
+                    <p class="text-sm text-stone-500 mb-4">Enter raw numeric data points separated by commas, spaces, or new lines.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-stone-700 mb-1">Sample Group 1 (e.g., Treatment)</label>
+                            <textarea class="w-full p-3 bg-stone-50 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-stone-800 text-sm font-mono placeholder-stone-400 transition" id="sample1" placeholder="10.5, 12.3, 11.8..." rows="5"></textarea>
+                            <div class="mt-1 flex justify-between text-xs text-stone-500">
+                                <span id="s1-count">Count: 0</span>
+                                <span id="s1-mean">Mean: -</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-stone-700 mb-1">Sample Group 2 (e.g., Control)</label>
+                            <textarea class="w-full p-3 bg-stone-50 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-stone-800 text-sm font-mono placeholder-stone-400 transition" id="sample2" placeholder="9.8, 10.1, 11.2..." rows="5"></textarea>
+                            <div class="mt-1 flex justify-between text-xs text-stone-500">
+                                <span id="s2-count">Count: 0</span>
+                                <span id="s2-mean">Mean: -</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parameters -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200">
+                    <h2 class="text-lg font-semibold text-stone-800 mb-3">Test Parameters</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-stone-700 mb-1">Significance Level (α)</label>
+                            <select class="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-sm" id="alpha">
+                                <option value="0.01">0.01 (99% Confidence)</option>
+                                <option selected="" value="0.05">0.05 (95% Confidence)</option>
+                                <option value="0.10">0.10 (90% Confidence)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-stone-700 mb-1">Alternative Hypothesis</label>
+                            <select class="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-sm" id="tails">
+                                <option value="two">Two-Tailed (Diff ≠ 0)</option>
+                                <option value="greater">Greater Than (Mean 1 &gt; Mean 2)</option>
+                                <option value="less">Less Than (Mean 1 &lt; Mean 2)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-stone-700">Assume Equal Variance?</label>
+                            <input class="w-5 h-5 text-teal-600 rounded border-stone-300 focus:ring-teal-500" id="equalVar" type="checkbox"/>
+                        </div>
+                        <p class="text-xs text-stone-500 italic">Unchecked: Welch's t-test (Recommended). Checked: Pooled t-test.</p>
+                    </div>
+                    
+                    <button class="w-full mt-6 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-all transform active:scale-95" id="calcBtn">
+                        Calculate Results
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Output & Visualization -->
+            <div class="lg:col-span-8 space-y-6">
+
+                <!-- Results Banner -->
+                <div class="hidden bg-white p-6 rounded-xl shadow-md border-l-8 border-stone-300" id="resultsBanner">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                        <h2 class="text-xl font-bold text-stone-800">Analysis Results</h2>
+                        <span class="mt-2 md:mt-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-stone-100 text-stone-500" id="significanceBadge">Waiting for data</span>
+                    </div>
+                    
+                    <p class="text-stone-700 text-lg leading-relaxed mb-4" id="conclusionText">
+                        Enter data and click calculate to see the statistical conclusion.
+                    </p>
+
+                    <!-- Key Metrics Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-stone-100">
+                        <div class="bg-stone-50 p-3 rounded-lg text-center">
+                            <div class="text-xs text-stone-500 uppercase font-semibold">t-Statistic</div>
+                            <div class="text-xl font-bold text-indigo-600" id="res-tstat">-</div>
+                        </div>
+                        <div class="bg-stone-50 p-3 rounded-lg text-center">
+                            <div class="text-xs text-stone-500 uppercase font-semibold">p-Value</div>
+                            <div class="text-xl font-bold text-teal-600" id="res-pvalue">-</div>
+                        </div>
+                        <div class="bg-stone-50 p-3 rounded-lg text-center">
+                            <div class="text-xs text-stone-500 uppercase font-semibold">Diff of Means</div>
+                            <div class="text-xl font-bold text-stone-700" id="res-diff">-</div>
+                        </div>
+                        <div class="bg-stone-50 p-3 rounded-lg text-center">
+                            <div class="text-xs text-stone-500 uppercase font-semibold">DF</div>
+                            <div class="text-xl font-bold text-stone-700" id="res-df">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="border-b border-stone-200">
+                    <nav aria-label="Tabs" class="flex space-x-8">
+                        <button class="tab-active py-4 px-1 inline-flex items-center text-sm font-medium border-b-2 transition-colors" id="tab-viz" onclick="switchTab('viz')">
+                            Visualizations
+                        </button>
+                        <button class="tab-inactive py-4 px-1 inline-flex items-center text-sm font-medium border-b-2 border-transparent transition-colors" id="tab-theory" onclick="switchTab('theory')">
+                            Step-by-Step Logic
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- VISUALIZATION TAB CONTENT -->
+                <div class="space-y-6" id="content-viz">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Chart 1: Group Comparison -->
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200">
+                            <h3 class="text-sm font-bold text-stone-700 uppercase mb-4 flex items-center">
+                                <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
+                                Means &amp; Confidence Intervals
+                            </h3>
+                            <div class="chart-container">
+                                <canvas id="meansChart"></canvas>
+                            </div>
+                            <p class="text-xs text-stone-500 mt-3">
+                                Visualizes the estimated means (bars) and the 95% Confidence Interval (lines). If the intervals overlap significantly, the difference is less likely to be significant.
+                            </p>
+                        </div>
+
+                        <!-- Chart 2: T-Distribution -->
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200">
+                            <h3 class="text-sm font-bold text-stone-700 uppercase mb-4 flex items-center">
+                                <span class="w-2 h-2 bg-teal-500 rounded-full mr-2"></span>
+                                Hypothesis Test (T-Dist)
+                            </h3>
+                            <div class="chart-container">
+                                <canvas id="distChart"></canvas>
+                            </div>
+                            <p class="text-xs text-stone-500 mt-3">
+                                Shows the null hypothesis distribution (center). The shaded areas are the rejection regions. If the red line (your T-stat) falls in the shaded area, reject H₀.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Confidence Interval Details -->
+                    <div class="bg-stone-100 p-4 rounded-lg border border-stone-200">
+                        <h4 class="font-semibold text-stone-700 mb-2">Confidence Interval of the Difference</h4>
+                        <p class="text-stone-600 text-sm">
+                            We are <span id="ci-conf-level">95</span>% confident that the true difference between the population means lies between:
+                        </p>
+                        <div class="text-center py-3">
+                            <span class="text-2xl font-mono font-bold text-stone-800">[ <span id="ci-lower">-</span> , <span id="ci-upper">-</span> ]</span>
+                        </div>
+                        <p class="text-xs text-stone-500 italic text-center">
+                            Note: If this interval includes 0, the difference is not statistically significant at this alpha level.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- THEORY TAB CONTENT -->
+                <div class="hidden bg-white p-6 rounded-xl shadow-sm border border-stone-200 space-y-8" id="content-theory">
+                    <div class="prose prose-stone max-w-none">
+                        <h3 class="text-xl font-bold text-stone-800">How is this calculated?</h3>
+                        <p class="text-stone-600">The t-test compares the actual difference between your two group means in relation to the variation in the data. Here is the breakdown using your current data.</p>
+
+                        <div class="border-l-4 border-teal-500 pl-4 py-2 bg-stone-50 my-4">
+                            <h4 class="font-bold text-teal-700 text-sm uppercase">Step 1: Calculate Summary Stats</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm mt-2">
+                                <div>
+                                    <span class="font-semibold">Group 1:</span><br/>
+                                    Mean ($\bar{x}_1$) = <span class="font-mono" id="theory-m1">-</span><br/>
+                                    Variance ($s^2_1$) = <span class="font-mono" id="theory-v1">-</span><br/>
+                                    n ($n_1$) = <span class="font-mono" id="theory-n1">-</span>
+                                </div>
+                                <div>
+                                    <span class="font-semibold">Group 2:</span><br/>
+                                    Mean ($\bar{x}_2$) = <span class="font-mono" id="theory-m2">-</span><br/>
+                                    Variance ($s^2_2$) = <span class="font-mono" id="theory-v2">-</span><br/>
+                                    n ($n_2$) = <span class="font-mono" id="theory-n2">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-indigo-500 pl-4 py-2 bg-stone-50 my-4">
+                            <h4 class="font-bold text-indigo-700 text-sm uppercase">Step 2: Calculate Standard Error (SE)</h4>
+                            <p class="text-sm mb-2" id="theory-se-expl">Using Welch's approximation for unequal variances:</p>
+                            <div class="font-mono text-sm bg-white p-2 rounded border border-stone-200 inline-block">
+                                SE = √[ (s²₁/n₁) + (s²₂/n₂) ]
+                            </div>
+                            <div class="mt-2 text-sm">
+                                SE = √[ (<span id="theory-v1-sub">-</span>/<span id="theory-n1-sub">-</span>) + (<span id="theory-v2-sub">-</span>/<span id="theory-n2-sub">-</span>) ] = <span class="font-bold" id="theory-se-val">-</span>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-amber-500 pl-4 py-2 bg-stone-50 my-4">
+                            <h4 class="font-bold text-amber-700 text-sm uppercase">Step 3: Compute the t-Statistic</h4>
+                            <p class="text-sm mb-2">The t-statistic represents how many standard errors the difference between means is away from 0.</p>
+                            <div class="font-mono text-sm bg-white p-2 rounded border border-stone-200 inline-block">
+                                t = ( x̄₁ - x̄₂ ) / SE
+                            </div>
+                            <div class="mt-2 text-sm">
+                                t = (<span id="theory-m1-sub">-</span> - <span id="theory-m2-sub">-</span>) / <span id="theory-se-sub">-</span> = <span class="font-bold" id="theory-t-val">-</span>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-rose-500 pl-4 py-2 bg-stone-50 my-4">
+                            <h4 class="font-bold text-rose-700 text-sm uppercase">Step 4: Conclusion</h4>
+                            <p class="text-sm">
+                                We compare the p-value (<span class="font-bold" id="theory-p-val">-</span>) to your alpha level (<span id="theory-alpha">-</span>).
+                            </p>
+                            <ul class="list-disc ml-5 text-sm mt-2 text-stone-600">
+                                <li>If p &lt; alpha: The difference is unlikely to be random chance. <strong>Reject Null Hypothesis.</strong></li>
+                                <li>If p &gt; alpha: We do not have enough evidence to say the groups differ. <strong>Fail to Reject.</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            sample1: [],
+            sample2: [],
+            alpha: 0.05,
+            tails: 'two',
+            equalVar: false,
+            results: null
+        };
+
+        // --- Chart Instances ---
+        let meansChartInstance = null;
+        let distChartInstance = null;
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event Listeners
+            document.getElementById('sample1').addEventListener('input', handleInput);
+            document.getElementById('sample2').addEventListener('input', handleInput);
+            document.getElementById('alpha').addEventListener('change', () => { updateParams(); calculate(); });
+            document.getElementById('tails').addEventListener('change', () => { updateParams(); calculate(); });
+            document.getElementById('equalVar').addEventListener('change', () => { updateParams(); calculate(); });
+            document.getElementById('calcBtn').addEventListener('click', calculate);
+
+            // Initial Draw (Empty)
+            initCharts();
+        });
+
+        // --- Core Functions ---
+
+        function handleInput(e) {
+            const id = e.target.id;
+            const raw = e.target.value;
+            // Split by comma, space, or newline, filter empty, parse float
+            const data = raw.split(/[\s,]+/).filter(v => v.trim() !== '').map(Number).filter(n => !isNaN(n));
+            
+            state[id] = data;
+
+            // Update stats indicators near text area
+            const mean = data.length > 0 ? (data.reduce((a,b)=>a+b,0)/data.length).toFixed(2) : '-';
+            document.getElementById(id === 'sample1' ? 's1-count' : 's2-count').innerText = `Count: ${data.length}`;
+            document.getElementById(id === 'sample1' ? 's1-mean' : 's2-mean').innerText = `Mean: ${mean}`;
+        }
+
+        function updateParams() {
+            state.alpha = parseFloat(document.getElementById('alpha').value);
+            state.tails = document.getElementById('tails').value;
+            state.equalVar = document.getElementById('equalVar').checked;
+        }
+
+        function switchTab(tabId) {
+            document.getElementById('content-viz').classList.add('hidden');
+            document.getElementById('content-theory').classList.add('hidden');
+            document.getElementById('tab-viz').className = 'tab-inactive py-4 px-1 inline-flex items-center text-sm font-medium border-b-2 border-transparent transition-colors cursor-pointer';
+            document.getElementById('tab-theory').className = 'tab-inactive py-4 px-1 inline-flex items-center text-sm font-medium border-b-2 border-transparent transition-colors cursor-pointer';
+
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).className = 'tab-active py-4 px-1 inline-flex items-center text-sm font-medium border-b-2 transition-colors cursor-pointer';
+        }
+
+        function clearData() {
+            document.getElementById('sample1').value = '';
+            document.getElementById('sample2').value = '';
+            state.sample1 = [];
+            state.sample2 = [];
+            handleInput({target: {id: 'sample1', value: ''}});
+            handleInput({target: {id: 'sample2', value: ''}});
+            document.getElementById('resultsBanner').classList.add('hidden');
+            if(meansChartInstance) meansChartInstance.data.datasets = [];
+            if(distChartInstance) distChartInstance.data.datasets = [];
+            meansChartInstance.update();
+            distChartInstance.update();
+        }
+
+        function loadScenario(type) {
+            let s1 = [], s2 = [];
+            if (type === 'medical') {
+                // Scenario: Drug lowers blood pressure more than placebo?
+                // Group 1 (Drug): Lower numbers are better
+                s1 = [120, 118, 115, 122, 119, 116, 114, 121, 125, 113, 118, 117];
+                // Group 2 (Placebo): Higher numbers
+                s2 = [128, 130, 125, 129, 132, 127, 126, 124, 131, 128, 135, 129];
+                document.getElementById('tails').value = 'two'; 
+            } else if (type === 'marketing') {
+                // Scenario: Conversion rates ($ spent)
+                s1 = [45, 52, 38, 60, 48, 55, 42, 49, 58, 51, 47, 53, 61, 44, 50];
+                s2 = [40, 42, 35, 48, 41, 39, 43, 40, 45, 38, 41, 42, 36, 39, 40];
+                document.getElementById('tails').value = 'greater'; // H1: S1 > S2
+            }
+
+            document.getElementById('sample1').value = s1.join(', ');
+            document.getElementById('sample2').value = s2.join(', ');
+            
+            // Trigger input events
+            handleInput({target: {id: 'sample1', value: s1.join(', ')}});
+            handleInput({target: {id: 'sample2', value: s2.join(', ')}});
+            updateParams();
+            calculate();
+        }
+
+        // --- Statistical Logic ---
+
+        function calculateStatistics(arr) {
+            const n = arr.length;
+            if (n === 0) return { n: 0, mean: 0, variance: 0, sd: 0 };
+            const mean = arr.reduce((a, b) => a + b) / n;
+            const variance = arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1);
+            return { n, mean, variance, sd: Math.sqrt(variance) };
+        }
+
+        function calculate() {
+            updateParams();
+            const s1 = calculateStatistics(state.sample1);
+            const s2 = calculateStatistics(state.sample2);
+
+            if (s1.n < 2 || s2.n < 2) {
+                alert("Please enter at least 2 numbers for both samples.");
+                return;
+            }
+
+            let tStat, df, se;
+            const meanDiff = s1.mean - s2.mean;
+
+            if (state.equalVar) {
+                // Pooled Variance
+                const pooledVar = ((s1.n - 1) * s1.variance + (s2.n - 1) * s2.variance) / (s1.n + s2.n - 2);
+                se = Math.sqrt(pooledVar * (1/s1.n + 1/s2.n));
+                tStat = meanDiff / se;
+                df = s1.n + s2.n - 2;
+            } else {
+                // Welch's t-test
+                se = Math.sqrt((s1.variance / s1.n) + (s2.variance / s2.n));
+                tStat = meanDiff / se;
+                // Welch-Satterthwaite equation for DF
+                const num = Math.pow((s1.variance / s1.n) + (s2.variance / s2.n), 2);
+                const den = (Math.pow((s1.variance / s1.n), 2) / (s1.n - 1)) + (Math.pow((s2.variance / s2.n), 2) / (s2.n - 1));
+                df = num / den;
+            }
+
+            // P-value calculation using jStat
+            let pValue;
+            if (state.tails === 'two') {
+                pValue = 2 * (1 - jStat.studentt.cdf(Math.abs(tStat), df));
+            } else if (state.tails === 'greater') {
+                pValue = 1 - jStat.studentt.cdf(tStat, df);
+            } else { // less
+                pValue = jStat.studentt.cdf(tStat, df);
+            }
+
+            // Confidence Interval
+            // Get critical t value for 95% (or based on alpha) 2-tailed usually for CI
+            const criticalT = jStat.studentt.inv(1 - (state.alpha / 2), df);
+            const marginOfError = criticalT * se;
+            const ciLower = meanDiff - marginOfError;
+            const ciUpper = meanDiff + marginOfError;
+
+            // Store results
+            state.results = { s1, s2, tStat, df, pValue, meanDiff, se, ciLower, ciUpper };
+
+            // Update UI
+            updateUI();
+            updateCharts();
+            updateTheory();
+        }
+
+        function updateUI() {
+            const res = state.results;
+            const banner = document.getElementById('resultsBanner');
+            const badge = document.getElementById('significanceBadge');
+            const conclusion = document.getElementById('conclusionText');
+            
+            banner.classList.remove('hidden');
+
+            document.getElementById('res-tstat').innerText = res.tStat.toFixed(4);
+            document.getElementById('res-pvalue').innerText = res.pValue.lt(0.0001) ? "< 0.0001" : res.pValue.toFixed(4);
+            document.getElementById('res-diff').innerText = res.meanDiff.toFixed(4);
+            document.getElementById('res-df').innerText = res.df.toFixed(2);
+
+            document.getElementById('ci-conf-level').innerText = (100 * (1 - state.alpha));
+            document.getElementById('ci-lower').innerText = res.ciLower.toFixed(4);
+            document.getElementById('ci-upper').innerText = res.ciUpper.toFixed(4);
+
+            const isSig = res.pValue < state.alpha;
+            
+            if (isSig) {
+                badge.innerText = "Significant Difference";
+                badge.className = "mt-2 md:mt-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-teal-100 text-teal-800 border border-teal-200";
+                banner.className = "bg-white p-6 rounded-xl shadow-md border-l-8 border-teal-500";
+                conclusion.innerHTML = `Since the p-value (<strong>${res.pValue.toFixed(4)}</strong>) is less than α (${state.alpha}), we <strong>reject the null hypothesis</strong>. There is a statistically significant difference between the two groups.`;
+            } else {
+                badge.innerText = "No Significant Difference";
+                badge.className = "mt-2 md:mt-0 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-stone-200 text-stone-600 border border-stone-300";
+                banner.className = "bg-white p-6 rounded-xl shadow-md border-l-8 border-stone-400";
+                conclusion.innerHTML = `Since the p-value (<strong>${res.pValue.toFixed(4)}</strong>) is greater than α (${state.alpha}), we <strong>fail to reject the null hypothesis</strong>. There is not enough evidence to claim a significant difference.`;
+            }
+        }
+
+        function updateTheory() {
+            const r = state.results;
+            if(!r) return;
+
+            // Step 1
+            document.getElementById('theory-m1').innerText = r.s1.mean.toFixed(2);
+            document.getElementById('theory-v1').innerText = r.s1.variance.toFixed(2);
+            document.getElementById('theory-n1').innerText = r.s1.n;
+            document.getElementById('theory-m2').innerText = r.s2.mean.toFixed(2);
+            document.getElementById('theory-v2').innerText = r.s2.variance.toFixed(2);
+            document.getElementById('theory-n2').innerText = r.s2.n;
+
+            // Step 2
+            document.getElementById('theory-se-expl').innerText = state.equalVar ? "Using Pooled Variance (Equal Vars Assumed):" : "Using Welch's Approximation (Unequal Vars):";
+            document.getElementById('theory-v1-sub').innerText = r.s1.variance.toFixed(2);
+            document.getElementById('theory-n1-sub').innerText = r.s1.n;
+            document.getElementById('theory-v2-sub').innerText = r.s2.variance.toFixed(2);
+            document.getElementById('theory-n2-sub').innerText = r.s2.n;
+            document.getElementById('theory-se-val').innerText = r.se.toFixed(4);
+
+            // Step 3
+            document.getElementById('theory-m1-sub').innerText = r.s1.mean.toFixed(2);
+            document.getElementById('theory-m2-sub').innerText = r.s2.mean.toFixed(2);
+            document.getElementById('theory-se-sub').innerText = r.se.toFixed(4);
+            document.getElementById('theory-t-val').innerText = r.tStat.toFixed(4);
+
+            // Step 4
+            document.getElementById('theory-p-val').innerText = r.pValue.toFixed(4);
+            document.getElementById('theory-alpha').innerText = state.alpha;
+        }
+
+        // --- Charting ---
+
+        function initCharts() {
+            // Chart 1: Means & CI
+            const ctxMeans = document.getElementById('meansChart').getContext('2d');
+            meansChartInstance = new Chart(ctxMeans, {
+                type: 'bar',
+                data: {
+                    labels: ['Group 1', 'Group 2'],
+                    datasets: [{
+                        label: 'Mean',
+                        data: [],
+                        backgroundColor: ['rgba(79, 70, 229, 0.6)', 'rgba(20, 184, 166, 0.6)'],
+                        borderColor: ['rgba(79, 70, 229, 1)', 'rgba(20, 184, 166, 1)'],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    // Fix for "Cannot read properties of undefined (reading 'toFixed')"
+                                    // Handle different data types (Scatter {x,y} vs Bar [min,max])
+                                    const raw = ctx.raw;
+                                    if (raw && typeof raw.y === 'number') {
+                                        return `Mean: ${raw.y.toFixed(2)}`;
+                                    }
+                                    if (Array.isArray(raw) && raw.length >= 2) {
+                                        return `95% CI: [${raw[0].toFixed(2)}, ${raw[1].toFixed(2)}]`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: '#f5f5f4' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 2: T-Distribution
+            const ctxDist = document.getElementById('distChart').getContext('2d');
+            distChartInstance = new Chart(ctxDist, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: { point: { radius: 0 } },
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            labels: { boxWidth: 12, usePointStyle: true }
+                        },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: { 
+                            type: 'linear',
+                            grid: { display: false },
+                            title: { display: true, text: 't-value' }
+                        },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            const r = state.results;
+            
+            // Update Means Chart with Error Bars using Floating Bar Hack or specific plugin (Simpler: just use visual logic)
+            // Note: Chart.js standard bar doesn't do error bars easily without plugins. 
+            // We will use a mixed chart: Bars for mean, and a separate 'line' dataset for error whiskers drawn manually or scatter points.
+            // Simplest robust method for this context: Use floating bars [min, max] to represent CI, and a scatter point for the Mean.
+            
+            // ACTUALLY, let's stick to standard bars for Means, and just add text annotation or keep it simple.
+            // Better yet, use floating bars to show the Confidence Interval range, and a line to show the mean.
+            
+            meansChartInstance.data.datasets = [
+                {
+                    type: 'bar',
+                    label: '95% CI Range',
+                    data: [
+                        [r.s1.mean - (1.96 * (r.s1.sd/Math.sqrt(r.s1.n))), r.s1.mean + (1.96 * (r.s1.sd/Math.sqrt(r.s1.n)))],
+                        [r.s2.mean - (1.96 * (r.s2.sd/Math.sqrt(r.s2.n))), r.s2.mean + (1.96 * (r.s2.sd/Math.sqrt(r.s2.n)))]
+                    ],
+                    backgroundColor: ['rgba(79, 70, 229, 0.2)', 'rgba(20, 184, 166, 0.2)'],
+                    borderColor: ['rgba(79, 70, 229, 0.5)', 'rgba(20, 184, 166, 0.5)'],
+                    borderWidth: 1,
+                    barPercentage: 0.3
+                },
+                {
+                    type: 'scatter',
+                    label: 'Mean',
+                    data: [{x: 'Group 1', y: r.s1.mean}, {x: 'Group 2', y: r.s2.mean}],
+                    backgroundColor: ['#4f46e5', '#0d9488'],
+                    pointRadius: 6,
+                    pointStyle: 'rectRot'
+                }
+            ];
+            meansChartInstance.update();
+
+            // Update T-Distribution Chart
+            // Generate points for the curve
+            const points = [];
+            const startX = -5;
+            const endX = 5;
+            const step = 0.1;
+            
+            // Adjust range if tStat is huge
+            const maxVal = Math.max(5, Math.abs(r.tStat) + 1);
+            
+            for (let x = -maxVal; x <= maxVal; x += 0.1) {
+                points.push({x: x, y: jStat.studentt.pdf(x, r.df)});
+            }
+
+            // Identify Critical Regions
+            let critLow, critHigh;
+            if (state.tails === 'two') {
+                critHigh = Math.abs(jStat.studentt.inv(state.alpha / 2, r.df));
+                critLow = -critHigh;
+            } else if (state.tails === 'greater') {
+                critHigh = Math.abs(jStat.studentt.inv(state.alpha, r.df));
+                critLow = -9999;
+            } else {
+                critLow = jStat.studentt.inv(state.alpha, r.df);
+                critHigh = 9999;
+            }
+
+            // Create datasets for Rejection Regions (filled)
+            const rejectData = points.map(p => {
+                if ((state.tails === 'two' && (p.x < critLow || p.x > critHigh)) ||
+                    (state.tails === 'greater' && p.x > critHigh) ||
+                    (state.tails === 'less' && p.x < critLow)) {
+                    return {x: p.x, y: p.y};
+                }
+                return {x: p.x, y: null}; // Null breaks the line for chartjs
+            });
+
+            distChartInstance.data.datasets = [
+                {
+                    label: 'Null Dist (H₀)',
+                    data: points,
+                    borderColor: '#a8a29e', // stone-400
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.4
+                },
+                {
+                    label: 'Rejection Region',
+                    data: rejectData,
+                    backgroundColor: 'rgba(239, 68, 68, 0.3)', // red-500
+                    borderColor: 'transparent',
+                    fill: true,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Your t-statistic',
+                    data: [{x: r.tStat, y: 0}, {x: r.tStat, y: jStat.studentt.pdf(r.tStat, r.df)}],
+                    borderColor: '#4f46e5', // indigo-600
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    type: 'line'
+                }
+            ];
+            distChartInstance.options.scales.x.min = -maxVal;
+            distChartInstance.options.scales.x.max = maxVal;
+            distChartInstance.update();
+        }
+        
+        // Polyfill for simple number formatting if needed
+        Number.prototype.lt = function(o) { return this < o; }
+
+    </script>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-overview-of-test.html">Ab Test Overview Of Test</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-sample-size-calculator.html">Ab Test Sample Size Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-for-ai.html">Ab Testing For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-stats-guide.html">Ab Testing Stats Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-texting-for-ai.html">Ab Texting For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/asociation-to-understanding.html">Asociation To Understanding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/causal-inference-2.html">Causal Inference 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/chi-squared-test-calculator.html">Chi Squared Test Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing-info.html">Evolution Of Ab Testing Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing.html">Evolution Of Ab Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/observationstudy-fieldexperiment-abtesting.html">Observationstudy Fieldexperiment Abtesting</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/research-methodology.html">Research Methodology</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/two-sample-t-test-analyzer.html">Two Sample T Test Analyzer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></body></html>

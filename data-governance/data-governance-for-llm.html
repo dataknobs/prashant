@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Data Governance for LLM Generation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutrals (Stone, Amber) -->
+    <!-- Application Structure Plan: The SPA is designed as a thematic, single-page interactive report. It uses a sticky top navigation bar (Overview, Key Risks, Governance Framework, Implementation) to guide the user through a logical narrative. This structure was chosen because the topic is a conceptual framework, not a raw dataset. A guided, top-down exploration—from the 'Why' (Overview/Risks) to the 'What' (Framework) and the 'How' (Implementation)—is the most user-friendly and educational approach. Key interactions include: 1) Nav-link smooth scrolling. 2) Clickable tabs in the 'Risks' section to display details-on-demand for each risk, linking text and visuals. 3) Clickable pillar cards in the 'Framework' section that expand an inline detail panel, allowing users to explore the solution's components without leaving the page. This design prioritizes clarity, user guidance, and interactive discovery. -->
+    <!-- Visualization & Content Choices:
+        1. Report Info: LLM Governance Priority Areas (Conceptual) -> Goal: Inform -> Viz: Donut Chart (Canvas) -> Interaction: Hover tooltips -> Justification: Provides a high-level visual summary in the Overview. -> Library: Chart.js.
+        2. Report Info: LLM Risk Areas (Likelihood vs. Impact) -> Goal: Compare -> Viz: Grouped Bar Chart (Canvas) -> Interaction: Paired with clickable HTML tabs. Clicking a 'Risk' tab (e.g., 'Accuracy') updates a text panel, providing context for the static chart. -> Justification: Bar chart clearly compares conceptual risk scores. Linking to JS-driven text panels provides depth without cluttering the visualization. -> Library: Chart.js + Vanilla JS.
+        3. Report Info: 5 Pillars of Governance Framework -> Goal: Organize -> Viz: Interactive Diagram (HTML/CSS Grid) -> Interaction: Clicking a pillar card (HTML) uses JS to show/hide a corresponding detail `div` below. -> Justification: This is the most effective, accessible, and responsive way to create a 'diagram' without SVG/Mermaid. It keeps the user in-flow. -> Library: Vanilla JS.
+        4. Report Info: 4-Phase Implementation Roadmap -> Goal: Change (Show process) -> Viz: Timeline/Process Flow (HTML/CSS Flexbox) -> Interaction: Static display with clear visual separation. -> Justification: A simple, responsive flex-based timeline clearly communicates a phased process. -> Library: HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-link.active {
+            @apply text-amber-600 border-b-2 border-amber-600;
+        }
+        .nav-link {
+            @apply text-stone-600 hover:text-stone-900 transition-colors duration-200;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <header class="sticky top-0 w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
+        <nav class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl font-bold text-stone-900">LLM Governance Framework</h1>
+                <div class="hidden sm:flex sm:space-x-8">
+                    <a class="nav-link font-medium text-sm py-4" href="#overview">Overview</a>
+                    <a class="nav-link font-medium text-sm py-4" href="#risks">Key Risks</a>
+                    <a class="nav-link font-medium text-sm py-4" href="#framework">Framework</a>
+                    <a class="nav-link font-medium text-sm py-4" href="#implementation">Implementation</a>
+                </div>
+                <div class="sm:hidden">
+                    <select class="block w-full rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm" onchange="window.location.hash = this.value;">
+                        <option value="#overview">Overview</option>
+                        <option value="#risks">Key Risks</option>
+                        <option value="#framework">Framework</option>
+                        <option value="#implementation">Implementation</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
+
+        <section class="pt-20 -mt-16 mb-16" id="overview">
+            <h2 class="text-3xl font-bold text-stone-900 mb-4">Overview: The New Governance Frontier</h2>
+            <p class="text-lg text-stone-700 mb-8">
+                The rapid adoption of Large Language Models (LLMs) for content and analysis generation introduces unprecedented opportunities for efficiency and innovation. However, it also creates significant governance challenges. This interactive report explores a framework for managing the risks associated with LLM-generated content, ensuring it is accurate, secure, compliant, and aligned with organizational values.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-stone-900">Core Challenges</h3>
+                    <div class="p-6 bg-white rounded-lg shadow-md border border-stone-200">
+                        <h4 class="text-lg font-bold text-amber-700 mb-2">1. Speed vs. Risk</h4>
+                        <p class="text-stone-700">The velocity of LLM content generation can outpace traditional human-in-the-loop review, amplifying the spread of potential errors or biases.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-lg shadow-md border border-stone-200">
+                        <h4 class="text-lg font-bold text-amber-700 mb-2">2. Data Privacy &amp; Security</h4>
+                        <p class="text-stone-700">Prompts and training data may contain sensitive PII or proprietary information, which can be exposed in model outputs or inadvertently retained.</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-lg shadow-md border border-stone-200">
+                        <h4 class="text-lg font-bold text-amber-700 mb-2">3. Quality &amp; Accountability</h4>
+                        <p class="text-stone-700">"Hallucinations" (factually incorrect outputs) and subtle biases create a critical need for robust quality control and clear lines of accountability.</p>
+                    </div>
+                </div>
+                <div class="chart-container max-w-md h-80 md:h-96 max-h-[400px]">
+                    <h3 class="text-center text-xl font-bold text-stone-900 mb-4">Governance Priority Areas</h3>
+                    <canvas id="prioritiesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-stone-200 my-16"></div>
+
+        <section class="pt-20 -mt-16 mb-16" id="risks">
+            <h2 class="text-3xl font-bold text-stone-900 mb-4">Key Risk Areas</h2>
+            <p class="text-lg text-stone-700 mb-8">
+                A successful governance solution must identify, measure, and mitigate a new class of risks. This section outlines the primary risk categories, their potential likelihood, and their business impact. Use the tabs to explore each risk in detail.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div class="chart-container max-w-xl h-96 md:h-[450px] max-h-[500px]">
+                    <h3 class="text-center text-xl font-bold text-stone-900 mb-4">Conceptual Risk Analysis</h3>
+                    <canvas id="riskChart"></canvas>
+                </div>
+                <div class="mt-4 lg:mt-0">
+                    <div class="mb-4 border-b border-stone-300">
+                        <nav aria-label="Tabs" class="flex flex-wrap -mb-px space-x-4">
+                            <button class="risk-toggle-btn active-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-amber-500 text-amber-600" data-risk="accuracy">Accuracy &amp; Quality</button>
+                            <button class="risk-toggle-btn whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300" data-risk="bias">Bias &amp; Fairness</button>
+                            <button class="risk-toggle-btn whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300" data-risk="security">Security &amp; Privacy</button>
+                            <button class="risk-toggle-btn whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300" data-risk="ip">IP &amp; Copyright</button>
+                            <button class="risk-toggle-btn whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300" data-risk="compliance">Compliance</button>
+                        </nav>
+                    </div>
+                    <div id="risk-details">
+                        <div class="risk-detail-panel p-6 bg-white rounded-lg shadow-md border border-stone-200 space-y-3" id="risk-accuracy">
+                            <h4 class="text-xl font-bold text-stone-900">Accuracy &amp; Quality</h4>
+                            <p class-="">Risk: Model generates plausible but factually incorrect information ("hallucinations"), leading to poor decision-making or misinformation.</p>
+                            <p class="font-medium text-stone-700">Mitigation Strategy:</p>
+                            <ul class="list-disc list-inside text-stone-700 space-y-1">
+                                <li>Mandatory human review for critical analysis.</li>
+                                <li>Use of Retrieval-Augmented Generation (RAG) to ground outputs in factual, external data.</li>
+                                <li>Implement "confidence scoring" for all generated content.</li>
+                            </ul>
+                        </div>
+                        <div class="risk-detail-panel hidden p-6 bg-white rounded-lg shadow-md border border-stone-200 space-y-3" id="risk-bias">
+                            <h4 class="text-xl font-bold text-stone-900">Bias &amp; Fairness</h4>
+                            <p class-="">Risk: Model perpetuates or amplifies societal biases present in its training data, leading to discriminatory outcomes or reputational damage.</p>
+                            <p class="font-medium text-stone-700">Mitigation Strategy:</p>
+                            <ul class="list-disc list-inside text-stone-700 space-y-1">
+                                <li>Regular bias auditing of model outputs using fairness metrics.</li>
+                                <li>Use of diverse and representative datasets for fine-tuning.</li>
+                                <li>Implement "de-biasing" techniques and provide clear guidelines for prompt engineering.</li>
+                            </ul>
+                        </div>
+                        <div class="risk-detail-panel hidden p-6 bg-white rounded-lg shadow-md border border-stone-200 space-y-3" id="risk-security">
+                            <h4 class="text-xl font-bold text-stone-900">Security &amp; Privacy</h4>
+                            <p class-="">Risk: Users input PII, trade secrets, or proprietary data into prompts, which could be leaked or used to train future models.</p>
+                            <p class="font-medium text-stone-700">Mitigation Strategy:</p>
+                            <ul class="list-disc list-inside text-stone-700 space-y-1">
+                                <li>Deploy models in a private, sandboxed environment (VPC).</li>
+                                <li>Implement PII-scrubbing tools for all prompts and outputs.</li>
+                                <li>Strict data handling policies and user training on data sensitivity.</li>
+                            </ul>
+                        </div>
+                        <div class="risk-detail-panel hidden p-6 bg-white rounded-lg shadow-md border border-stone-200 space-y-3" id="risk-ip">
+                            <h4 class="text-xl font-bold text-stone-900">IP &amp; Copyright</h4>
+                            <p class-="">Risk: Model generates content that infringes on existing copyrights (plagiarism) or creates ambiguity over the ownership of novel generated content.</p>
+                            <p class="font-medium text-stone-700">Mitigation Strategy:</p>
+                            <ul class="list-disc list-inside text-stone-700 space-y-1">
+                                <li>Integrate plagiarism-checking tools in the generation workflow.</li>
+                                <li>Clear corporate policies defining ownership of AI-generated work.</li>
+                                <li>Use models from vendors with strong indemnification policies.</li>
+                            </ul>
+                        </div>
+                        <div class="risk-detail-panel hidden p-6 bg-white rounded-lg shadow-md border border-stone-200 space-y-3" id="risk-compliance">
+                            <h4 class="text-xl font-bold text-stone-900">Compliance</h4>
+                            <p class-="">Risk: Use of LLMs violates industry-specific regulations (e.g., GDPR, HIPAA) or emerging AI-specific laws (e.g., EU AI Act) regarding data use and automated decision-making.</p>
+                            <p class="font-medium text-stone-700">Mitigation Strategy:</p>
+                            <ul class="list-disc list-inside text-stone-700 space-y-1">
+                                <li>Maintain a detailed audit log of all prompts, outputs, and user reviews.</li>
+                                <li>Conduct regular "AI Impact Assessments" reviewed by Legal &amp; Compliance.</li>
+                                <li>Classify LLM use cases by risk level (per EU AI Act).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-stone-200 my-16"></div>
+
+        <section class="pt-20 -mt-16 mb-16" id="framework">
+            <h2 class="text-3xl font-bold text-stone-900 mb-4">A 5-Pillar Governance Framework</h2>
+            <p class="text-lg text-stone-700 mb-8">
+                A robust response requires a holistic framework that integrates policy, people, and technology. This model is built on five interconnected pillars. Click each pillar to explore its key components and a sample Key Performance Indicator (KPI).
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+                <button class="framework-pillar-btn p-6 bg-white rounded-lg shadow-md border-2 border-amber-500 text-amber-700 hover:shadow-lg transition-all duration-200" data-pillar="policy">
+                    <span class="text-4xl">📜</span>
+                    <h3 class="text-xl font-bold mt-3">Policy &amp; Standards</h3>
+                </button>
+                <button class="framework-pillar-btn p-6 bg-white rounded-lg shadow-md border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-200" data-pillar="lifecycle">
+                    <span class="text-4xl">🔄</span>
+                    <h3 class="text-xl font-bold mt-3">Data &amp; Model Lifecycle</h3>
+                </button>
+                <button class="framework-pillar-btn p-6 bg-white rounded-lg shadow-md border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-200" data-pillar="people">
+                    <span class="text-4xl">👥</span>
+                    <h3 class="text-xl font-bold mt-3">People &amp; Roles</h3>
+                </button>
+                <button class="framework-pillar-btn p-6 bg-white rounded-lg shadow-md border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-200" data-pillar="technology">
+                    <span class="text-4xl">🛠️</span>
+                    <h3 class="text-xl font-bold mt-3">Technology &amp; Tools</h3>
+                </button>
+                <button class="framework-pillar-btn p-6 bg-white rounded-lg shadow-md border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-200" data-pillar="monitoring">
+                    <span class="text-4xl">📈</span>
+                    <h3 class="text-xl font-bold mt-3">Monitoring &amp; Auditing</h3>
+                </button>
+            </div>
+
+            <div class="mt-8" id="framework-details">
+                <div class="pillar-detail-panel p-6 bg-amber-50 rounded-lg border border-amber-200" id="pillar-policy">
+                    <h3 class="text-2xl font-bold text-amber-800 mb-4">Policy &amp; Standards</h3>
+                    <p class="text-stone-700 mb-4">Defines the "rules of the road." This includes creating an "Acceptable Use Policy" (AUP) for AI, defining data sensitivity levels, and setting clear guidelines for reviewing and publishing AI-generated content.</p>
+                    <strong class="text-stone-800">Key Components:</strong>
+                    <ul class="list-disc list-inside text-stone-700 my-2 space-y-1">
+                        <li>AI Acceptable Use Policy (AUP)</li>
+                        <li>Data Classification Standards (Public, Internal, Confidential)</li>
+                        <li>Human-in-the-Loop Review Tiers</li>
+                        <li>Ethical AI Principles</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-white rounded-md border border-stone-200">
+                        <span class="font-medium text-sm text-stone-600">Sample KPI:</span>
+                        <p class="font-bold text-stone-800">% of employees who have completed mandatory AUP training.</p>
+                    </div>
+                </div>
+                <div class="pillar-detail-panel hidden p-6 bg-stone-100 rounded-lg border border-stone-200" id="pillar-lifecycle">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Data &amp; Model Lifecycle</h3>
+                    <p class="text-stone-700 mb-4">Manages the end-to-end flow of data and models. This covers secure data sourcing for training, model validation and versioning, and a clear process for "sunsetting" or retiring outdated or biased models.</p>
+                    <strong class="text-stone-800">Key Components:</strong>
+                    <ul class="list-disc list-inside text-stone-700 my-2 space-y-1">
+                        <li>Data Lineage &amp; Provenance Tracking</li>
+                        <li>Model Validation &amp; Testing Protocols</li>
+                        <li>Model Versioning and Rollback Plans</li>
+                        <li>Secure Data Curation for Fine-Tuning</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-white rounded-md border border-stone-200">
+                        <span class="font-medium text-sm text-stone-600">Sample KPI:</span>
+                        <p class="font-bold text-stone-800">Time-to-deploy for model updates (balancing speed with safety).</p>
+                    </div>
+                </div>
+                <div class="pillar-detail-panel hidden p-6 bg-stone-100 rounded-lg border border-stone-200" id="pillar-people">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">People &amp; Roles</h3>
+                    <p class="text-stone-700 mb-4">Establishes clear accountability. This involves creating new roles (like AI Data Stewards) and committees (like an AI Ethics Review Board), and ensuring all users are trained on their responsibilities.</p>
+                    <strong class="text-stone-800">Key Components:</strong>
+                    <ul class="list-disc list-inside text-stone-700 my-2 space-y-1">
+                        <li>AI Ethics Review Board</li>
+                        <li>Designated AI Data Stewards</li>
+                        <li>Role-Based Training Programs</li>
+                        <li>Clear accountability for AI-assisted decisions.</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-white rounded-md border border-stone-200">
+                        <span class="font-medium text-sm text-stone-600">Sample KPI:</span>
+                        <p class="font-bold text-stone-800">Clear "owner" defined for 100% of high-risk AI use cases.</p>
+                    </div>
+                </div>
+                <div class="pillar-detail-panel hidden p-6 bg-stone-100 rounded-lg border border-stone-200" id="pillar-technology">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Technology &amp; Tools</h3>
+                    <p class="text-stone-700 mb-4">Implements the technology stack to enforce policy. This includes prompt-scanners for PII, output-checkers for bias, and a centralized "Model Registry" to track all approved models and their versions.</p>
+                    <strong class="text-stone-800">Key Components:</strong>
+                    <ul class="list-disc list-inside text-stone-700 my-2 space-y-1">
+                        <li>PII &amp; Sensitive Data Scanners</li>
+                        <li>Bias &amp; Fairness Detection Tools</li>
+                        <li>Plagiarism &amp; IP Infringement Checkers</li>
+                        <li>Centralized Model &amp; Prompt Registry</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-white rounded-md border border-stone-200">
+                        <span class="font-medium text-sm text-stone-600">Sample KPI:</span>
+                        <p class="font-bold text-stone-800"># of high-risk prompts automatically blocked or flagged for review.</p>
+                    </div>
+                </div>
+                <div class="pillar-detail-panel hidden p-6 bg-stone-100 rounded-lg border border-stone-200" id="pillar-monitoring">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Monitoring &amp; Auditing</h3>
+                    <p class="text-stone-700 mb-4">Provides continuous oversight. This involves logging all prompts and outputs for audit, tracking "model drift" (where performance degrades), and generating regular compliance reports for legal and executive teams.</p>
+                    <strong class="text-stone-800">Key Components:</strong>
+                    <ul class="list-disc list-inside text-stone-700 my-2 space-y-1">
+                        <li>Comprehensive Prompt &amp; Output Logging</li>
+                        <li>Model Performance &amp; Drift Monitoring</li>
+                        <li>User Feedback Loop &amp; Incident Reporting</li>
+                        <li>Automated Compliance &amp; Audit Reports</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-white rounded-md border border-stone-200">
+                        <span class="font-medium text-sm text-stone-600">Sample KPI:</span>
+                        <p class="font-bold text-stone-800">Time-to-detection for new bias or compliance incidents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-stone-200 my-16"></div>
+
+        <section class="pt-20 -mt-16 mb-16" id="implementation">
+            <h2 class="text-3xl font-bold text-stone-900 mb-4">Implementation Roadmap</h2>
+            <p class="text-lg text-stone-700 mb-8">
+                Deploying LLM governance is a journey, not a single event. A phased approach allows for continuous learning and adaptation while delivering incremental value and risk reduction. This is a sample 4-phase roadmap.
+            </p>
+            <div class="relative">
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-amber-200 -translate-y-1/2 -z-10"></div>
+                <div class="flex flex-col md:flex-row justify-between gap-6 md:gap-4">
+                    <div class="flex-1 p-6 bg-white rounded-lg shadow-lg border border-stone-200 z-10">
+                        <span class="block text-sm font-bold text-amber-600">PHASE 1</span>
+                        <h3 class="text-xl font-bold text-stone-900 my-2">Assess &amp; Discover</h3>
+                        <p class="text-stone-700 text-sm">Inventory all current and planned LLM use cases. Conduct initial risk assessments for each and identify high-priority gaps in existing data governance policies.</p>
+                    </div>
+                    <div class="flex-1 p-6 bg-white rounded-lg shadow-lg border border-stone-200 z-10">
+                        <span class="block text-sm font-bold text-amber-600">PHASE 2</span>
+                        <h3 class="text-xl font-bold text-stone-900 my-2">Define &amp; Design</h3>
+                        <p class="text-stone-700 text-sm">Develop the v1.0 AI Acceptable Use Policy. Define roles and responsibilities (e.g., AI Review Board). Design the technical architecture for monitoring and PII scanning.</p>
+                    </div>
+                    <div class="flex-1 p-6 bg-white rounded-lg shadow-lg border border-stone-200 z-10">
+                        <span class="block text-sm font-bold text-amber-600">PHASE 3</span>
+                        <h3 class="text-xl font-bold text-stone-900 my-2">Implement &amp; Enforce</h3>
+                        <p class="text-stone-700 text-sm">Roll out mandatory training for all users. Deploy monitoring tools for high-risk use cases. Begin enforcing policies for new projects and create a centralized prompt library.</p>
+                    </div>
+                    <div class="flex-1 p-6 bg-white rounded-lg shadow-lg border border-stone-200 z-10">
+                        <span class="block text-sm font-bold text-amber-600">PHASE 4</span>
+                        <h3 class="text-xl font-bold text-stone-900 my-2">Monitor &amp; Evolve</h3>
+                        <p class="text-stone-700 text-sm">Conduct first internal audit. Use data from monitoring to identify new risks and model drift. Update policies based on operational feedback and new regulations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-first-ai-security.html">Data First Ai Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-agentic-ai.html">Data Governance For Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai-info.html">Data Governance For Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai.html">Data Governance For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-llm.html">Data Governance For Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant copy.html">Data Lineage Ai Assitant Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant.html">Data Lineage Ai Assitant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai-interactive.html">Data Lineage For Ai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai.html">Data Lineage For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info copy.html">Data Lineage Info Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info.html">Data Lineage Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage.html">Data Lineage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant-info.html">Privacy Ai Assistant Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant.html">Privacy Ai Assistant</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const priorityData = {
+                labels: ['Quality & Accuracy', 'Security & Privacy', 'Compliance', 'Bias & Fairness', 'IP & Copyright'],
+                datasets: [{
+                    label: 'Governance Priority',
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: [
+                        'rgba(217, 119, 6, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(252, 211, 77, 0.8)',
+                        'rgba(253, 230, 138, 0.8)',
+                        'rgba(254, 243, 199, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(217, 119, 6, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(252, 211, 77, 1)',
+                        'rgba(253, 230, 138, 1)',
+                        'rgba(254, 243, 199, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            const ctxPriorities = document.getElementById('prioritiesChart').getContext('2d');
+            new Chart(ctxPriorities, {
+                type: 'doughnut',
+                data: priorityData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Inter',
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                family: 'Inter',
+                            },
+                            titleFont: {
+                                family: 'Inter',
+                            }
+                        }
+                    }
+                }
+            });
+
+            const riskData = {
+                labels: ['Accuracy', 'Bias', 'Security', 'IP', 'Compliance'],
+                datasets: [
+                    {
+                        label: 'Likelihood (1-10)',
+                        data: [8, 6, 7, 5, 9],
+                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Potential Impact (1-10)',
+                        data: [9, 8, 10, 7, 9],
+                        backgroundColor: 'rgba(217, 119, 6, 0.7)',
+                        borderColor: 'rgba(217, 119, 6, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            const ctxRisk = document.getElementById('riskChart').getContext('2d');
+            new Chart(ctxRisk, {
+                type: 'bar',
+                data: riskData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Inter',
+                                }
+                            }
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                family: 'Inter',
+                            },
+                            titleFont: {
+                                family: 'Inter',
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const riskToggles = document.querySelectorAll('.risk-toggle-btn');
+            const riskPanels = document.querySelectorAll('.risk-detail-panel');
+
+            riskToggles.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetRisk = btn.getAttribute('data-risk');
+                    
+                    riskToggles.forEach(toggleBtn => {
+                        toggleBtn.classList.remove('active-tab', 'border-amber-500', 'text-amber-600');
+                        toggleBtn.classList.add('border-transparent', 'text-stone-500', 'hover:text-stone-700', 'hover:border-stone-300');
+                    });
+                    
+                    btn.classList.add('active-tab', 'border-amber-500', 'text-amber-600');
+                    btn.classList.remove('border-transparent', 'text-stone-500', 'hover:text-stone-700', 'hover:border-stone-300');
+
+                    riskPanels.forEach(panel => {
+                        if (panel.id === `risk-${targetRisk}`) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const pillarToggles = document.querySelectorAll('.framework-pillar-btn');
+            const pillarPanels = document.querySelectorAll('.pillar-detail-panel');
+
+            pillarToggles.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetPillar = btn.getAttribute('data-pillar');
+                    const targetPanel = document.getElementById(`pillar-${targetPillar}`);
+                    
+                    const isActive = !targetPanel.classList.contains('hidden');
+
+                    pillarPanels.forEach(panel => {
+                        panel.classList.add('hidden');
+                    });
+                    
+                    pillarToggles.forEach(toggleBtn => {
+                        toggleBtn.classList.remove('border-amber-500', 'text-amber-700', 'border-2');
+                        toggleBtn.classList.add('border-stone-200', 'hover:border-stone-400');
+                    });
+
+                    if (!isActive) {
+                        targetPanel.classList.remove('hidden');
+                        btn.classList.add('border-amber-500', 'text-amber-700', 'border-2');
+                        btn.classList.remove('border-stone-200', 'hover:border-stone-400');
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const onScroll = () => {
+                let currentSection = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (window.scrollY >= sectionTop - 100) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSection}`) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', onScroll);
+            onScroll(); 
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</body></html>

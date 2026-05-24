@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Causal Inference Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is designed as a top-down educational journey. It starts with a high-level introduction (Hero), moves to fundamental distinctions (Correlation vs. Causation), introduces core vocabulary (Key Concepts), presents a mental model for thinking (The Causal Ladder), details practical approaches (Methodologies), and concludes with real-world relevance (Applications). This thematic, progressive structure was chosen over a report-like format to build understanding step-by-step, making a complex topic accessible for newcomers. A sticky navigation bar allows users to jump between these logical sections, supporting both linear learning and non-linear exploration. Key interactions involve clicking on concepts and methods to reveal detailed information in place, which prevents cognitive overload and keeps the user focused. -->
+    <!-- Visualization & Content Choices: 
+        1. Correlation vs. Causation: Report Info -> Spurious correlation between ice cream sales and drownings. Goal -> Differentiate correlation from causation. Viz/Presentation -> Interactive scatter plot (Chart.js) next to a text block. Interaction -> A "Reveal Confounder" button dynamically adds the "Temperature" explanation. Justification -> A classic, intuitive example that visually demonstrates the core problem of confounding. Library -> Chart.js.
+        2. The Causal Ladder: Report Info -> Judea Pearl's three levels of causal reasoning. Goal -> Organize and explain this framework. Viz/Presentation -> A vertical step diagram built with HTML/CSS. Interaction -> Clicking on a step (Seeing, Doing, Imagining) highlights it and displays its detailed explanation in an adjacent text area. Justification -> Translates an abstract concept into a tangible, interactive visual metaphor that is easy to navigate and understand. Library/Method -> Vanilla JS with HTML/CSS.
+        3. Methodologies: Report Info -> Common causal inference techniques (RCT, DiD, IV, RDD). Goal -> Compare and explain methods. Viz/Presentation -> A tabbed interface where clicking a method's name reveals its description and a simplified illustrative chart. Interaction -> Clicking tabs updates content and a Chart.js canvas. Justification -> The "master-detail" or tabbed view allows for a clean comparison of multiple complex topics without cluttering the screen, letting the user focus on one method at a time. Library/Method -> Chart.js and Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #333D42;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4A6C6F;
+            border-bottom-color: #4A6C6F;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #4A6C6F;
+            color: #FFFFFF;
+        }
+        .btn-primary:hover {
+            background-color: #3B5658;
+            transform: translateY(-2px);
+        }
+        .method-tab {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: 1px solid #D1D5DB;
+        }
+        .method-tab.active {
+            background-color: #4A6C6F;
+            color: white;
+            border-color: #4A6C6F;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+         @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .ladder-step {
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            border-left-width: 4px;
+            border-color: #D1D5DB;
+        }
+        .ladder-step.active {
+            background-color: #E6EEED;
+            border-color: #4A6C6F;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm" id="header">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-[#3B5658]">Causal Inference Explorer</h1>
+            <div class="hidden md:flex space-x-8">
+                <a class="nav-link" href="#concepts">Concepts</a>
+                <a class="nav-link" href="#ladder">The Ladder</a>
+                <a class="nav-link" href="#methods">Methods</a>
+                <a class="nav-link" href="#applications">Applications</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="py-20 bg-white" id="hero">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-5xl md:text-6xl font-bold mb-4">Moving Beyond Correlation</h2>
+                <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
+                    An interactive journey into Causal Inference: the science of asking "What if?" and truly understanding cause and effect.
+                </p>
+            </div>
+        </section>
+
+        <section class="py-16" id="correlation">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-4xl font-bold mb-2">Correlation ≠ Causation</h3>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">This is the foundational principle of causal inference. Two things can be related without one causing the other. This section provides an interactive example to demonstrate this critical distinction.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="card p-6">
+                        <h4 class="text-2xl font-bold mb-4 text-center">The Classic Example</h4>
+                        <p class="text-gray-600 mb-4">The chart shows a strong positive correlation between monthly ice cream sales and the number of drowning incidents. Does eating ice cream cause drowning?</p>
+                        <div class="chart-container h-80 max-h-96">
+                            <canvas id="correlationChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <div class="p-6 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg opacity-0 transition-opacity duration-700" id="confounderExplanation">
+                             <h4 class="text-2xl font-bold mb-2">The Hidden Confounder: Heat!</h4>
+                             <p class="text-lg text-gray-700">Of course not. The lurking or 'confounding' variable is the season. Hot weather (e.g., summer) causes both an increase in ice cream sales and an increase in people swimming, which unfortunately leads to more drowning incidents. The variables are correlated, but not causally linked.</p>
+                        </div>
+                        <button class="btn btn-primary mt-6" id="revealBtn">Reveal the Confounder</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white" id="concepts">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-4xl font-bold mb-2">Core Concepts</h3>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">To perform causal analysis, we need a specific vocabulary. These are the building blocks for understanding the methods used to uncover cause-and-effect relationships.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card p-6 text-center">
+                        <div class="text-4xl mb-4">→</div>
+                        <h4 class="text-2xl font-bold mb-2">Treatment</h4>
+                        <p class="text-gray-600">The action, intervention, or variable whose effect we want to measure. For example, a new drug, a marketing campaign, or a government policy.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="text-4xl mb-4">?</div>
+                        <h4 class="text-2xl font-bold mb-2">Counterfactual</h4>
+                        <p class="text-gray-600">The "what if" scenario. What would have happened to the same group if they had not received the treatment? The core challenge is that we can never observe this directly.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="text-4xl mb-4">⬨</div>
+                        <h4 class="text-2xl font-bold mb-2">Confounding</h4>
+                        <p class="text-gray-600">A third variable that influences both the treatment and the outcome, creating a spurious association. As we saw with "heat" in the previous example.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16" id="ladder">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-4xl font-bold mb-2">The Ladder of Causation</h3>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">Computer scientist Judea Pearl proposed a three-level hierarchy for causal reasoning. This framework helps us understand the types of questions we can answer with data. Click on each step to learn more.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <div class="ladder-step p-6 mb-4 rounded-lg active" id="ladderStep1">
+                            <span class="text-sm font-bold text-gray-500">Step 1</span>
+                            <h4 class="text-2xl font-bold">Association (Seeing)</h4>
+                        </div>
+                        <div class="ladder-step p-6 mb-4 rounded-lg" id="ladderStep2">
+                            <span class="text-sm font-bold text-gray-500">Step 2</span>
+                            <h4 class="text-2xl font-bold">Intervention (Doing)</h4>
+                        </div>
+                         <div class="ladder-step p-6 rounded-lg" id="ladderStep3">
+                            <span class="text-sm font-bold text-gray-500">Step 3</span>
+                            <h4 class="text-2xl font-bold">Counterfactuals (Imagining)</h4>
+                        </div>
+                    </div>
+                    <div class="card p-8">
+                        <div id="ladderExplanation">
+                            <h4 class="text-2xl font-bold mb-3">Level 1: Association (Seeing)</h4>
+                            <p class="text-gray-700 text-lg">This is the level of standard statistics and machine learning. We look for patterns and correlations in data.
+                            <br/><br/><b>Question:</b> "What is the relationship between cholesterol and heart disease?"
+                            <br/><b>Action:</b> Observing data, finding correlations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white" id="methods">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-4xl font-bold mb-2">Causal Inference Methods</h3>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">Scientists have developed various methods to climb the ladder of causation and estimate causal effects, especially when direct experiments are not possible. Select a method to see how it works.</p>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button class="method-tab active" data-method="rct">Randomized Controlled Trials</button>
+                    <button class="method-tab" data-method="did">Difference-in-Differences</button>
+                    <button class="method-tab" data-method="iv">Instrumental Variables</button>
+                    <button class="method-tab" data-method="rdd">Regression Discontinuity</button>
+                </div>
+
+                <div class="card p-6 md:p-8 grid lg:grid-cols-2 gap-8 items-center">
+                    <div id="method-text">
+                        <h4 class="text-2xl font-bold mb-3">Randomized Controlled Trials (RCTs)</h4>
+                        <p class="text-gray-700">Considered the "gold standard." A population is randomly assigned to a treatment group (gets the intervention) or a control group (does not). Because the assignment is random, any systematic difference in outcomes between the groups can be attributed to the treatment, effectively eliminating confounding variables.</p>
+                    </div>
+                    <div class="chart-container h-80 max-h-96">
+                        <canvas id="methodChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-16" id="applications">
+            <div class="container mx-auto px-6">
+                 <div class="text-center mb-12">
+                    <h3 class="text-4xl font-bold mb-2">Why It Matters: Real-World Applications</h3>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">Causal inference isn't just academic; it's crucial for making effective decisions in business, policy, medicine, and beyond. Understanding causality helps us design better systems and interventions.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card p-6">
+                        <h4 class="text-xl font-bold mb-2">Medicine &amp; Public Health</h4>
+                        <p class="text-gray-600">Does a new vaccine prevent disease? Does a public health campaign reduce smoking rates? Answering these questions requires rigorous causal analysis to save lives.</p>
+                    </div>
+                    <div class="card p-6">
+                        <h4 class="text-xl font-bold mb-2">Economics &amp; Policy</h4>
+                        <p class="text-gray-600">Does increasing the minimum wage cause unemployment? Does a universal basic income program improve health outcomes? Governments rely on causal estimates to enact effective policies.</p>
+                    </div>
+                     <div class="card p-6">
+                        <h4 class="text-xl font-bold mb-2">Business &amp; Technology</h4>
+                        <p class="text-gray-600">Did our new website design cause an increase in sales? Does a specific ad campaign have a positive return on investment? Companies use causal inference to optimize strategies and products.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-for-business-economy.html">Causal Inference For Business Economy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-in-health-care.html">Causal Inference In Health Care</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-overview-info.html">Causal Inference Overview Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-overview.html">Causal Inference Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/why-layer-of-agentic-ai.html">Why Layer Of Agentic Ai</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const chartColors = {
+        blue: 'rgba(54, 162, 235, 0.6)',
+        red: 'rgba(255, 99, 132, 0.6)',
+        green: 'rgba(75, 192, 192, 0.6)',
+        grey: 'rgba(201, 203, 207, 0.6)',
+        blueBorder: 'rgb(54, 162, 235)',
+        redBorder: 'rgb(255, 99, 132)',
+        greenBorder: 'rgb(75, 192, 192)',
+    };
+
+    let correlationChart, methodChart;
+
+    function createCorrelationChart() {
+        const ctx = document.getElementById('correlationChart').getContext('2d');
+        const data = {
+            datasets: [{
+                label: 'Monthly Data Points',
+                data: [
+                    {x: 2, y: 10}, {x: 2.5, y: 12}, {x: 3, y: 15}, 
+                    {x: 5, y: 25}, {x: 6, y: 30}, {x: 7, y: 35},
+                    {x: 8, y: 42}, {x: 9, y: 48}, {x: 10, y: 55},
+                    {x: 4, y: 20}, {x: 5.5, y: 28}, {x: 7.5, y: 38}
+                ],
+                backgroundColor: chartColors.blue,
+            }]
+        };
+        const options = {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: { display: true, text: 'Ice Cream Sales (in $10,000s)' }
+                },
+                y: {
+                    title: { display: true, text: 'Drowning Incidents' }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Sales: $${context.parsed.x*10}k, Incidents: ${context.parsed.y}`;
+                        }
+                    }
+                }
+            }
+        };
+        correlationChart = new Chart(ctx, { type: 'scatter', data, options });
+    }
+
+    document.getElementById('revealBtn').addEventListener('click', () => {
+        document.getElementById('confounderExplanation').classList.remove('opacity-0');
+    });
+
+    const ladderSteps = document.querySelectorAll('.ladder-step');
+    const ladderExplanation = document.getElementById('ladderExplanation');
+    const ladderContent = {
+        ladderStep1: {
+            title: 'Level 1: Association (Seeing)',
+            text: 'This is the level of standard statistics and machine learning. We look for patterns and correlations in data.<br><br><b>Question:</b> "What is the relationship between cholesterol and heart disease?"<br><b>Action:</b> Observing data, finding correlations.'
+        },
+        ladderStep2: {
+            title: 'Level 2: Intervention (Doing)',
+            text: 'Here, we move from passive observation to active intervention. We want to know what happens when we change something.<br><br><b>Question:</b> "If we prescribe a drug, what will happen to a patient\'s cholesterol?"<br><b>Action:</b> Actively intervening and measuring the outcome.'
+        },
+        ladderStep3: {
+            title: 'Level 3: Counterfactuals (Imagining)',
+            text: 'This is the highest level of causal reasoning. It involves thinking about "what if" scenarios that did not happen.<br><br><b>Question:</b> "It was the drug that saved the patient, but what if they hadn\'t taken it? Would they have recovered anyway?"<br><b>Action:</b> Retrospective reasoning about alternative possibilities.'
+        }
+    };
+
+    ladderSteps.forEach(step => {
+        step.addEventListener('click', () => {
+            ladderSteps.forEach(s => s.classList.remove('active'));
+            step.classList.add('active');
+            const content = ladderContent[step.id];
+            ladderExplanation.innerHTML = `<h4 class="text-2xl font-bold mb-3">${content.title}</h4><p class="text-gray-700 text-lg">${content.text}</p>`;
+        });
+    });
+
+    const methodTabs = document.querySelectorAll('.method-tab');
+    const methodText = document.getElementById('method-text');
+    const methodData = {
+        rct: {
+            title: 'Randomized Controlled Trials (RCTs)',
+            text: 'Considered the "gold standard." A population is randomly assigned to a treatment group (gets the intervention) or a control group (does not). Because the assignment is random, any systematic difference in outcomes between the groups can be attributed to the treatment, effectively eliminating confounding variables.',
+            chart: {
+                type: 'bar',
+                data: {
+                    labels: ['Control Group', 'Treatment Group'],
+                    datasets: [{
+                        label: 'Average Outcome',
+                        data: [15, 25],
+                        backgroundColor: [chartColors.grey, chartColors.green],
+                        borderColor: ['rgb(201, 203, 207)', chartColors.greenBorder],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true, title: {display: true, text: 'Outcome Measure'} } },
+                    plugins: { legend: { display: false } }
+                }
+            }
+        },
+        did: {
+            title: 'Difference-in-Differences (DiD)',
+            text: 'A quasi-experimental method that compares the change in outcomes over time between a treatment group and a control group. It relies on the "parallel trends" assumption: that both groups would have followed the same trend in the absence of the treatment.',
+            chart: {
+                type: 'line',
+                data: {
+                    labels: ['Before Treatment', 'After Treatment'],
+                    datasets: [
+                        { label: 'Control Group', data: [10, 12], borderColor: chartColors.redBorder, backgroundColor: chartColors.red, fill: false, tension: 0.1 },
+                        { label: 'Treatment Group', data: [10, 18], borderColor: chartColors.blueBorder, backgroundColor: chartColors.blue, fill: false, tension: 0.1 }
+                    ]
+                },
+                options: { 
+                    scales: { y: { beginAtZero: true, title: {display: true, text: 'Outcome Measure'} } },
+                    plugins: { legend: { position: 'top' } }
+                }
+            }
+        },
+        iv: {
+            title: 'Instrumental Variables (IV)',
+            text: 'Used when an RCT is not possible and confounding is a major issue. An "instrument" is a variable that influences the treatment but does not directly affect the outcome, except through the treatment. It creates a "natural experiment" to isolate the causal effect.',
+             chart: {
+                type: 'bar',
+                data: {
+                    labels: ['Low Instrument', 'High Instrument'],
+                    datasets: [
+                        { label: 'Treatment Uptake', yAxisID: 'y', data: [20, 80], backgroundColor: chartColors.grey },
+                        { label: 'Outcome', yAxisID: 'y1', data: [15, 22], backgroundColor: chartColors.green },
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', title: {display: true, text: 'Treatment Uptake (%)'} },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: {display: true, text: 'Outcome'} }
+                    },
+                    plugins: { legend: { position: 'top' } }
+                }
+            }
+        },
+        rdd: {
+            title: 'Regression Discontinuity Design (RDD)',
+            text: 'Exploits a cutoff point or threshold in a policy or rule. By comparing individuals just above and just below the threshold, we can estimate the causal effect of the treatment, assuming these individuals are otherwise very similar.',
+            chart: {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Below Cutoff (Control)', data: [{x: 40, y: 8}, {x: 42, y: 9}, {x: 45, y: 8.5}, {x: 48, y: 10}], backgroundColor: chartColors.red },
+                        { label: 'Above Cutoff (Treatment)', data: [{x: 51, y: 15}, {x: 53, y: 16}, {x: 56, y: 15.5}, {x: 59, y: 17}], backgroundColor: chartColors.green }
+                    ]
+                },
+                options: {
+                     scales: {
+                        x: { title: { display: true, text: 'Eligibility Score (Cutoff at 50)' } },
+                        y: { title: { display: true, text: 'Outcome' } }
+                     },
+                     plugins: { legend: { position: 'top' } }
+                }
+            }
+        }
+    };
+
+    function updateMethodDisplay(method) {
+        const data = methodData[method];
+        methodText.innerHTML = `<h4 class="text-2xl font-bold mb-3">${data.title}</h4><p class="text-gray-700">${data.text}</p>`;
+
+        if (methodChart) {
+            methodChart.destroy();
+        }
+        const ctx = document.getElementById('methodChart').getContext('2d');
+        const chartConfig = {
+            type: data.chart.type,
+            data: data.chart.data,
+            options: { ...data.chart.options, maintainAspectRatio: false, responsive: true }
+        };
+        methodChart = new Chart(ctx, chartConfig);
+    }
+    
+    methodTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            methodTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            updateMethodDisplay(tab.dataset.method);
+        });
+    });
+
+    const navLinks = document.querySelectorAll('header .nav-link');
+    const sections = document.querySelectorAll('main section');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    createCorrelationChart();
+    updateMethodDisplay('rct');
+});
+</script>
+
+
+
+</body></html>

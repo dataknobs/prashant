@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="Educational hub on Causal Inference in Healthcare and Personalized Medicine. Explore Target Trial Emulation, Multiscale Digital Twins, Epidemiology, ITE estimation, and Wearable causal triggers." name="description"/>
+    <meta content="Causal Inference, Healthcare, Personalized Medicine, Target Trial Emulation, Digital Twins, Precision Oncology, Epidemiology, Individualized Treatment Effects, Wearables" name="keywords"/>
+    
+    <title>Causal Inference in Healthcare &amp; Personalized Medicine</title>
+    
+    <style>
+        :root {
+            --primary-color: #0f766e;
+            --secondary-color: #0d9488;
+            --bg-color: #f0fdfa;
+            --card-bg: #ffffff;
+            --text-main: #134e4a;
+            --text-muted: #475569;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 1rem auto 0;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .intro-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            background-color: #ccfbf1;
+            border: 1px solid #99f6e4;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background-color: #99f6e4;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2, h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        .citation {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            vertical-align: super;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        table, th, td {
+            border: 1px solid #cbd5e1;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            margin-top: 3rem;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .question {
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 1rem;
+            text-align: left;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+        }
+
+        .option-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .option-btn.correct {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            font-weight: bold;
+            min-height: 24px;
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .action-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Causal Inference in Healthcare</h1>
+        <p>Exploring the frontiers of personalized medicine: Target Trial Emulation, Digital Twins, Epidemiology, ITE, and Wearables.</p>
+    </header>
+
+    <div class="container">
+        <div class="intro-card">
+            <h2>The State of Causal Inference in Medicine</h2>
+            <p>Across five active fronts in healthcare and personalized medicine, the strongest recurring finding is that causal validity is limited less by model capacity than by study design, measurement quality, time-zero alignment, treatment definition, and domain knowledge <span class="citation">[cite: 330]</span>.</p>
+            <p>This educational hub reviews the critical pathways moving modern medicine from simple correlations and predictive forecasting toward verifiable, individualized causal structures.</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tte')">Target Trial Emulation (TTE)</button>
+            <button class="tab-btn" onclick="openTab(event, 'digital-twins')">Digital Twins</button>
+            <button class="tab-btn" onclick="openTab(event, 'epidemiology')">Epidemiology</button>
+            <button class="tab-btn" onclick="openTab(event, 'ite')">Individualized Effects (ITE)</button>
+            <button class="tab-btn" onclick="openTab(event, 'wearables')">Wearables &amp; Flares</button>
+        </div>
+
+        <div class="tab-content active" id="tte">
+            <h2>Target Trial Emulation (TTE) with EHRs</h2>
+            <p>For electronic health records (EHRs), target trial emulation has become the dominant organizing framework because it forces investigators to define eligibility, treatment strategies, assignment, follow-up, outcomes, causal contrast, and analysis before looking at data <span class="citation">[cite: 331]</span>.</p>
+            
+            <h3>Application in Rare Diseases</h3>
+            <ul>
+                <li>Target trial emulation is especially attractive for rare diseases because conventional randomized trials are often infeasible due to small, geographically dispersed, and heterogeneous populations <span class="citation">[cite: 333]</span>.</li>
+                <li>However, rare-disease TTE is only credible when the EHR or registry can support reliable phenotyping, near-complete ascertainment of treatment timing and outcomes, and enough covariate information to defend exchangeability <span class="citation">[cite: 334]</span>.</li>
+            </ul>
+
+            <p>Recent methodological work clarifies that EHR-based TTE is not guaranteed merely by using the label. The 2026 operational framework separates trial specification from realization in EHR data, emphasizing that care processes determine what can be observed <span class="citation">[cite: 382, 383]</span>.</p>
+        </div>
+
+        <div class="tab-content" id="digital-twins">
+            <h2>Multiscale Digital Twins in Precision Oncology</h2>
+            <p>Digital twins in precision oncology are moving from static predictive surrogates toward dynamic, multiscale patient representations that integrate imaging, molecular data, therapy response, and sometimes mechanistic tumor biology <span class="citation">[cite: 337]</span>.</p>
+            
+            <h3>The Causal Requirement</h3>
+            <p>A clinically meaningful oncology twin cannot be only a high-performing predictive model; it must respond correctly to interventions <span class="citation">[cite: 416, 417]</span>. Recent definitions increasingly describe digital twins as transparent predictive models of relevant causal mechanisms that can be updated with new data and queried under counterfactual scenarios <span class="citation">[cite: 417]</span>.</p>
+
+            <h3>Methods and Calibration</h3>
+            <p>Methodologically, the main families include mechanistic tumor-growth ODE/PDE models, agent-based tumor-microenvironment models, hybrid multiscale systems-biology models, imaging-informed inverse problems, and data assimilation <span class="citation">[cite: 427]</span>. The twin is calibrated to baseline data, updated with incoming longitudinal measurements, queried under candidate treatment strategies, and judged under a VVUQ (Verification, Validation, and Uncertainty Quantification) framework <span class="citation">[cite: 445]</span>.</p>
+        </div>
+
+        <div class="tab-content" id="epidemiology">
+            <h2>Causal AI in Epidemiology</h2>
+            <p>In epidemiology, a productive synthesis is emerging between traditional causal reasoning and automated discovery <span class="citation">[cite: 341]</span>. Bradford Hill’s viewpoints remain influential as an interpretive framework, but modern epidemiology continues to stress that they are not a mechanical checklist <span class="citation">[cite: 342]</span>.</p>
+            
+            <h3>The Synthesis Approach</h3>
+            <p>Current work argues for synergy between domain-built DAGs (Directed Acyclic Graphs), evidence-synthesis protocols such as ESC-DAGs, and automated causal discovery tools (e.g., constraint-based, score-based, and functional-causal algorithms) <span class="citation">[cite: 343]</span>.</p>
+            
+            <p>The highest-confidence near-term role for automated discovery is not "fully automatic causal truth," but hypothesis generation, structure refinement, robustness checking, and expert-augmented causal model construction <span class="citation">[cite: 344]</span>. The final product should be a causal model that is interpretable, intervention-relevant, and transparent about assumptions <span class="citation">[cite: 488]</span>.</p>
+        </div>
+
+        <div class="tab-content" id="ite">
+            <h2>Individualized Treatment Effects (ITE)</h2>
+            <p>For individualized treatment effects, the field is mature enough to move beyond average treatment effects, but not mature enough to treat individual effect predictions as routine clinical truth <span class="citation">[cite: 346]</span>.</p>
+
+            <h3>Methods and Challenges</h3>
+            <ul>
+                <li><strong>Common Approaches:</strong> Meta-learners, causal forests, Bayesian methods, representation-learning approaches, and doubly robust estimators are increasingly used <span class="citation">[cite: 347]</span>.</li>
+                <li><strong>The Core Difficulty:</strong> Evaluation remains difficult because counterfactuals are unobserved <span class="citation">[cite: 348]</span>. Outcome prediction quality is not the same as treatment-effect prediction quality <span class="citation">[cite: 528]</span>.</li>
+                <li><strong>Metrics:</strong> Metrics such as C-for-benefit, calibration-for-benefit, Qini-type uplift measures, and policy-value analysis matter because the counterfactual is unobserved for any one patient <span class="citation">[cite: 529]</span>.</li>
+            </ul>
+
+            <p>In practice, the most robust clinical pathway is often triangulation: derive heterogeneity patterns in an RCT if possible, transport or recalibrate them in observational data, and externally validate in another cohort <span class="citation">[cite: 531]</span>.</p>
+        </div>
+
+        <div class="tab-content" id="wearables">
+            <h2>Wearables and Causal Flare Triggers</h2>
+            <p>The best evidence currently comes from prospective observational studies showing that physiological markers such as heart rate, resting heart rate, heart-rate variability, activity, sleep-linked signals, and oxygenation can change days to weeks before flare or symptom worsening in chronic inflammatory disease <span class="citation">[cite: 350]</span>.</p>
+
+            <h3>From Prediction to Causation</h3>
+            <p>Most published studies are still better described as high-quality temporal prediction or associative flare forecasting than definitive causal trigger identification <span class="citation">[cite: 351]</span>. A causal trigger is something whose modification would change flare risk <span class="citation">[cite: 556]</span>.</p>
+            
+            <p>The research opportunity is to combine high-frequency sensing with self-controlled designs, N-of-1 causal frameworks, time-series causal discovery, and intervention tests so that the field moves from "what changes before a flare?" to "what modifiable factors cause or mediate the flare?" <span class="citation">[cite: 352, 353]</span>.</p>
+        </div>
+
+        <div class="quiz-section">
+            <h2>Test Your Knowledge</h2>
+            
+            <div class="question active" id="q1">
+                <p><strong>Question 1 of 3:</strong> Why is Target Trial Emulation (TTE) especially attractive for rare diseases?</p>
+                <div class="options">
+                    <button class="option-btn" onclick="checkAnswer('q1', this, false)">A. It automatically handles hidden confounding without expert input.</button>
+                    <button class="option-btn" onclick="checkAnswer('q1', this, true, 'Correct! TTE is valuable here because conventional randomized trials are often infeasible due to small, dispersed populations[cite: 333].')">B. Conventional randomized trials are often infeasible due to small, geographically dispersed, heterogeneous populations.</button>
+                    <button class="option-btn" onclick="checkAnswer('q1', this, false)">C. Rare diseases typically have massive, perfectly structured EHR datasets.</button>
+                    <button class="option-btn" onclick="checkAnswer('q1', this, false)">D. It replaces the need for careful phenotyping.</button>
+                </div>
+                <div class="feedback" id="feedback-q1"></div>
+            </div>
+
+            <div class="question" id="q2">
+                <p><strong>Question 2 of 3:</strong> What is a fundamental requirement for a clinically meaningful oncology digital twin, separating it from a simple predictive model?</p>
+                <div class="options">
+                    <button class="option-btn" onclick="checkAnswer('q2', this, true, 'Correct! A clinically meaningful twin must respond correctly to interventions and support counterfactual scenarios[cite: 416, 417].')">A. It must respond correctly to interventions and allow counterfactual querying.</button>
+                    <button class="option-btn" onclick="checkAnswer('q2', this, false)">B. It must solely utilize static radiology imaging.</button>
+                    <button class="option-btn" onclick="checkAnswer('q2', this, false)">C. It must be a fully black-box machine learning system.</button>
+                    <button class="option-btn" onclick="checkAnswer('q2', this, false)">D. It must predict outcomes without any need for longitudinal updating.</button>
+                </div>
+                <div class="feedback" id="feedback-q2"></div>
+            </div>
+
+            <div class="question" id="q3">
+                <p><strong>Question 3 of 3:</strong> What is the core difficulty in evaluating Individualized Treatment Effect (ITE) models?</p>
+                <div class="options">
+                    <button class="option-btn" onclick="checkAnswer('q3', this, false)">A. A lack of tree-based algorithms like causal forests.</button>
+                    <button class="option-btn" onclick="checkAnswer('q3', this, false)">B. It is too easy to measure perfectly in observational data.</button>
+                    <button class="option-btn" onclick="checkAnswer('q3', this, true, 'Correct! Evaluation remains difficult because the counterfactual (what would have happened under the alternative treatment) is unobserved for any single patient[cite: 348].')">C. Counterfactuals are unobserved for any one patient.</button>
+                    <button class="option-btn" onclick="checkAnswer('q3', this, false)">D. EHRs do not track treatment timelines.</button>
+                </div>
+                <div class="feedback" id="feedback-q3"></div>
+            </div>
+
+            <div class="controls">
+                <button class="action-btn" disabled="" id="prev-btn" onclick="changeQuestion(-1)">Previous</button>
+                <button class="action-btn" id="next-btn" onclick="changeQuestion(1)">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation Logic
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+            }
+            
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).className += " active";
+            evt.currentTarget.className += " active";
+        }
+
+        // Quiz Logic
+        let currentQuestion = 1;
+        const totalQuestions = 3;
+
+        function checkAnswer(questionId, buttonEl, isCorrect, successMsg = "") {
+            const container = document.getElementById(questionId);
+            const buttons = container.getElementsByClassName("option-btn");
+            const feedbackEl = document.getElementById("feedback-" + questionId);
+
+            // Disable all buttons in this question
+            for(let btn of buttons) {
+                btn.style.pointerEvents = "none";
+            }
+
+            if(isCorrect) {
+                buttonEl.classList.add("correct");
+                feedbackEl.style.color = "#166534";
+                feedbackEl.innerText = successMsg;
+            } else {
+                buttonEl.classList.add("wrong");
+                feedbackEl.style.color = "#991b1b";
+                feedbackEl.innerText = "Incorrect. Review the content in the tabs above to find the right answer.";
+                
+                // Highlight correct answer
+                for(let btn of buttons) {
+                    if(btn.getAttribute("onclick").includes("true")) {
+                        btn.classList.add("correct");
+                    }
+                }
+            }
+        }
+
+        function changeQuestion(direction) {
+            document.getElementById("q" + currentQuestion).classList.remove("active");
+            currentQuestion += direction;
+            document.getElementById("q" + currentQuestion).classList.add("active");
+
+            document.getElementById("prev-btn").disabled = currentQuestion === 1;
+            document.getElementById("next-btn").disabled = currentQuestion === totalQuestions;
+        }
+    </script>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-for-business-economy.html">Causal Inference For Business Economy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-in-health-care.html">Causal Inference In Health Care</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-overview-info.html">Causal Inference Overview Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-overview.html">Causal Inference Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/why-layer-of-agentic-ai.html">Why Layer Of Agentic Ai</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></body></html>

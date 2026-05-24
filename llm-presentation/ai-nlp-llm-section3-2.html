@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>3.2 Structured Output Generation :: AI, NLP &amp; LLMs Course</title>
+<meta content="Master structured output generation: JSON outputs, schema-guided generation, function calling, tool invocation, and validation. Hands-on invoice and W-2 data extraction with live demos." name="description"/>
+<meta content="structured output, JSON generation, schema-guided generation, function calling, tool use, LLM JSON, structured data extraction, invoice extraction, pydantic validation, OpenAI function calling, Claude tool use" name="keywords"/>
+<meta content="AI, NLP &amp; LLMs Course" name="author"/>
+<meta content="3.2 Structured Output Generation :: AI, NLP &amp; LLMs Course" property="og:title"/>
+<meta content="article" property="og:type"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Cabinet+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<style>
+  :root {
+    --ink:     #080c10;
+    --paper:   #f5faf8;
+    --cream:   #eaf3ef;
+    --accent:  #0d6b4e;   /* deep emerald :: Section 3.2 */
+    --accent2: #10b981;
+    --amber:   #d97706;
+    --blue:    #1e40af;
+    --rose:    #be123c;
+    --purple:  #7c3aed;
+    --muted:   #4b6358;
+    --border:  #c4d9d0;
+    --code-bg: #050a08;
+    --code-txt:#a7f3d0;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Cabinet Grotesk',sans-serif;
+    font-size:16px;
+    line-height:1.72;
+    overflow-x:hidden;
+  }
+
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(13,107,78,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(16,185,129,0.03) 0%, transparent 50%);
+    pointer-events:none;z-index:0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar{
+    position:fixed;left:0;top:0;height:100vh;width:268px;
+    background:var(--ink);color:var(--paper);
+    padding:36px 0;z-index:100;
+    display:flex;flex-direction:column;
+    border-right:3px solid var(--accent2);
+    overflow-y:auto;
+  }
+  .sidebar-logo{padding:0 26px 26px;border-bottom:1px solid rgba(245,250,248,0.1);}
+  .sidebar-logo .eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--accent2);text-transform:uppercase;margin-bottom:6px;}
+  .sidebar-logo h2{font-family:'DM Serif Display',serif;font-size:16px;line-height:1.3;}
+  .sidebar-nav{flex:1;padding:18px 0;}
+  .nav-section{padding:0 26px;}
+  .nav-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,250,248,0.28);padding:14px 0 7px;display:block;}
+  .nav-link{display:block;padding:6px 10px;margin:1px -10px;border-radius:4px;color:rgba(245,250,248,0.6);text-decoration:none;font-size:12.5px;font-weight:500;transition:all .2s;}
+  .nav-link:hover,.nav-link.active{background:rgba(16,185,129,0.18);color:#6ee7b7;}
+  .nav-link.active{border-left:2px solid var(--accent2);padding-left:8px;color:#a7f3d0;}
+  .nav-link.dim{color:rgba(245,250,248,0.22);font-size:12px;}
+  .sidebar-footer{padding:16px 26px;border-top:1px solid rgba(245,250,248,0.08);font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(245,250,248,0.28);}
+
+  /* ── PROGRESS ── */
+  .progress-bar{height:3px;background:var(--border);position:sticky;top:0;z-index:200;}
+  .progress-fill{height:100%;width:0%;transition:width .1s;background:linear-gradient(90deg,var(--accent),var(--accent2),#34d399);}
+
+  /* ── MAIN ── */
+  .main{margin-left:268px;min-height:100vh;position:relative;z-index:1;}
+
+  /* ── HERO ── */
+  .hero{
+    background:var(--ink);color:var(--paper);
+    padding:80px 80px 64px;position:relative;overflow:hidden;
+    border-bottom:1px solid rgba(16,185,129,0.2);
+  }
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(16,185,129,0.04) 79px,rgba(16,185,129,0.04) 80px),
+      repeating-linear-gradient(0deg,transparent,transparent 79px,rgba(16,185,129,0.025) 79px,rgba(16,185,129,0.025) 80px);
+    pointer-events:none;
+  }
+  .hero::after{
+    content:'{ }';position:absolute;right:30px;top:10px;
+    font-family:'JetBrains Mono',monospace;font-size:260px;line-height:1;
+    color:rgba(16,185,129,0.05);pointer-events:none;user-select:none;letter-spacing:-.05em;
+  }
+  .breadcrumb{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:rgba(245,250,248,0.3);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .breadcrumb a{color:rgba(245,250,248,0.3);text-decoration:none;}
+  .hero-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent2);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .hero-label::before{content:'';display:inline-block;width:32px;height:1px;background:var(--accent2);}
+  .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(36px,5vw,58px);line-height:1.1;margin-bottom:22px;max-width:700px;}
+  .hero h1 em{font-style:italic;color:#6ee7b7;}
+  .hero-desc{font-size:17px;color:rgba(245,250,248,0.62);max-width:560px;line-height:1.75;margin-bottom:36px;}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{background:rgba(245,250,248,0.06);border:1px solid rgba(245,250,248,0.12);color:rgba(245,250,248,0.6);padding:4px 13px;border-radius:20px;font-size:11.5px;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;}
+
+  /* ── CONTENT ── */
+  .content{padding:0 80px 80px;max-width:1100px;}
+  .section{margin-top:72px;padding-top:72px;border-top:1px solid var(--border);}
+  .section:first-child{border-top:none;padding-top:56px;}
+  .section-number{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--accent2);text-transform:uppercase;margin-bottom:10px;display:block;}
+  .section h2{font-family:'DM Serif Display',serif;font-size:clamp(26px,3.2vw,40px);line-height:1.15;margin-bottom:20px;}
+  .section-intro{font-size:16.5px;color:var(--muted);max-width:680px;margin-bottom:44px;border-left:3px solid var(--accent2);padding-left:20px;}
+  .subsection{margin-bottom:52px;}
+  .subsection h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+  .anchor-icon{width:27px;height:27px;background:var(--ink);color:var(--paper);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;flex-shrink:0;}
+  p{margin-bottom:14px;}
+
+  /* ── CALLOUT ── */
+  .callout{background:var(--cream);border-left:4px solid var(--accent2);border-radius:0 8px 8px 0;padding:16px 20px;margin:22px 0;}
+  .callout.amber{border-left-color:var(--amber);}
+  .callout.blue{border-left-color:var(--blue);}
+  .callout.rose{border-left-color:var(--rose);}
+  .callout.purple{border-left-color:var(--purple);}
+  .callout-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin-bottom:7px;color:var(--accent2);}
+  .callout.amber .callout-label{color:var(--amber);}
+  .callout.blue .callout-label{color:var(--blue);}
+  .callout.rose .callout-label{color:var(--rose);}
+  .callout.purple .callout-label{color:var(--purple);}
+  .callout p{margin-bottom:0;font-size:15px;}
+
+  /* ── TABLE ── */
+  .table-wrap{overflow-x:auto;margin:24px 0;border-radius:8px;border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;}
+  thead{background:var(--ink);color:var(--paper);}
+  th{padding:12px 18px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;}
+  td{padding:11px 18px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:var(--cream);}
+  .ic{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--cream);border:1px solid var(--border);padding:2px 7px;border-radius:3px;color:var(--accent);}
+
+  /* ── CODE ── */
+  .code-container{margin:24px 0;border-radius:10px;overflow:hidden;box-shadow:0 8px 32px rgba(8,12,16,0.18);}
+  .code-header{background:#030605;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;}
+  .code-header-left{display:flex;align-items:center;gap:10px;}
+  .code-dots{display:flex;gap:6px;}
+  .code-dot{width:12px;height:12px;border-radius:50%;}
+  .code-dot.red{background:#ff5f57;}.code-dot.yellow{background:#febc2e;}.code-dot.green{background:#28c840;}
+  .code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(167,243,208,0.35);}
+  .code-lang{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;background:rgba(16,185,129,0.2);color:#6ee7b7;border-radius:4px;letter-spacing:.05em;}
+  pre{background:var(--code-bg);padding:24px;overflow-x:auto;margin:0;line-height:1.65;}
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--code-txt);}
+  .kw{color:#c792ea;}.str{color:#c3e88d;}.num{color:#f78c6c;}
+  .cmt{color:#1a3329;font-style:italic;}.fn{color:#82aaff;}
+  .var{color:#eeffa7;}.key{color:#89ddff;}.cls{color:#ffcb6b;}.dec{color:#a7f3d0;}
+
+  /* ── DARK VIZ BOX ── */
+  .viz-box{background:var(--ink);border-radius:12px;overflow:hidden;margin:32px 0;border:1px solid rgba(16,185,129,0.2);}
+  .viz-header{padding:16px 24px;border-bottom:1px solid rgba(245,250,248,0.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .viz-header h4{font-family:'DM Serif Display',serif;font-size:18px;color:var(--paper);}
+  .viz-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(16,185,129,0.2);color:#6ee7b7;letter-spacing:.05em;}
+  .viz-body{padding:24px;}
+
+  /* ── SCHEMA BUILDER ── */
+  .schema-builder{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:28px 0;}
+  .schema-col{}
+  .schema-col-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;display:block;}
+  .schema-col-label.input{color:var(--amber);}
+  .schema-col-label.output{color:var(--accent2);}
+
+  /* ── STRATEGY CARDS ── */
+  .strategy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0;}
+  .strat-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+  .strat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(8,12,16,0.09);}
+  .strat-head{padding:16px 18px;}
+  .strat-head h4{font-family:'DM Serif Display',serif;font-size:18px;color:var(--paper);margin-bottom:3px;}
+  .strat-head .st-tag{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.65;}
+  .strat-body{padding:14px 18px;background:var(--paper);}
+  .strat-body p{font-size:14px;color:var(--muted);margin:0;}
+
+  /* ── TOOL CALL FLOW ── */
+  .tool-flow{display:flex;flex-direction:column;gap:2px;margin:28px 0;}
+  .tf-step{display:grid;grid-template-columns:56px 1fr;gap:0;overflow:hidden;}
+  .tf-step:first-child .tf-card{border-radius:8px 8px 0 0;}
+  .tf-step:last-child .tf-card{border-radius:0 0 8px 8px;}
+  .tf-num{background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent2);}
+  .tf-card{padding:14px 18px;border-bottom:1px solid rgba(245,250,248,0.06);background:rgba(245,250,248,0.03);border-left:1px solid rgba(245,250,248,0.06);border-right:1px solid rgba(245,250,248,0.06);}
+  .tf-step:last-child .tf-card{border-bottom:1px solid rgba(245,250,248,0.06);}
+  .tf-role{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;}
+  .tf-content{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(245,250,248,0.75);line-height:1.65;}
+  .tf-content .highlight-json{color:#a7f3d0;}
+  .tf-content .highlight-fn{color:#fcd34d;}
+  .tf-content .highlight-param{color:#93c5fd;}
+
+  /* ── VALIDATION STATUS ── */
+  .val-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
+  .val-card{border-radius:8px;overflow:hidden;}
+  .val-header{padding:12px 16px;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;}
+  .val-body{padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.65;}
+  .val-pass{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:rgba(245,250,248,0.8);}
+  .val-fail{background:rgba(190,18,60,0.1);border:1px solid rgba(190,18,60,0.3);color:rgba(245,250,248,0.8);}
+  .val-header.pass{color:#6ee7b7;}.val-header.fail{color:#fda4af;}
+
+  /* ── DOCUMENT DEMO ── */
+  .doc-demo{background:var(--ink);border-radius:12px;overflow:hidden;margin:32px 0;border:1px solid rgba(16,185,129,0.2);}
+  .doc-demo-header{padding:18px 24px;border-bottom:1px solid rgba(245,250,248,0.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .doc-demo-header h4{font-family:'DM Serif Display',serif;font-size:20px;color:var(--paper);}
+  .doc-demo-body{padding:24px;}
+
+  .doc-tabs{display:flex;gap:2px;background:rgba(245,250,248,0.05);padding:4px;border-radius:7px;margin-bottom:20px;width:fit-content;}
+  .doc-tab{padding:7px 18px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;color:rgba(245,250,248,0.5);border:none;background:none;transition:all .2s;}
+  .doc-tab.active{background:var(--accent);color:white;}
+
+  .doc-panel{display:none;}
+  .doc-panel.active{display:block;}
+
+  .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+  .doc-render{
+    background:white;border-radius:8px;padding:24px;color:#1a1a1a;
+    font-family:'Cabinet Grotesk',sans-serif;font-size:14px;line-height:1.7;
+    border:1px solid rgba(245,250,248,0.1);min-height:300px;
+  }
+  .doc-render h5{font-size:16px;font-weight:800;margin-bottom:2px;color:#111;}
+  .doc-render .doc-subtitle{font-size:12px;color:#666;margin-bottom:16px;}
+  .doc-render table{width:100%;border-collapse:collapse;font-size:13px;}
+  .doc-render td,.doc-render th{padding:5px 8px;border:1px solid #ddd;text-align:left;}
+  .doc-render thead td{background:#f5f5f5;font-weight:600;}
+  .doc-render .doc-total{font-weight:700;font-size:15px;margin-top:12px;text-align:right;}
+  .doc-render .doc-section{font-weight:700;font-size:12px;border-bottom:2px solid #222;margin:12px 0 6px;padding-bottom:3px;}
+  .doc-render .doc-row{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;}
+  .doc-render .doc-row.bold{font-weight:700;border-top:1px solid #aaa;padding-top:6px;margin-top:4px;}
+
+  .json-out{
+    background:var(--code-bg);border-radius:8px;padding:18px;
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;
+    color:#a7f3d0;line-height:1.65;min-height:300px;overflow-x:auto;
+    white-space:pre;border:1px solid rgba(16,185,129,0.15);
+  }
+  .json-out.loading::after{content:'▋';animation:blink .8s infinite;color:rgba(167,243,208,0.4);}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  .doc-controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .run-btn{background:var(--accent);color:white;border:none;padding:10px 22px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+  .run-btn:hover{background:#0a5a3d;transform:translateY(-1px);}
+  .run-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  .run-btn.secondary{background:rgba(16,185,129,0.2);color:#6ee7b7;}
+
+  .val-result{margin-top:14px;padding:12px 16px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.65;display:none;}
+  .val-result.pass{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7;}
+  .val-result.fail{background:rgba(190,18,60,0.1);border:1px solid rgba(190,18,60,0.3);color:#fda4af;}
+
+  /* ── CUSTOM EXTRACTOR ── */
+  .custom-extractor{background:var(--ink);border-radius:12px;overflow:hidden;margin:32px 0;border:1px solid rgba(16,185,129,0.2);}
+  .ce-header{padding:18px 24px;border-bottom:1px solid rgba(245,250,248,0.07);}
+  .ce-header h4{font-family:'DM Serif Display',serif;font-size:20px;color:var(--paper);margin-bottom:4px;}
+  .ce-header p{font-size:13.5px;color:rgba(245,250,248,0.4);}
+  .ce-body{padding:24px;}
+  .ce-input{width:100%;background:rgba(245,250,248,0.05);border:1px solid rgba(245,250,248,0.12);color:var(--paper);padding:12px 14px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;resize:vertical;outline:none;margin-bottom:12px;transition:border-color .2s;line-height:1.65;}
+  .ce-input:focus{border-color:var(--accent2);}
+  .ce-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;}
+  .ce-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,250,248,0.38);display:block;margin-bottom:6px;}
+
+  /* ── REVEAL ── */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s,transform .55s;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav{margin-top:80px;padding:36px 80px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--cream);}
+  .btn-nav{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border:1.5px solid var(--ink);border-radius:6px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;transition:all .2s;}
+  .btn-nav.primary{background:var(--ink);color:var(--paper);}
+  .btn-nav:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(8,12,16,0.12);}
+
+  @media(max-width:900px){
+    .sidebar{display:none;}.main{margin-left:0;}
+    .hero,.content{padding-left:28px;padding-right:28px;}
+    .strategy-grid,.schema-builder,.doc-grid,.ce-row,.val-grid{grid-template-columns:1fr;}
+    .bottom-nav{flex-direction:column;gap:14px;padding:24px 28px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="eyebrow">Course Material</div>
+    <h2>AI, NLP &amp; LLMs</h2>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <span class="nav-label">Previous</span>
+      <a class="nav-link dim" href="ai-nlp-llm-section3-1.html">3.1 Fundamentals of Prompting</a>
+      <span class="nav-label">Section 3.2</span>
+      <a class="nav-link active" href="#hero">Structured Output</a>
+      <a class="nav-link" href="#why">Why Structure Matters</a>
+      <a class="nav-link" href="#json">JSON Generation</a>
+      <a class="nav-link" href="#schema">Schema-guided</a>
+      <a class="nav-link" href="#functions">Function Calling</a>
+      <a class="nav-link" href="#tools">Tool Invocation</a>
+      <a class="nav-link" href="#validation">Validation</a>
+      <a class="nav-link" href="#handson">Hands-on: Invoice &amp; W-2</a>
+      <a class="nav-link" href="#custom">Custom Extractor</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Section 3.2 · ~55 min</div>
+</nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<main class="main">
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="breadcrumb">
+      <a href="#">Section 3</a>
+      <span style="color:rgba(245,250,248,0.18)">›</span>
+      <span>3.2 Structured Output Generation</span>
+    </div>
+    <div class="hero-label">Section 3.2 :: Prompt Engineering</div>
+    <h1>Structured <em>Output</em><br/>Generation</h1>
+    <p class="hero-desc">Turn LLM responses from prose into reliable, machine-readable data. Learn JSON generation, schema enforcement, function calling, and validation :: the foundation of production AI systems.</p>
+    <div class="hero-tags">
+      <span class="tag">JSON Outputs</span>
+      <span class="tag">JSON Schema</span>
+      <span class="tag">Function Calling</span>
+      <span class="tag">Tool Use</span>
+      <span class="tag">Pydantic</span>
+      <span class="tag">Data Extraction</span>
+      <span class="tag">Validation</span>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <!-- WHY STRUCTURE MATTERS -->
+    <section class="section reveal" id="why">
+      <span class="section-number">3.2.0</span>
+      <h2>Why Structured Output Matters</h2>
+      <p class="section-intro">Prose is for humans. Production software needs data. Structured output generation bridges the gap between LLM's generative power and the typed, validated data structures your code expects.</p>
+
+      <div class="subsection">
+        <p>When an LLM returns a paragraph, your application must parse it :: a brittle, error-prone process. When it returns structured JSON matching a known schema, your code can parse, validate, and act on it programmatically. This is the difference between a demo and a production system.</p>
+
+        <div class="viz-box">
+          <div class="viz-header"><h4>Unstructured vs Structured Pipeline</h4><span class="viz-badge">ARCHITECTURE</span></div>
+          <div class="viz-body">
+            <svg style="width:100%;max-width:680px;" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="ar" markerHeight="7" markerWidth="7" orient="auto" refX="5" refY="3"><path d="M0,0 L0,6 L7,3z" fill="rgba(245,250,248,0.3)"></path></marker>
+                <marker id="ar-g" markerHeight="7" markerWidth="7" orient="auto" refX="5" refY="3"><path d="M0,0 L0,6 L7,3z" fill="#6ee7b7"></path></marker>
+                <marker id="ar-r" markerHeight="7" markerWidth="7" orient="auto" refX="5" refY="3"><path d="M0,0 L0,6 L7,3z" fill="#fda4af"></path></marker>
+              </defs>
+
+              <!-- UNSTRUCTURED row -->
+              <text fill="rgba(245,250,248,0.35)" font-family="'JetBrains Mono'" font-size="10" letter-spacing="2" x="10" y="26">UNSTRUCTURED</text>
+              <rect fill="rgba(245,250,248,0.06)" height="36" rx="4" stroke="rgba(245,250,248,0.15)" stroke-width="1" width="90" x="10" y="36"></rect>
+              <text fill="rgba(245,250,248,0.7)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="55" y="59">Prompt</text>
+              <line marker-end="url(#ar)" stroke="rgba(245,250,248,0.25)" stroke-width="1.5" x1="100" x2="140" y1="54" y2="54"></line>
+              <rect fill="rgba(245,250,248,0.06)" height="36" rx="4" stroke="rgba(245,250,248,0.15)" stroke-width="1" width="90" x="140" y="36"></rect>
+              <text fill="rgba(245,250,248,0.7)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="185" y="59">LLM</text>
+              <line marker-end="url(#ar)" stroke="rgba(245,250,248,0.25)" stroke-width="1.5" x1="230" x2="270" y1="54" y2="54"></line>
+              <rect fill="rgba(245,250,248,0.06)" height="48" rx="4" stroke="rgba(190,18,60,0.4)" stroke-width="1" width="130" x="270" y="30"></rect>
+              <text fill="#fda4af" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="335" y="50">"The total is about</text>
+              <text fill="#fda4af" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="335" y="66">$120 give or take..."</text>
+              <line marker-end="url(#ar-r)" stroke="rgba(190,18,60,0.4)" stroke-width="1.5" x1="400" x2="440" y1="54" y2="54"></line>
+              <rect fill="rgba(190,18,60,0.1)" height="36" rx="4" stroke="rgba(190,18,60,0.35)" stroke-width="1" width="110" x="440" y="36"></rect>
+              <text fill="#fda4af" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="495" y="52">Regex parsing</text>
+              <text fill="#fda4af" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="495" y="65">= brittle ❌</text>
+
+              <!-- Separator -->
+              <line stroke="rgba(245,250,248,0.06)" stroke-width="1" x1="0" x2="680" y1="108" y2="108"></line>
+
+              <!-- STRUCTURED row -->
+              <text fill="rgba(16,185,129,0.6)" font-family="'JetBrains Mono'" font-size="10" letter-spacing="2" x="10" y="130">STRUCTURED</text>
+              <rect fill="rgba(16,185,129,0.08)" height="36" rx="4" stroke="rgba(16,185,129,0.3)" stroke-width="1" width="90" x="10" y="140"></rect>
+              <text fill="#6ee7b7" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="55" y="163">Prompt</text>
+              <text fill="rgba(16,185,129,0.5)" font-family="'JetBrains Mono'" font-size="9" text-anchor="middle" x="55" y="175">+ schema</text>
+              <line marker-end="url(#ar-g)" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" x1="100" x2="140" y1="158" y2="158"></line>
+              <rect fill="rgba(16,185,129,0.08)" height="36" rx="4" stroke="rgba(16,185,129,0.3)" stroke-width="1" width="90" x="140" y="140"></rect>
+              <text fill="#6ee7b7" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="185" y="163">LLM</text>
+              <line marker-end="url(#ar-g)" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" x1="230" x2="270" y1="158" y2="158"></line>
+              <rect fill="rgba(16,185,129,0.08)" height="48" rx="4" stroke="rgba(16,185,129,0.3)" stroke-width="1" width="130" x="270" y="134"></rect>
+              <text fill="#a7f3d0" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="335" y="154">{"amount": 120.00,</text>
+              <text fill="#a7f3d0" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="335" y="170">"currency": "USD"}</text>
+              <line marker-end="url(#ar-g)" stroke="rgba(16,185,129,0.5)" stroke-width="1.5" x1="400" x2="440" y1="158" y2="158"></line>
+              <rect fill="rgba(16,185,129,0.1)" height="36" rx="4" stroke="rgba(16,185,129,0.35)" stroke-width="1" width="110" x="440" y="140"></rect>
+              <text fill="#6ee7b7" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="495" y="156">json.loads()</text>
+              <text fill="#6ee7b7" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="495" y="169">→ reliable ✓</text>
+
+              <text fill="rgba(245,250,248,0.2)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="340" y="212">Structured output turns LLM generation into a data pipeline :: parseable, validatable, type-safe</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="strategy-grid">
+          <div class="strat-card">
+            <div class="strat-head" style="background:rgba(13,107,78,0.8);">
+              <h4>Reliability</h4>
+              <span class="st-tag">vs. free-form</span>
+            </div>
+            <div class="strat-body"><p>JSON is parseable deterministically. Prose requires regex or another LLM call to parse. Format errors drop to near-zero with schema enforcement.</p></div>
+          </div>
+          <div class="strat-card">
+            <div class="strat-head" style="background:rgba(30,64,175,0.8);">
+              <h4>Composability</h4>
+              <span class="st-tag">pipeline integration</span>
+            </div>
+            <div class="strat-body"><p>Structured outputs plug directly into databases, APIs, and downstream code. The LLM becomes a typed function, not a text generator.</p></div>
+          </div>
+          <div class="strat-card">
+            <div class="strat-head" style="background:rgba(124,58,237,0.8);">
+              <h4>Validation</h4>
+              <span class="st-tag">catch errors early</span>
+            </div>
+            <div class="strat-body"><p>Schemas let you validate types, ranges, required fields, and business rules :: catching hallucinations and format drift before they reach production.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JSON GENERATION -->
+    <section class="section reveal" id="json">
+      <span class="section-number">3.2.1</span>
+      <h2>JSON Output Generation</h2>
+      <p class="section-intro">The simplest form of structured output: instruct the model to return JSON, specify the exact schema, and parse the result. Three levels of reliability :: each more robust than the last.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">1</span>Level 1 :: Prompt-Only (Fragile)</h3>
+        <p>Simply ask for JSON. Works most of the time, but the model may add markdown fences, explanations, or deviate from your schema under pressure.</p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left"><div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div><span class="code-filename">level1_prompt_only.py</span></div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">import</span> json
+<span class="kw">from</span> anthropic <span class="kw">import</span> <span class="cls">Anthropic</span>
+
+<span class="var">client</span> = <span class="cls">Anthropic</span>()
+
+<span class="kw">def</span> <span class="fn">extract_contact</span>(text: <span class="cls">str</span>) -&gt; dict:
+    <span class="var">response</span> = <span class="var">client</span>.messages.<span class="fn">create</span>(
+        model=<span class="str">"claude-sonnet-4-20250514"</span>,
+        max_tokens=<span class="num">512</span>,
+        system=<span class="str">"""Extract contact information and return ONLY valid JSON.
+No markdown, no explanation, no code fences.
+Schema: {"name": str, "email": str|null, "phone": str|null, "company": str|null}"""</span>,
+        messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: text}]
+    )
+    <span class="var">raw</span> = <span class="var">response</span>.content[<span class="num">0</span>].text.<span class="fn">strip</span>()
+    <span class="cmt"># Strip markdown fences if the model added them anyway</span>
+    <span class="kw">if</span> <span class="var">raw</span>.<span class="fn">startswith</span>(<span class="str">"```"</span>):
+        <span class="var">raw</span> = <span class="var">raw</span>.<span class="fn">split</span>(<span class="str">"\n"</span>, <span class="num">1</span>)[<span class="num">1</span>].<span class="fn">rsplit</span>(<span class="str">"```"</span>, <span class="num">1</span>)[<span class="num">0</span>].<span class="fn">strip</span>()
+    <span class="kw">return</span> json.<span class="fn">loads</span>(<span class="var">raw</span>)  <span class="cmt"># ← raises JSONDecodeError if model misbehaves</span>
+
+<span class="var">result</span> = <span class="fn">extract_contact</span>(
+    <span class="str">"Hi I'm Sarah Chen, lead engineer at Vertex Systems. "
+    "Reach me at s.chen@vertex.io or +1-415-555-0192."</span>
+)
+<span class="fn">print</span>(<span class="var">result</span>)
+<span class="cmt"># {"name": "Sarah Chen", "email": "s.chen@vertex.io",
+#  "phone": "+1-415-555-0192", "company": "Vertex Systems"}</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">2</span>Level 2 :: Schema in Prompt (More Robust)</h3>
+        <p>Include the full JSON Schema in the system prompt with types, constraints, and examples. Dramatically reduces format deviations.</p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left"><div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div><span class="code-filename">level2_schema_prompt.py</span></div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">import</span> json
+
+<span class="var">INVOICE_SCHEMA</span> = {
+    <span class="str">"type"</span>: <span class="str">"object"</span>,
+    <span class="str">"required"</span>: [<span class="str">"invoice_number"</span>, <span class="str">"vendor"</span>, <span class="str">"total_amount"</span>, <span class="str">"currency"</span>, <span class="str">"line_items"</span>],
+    <span class="str">"properties"</span>: {
+        <span class="str">"invoice_number"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>},
+        <span class="str">"invoice_date"</span>:   {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"format"</span>: <span class="str">"date"</span>},
+        <span class="str">"due_date"</span>:        {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"format"</span>: <span class="str">"date"</span>, <span class="str">"nullable"</span>: <span class="cls">True</span>},
+        <span class="str">"vendor"</span>: {
+            <span class="str">"type"</span>: <span class="str">"object"</span>,
+            <span class="str">"properties"</span>: {
+                <span class="str">"name"</span>:    {<span class="str">"type"</span>: <span class="str">"string"</span>},
+                <span class="str">"address"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"nullable"</span>: <span class="cls">True</span>},
+                <span class="str">"tax_id"</span>:  {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"nullable"</span>: <span class="cls">True</span>},
+            }
+        },
+        <span class="str">"line_items"</span>: {
+            <span class="str">"type"</span>: <span class="str">"array"</span>,
+            <span class="str">"items"</span>: {
+                <span class="str">"type"</span>: <span class="str">"object"</span>,
+                <span class="str">"properties"</span>: {
+                    <span class="str">"description"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>},
+                    <span class="str">"quantity"</span>:    {<span class="str">"type"</span>: <span class="str">"number"</span>},
+                    <span class="str">"unit_price"</span>:  {<span class="str">"type"</span>: <span class="str">"number"</span>},
+                    <span class="str">"amount"</span>:      {<span class="str">"type"</span>: <span class="str">"number"</span>},
+                }
+            }
+        },
+        <span class="str">"subtotal"</span>:     {<span class="str">"type"</span>: <span class="str">"number"</span>, <span class="str">"nullable"</span>: <span class="cls">True</span>},
+        <span class="str">"tax_amount"</span>:   {<span class="str">"type"</span>: <span class="str">"number"</span>, <span class="str">"nullable"</span>: <span class="cls">True</span>},
+        <span class="str">"total_amount"</span>: {<span class="str">"type"</span>: <span class="str">"number"</span>},
+        <span class="str">"currency"</span>:     {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"enum"</span>: [<span class="str">"USD"</span>, <span class="str">"EUR"</span>, <span class="str">"GBP"</span>, <span class="str">"JPY"</span>]},
+    }
+}
+
+<span class="var">SYSTEM</span> = <span class="str">f"""You are a document parser. Extract invoice data and return ONLY valid JSON.
+Match this JSON Schema exactly:
+{json.dumps(INVOICE_SCHEMA, indent=2)}
+Rules:
+- All monetary values as numbers (not strings)
+- Dates in YYYY-MM-DD format
+- null for any field not found in the document
+- Return ONLY the JSON object, no other text"""</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">3</span>Level 3 :: Native Structured Outputs (Most Reliable)</h3>
+        <p>Modern APIs support native structured output modes that <em>constrain the token generation</em> to match your schema :: the model cannot physically produce invalid JSON.</p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left"><div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div><span class="code-filename">level3_native_structured.py</span></div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="cmt"># ── Approach A: OpenAI Structured Outputs (JSON Schema enforcement) ──</span>
+<span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+<span class="kw">from</span> pydantic <span class="kw">import</span> <span class="cls">BaseModel</span>
+<span class="kw">from</span> typing <span class="kw">import</span> <span class="cls">Optional</span>
+
+<span class="var">client</span> = <span class="cls">OpenAI</span>()
+
+<span class="kw">class</span> <span class="cls">LineItem</span>(<span class="cls">BaseModel</span>):
+    description: str
+    quantity:    float
+    unit_price:  float
+    amount:      float
+
+<span class="kw">class</span> <span class="cls">Vendor</span>(<span class="cls">BaseModel</span>):
+    name:    str
+    address: <span class="cls">Optional</span>[str] = <span class="cls">None</span>
+    tax_id:  <span class="cls">Optional</span>[str] = <span class="cls">None</span>
+
+<span class="kw">class</span> <span class="cls">Invoice</span>(<span class="cls">BaseModel</span>):
+    invoice_number: str
+    invoice_date:   str
+    due_date:       <span class="cls">Optional</span>[str] = <span class="cls">None</span>
+    vendor:         <span class="cls">Vendor</span>
+    line_items:     list[<span class="cls">LineItem</span>]
+    subtotal:       <span class="cls">Optional</span>[float] = <span class="cls">None</span>
+    tax_amount:     <span class="cls">Optional</span>[float] = <span class="cls">None</span>
+    total_amount:   float
+    currency:       str
+
+<span class="var">response</span> = <span class="var">client</span>.beta.chat.completions.<span class="fn">parse</span>(
+    model=<span class="str">"gpt-4o"</span>,
+    messages=[
+        {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Extract invoice data from the document."</span>},
+        {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: invoice_text}
+    ],
+    response_format=<span class="cls">Invoice</span>,   <span class="cmt"># ← constrained generation</span>
+)
+
+<span class="var">invoice</span>: <span class="cls">Invoice</span> = <span class="var">response</span>.choices[<span class="num">0</span>].message.parsed  <span class="cmt"># typed Python object</span>
+<span class="fn">print</span>(<span class="str">f"Total: {invoice.currency} {invoice.total_amount}"</span>)
+<span class="fn">print</span>(<span class="str">f"Items: {len(invoice.line_items)}"</span>)
+
+<span class="cmt"># ── Approach B: Anthropic with explicit JSON schema in tool ──</span>
+<span class="kw">from</span> anthropic <span class="kw">import</span> <span class="cls">Anthropic</span>
+<span class="var">aclient</span> = <span class="cls">Anthropic</span>()
+
+<span class="var">response</span> = <span class="var">aclient</span>.messages.<span class="fn">create</span>(
+    model=<span class="str">"claude-sonnet-4-20250514"</span>,
+    max_tokens=<span class="num">2048</span>,
+    tools=[{
+        <span class="str">"name"</span>: <span class="str">"extract_invoice"</span>,
+        <span class="str">"description"</span>: <span class="str">"Extract structured invoice data"</span>,
+        <span class="str">"input_schema"</span>: <span class="cls">Invoice</span>.<span class="fn">model_json_schema</span>()
+    }],
+    tool_choice={<span class="str">"type"</span>: <span class="str">"tool"</span>, <span class="str">"name"</span>: <span class="str">"extract_invoice"</span>},
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: invoice_text}]
+)
+
+<span class="var">tool_use</span> = next(b <span class="kw">for</span> b <span class="kw">in</span> <span class="var">response</span>.content <span class="kw">if</span> b.type == <span class="str">"tool_use"</span>)
+<span class="var">invoice</span>  = <span class="cls">Invoice</span>(**<span class="var">tool_use</span>.input)  <span class="cmt"># validated Pydantic object</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCHEMA-GUIDED GENERATION -->
+    <section class="section reveal" id="schema">
+      <span class="section-number">3.2.2</span>
+      <h2>Schema-guided Generation</h2>
+      <p class="section-intro">JSON Schema gives you a formal grammar for your output. Mastering schema design :: types, enums, nested objects, arrays, constraints :: is what separates amateur from production-grade structured output prompts.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">S</span>Schema Design Patterns</h3>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left"><div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div><span class="code-filename">schema_patterns.py</span></div>
+            <span class="code-lang">JSON SCHEMA</span>
+          </div>
+          <pre><code><span class="cmt"># ── Pattern 1: Enum constraints (limit model's choices) ──</span>
+{
+  <span class="str">"sentiment"</span>: {
+    <span class="str">"type"</span>: <span class="str">"string"</span>,
+    <span class="str">"enum"</span>: [<span class="str">"POSITIVE"</span>, <span class="str">"NEGATIVE"</span>, <span class="str">"NEUTRAL"</span>, <span class="str">"MIXED"</span>]
+  }
+}
+
+<span class="cmt"># ── Pattern 2: Numeric ranges (prevent hallucinated values) ──</span>
+{
+  <span class="str">"confidence"</span>: {
+    <span class="str">"type"</span>: <span class="str">"number"</span>,
+    <span class="str">"minimum"</span>: <span class="num">0.0</span>,
+    <span class="str">"maximum"</span>: <span class="num">1.0</span>
+  },
+  <span class="str">"year"</span>: {
+    <span class="str">"type"</span>: <span class="str">"integer"</span>,
+    <span class="str">"minimum"</span>: <span class="num">1900</span>,
+    <span class="str">"maximum"</span>: <span class="num">2100</span>
+  }
+}
+
+<span class="cmt"># ── Pattern 3: Nullable fields (explicit about missing data) ──</span>
+{
+  <span class="str">"phone"</span>: {
+    <span class="str">"oneOf"</span>: [
+      {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"pattern"</span>: <span class="str">"^\\+?[\\d\\s\\-()]+$"</span>},
+      {<span class="str">"type"</span>: <span class="str">"null"</span>}
+    ],
+    <span class="str">"description"</span>: <span class="str">"Phone number in any format, or null if not present"</span>
+  }
+}
+
+<span class="cmt"># ── Pattern 4: Typed arrays with min/max items ──</span>
+{
+  <span class="str">"tags"</span>: {
+    <span class="str">"type"</span>: <span class="str">"array"</span>,
+    <span class="str">"items"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"maxLength"</span>: <span class="num">50</span>},
+    <span class="str">"minItems"</span>: <span class="num">1</span>,
+    <span class="str">"maxItems"</span>: <span class="num">10</span>
+  }
+}
+
+<span class="cmt"># ── Pattern 5: Discriminated unions (polymorphic results) ──</span>
+{
+  <span class="str">"event"</span>: {
+    <span class="str">"oneOf"</span>: [
+      {
+        <span class="str">"type"</span>: <span class="str">"object"</span>,
+        <span class="str">"properties"</span>: {
+          <span class="str">"type"</span>: {<span class="str">"const"</span>: <span class="str">"purchase"</span>},
+          <span class="str">"amount"</span>: {<span class="str">"type"</span>: <span class="str">"number"</span>}
+        }
+      },
+      {
+        <span class="str">"type"</span>: <span class="str">"object"</span>,
+        <span class="str">"properties"</span>: {
+          <span class="str">"type"</span>: {<span class="str">"const"</span>: <span class="str">"refund"</span>},
+          <span class="str">"reason"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>}
+        }
+      }
+    ]
+  }
+}</code></pre>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">Schema Design Tips</div>
+          <p>Use <strong>enums</strong> for any field with a known finite set of values :: this eliminates hallucinated alternatives. Use <strong>descriptions</strong> in schema fields :: the model reads them as instructions. Mark fields as <strong>required</strong> only if truly mandatory; nullable fields with clear labels ("null if not present") produce better outputs than forcing fabrication.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUNCTION CALLING -->
+    <section class="section reveal" id="functions">
+      <span class="section-number">3.2.3</span>
+      <h2>Function Calling</h2>
+      <p class="section-intro">Function calling (OpenAI) / Tool use (Anthropic) lets the model decide <em>when</em> and <em>how</em> to invoke an external function :: passing structured arguments it extracts from the conversation. This is the foundation of agentic AI.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">F</span>How Function Calling Works</h3>
+        <p>You provide a list of function definitions with JSON Schema parameter specs. The model reads the conversation and, when appropriate, returns a <span class="ic">tool_use</span> block with the function name and extracted arguments. Your code executes the function and returns the result back to the model.</p>
+
+        <div class="viz-box">
+          <div class="viz-header"><h4>Function Calling :: Message Flow</h4><span class="viz-badge">5-STEP PROTOCOL</span></div>
+          <div class="viz-body">
+            <div class="tool-flow">
+              <div class="tf-step">
+                <div class="tf-num" style="background:rgba(13,107,78,0.4);">1</div>
+                <div class="tf-card">
+                  <div class="tf-role" style="color:#6ee7b7;">USER → MODEL</div>
+                  <div class="tf-content">User message + <span class="highlight-fn">function definitions</span> provided in the API call<br/><span class="highlight-param">tools=[{"name": "get_weather", "description": "...", "input_schema": {...}}]</span></div>
+                </div>
+              </div>
+              <div class="tf-step">
+                <div class="tf-num" style="background:rgba(13,107,78,0.4);">2</div>
+                <div class="tf-card">
+                  <div class="tf-role" style="color:#fcd34d;">MODEL DECISION</div>
+                  <div class="tf-content">Model decides a tool call is needed. Returns <span class="highlight-fn">stop_reason: "tool_use"</span> with arguments:<br/><span class="highlight-json">{"type": "tool_use", "name": "get_weather", "input": {"city": "San Francisco", "unit": "celsius"}}</span></div>
+                </div>
+              </div>
+              <div class="tf-step">
+                <div class="tf-num" style="background:rgba(13,107,78,0.4);">3</div>
+                <div class="tf-card">
+                  <div class="tf-role" style="color:#93c5fd;">YOUR CODE EXECUTES</div>
+                  <div class="tf-content">You call the actual function with the model's arguments:<br/><span class="highlight-param">result = get_weather(city="San Francisco", unit="celsius")  # → {"temp": 18, "condition": "foggy"}</span></div>
+                </div>
+              </div>
+              <div class="tf-step">
+                <div class="tf-num" style="background:rgba(13,107,78,0.4);">4</div>
+                <div class="tf-card">
+                  <div class="tf-role" style="color:#6ee7b7;">TOOL RESULT → MODEL</div>
+                  <div class="tf-content">Send result back to model in a tool_result message:<br/><span class="highlight-json">{"type": "tool_result", "tool_use_id": "...", "content": "{\"temp\": 18, \"condition\": \"foggy\"}"}</span></div>
+                </div>
+              </div>
+              <div class="tf-step">
+                <div class="tf-num" style="background:rgba(16,185,129,0.6);">5</div>
+                <div class="tf-card">
+                  <div class="tf-role" style="color:#a7f3d0;">FINAL RESPONSE</div>
+                  <div class="tf-content">Model uses the function result to generate a natural language reply:<br/><span style="color:rgba(245,250,248,0.7);">"It's currently 18°C and foggy in San Francisco. You'll want to bring a jacket."</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left"><div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div><span class="code-filename">function_calling_anthropic.py</span></div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> anthropic <span class="kw">import</span> <span class="cls">Anthropic</span>
+<span class="kw">import</span> json
+
+<span class="var">client</span> = <span class="cls">Anthropic</span>()
+
+<span class="cmt"># ── Define tools ──</span>
+<span class="var">TOOLS</span> = [
+    {
+        <span class="str">"name"</span>: <span class="str">"search_products"</span>,
+        <span class="str">"description"</span>: <span class="str">"Search the product catalogue by name, category, or price range"</span>,
+        <span class="str">"input_schema"</span>: {
+            <span class="str">"type"</span>: <span class="str">"object"</span>,
+            <span class="str">"required"</span>: [<span class="str">"query"</span>],
+            <span class="str">"properties"</span>: {
+                <span class="str">"query"</span>:      {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"description"</span>: <span class="str">"Search query"</span>},
+                <span class="str">"category"</span>:  {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"enum"</span>: [<span class="str">"electronics"</span>, <span class="str">"clothing"</span>, <span class="str">"books"</span>]},
+                <span class="str">"max_price"</span>: {<span class="str">"type"</span>: <span class="str">"number"</span>, <span class="str">"description"</span>: <span class="str">"Maximum price in USD"</span>},
+            }
+        }
+    },
+    {
+        <span class="str">"name"</span>: <span class="str">"add_to_cart"</span>,
+        <span class="str">"description"</span>: <span class="str">"Add a product to the shopping cart by product ID"</span>,
+        <span class="str">"input_schema"</span>: {
+            <span class="str">"type"</span>: <span class="str">"object"</span>,
+            <span class="str">"required"</span>: [<span class="str">"product_id"</span>, <span class="str">"quantity"</span>],
+            <span class="str">"properties"</span>: {
+                <span class="str">"product_id"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>},
+                <span class="str">"quantity"</span>:   {<span class="str">"type"</span>: <span class="str">"integer"</span>, <span class="str">"minimum"</span>: <span class="num">1</span>},
+            }
+        }
+    }
+]
+
+<span class="cmt"># ── Simulated tool implementations ──</span>
+<span class="kw">def</span> <span class="fn">search_products</span>(query, category=<span class="cls">None</span>, max_price=<span class="cls">None</span>):
+    <span class="kw">return</span> [
+        {<span class="str">"id"</span>: <span class="str">"P001"</span>, <span class="str">"name"</span>: <span class="str">"Wireless Headphones"</span>, <span class="str">"price"</span>: <span class="num">89.99</span>},
+        {<span class="str">"id"</span>: <span class="str">"P002"</span>, <span class="str">"name"</span>: <span class="str">"Bluetooth Speaker"</span>,   <span class="str">"price"</span>: <span class="num">49.99</span>},
+    ]
+
+<span class="kw">def</span> <span class="fn">add_to_cart</span>(product_id, quantity):
+    <span class="kw">return</span> {<span class="str">"success"</span>: <span class="cls">True</span>, <span class="str">"cart_total"</span>: <span class="num">89.99</span> * quantity}
+
+<span class="var">TOOL_MAP</span> = {<span class="str">"search_products"</span>: <span class="var">search_products</span>, <span class="str">"add_to_cart"</span>: <span class="var">add_to_cart</span>}
+
+<span class="cmt"># ── Agentic loop ──</span>
+<span class="kw">def</span> <span class="fn">agent</span>(user_message: str) -&gt; str:
+    <span class="var">messages</span> = [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: user_message}]
+
+    <span class="kw">while</span> <span class="cls">True</span>:
+        <span class="var">response</span> = <span class="var">client</span>.messages.<span class="fn">create</span>(
+            model=<span class="str">"claude-sonnet-4-20250514"</span>,
+            max_tokens=<span class="num">1024</span>,
+            tools=<span class="var">TOOLS</span>,
+            messages=<span class="var">messages</span>
+        )
+
+        <span class="kw">if</span> <span class="var">response</span>.stop_reason == <span class="str">"end_turn"</span>:
+            <span class="kw">return</span> <span class="var">response</span>.content[<span class="num">0</span>].text  <span class="cmt"># done</span>
+
+        <span class="cmt"># Collect all tool uses from this response</span>
+        <span class="var">messages</span>.<span class="fn">append</span>({<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="var">response</span>.content})
+
+        <span class="var">tool_results</span> = []
+        <span class="kw">for</span> block <span class="kw">in</span> <span class="var">response</span>.content:
+            <span class="kw">if</span> block.type == <span class="str">"tool_use"</span>:
+                <span class="var">fn</span>     = <span class="var">TOOL_MAP</span>[block.name]
+                <span class="var">result</span> = <span class="fn">fn</span>(**block.input)
+                <span class="var">tool_results</span>.<span class="fn">append</span>({
+                    <span class="str">"type"</span>: <span class="str">"tool_result"</span>,
+                    <span class="str">"tool_use_id"</span>: block.id,
+                    <span class="str">"content"</span>: json.<span class="fn">dumps</span>(<span class="var">result</span>)
+                })
+
+        <span class="var">messages</span>.<span class="fn">append</span>({<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="var">tool_results</span>})
+
+<span class="fn">print</span>(<span class="fn">agent</span>(<span class="str">"Find me wireless audio gear under $100 and add the cheapest to my cart"</span>))</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- VALIDATION -->
+    <section class="section reveal" id="validation">
+      <span class="section-number">3.2.4</span>
+      <h2>Validation</h2>
+      <p class="section-intro">LLMs can hallucinate field values even when the structure is correct. Multi-layer validation :: JSON parsing, schema validation, type checking, business rules :: catches different failure modes at each stage.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">V</span>Validation Layers</h3>
+        <div class="val-grid">
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+            <div style="background:rgba(13,107,78,0.1);padding:12px 16px;border-bottom:1px solid var(--border);">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);">Layer 1 :: JSON Parse</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--paper);">
+              <p style="font-size:14px;color:var(--muted);margin:0;">Verify the output is valid JSON at all. Catches unclosed braces, invalid escape sequences, and trailing text. <code style="font-size:12px;background:var(--cream);padding:1px 5px;border-radius:3px;">json.loads()</code> or <code style="font-size:12px;background:var(--cream);padding:1px 5px;border-radius:3px;">JSON.parse()</code>.</p>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+            <div style="background:rgba(30,64,175,0.1);padding:12px 16px;border-bottom:1px solid var(--border);">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--blue);">Layer 2 :: Schema Validate</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--paper);">
+              <p style="font-size:14px;color:var(--muted);margin:0;">Check all required fields present, types match, enums respected. Use <code style="font-size:12px;background:var(--cream);padding:1px 5px;border-radius:3px;">jsonschema</code> or Pydantic's <code style="font-size:12px;background:var(--cream);padding:1px 5px;border-radius:3px;">model_validate()</code>.</p>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+            <div style="background:rgba(124,58,237,0.1);padding:12px 16px;border-bottom:1px solid var(--border);">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--purple);">Layer 3 :: Business Rules</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--paper);">
+              <p style="font-size:14px;color:var(--muted);margin:0;">Domain-specific checks: line_items sum ≈ total, date is not in the future, amounts are positive, tax_id format correct.</p>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+            <div style="background:rgba(217,119,6,0.1);padding:12px 16px;border-bottom:1px solid var(--border);">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--amber);">Layer 4 :: Retry Strategy</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--paper);">
+              <p style="font-size:14px;color:var(--muted);margin:0;">On validation failure, re-prompt with the error message: "Your output failed validation: [error]. Try again." Most models self-correct on the first retry.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left"><div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div><span class="code-filename">robust_extractor.py</span></div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">import</span> json
+<span class="kw">from</span> pydantic <span class="kw">import</span> <span class="cls">BaseModel</span>, <span class="cls">ValidationError</span>, <span class="cls">field_validator</span>
+<span class="kw">from</span> anthropic <span class="kw">import</span> <span class="cls">Anthropic</span>
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="var">client</span> = <span class="cls">Anthropic</span>()
+
+<span class="kw">class</span> <span class="cls">InvoiceExtract</span>(<span class="cls">BaseModel</span>):
+    invoice_number: str
+    invoice_date:   str
+    total_amount:   float
+    currency:       str = <span class="str">"USD"</span>
+    vendor_name:    str
+    line_items_count: int
+
+    <span class="cls">@field_validator</span>(<span class="str">"total_amount"</span>)
+    <span class="cls">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">total_must_be_positive</span>(cls, v):
+        <span class="kw">if</span> v &lt;= <span class="num">0</span>:
+            <span class="kw">raise</span> <span class="cls">ValueError</span>(<span class="str">"total_amount must be positive"</span>)
+        <span class="kw">return</span> v
+
+    <span class="cls">@field_validator</span>(<span class="str">"currency"</span>)
+    <span class="cls">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">valid_currency</span>(cls, v):
+        <span class="kw">if</span> v <span class="kw">not in</span> {<span class="str">"USD"</span>, <span class="str">"EUR"</span>, <span class="str">"GBP"</span>, <span class="str">"JPY"</span>, <span class="str">"CAD"</span>, <span class="str">"AUD"</span>}:
+            <span class="kw">raise</span> <span class="cls">ValueError</span>(<span class="str">f"Unknown currency: {v}"</span>)
+        <span class="kw">return</span> v
+
+
+<span class="kw">def</span> <span class="fn">extract_with_retry</span>(text: str, max_retries: int = <span class="num">3</span>) -&gt; <span class="cls">InvoiceExtract</span>:
+    <span class="var">messages</span> = [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: text}]
+    <span class="var">schema</span>   = <span class="cls">InvoiceExtract</span>.<span class="fn">model_json_schema</span>()
+
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_retries):
+        <span class="var">response</span> = <span class="var">client</span>.messages.<span class="fn">create</span>(
+            model=<span class="str">"claude-sonnet-4-20250514"</span>,
+            max_tokens=<span class="num">1024</span>,
+            system=<span class="str">f"Extract invoice data. Return ONLY JSON matching: {json.dumps(schema)}"</span>,
+            messages=<span class="var">messages</span>
+        )
+        <span class="var">raw</span> = <span class="var">response</span>.content[<span class="num">0</span>].text.<span class="fn">strip</span>()
+
+        <span class="kw">try</span>:
+            <span class="cmt"># Layer 1: JSON parse</span>
+            <span class="var">data</span> = json.<span class="fn">loads</span>(<span class="var">raw</span>.<span class="fn">strip</span>(<span class="str">"` \n"</span>).<span class="fn">removeprefix</span>(<span class="str">"json"</span>))
+            <span class="cmt"># Layer 2 + 3: Pydantic validates schema + business rules</span>
+            <span class="kw">return</span> <span class="cls">InvoiceExtract</span>.<span class="fn">model_validate</span>(<span class="var">data</span>)
+
+        <span class="kw">except</span> (<span class="cls">json.JSONDecodeError</span>, <span class="cls">ValidationError</span>) <span class="kw">as</span> e:
+            <span class="kw">if</span> attempt == max_retries - <span class="num">1</span>:
+                <span class="kw">raise</span>
+            <span class="cmt"># Layer 4: Re-prompt with the exact error</span>
+            <span class="var">messages</span> += [
+                {<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="var">raw</span>},
+                {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">f"Validation failed: {e}. Fix and return only valid JSON."</span>}
+            ]
+
+    <span class="kw">raise</span> <span class="cls">RuntimeError</span>(<span class="str">"Failed after all retries"</span>)</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDS-ON: INVOICE & W2 -->
+    <section class="section reveal" id="handson">
+      <span class="section-number">3.2.5</span>
+      <h2>Hands-on: Extract from Invoice &amp; W-2</h2>
+      <p class="section-intro">See structured extraction in action on two realistic document types :: a commercial invoice and a US W-2 tax form. Run the extraction live and inspect the JSON output.</p>
+
+      <div class="doc-demo">
+        <div class="doc-demo-header">
+          <h4>Document Extraction Demo</h4>
+          <span class="viz-badge">LIVE API</span>
+        </div>
+        <div class="doc-demo-body">
+          <div class="doc-tabs" id="docTabs">
+            <button class="doc-tab active" onclick="switchDoc('invoice',this)">🧾 Invoice</button>
+            <button class="doc-tab" onclick="switchDoc('w2',this)">📋 W-2 Form</button>
+          </div>
+
+          <!-- INVOICE PANEL -->
+          <div class="doc-panel active" id="doc-invoice">
+            <div class="doc-grid">
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,250,248,0.35);margin-bottom:10px;">Source Document</div>
+                <div class="doc-render">
+                  <h5>NEXUS TECH SOLUTIONS LLC</h5>
+                  <div class="doc-subtitle">742 Innovation Drive, Austin TX 78701 · EIN: 47-1234567</div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+                    <div><strong>Invoice #:</strong> INV-2024-0892<br/><strong>Date:</strong> Nov 15, 2024<br/><strong>Due:</strong> Dec 15, 2024</div>
+                    <div style="text-align:right;"><strong>Bill To:</strong><br/>Apex Financial Group<br/>200 Park Ave, NY 10166<br/>AP: accounts@apexfin.com</div>
+                  </div>
+                  <table>
+                    <thead><tr><td>Description</td><td>Qty</td><td>Unit</td><td>Amount</td></tr></thead>
+                    <tbody>
+                      <tr><td>Cloud Infrastructure Setup</td><td>1</td><td>$4,500.00</td><td>$4,500.00</td></tr>
+                      <tr><td>Security Audit &amp; Penetration Test</td><td>1</td><td>$2,800.00</td><td>$2,800.00</td></tr>
+                      <tr><td>ML Pipeline Development</td><td>40 hrs</td><td>$185.00</td><td>$7,400.00</td></tr>
+                      <tr><td>Monthly Support Retainer</td><td>3 mo</td><td>$1,200.00</td><td>$3,600.00</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="doc-total">Subtotal: $18,300.00<br/>Tax (8.25%): $1,509.75<br/><strong>TOTAL DUE: $19,809.75</strong></div>
+                  <div style="margin-top:12px;font-size:11px;color:#888;">Payment: Wire transfer or ACH. Terms: Net 30. Late fee: 1.5%/mo.</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,250,248,0.35);margin-bottom:10px;">Extracted JSON</div>
+                <div class="json-out empty" id="invoice-json">Click "Extract" to run</div>
+              </div>
+            </div>
+            <div class="doc-controls" style="margin-top:16px;">
+              <button class="run-btn" id="invoiceBtn" onclick="extractDoc('invoice')">
+                <span id="invoiceBtnTxt">▶ Extract Invoice Data</span>
+              </button>
+              <button class="run-btn secondary" id="invoiceValBtn" onclick="validateOutput('invoice')" style="display:none;">✓ Validate Output</button>
+            </div>
+            <div class="val-result" id="invoice-val"></div>
+          </div>
+
+          <!-- W2 PANEL -->
+          <div class="doc-panel" id="doc-w2">
+            <div class="doc-grid">
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,250,248,0.35);margin-bottom:10px;">Source Document</div>
+                <div class="doc-render">
+                  <div style="border:2px solid #333;padding:16px;font-size:13px;">
+                    <div style="text-align:center;font-weight:800;font-size:15px;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:12px;">W-2 Wage and Tax Statement 2024</div>
+                    <div class="doc-section">a. Employee SSN: ***-**-4821  |  b. EIN: 82-3456789</div>
+                    <div class="doc-row"><span>c. Employer: QuantumLeap Industries Inc.</span></div>
+                    <div class="doc-row"><span style="color:#666;">1400 Technology Blvd, San Jose, CA 95110</span></div>
+                    <div class="doc-section" style="margin-top:14px;">e. Employee: James R. Thornton</div>
+                    <div class="doc-row"><span style="color:#666;">8823 Maple Court, Redwood City, CA 94063</span></div>
+                    <div class="doc-section" style="margin-top:14px;">Wages &amp; Compensation</div>
+                    <div class="doc-row"><span>Box 1 :: Wages, tips:</span><span>$142,500.00</span></div>
+                    <div class="doc-row"><span>Box 2 :: Fed income tax withheld:</span><span>$31,350.00</span></div>
+                    <div class="doc-row"><span>Box 3 :: Social security wages:</span><span>$142,500.00</span></div>
+                    <div class="doc-row"><span>Box 4 :: SS tax withheld:</span><span>$8,835.00</span></div>
+                    <div class="doc-row"><span>Box 5 :: Medicare wages:</span><span>$142,500.00</span></div>
+                    <div class="doc-row"><span>Box 6 :: Medicare tax withheld:</span><span>$2,066.25</span></div>
+                    <div class="doc-row"><span>Box 12a :: 401(k) contributions:</span><span>D $14,250.00</span></div>
+                    <div class="doc-row"><span>Box 14 :: CA SDI:</span><span>$1,425.00</span></div>
+                    <div class="doc-row bold"><span>Box 16 :: State wages (CA):</span><span>$142,500.00</span></div>
+                    <div class="doc-row"><span>Box 17 :: State income tax:</span><span>$11,400.00</span></div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,250,248,0.35);margin-bottom:10px;">Extracted JSON</div>
+                <div class="json-out empty" id="w2-json">Click "Extract" to run</div>
+              </div>
+            </div>
+            <div class="doc-controls" style="margin-top:16px;">
+              <button class="run-btn" id="w2Btn" onclick="extractDoc('w2')">
+                <span id="w2BtnTxt">▶ Extract W-2 Data</span>
+              </button>
+              <button class="run-btn secondary" id="w2ValBtn" onclick="validateOutput('w2')" style="display:none;">✓ Validate Output</button>
+            </div>
+            <div class="val-result" id="w2-val"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOM EXTRACTOR -->
+    <section class="section reveal" id="custom">
+      <span class="section-number">3.2.6</span>
+      <h2>Custom Document Extractor</h2>
+      <p class="section-intro">Build your own extraction pipeline: paste any document, define your JSON schema, and extract structured data in one click.</p>
+
+      <div class="custom-extractor">
+        <div class="ce-header">
+          <h4>Custom Schema Extractor</h4>
+          <p>Define a JSON schema, paste your document, and extract structured data</p>
+        </div>
+        <div class="ce-body">
+          <div class="ce-row">
+            <div>
+              <span class="ce-label">Document Text</span>
+              <textarea class="ce-input" id="ceDoc" placeholder="Paste any document :: email, receipt, contract, article, report…" rows="10">From: Marcus Webb &lt;m.webb@globalops.co&gt;
+To: Sarah Kim &lt;s.kim@globalops.co&gt;
+Date: March 3, 2025, 14:32 PST
+Subject: Q1 Project Kickoff :: Urgent
+
+Sarah,
+
+Following our board meeting this morning, we need to fast-track the Helios platform migration. Key decisions:
+
+- Budget approved: $340,000 (phased: $180k Q1, $160k Q2)
+- Deadline: June 30, 2025 (hard deadline, client contract)
+- Team leads assigned: Emily Frost (backend), David Park (infra), Priya Sharma (QA)
+- Primary risk: legacy data migration :: estimated 3 weeks with possible 1-week buffer
+- Client: Meridian Analytics Group (contact: Tom Kellner, VP Engineering)
+
+Can you set up the project in Jira and schedule kickoff for Thursday? I'll join the first 30 mins.
+
+Marcus</textarea>
+            </div>
+            <div>
+              <span class="ce-label">Target JSON Schema (describe what to extract)</span>
+              <textarea class="ce-input" id="ceSchema" placeholder="Define your schema…" rows="10">{
+  "sender": {"name": "string", "email": "string"},
+  "recipient": {"name": "string", "email": "string"},
+  "date": "string (ISO 8601)",
+  "subject": "string",
+  "project_name": "string",
+  "budget_total": "number",
+  "deadline": "string (ISO 8601 date)",
+  "team_leads": [{"name": "string", "role": "string"}],
+  "client_company": "string",
+  "client_contact": {"name": "string", "title": "string"},
+  "action_items": ["string"],
+  "primary_risk": "string"
+}</textarea>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button class="run-btn" id="ceBtn" onclick="runCustomExtract()">
+              <span id="ceBtnTxt">▶ Extract Structured Data</span>
+            </button>
+            <span id="ceHint" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(245,250,248,0.3);">Ctrl+Enter to run</span>
+          </div>
+          <div style="margin-top:16px;">
+            <span class="ce-label">Extracted JSON Output</span>
+            <div class="json-out" id="ceOutput" style="min-height:200px;"></div>
+          </div>
+          <div class="val-result" id="ce-val" style="margin-top:12px;"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn-nav" href="ai-nlp-llm-section3-1.html">← 3.1 Fundamentals of Prompting</a>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">Section 3.2 complete</div>
+    <a class="btn-nav primary" href="#">→ 3.3 RAG &amp; Retrieval</a>
+  </div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-2.html">Ai Nlp Llm Section1 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-3.html">Ai Nlp Llm Section1 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1.html">Ai Nlp Llm Section1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-1.html">Ai Nlp Llm Section2 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-2.html">Ai Nlp Llm Section2 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-3-4.html">Ai Nlp Llm Section2 3 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-1.html">Ai Nlp Llm Section3 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-2.html">Ai Nlp Llm Section3 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-3.html">Ai Nlp Llm Section3 3</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<script>
+// ── PROGRESS & REVEAL ──
+const pf = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  pf.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+});
+document.querySelectorAll('.reveal').forEach(el =>
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) el.classList.add('visible'); },
+    { threshold: 0.05, rootMargin: '0px 0px -50px 0px' }).observe(el)
+);
+document.querySelectorAll('section[id]').forEach(s =>
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-link[href="#${s.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  }, { threshold: 0.25 }).observe(s)
+);
+
+// ── DOC TABS ──
+function switchDoc(name, btn) {
+  document.querySelectorAll('.doc-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`doc-${name}`)?.classList.add('active');
+  document.querySelectorAll('.doc-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── API CALL ──
+async function callClaude(system, user, maxTokens = 1500) {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  return d.content?.[0]?.text || '';
+}
+
+function cleanJSON(raw) {
+  return raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+}
+
+function prettyJSON(raw) {
+  try {
+    return JSON.stringify(JSON.parse(raw), null, 2);
+  } catch { return raw; }
+}
+
+function syntaxHighlight(json) {
+  return json
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) return `<span style="color:#89ddff;">${match}</span>`;
+        return `<span style="color:#c3e88d;">${match}</span>`;
+      }
+      if (/true|false/.test(match)) return `<span style="color:#c792ea;">${match}</span>`;
+      if (/null/.test(match)) return `<span style="color:#f78c6c;">${match}</span>`;
+      return `<span style="color:#f78c6c;">${match}</span>`;
+    });
+}
+
+// ── DOCUMENT EXTRACTION ──
+const DOC_SYSTEMS = {
+  invoice: `You are a document parser specialising in commercial invoices.
+Extract all fields and return ONLY valid JSON :: no markdown, no explanation.
+Required schema:
+{
+  "invoice_number": "string",
+  "invoice_date": "YYYY-MM-DD",
+  "due_date": "YYYY-MM-DD or null",
+  "vendor": {"name": "string", "address": "string or null", "ein": "string or null"},
+  "bill_to": {"company": "string", "address": "string or null", "email": "string or null"},
+  "line_items": [{"description": "string", "quantity": number, "unit_price": number, "amount": number}],
+  "subtotal": number,
+  "tax_rate_percent": number or null,
+  "tax_amount": number or null,
+  "total_amount": number,
+  "currency": "USD",
+  "payment_terms": "string or null"
+}
+All monetary values must be numbers. Return only the JSON object.`,
+
+  w2: `You are a tax document parser specialising in IRS W-2 forms.
+Extract all fields and return ONLY valid JSON :: no markdown, no explanation.
+Required schema:
+{
+  "tax_year": number,
+  "employee": {"name": "string", "ssn_last4": "string", "address": "string or null"},
+  "employer": {"name": "string", "ein": "string", "address": "string or null"},
+  "box1_wages": number,
+  "box2_federal_tax_withheld": number,
+  "box3_ss_wages": number,
+  "box4_ss_tax_withheld": number,
+  "box5_medicare_wages": number,
+  "box6_medicare_tax": number,
+  "box12": [{"code": "string", "amount": number}],
+  "box14": [{"description": "string", "amount": number}],
+  "state_wages": number or null,
+  "state_tax_withheld": number or null,
+  "state": "string or null",
+  "effective_tax_rate_percent": number
+}
+Compute effective_tax_rate_percent = (box2 / box1) * 100. Return only the JSON.`
+};
+
+const DOC_TEXTS = {
+  invoice: `NEXUS TECH SOLUTIONS LLC
+742 Innovation Drive, Austin TX 78701
+EIN: 47-1234567
+
+Invoice #: INV-2024-0892
+Date: November 15, 2024
+Due Date: December 15, 2024
+
+Bill To:
+Apex Financial Group
+200 Park Ave, New York, NY 10166
+accounts@apexfin.com
+
+Line Items:
+- Cloud Infrastructure Setup: 1 x $4,500.00 = $4,500.00
+- Security Audit & Penetration Test: 1 x $2,800.00 = $2,800.00
+- ML Pipeline Development: 40 hrs x $185.00 = $7,400.00
+- Monthly Support Retainer: 3 months x $1,200.00 = $3,600.00
+
+Subtotal: $18,300.00
+Tax (8.25%): $1,509.75
+Total Due: $19,809.75 USD
+
+Payment Terms: Net 30. Wire transfer or ACH. Late fee 1.5%/month.`,
+
+  w2: `W-2 Wage and Tax Statement :: Tax Year 2024
+a. Employee SSN: ***-**-4821
+b. Employer EIN: 82-3456789
+c. Employer: QuantumLeap Industries Inc., 1400 Technology Blvd, San Jose, CA 95110
+e. Employee: James R. Thornton, 8823 Maple Court, Redwood City, CA 94063
+
+Box 1 :: Wages, tips, other compensation: $142,500.00
+Box 2 :: Federal income tax withheld: $31,350.00
+Box 3 :: Social security wages: $142,500.00
+Box 4 :: Social security tax withheld: $8,835.00
+Box 5 :: Medicare wages and tips: $142,500.00
+Box 6 :: Medicare tax withheld: $2,066.25
+Box 12a :: Code D (401k elective deferrals): $14,250.00
+Box 14 :: CA SDI: $1,425.00
+Box 15 :: State: CA | Employer state ID: 999-1234-5
+Box 16 :: State wages: $142,500.00
+Box 17 :: State income tax withheld: $11,400.00`
+};
+
+let extractedData = {};
+
+async function extractDoc(docType) {
+  const btn = document.getElementById(`${docType}Btn`);
+  const btnTxt = document.getElementById(`${docType}BtnTxt`);
+  const jsonEl = document.getElementById(`${docType}-json`);
+
+  btn.disabled = true;
+  btnTxt.textContent = '⏳ Extracting…';
+  jsonEl.innerHTML = '';
+  jsonEl.classList.remove('empty');
+  jsonEl.classList.add('loading');
+
+  try {
+    const raw = await callClaude(DOC_SYSTEMS[docType], DOC_TEXTS[docType], 1500);
+    const cleaned = cleanJSON(raw);
+    const pretty = prettyJSON(cleaned);
+    jsonEl.classList.remove('loading');
+    jsonEl.innerHTML = syntaxHighlight(pretty);
+    extractedData[docType] = cleaned;
+    document.getElementById(`${docType}ValBtn`).style.display = 'inline-flex';
+  } catch(e) {
+    jsonEl.classList.remove('loading');
+    jsonEl.style.color = '#fda4af';
+    jsonEl.textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  btnTxt.textContent = docType === 'invoice' ? '▶ Extract Invoice Data' : '▶ Extract W-2 Data';
+}
+
+function validateOutput(docType) {
+  const raw = extractedData[docType];
+  if (!raw) return;
+  const valEl = document.getElementById(`${docType}-val`);
+
+  try {
+    const data = JSON.parse(raw);
+    const errors = [];
+
+    if (docType === 'invoice') {
+      if (!data.invoice_number) errors.push('Missing invoice_number');
+      if (typeof data.total_amount !== 'number' || data.total_amount <= 0) errors.push('Invalid total_amount');
+      if (!data.vendor?.name) errors.push('Missing vendor.name');
+      if (data.line_items && data.subtotal) {
+        const sum = data.line_items.reduce((s, i) => s + (i.amount || 0), 0);
+        if (Math.abs(sum - data.subtotal) > 0.01) errors.push(`Line items sum ${sum.toFixed(2)} ≠ subtotal ${data.subtotal}`);
+      }
+    } else {
+      if (typeof data.box1_wages !== 'number') errors.push('Missing box1_wages');
+      if (typeof data.box2_federal_tax_withheld !== 'number') errors.push('Missing box2_federal_tax_withheld');
+      if (data.box1_wages && data.box2_federal_tax_withheld) {
+        const rate = (data.box2_federal_tax_withheld / data.box1_wages * 100).toFixed(1);
+        if (!data.effective_tax_rate_percent) errors.push(`effective_tax_rate_percent not computed (should be ~${rate}%)`);
+      }
+    }
+
+    valEl.className = 'val-result ' + (errors.length === 0 ? 'pass' : 'fail');
+    valEl.style.display = 'block';
+    valEl.textContent = errors.length === 0
+      ? `✓ Validation passed :: all ${Object.keys(data).length} fields present, types correct, business rules satisfied`
+      : `✗ ${errors.length} validation error(s):\n${errors.map(e => '  · ' + e).join('\n')}`;
+  } catch(e) {
+    valEl.className = 'val-result fail';
+    valEl.style.display = 'block';
+    valEl.textContent = '✗ JSON parse failed: ' + e.message;
+  }
+}
+
+// ── CUSTOM EXTRACTOR ──
+async function runCustomExtract() {
+  const doc = document.getElementById('ceDoc').value.trim();
+  const schema = document.getElementById('ceSchema').value.trim();
+  if (!doc || !schema) return;
+
+  const btn = document.getElementById('ceBtn');
+  const out = document.getElementById('ceOutput');
+  btn.disabled = true;
+  document.getElementById('ceBtnTxt').textContent = '⏳ Extracting…';
+  out.innerHTML = '';
+  out.classList.add('loading');
+  document.getElementById('ce-val').style.display = 'none';
+  document.getElementById('ceHint').textContent = 'Running…';
+
+  const sys = `You are a universal document parser.
+Extract structured data from the document and return ONLY valid JSON matching this schema:
+${schema}
+
+Rules:
+- Return ONLY the JSON object :: no markdown fences, no explanation
+- Use null for any field not found in the document
+- Numbers as numbers, not strings
+- Dates in ISO 8601 format where possible`;
+
+  try {
+    const raw = await callClaude(sys, doc, 1500);
+    const cleaned = cleanJSON(raw);
+    out.classList.remove('loading');
+    out.innerHTML = syntaxHighlight(prettyJSON(cleaned));
+
+    // Attempt validation
+    try {
+      JSON.parse(cleaned);
+      const val = document.getElementById('ce-val');
+      val.className = 'val-result pass';
+      val.style.display = 'block';
+      val.textContent = '✓ Valid JSON :: successfully parsed';
+    } catch(e) {
+      const val = document.getElementById('ce-val');
+      val.className = 'val-result fail';
+      val.style.display = 'block';
+      val.textContent = '✗ JSON invalid: ' + e.message;
+    }
+  } catch(e) {
+    out.classList.remove('loading');
+    out.style.color = '#fda4af';
+    out.textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  document.getElementById('ceBtnTxt').textContent = '▶ Extract Structured Data';
+  document.getElementById('ceHint').textContent = 'Ctrl+Enter to run';
+}
+
+document.getElementById('ceDoc').addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') runCustomExtract();
+});
+</script>
+
+
+</body></html>

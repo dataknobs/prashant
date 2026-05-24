@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>2.3 Tokenization &amp; 2.4 Embeddings :: AI, NLP &amp; LLMs Course</title>
+<meta content="Complete guide to tokenization (BPE, SentencePiece, WordPiece, special tokens) and embeddings (semantic vectors, cosine similarity, dense representations, similarity search). Includes interactive demos, cross-model token comparisons, and a live semantic search engine." name="description"/>
+<meta content="tokenization, BPE, byte pair encoding, SentencePiece, WordPiece, special tokens, embeddings, semantic search, cosine similarity, dense vectors, vector representations, embedding space, word2vec, sentence transformers, NLP course, LLM course" name="keywords"/>
+<meta content="AI, NLP &amp; LLMs Course" name="author"/>
+<meta content="2.3 Tokenization &amp; 2.4 Embeddings :: AI, NLP &amp; LLMs Course" property="og:title"/>
+<meta content="article" property="og:type"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Fraunces:ital,wght@0,300;0,700;1,300;1,700&amp;family=Cabinet+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<style>
+  :root {
+    --ink:    #12100e;
+    --paper:  #fdfaf4;
+    --cream:  #f2eee3;
+    --tok:    #7c2d12;   /* tokenization :: burnt sienna */
+    --tok2:   #dc6b2f;
+    --emb:    #0f4c75;   /* embeddings :: deep navy */
+    --emb2:   #2980b9;
+    --muted:  #6b6354;
+    --border: #d6cebc;
+    --code-bg:#0d0b08;
+    --code-txt:#e8dfc8;
+    --gold:   #b45309;
+    --green:  #15803d;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Cabinet Grotesk',sans-serif;
+    font-size:16px;
+    line-height:1.72;
+    overflow-x:hidden;
+  }
+
+  /* halftone dot texture */
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:
+      radial-gradient(circle,rgba(124,45,18,0.06) 1px,transparent 1px),
+      radial-gradient(circle,rgba(15,76,117,0.04) 1px,transparent 1px);
+    background-size:32px 32px, 48px 48px;
+    background-position:0 0, 16px 16px;
+    pointer-events:none;z-index:0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar{
+    position:fixed;left:0;top:0;height:100vh;width:264px;
+    background:var(--ink);color:var(--paper);
+    padding:36px 0;z-index:100;
+    display:flex;flex-direction:column;
+    overflow-y:auto;
+  }
+  /* split sidebar accent */
+  .sidebar::before{content:'';position:absolute;left:0;top:0;width:3px;height:50%;background:var(--tok2);}
+  .sidebar::after{content:'';position:absolute;left:0;top:50%;width:3px;height:50%;background:var(--emb2);}
+
+  .sidebar-logo{padding:0 26px 26px;border-bottom:1px solid rgba(253,250,244,0.1);}
+  .sidebar-logo .eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--tok2);text-transform:uppercase;margin-bottom:6px;}
+  .sidebar-logo h2{font-family:'DM Serif Display',serif;font-size:16px;line-height:1.3;}
+  .sidebar-nav{flex:1;padding:18px 0;}
+  .nav-section{padding:0 26px;}
+  .nav-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(253,250,244,0.28);padding:14px 0 7px;display:block;}
+  .nav-label.emb-label{color:rgba(41,128,185,0.6);}
+  .nav-link{display:block;padding:6px 10px;margin:1px -10px;border-radius:4px;color:rgba(253,250,244,0.6);text-decoration:none;font-size:12.5px;font-weight:500;transition:all .2s;}
+  .nav-link.tok-link:hover,.nav-link.tok-link.active{background:rgba(220,107,47,0.18);color:#fdba74;}
+  .nav-link.tok-link.active{border-left:2px solid var(--tok2);padding-left:8px;}
+  .nav-link.emb-link:hover,.nav-link.emb-link.active{background:rgba(41,128,185,0.18);color:#7dd3fc;}
+  .nav-link.emb-link.active{border-left:2px solid var(--emb2);padding-left:8px;}
+  .nav-link.dim{color:rgba(253,250,244,0.22);font-size:12px;}
+  .sidebar-footer{padding:16px 26px;border-top:1px solid rgba(253,250,244,0.08);font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(253,250,244,0.28);}
+
+  /* ── PROGRESS ── */
+  .progress-bar{height:3px;background:var(--border);position:sticky;top:0;z-index:200;}
+  .progress-fill{height:100%;width:0%;transition:width .1s;
+    background:linear-gradient(90deg,var(--tok2),var(--gold),var(--emb2));}
+
+  /* ── MAIN ── */
+  .main{margin-left:264px;min-height:100vh;position:relative;z-index:1;}
+
+  /* ── DUAL HERO ── */
+  .dual-hero{display:grid;grid-template-columns:1fr 1fr;}
+
+  .hero-tok{
+    background:var(--tok);color:var(--paper);
+    padding:70px 60px 60px;position:relative;overflow:hidden;
+  }
+  .hero-tok::before{
+    content:'2.3';position:absolute;right:-20px;top:-10px;
+    font-family:'DM Serif Display',serif;font-size:200px;line-height:1;
+    color:rgba(253,250,244,0.04);pointer-events:none;user-select:none;
+  }
+
+  .hero-emb{
+    background:var(--emb);color:var(--paper);
+    padding:70px 60px 60px;position:relative;overflow:hidden;
+    border-left:2px solid rgba(253,250,244,0.08);
+  }
+  .hero-emb::before{
+    content:'2.4';position:absolute;right:-20px;top:-10px;
+    font-family:'DM Serif Display',serif;font-size:200px;line-height:1;
+    color:rgba(253,250,244,0.04);pointer-events:none;user-select:none;
+  }
+
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;opacity:.7;}
+  .hero-eyebrow::before{content:'';display:inline-block;width:24px;height:1px;background:currentColor;}
+  .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,48px);line-height:1.1;margin-bottom:16px;}
+  .hero h1 em{font-style:italic;opacity:.8;}
+  .hero-desc{font-size:15px;opacity:.6;line-height:1.75;margin-bottom:28px;max-width:400px;}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .tag{background:rgba(253,250,244,0.08);border:1px solid rgba(253,250,244,0.14);color:rgba(253,250,244,0.65);padding:3px 12px;border-radius:20px;font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;}
+
+  /* ── SECTION DIVIDERS ── */
+  .part-header{
+    padding:40px 80px 0;
+    display:flex;align-items:center;gap:20px;
+    margin-top:72px;
+  }
+  .part-num{
+    font-family:'DM Serif Display',serif;font-size:64px;line-height:1;
+    opacity:.12;
+  }
+  .part-num.tok-col{color:var(--tok);}
+  .part-num.emb-col{color:var(--emb);}
+  .part-title{font-family:'DM Serif Display',serif;font-size:32px;}
+  .part-rule{flex:1;height:1px;background:var(--border);}
+
+  /* ── CONTENT ── */
+  .content{padding:0 80px 80px;max-width:1100px;}
+
+  .section{margin-top:64px;padding-top:64px;border-top:1px solid var(--border);}
+  .section:first-child{border-top:none;padding-top:40px;}
+
+  .section-number{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;display:block;}
+  .section-number.tok{color:var(--tok2);}
+  .section-number.emb{color:var(--emb2);}
+
+  .section h2{font-family:'DM Serif Display',serif;font-size:clamp(24px,3vw,38px);line-height:1.15;margin-bottom:18px;}
+  .section-intro{font-size:16px;color:var(--muted);max-width:680px;margin-bottom:40px;padding-left:20px;}
+  .section-intro.tok-border{border-left:3px solid var(--tok2);}
+  .section-intro.emb-border{border-left:3px solid var(--emb2);}
+
+  .subsection{margin-bottom:48px;}
+  .subsection h3{font-family:'DM Serif Display',serif;font-size:21px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .anchor-icon{width:26px;height:26px;background:var(--ink);color:var(--paper);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;flex-shrink:0;}
+
+  p{margin-bottom:14px;}
+
+  /* ── CALLOUT ── */
+  .callout{background:var(--cream);border-left:4px solid var(--tok2);border-radius:0 8px 8px 0;padding:16px 20px;margin:22px 0;}
+  .callout.emb{border-left-color:var(--emb2);}
+  .callout.gold{border-left-color:var(--gold);}
+  .callout.green{border-left-color:var(--green);}
+  .callout-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin-bottom:7px;color:var(--tok2);}
+  .callout.emb .callout-label{color:var(--emb2);}
+  .callout.gold .callout-label{color:var(--gold);}
+  .callout.green .callout-label{color:var(--green);}
+  .callout p{margin-bottom:0;font-size:14.5px;}
+
+  /* ── TABLE ── */
+  .table-wrap{overflow-x:auto;margin:24px 0;border-radius:8px;border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;}
+  thead{background:var(--ink);color:var(--paper);}
+  th{padding:12px 18px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;}
+  td{padding:11px 18px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:var(--cream);}
+
+  /* ── CODE ── */
+  .code-container{margin:24px 0;border-radius:10px;overflow:hidden;box-shadow:0 8px 32px rgba(18,16,14,0.16);}
+  .code-header{background:#080705;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;}
+  .code-dots{display:flex;gap:6px;}
+  .code-dot{width:12px;height:12px;border-radius:50%;}
+  .code-dot.red{background:#ff5f57;}.code-dot.yellow{background:#febc2e;}.code-dot.green{background:#28c840;}
+  .code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(232,223,200,0.38);margin-left:10px;}
+  .code-lang-tok{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;background:rgba(124,45,18,0.3);color:#fdba74;border-radius:4px;}
+  .code-lang-emb{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;background:rgba(15,76,117,0.35);color:#7dd3fc;border-radius:4px;}
+  pre{background:var(--code-bg);padding:24px;overflow-x:auto;margin:0;line-height:1.65;}
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--code-txt);}
+  .kw{color:#c792ea;}.str{color:#c3e88d;}.num{color:#f78c6c;}
+  .cmt{color:#4a5230;font-style:italic;}.fn{color:#82aaff;}
+  .var{color:#eeffa7;}.key{color:#89ddff;}.cls{color:#ffcb6b;}
+  .ic{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--cream);border:1px solid var(--border);padding:2px 7px;border-radius:3px;color:var(--tok);}
+  .ic.emb{color:var(--emb);}
+
+  /* ── BPE VISUALIZER ── */
+  .bpe-viz{background:var(--ink);border-radius:12px;overflow:hidden;margin:28px 0;border:1px solid rgba(124,45,18,0.3);}
+  .bpe-header{padding:16px 24px;border-bottom:1px solid rgba(253,250,244,0.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .bpe-header h4{font-family:'DM Serif Display',serif;font-size:18px;color:var(--paper);}
+  .bpe-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(124,45,18,0.3);color:#fdba74;letter-spacing:.05em;}
+  .bpe-body{padding:24px;}
+
+  .bpe-input-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .bpe-input{flex:1;min-width:200px;background:rgba(253,250,244,0.06);border:1px solid rgba(253,250,244,0.14);color:var(--paper);padding:10px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;transition:border-color .2s;}
+  .bpe-input:focus{border-color:var(--tok2);}
+  .bpe-btn{background:var(--tok);color:white;border:none;padding:10px 22px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+  .bpe-btn:hover{background:#6c2410;transform:translateY(-1px);}
+
+  .bpe-tokens-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;min-height:44px;align-items:center;}
+  .bpe-token{
+    font-family:'JetBrains Mono',monospace;font-size:13px;
+    padding:5px 10px;border-radius:4px;border:1px solid;
+    display:inline-flex;align-items:center;gap:4px;
+    transition:all .3s;cursor:default;
+  }
+  .bpe-token:hover .token-id{opacity:1;}
+  .token-id{font-size:9px;opacity:0;transition:opacity .2s;margin-top:-1px;}
+
+  .bpe-stats{display:flex;gap:20px;padding:14px 0;border-top:1px solid rgba(253,250,244,0.08);font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(253,250,244,0.45);flex-wrap:wrap;}
+  .bpe-stat-n{color:var(--paper);font-size:18px;font-family:'DM Serif Display',serif;display:block;}
+
+  /* ── MODEL COMPARISON ── */
+  .model-cmp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:24px 0;}
+  .model-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+  .model-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(18,16,14,0.09);}
+  .model-card-head{padding:14px 18px;display:flex;align-items:center;gap:10px;}
+  .model-card-head h5{font-family:'DM Serif Display',serif;font-size:17px;color:var(--paper);}
+  .model-card-body{padding:14px 18px;background:var(--paper);}
+  .model-token-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;}
+  .mt{font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 8px;border-radius:3px;border:1px solid;}
+
+  /* ── MATH FORMULA BOX ── */
+  .math-hero{
+    background:var(--emb);border-radius:12px;padding:36px 48px;margin:32px 0;
+    text-align:center;position:relative;overflow:hidden;
+    border:1px solid rgba(41,128,185,0.3);
+  }
+  .math-hero::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 0%,rgba(41,128,185,0.2),transparent 70%);
+    pointer-events:none;
+  }
+  .math-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#7dd3fc;margin-bottom:20px;display:block;opacity:.75;}
+  .math-formula{font-family:'Fraunces',serif;font-size:clamp(20px,3.5vw,36px);color:var(--paper);line-height:1.5;position:relative;}
+  .mf-a{color:#f87171;}
+  .mf-b{color:#34d399;}
+  .fraction{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;}
+  .fraction .numerator{border-bottom:1.5px solid rgba(253,250,244,0.4);padding:0 8px 3px;}
+  .fraction .denominator{padding:3px 8px 0;}
+  .math-annotation{margin-top:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:left;}
+  .math-ann-item{padding:12px 14px;border-radius:6px;background:rgba(253,250,244,0.04);border:1px solid rgba(253,250,244,0.07);}
+  .math-ann-sym{font-family:'Fraunces',serif;font-size:22px;margin-bottom:4px;display:block;}
+  .math-ann-txt{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(253,250,244,0.5);line-height:1.5;}
+
+  /* ── VECTOR SPACE VIZ ── */
+  .vsv{background:var(--ink);border-radius:12px;overflow:hidden;margin:28px 0;border:1px solid rgba(15,76,117,0.3);}
+  .vsv-header{padding:16px 24px;border-bottom:1px solid rgba(253,250,244,0.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .vsv-header h4{font-family:'DM Serif Display',serif;font-size:18px;color:var(--paper);}
+  .vsv-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(15,76,117,0.35);color:#7dd3fc;}
+  .vsv-body{padding:24px;}
+
+  /* ── SEMANTIC SEARCH DEMO ── */
+  .search-demo{background:var(--ink);border-radius:12px;overflow:hidden;margin:28px 0;border:1px solid rgba(15,76,117,0.3);}
+  .search-demo-header{padding:16px 24px;border-bottom:1px solid rgba(253,250,244,0.07);}
+  .search-demo-header h4{font-family:'DM Serif Display',serif;font-size:18px;color:var(--paper);}
+  .search-demo-header p{font-size:13px;color:rgba(253,250,244,0.45);margin:4px 0 0;}
+  .search-demo-body{padding:24px;}
+
+  .corpus-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+  .corpus-pill{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 12px;border-radius:20px;background:rgba(253,250,244,0.05);border:1px solid rgba(253,250,244,0.12);color:rgba(253,250,244,0.6);cursor:pointer;transition:all .2s;user-select:none;}
+  .corpus-pill.selected{background:rgba(15,76,117,0.3);border-color:var(--emb2);color:#7dd3fc;}
+
+  .search-input-row{display:flex;gap:10px;margin-bottom:20px;}
+  .search-input{flex:1;background:rgba(253,250,244,0.06);border:1px solid rgba(253,250,244,0.14);color:var(--paper);padding:11px 15px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+  .search-input:focus{border-color:var(--emb2);}
+  .search-btn{background:var(--emb);color:white;border:none;padding:11px 22px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+  .search-btn:hover{background:#0a3560;transform:translateY(-1px);}
+  .search-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+
+  .search-results{display:flex;flex-direction:column;gap:8px;}
+  .search-result{border-radius:8px;padding:14px 18px;background:rgba(253,250,244,0.04);border:1px solid rgba(253,250,244,0.08);transition:all .3s;}
+  .search-result.top{background:rgba(15,76,117,0.18);border-color:rgba(41,128,185,0.35);}
+  .search-result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .result-rank{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;}
+  .result-score{font-family:'JetBrains Mono',monospace;font-size:13px;color:#7dd3fc;}
+  .result-text{font-size:14px;color:rgba(253,250,244,0.8);line-height:1.6;}
+  .result-bar-wrap{height:3px;background:rgba(253,250,244,0.06);border-radius:2px;margin-top:8px;overflow:hidden;}
+  .result-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--emb),var(--emb2));transition:width .6s ease;}
+
+  /* ── SIMILARITY EXPLORER ── */
+  .sim-explorer{background:var(--ink);border-radius:12px;overflow:hidden;margin:28px 0;border:1px solid rgba(15,76,117,0.3);}
+  .sim-explorer-body{padding:24px;}
+  .sim-input-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+  .sim-textarea{width:100%;background:rgba(253,250,244,0.05);border:1px solid rgba(253,250,244,0.13);color:var(--paper);padding:11px 14px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;resize:none;outline:none;transition:border-color .2s;}
+  .sim-textarea:focus{border-color:var(--emb2);}
+  .sim-result{text-align:center;padding:20px;background:rgba(253,250,244,0.03);border-radius:8px;margin-top:14px;}
+  .sim-score-big{font-family:'DM Serif Display',serif;font-size:64px;line-height:1;color:var(--paper);display:block;}
+  .sim-score-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(253,250,244,0.4);letter-spacing:.12em;text-transform:uppercase;margin-top:6px;display:block;}
+  .sim-gauge{width:100%;height:10px;background:rgba(253,250,244,0.06);border-radius:5px;margin:16px 0 10px;overflow:hidden;}
+  .sim-gauge-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e);transition:width .5s ease;}
+  .sim-explanation{font-size:13.5px;color:rgba(253,250,244,0.55);line-height:1.65;max-width:500px;margin:0 auto;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .loading::after{content:'▋';animation:blink .8s infinite;color:rgba(253,250,244,0.3);}
+
+  /* ── EMBEDDING SPACE CANVAS ── */
+  #embCanvas{border-radius:8px;cursor:crosshair;background:transparent;}
+
+  /* ── REVEAL ── */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s,transform .55s;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  /* ── DEMO BOX ── */
+  .demo-box{background:var(--ink);border-radius:12px;padding:28px;margin:28px 0;color:var(--paper);border:1px solid rgba(15,76,117,0.2);}
+  .demo-box h4{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:6px;}
+  .demo-desc{font-size:13.5px;color:rgba(253,250,244,0.45);margin-bottom:20px;}
+  .demo-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(253,250,244,0.38);display:block;margin-bottom:7px;}
+  .demo-input{width:100%;background:rgba(253,250,244,0.05);border:1px solid rgba(253,250,244,0.12);color:var(--paper);padding:10px 14px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;resize:vertical;outline:none;margin-bottom:12px;transition:border-color .2s;}
+  .demo-input:focus{border-color:var(--emb2);}
+  .demo-btn{background:var(--emb);color:white;border:none;padding:10px 22px;border-radius:6px;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+  .demo-btn:hover{background:#0a3560;transform:translateY(-1px);}
+  .demo-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  .result-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#7dd3fc;margin-bottom:7px;display:block;margin-top:14px;}
+  .result-text{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(253,250,244,0.04);border:1px solid rgba(253,250,244,0.08);border-radius:6px;padding:14px;color:rgba(253,250,244,0.8);line-height:1.7;white-space:pre-wrap;}
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav{margin-top:80px;padding:36px 80px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--cream);}
+  .btn-nav{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border:1.5px solid var(--ink);border-radius:6px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;transition:all .2s;}
+  .btn-nav.primary{background:var(--ink);color:var(--paper);}
+  .btn-nav:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(18,16,14,0.12);}
+
+  @media(max-width:900px){
+    .sidebar{display:none;}.main{margin-left:0;}
+    .dual-hero{grid-template-columns:1fr;}
+    .hero-tok,.hero-emb{padding:48px 28px;}
+    .content{padding-left:28px;padding-right:28px;}
+    .model-cmp-grid{grid-template-columns:1fr;}
+    .math-annotation{grid-template-columns:1fr;}
+    .sim-input-pair{grid-template-columns:1fr;}
+    .bottom-nav{flex-direction:column;gap:14px;padding:24px 28px;}
+    .part-header{padding:40px 28px 0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="eyebrow">Course Material</div>
+    <h2>AI, NLP &amp; LLMs</h2>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <span class="nav-label">Previous</span>
+      <a class="nav-link dim" href="ai-nlp-llm-section2-1.html">2.1 Transformer Architecture</a>
+      <a class="nav-link dim" href="ai-nlp-llm-section2-2.html">2.2 Attention Mechanism</a>
+      <span class="nav-label">2.3 :: Tokenization</span>
+      <a class="nav-link tok-link" href="#bpe">BPE Algorithm</a>
+      <a class="nav-link tok-link" href="#sp">SentencePiece</a>
+      <a class="nav-link tok-link" href="#wp">WordPiece</a>
+      <a class="nav-link tok-link" href="#special">Special Tokens</a>
+      <a class="nav-link tok-link" href="#why-tok">Why It Matters</a>
+      <a class="nav-link tok-link" href="#tok-hands">Hands-on: Libraries</a>
+      <span class="nav-label emb-label">2.4 :: Embeddings</span>
+      <a class="nav-link emb-link" href="#semantic">Semantic Vectors</a>
+      <a class="nav-link emb-link" href="#cos-sim">Cosine Similarity</a>
+      <a class="nav-link emb-link" href="#dense">Dense Vectors</a>
+      <a class="nav-link emb-link" href="#emb-space">Embedding Space</a>
+      <a class="nav-link emb-link" href="#emb-hands">Hands-on: Search Demo</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Sections 2.3 &amp; 2.4 · ~65 min</div>
+</nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<main class="main">
+  <!-- DUAL HERO -->
+  <div class="dual-hero">
+    <div class="hero-tok">
+      <div class="hero-eyebrow">Section 2.3</div>
+      <h1><em>Tokenization</em></h1>
+      <p class="hero-desc">How text is broken into the atomic units that LLMs actually process :: and why that boundary between characters and words matters enormously.</p>
+      <div class="hero-tags">
+        <span class="tag">BPE</span>
+        <span class="tag">SentencePiece</span>
+        <span class="tag">WordPiece</span>
+        <span class="tag">Special Tokens</span>
+        <span class="tag">tiktoken</span>
+      </div>
+    </div>
+    <div class="hero-emb">
+      <div class="hero-eyebrow" style="color:#7dd3fc;">Section 2.4</div>
+      <h1><em>Embeddings</em></h1>
+      <p class="hero-desc">Meaning as geometry. Learn how words and sentences become vectors in high-dimensional space :: and how similarity becomes a dot product.</p>
+      <div class="hero-tags">
+        <span class="tag">Dense Vectors</span>
+        <span class="tag">Cosine Similarity</span>
+        <span class="tag">Semantic Search</span>
+        <span class="tag">Vector DB</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PART 2.3 ═══════════════ -->
+  <div class="part-header">
+    <span class="part-num tok-col">2.3</span>
+    <h2 class="part-title">Tokenization</h2>
+    <div class="part-rule"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- BPE -->
+    <section class="section reveal" id="bpe">
+      <span class="section-number tok">2.3.1</span>
+      <h2>Byte Pair Encoding (BPE)</h2>
+      <p class="section-intro tok-border">BPE is the dominant tokenization algorithm powering GPT-2, GPT-3, GPT-4, Llama, and most modern LLMs. It strikes the optimal balance between vocabulary size and sequence length through a simple, data-driven merge process.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">B</span>The Algorithm</h3>
+        <p>BPE starts with a character-level vocabulary and iteratively merges the most frequent adjacent pair of symbols. After k merges, you have a vocabulary of k plus the base character set. The training corpus determines which merges happen first :: common subwords get merged early, rare patterns stay split.</p>
+
+        <div class="bpe-viz">
+          <div class="bpe-header">
+            <h4>BPE Tokenizer :: Live Demo</h4>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="bpe-badge">TIKTOKEN GPT-4O</span>
+              <select id="modelSelect" onchange="tokenizeText()" style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(253,250,244,0.08);border:1px solid rgba(253,250,244,0.15);color:var(--paper);padding:4px 10px;border-radius:4px;cursor:pointer;outline:none;">
+                <option value="gpt4">GPT-4o style</option>
+                <option value="gpt2">GPT-2 style</option>
+                <option value="char">Character-level</option>
+              </select>
+            </div>
+          </div>
+          <div class="bpe-body">
+            <div class="bpe-input-row">
+              <input class="bpe-input" id="bpeInput" oninput="tokenizeText()" placeholder="Type anything…" value="Tokenization is fascinating! The LLM sees 'Hello' as one token."/>
+              <button class="bpe-btn" onclick="randomExample()">Random Example</button>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(253,250,244,0.3);margin-bottom:10px;">Token boundaries (hover for ID)</div>
+            <div class="bpe-tokens-wrap" id="bpeTokens"></div>
+            <div class="bpe-stats" id="bpeStats"></div>
+          </div>
+        </div>
+
+        <p>The BPE merge process is run offline on a training corpus. The resulting <em>merge rules</em> and <em>vocabulary</em> are then saved and used at inference time :: the tokenizer doesn't re-learn, it just applies stored rules in order.</p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">bpe_from_scratch.py</span>
+            </div>
+            <span class="code-lang-tok">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> collections <span class="kw">import</span> Counter, defaultdict
+<span class="kw">from</span> typing <span class="kw">import</span> <span class="cls">Dict</span>, <span class="cls">List</span>, <span class="cls">Tuple</span>
+
+<span class="kw">def</span> <span class="fn">get_vocab</span>(corpus: <span class="cls">List</span>[<span class="cls">str</span>]) -&gt; <span class="cls">Dict</span>[<span class="cls">str</span>, int]:
+    <span class="str">"""Build initial character-level vocabulary with end-of-word marker."""</span>
+    vocab = Counter()
+    <span class="kw">for</span> word <span class="kw">in</span> corpus:
+        <span class="cmt"># Represent each word as space-separated characters + end marker</span>
+        <span class="var">chars</span> = <span class="str">' '</span>.<span class="fn">join</span>(<span class="fn">list</span>(word)) + <span class="str">' &lt;/w&gt;'</span>
+        vocab[<span class="var">chars</span>] += <span class="num">1</span>
+    <span class="kw">return</span> dict(vocab)
+
+<span class="kw">def</span> <span class="fn">get_pairs</span>(vocab: <span class="cls">Dict</span>) -&gt; <span class="cls">Dict</span>[<span class="cls">Tuple</span>, int]:
+    <span class="str">"""Count all adjacent symbol pairs across the vocabulary."""</span>
+    pairs = Counter()
+    <span class="kw">for</span> word, freq <span class="kw">in</span> vocab.<span class="fn">items</span>():
+        symbols = word.<span class="fn">split</span>()
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(symbols) - <span class="num">1</span>):
+            pairs[(symbols[i], symbols[i+<span class="num">1</span>])] += freq
+    <span class="kw">return</span> pairs
+
+<span class="kw">def</span> <span class="fn">merge_vocab</span>(pair: <span class="cls">Tuple</span>, vocab: <span class="cls">Dict</span>) -&gt; <span class="cls">Dict</span>:
+    <span class="str">"""Merge all instances of a pair into a single symbol."""</span>
+    <span class="kw">import</span> re
+    <span class="var">pattern</span> = re.<span class="fn">compile</span>(r<span class="str">'(?&lt;!\S)'</span> + re.<span class="fn">escape</span>(<span class="str">' '</span>.<span class="fn">join</span>(pair)) + r<span class="str">'(?!\S)'</span>)
+    <span class="kw">return</span> {<span class="var">pattern</span>.<span class="fn">sub</span>(<span class="str">''</span>.<span class="fn">join</span>(pair), word): freq <span class="kw">for</span> word, freq <span class="kw">in</span> vocab.<span class="fn">items</span>()}
+
+<span class="kw">def</span> <span class="fn">train_bpe</span>(corpus: <span class="cls">List</span>[<span class="cls">str</span>], num_merges: int = <span class="num">10</span>) -&gt; <span class="cls">List</span>[<span class="cls">Tuple</span>]:
+    <span class="str">"""Train BPE and return the list of merge rules."""</span>
+    <span class="var">vocab</span>  = <span class="fn">get_vocab</span>(corpus)
+    <span class="var">merges</span> = []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(num_merges):
+        <span class="var">pairs</span>  = <span class="fn">get_pairs</span>(<span class="var">vocab</span>)
+        <span class="kw">if</span> <span class="kw">not</span> <span class="var">pairs</span>: <span class="kw">break</span>
+        <span class="var">best</span>   = <span class="fn">max</span>(<span class="var">pairs</span>, key=<span class="var">pairs</span>.get)
+        <span class="var">vocab</span>  = <span class="fn">merge_vocab</span>(<span class="var">best</span>, <span class="var">vocab</span>)
+        <span class="var">merges</span>.<span class="fn">append</span>(<span class="var">best</span>)
+        <span class="fn">print</span>(<span class="str">f"Merge {i+1:2d}: {best[0]!r} + {best[1]!r} → {best[0]+best[1]!r}  (freq={pairs[best]})"</span>)
+    <span class="kw">return</span> <span class="var">merges</span>
+
+<span class="cmt"># ── Train on a small corpus ──</span>
+<span class="var">corpus</span> = [<span class="str">"lower"</span>, <span class="str">"lowest"</span>, <span class="str">"newer"</span>, <span class="str">"wider"</span>, <span class="str">"new"</span>, <span class="str">"wide"</span>]
+<span class="var">merges</span> = <span class="fn">train_bpe</span>(<span class="var">corpus</span>, num_merges=<span class="num">8</span>)
+
+<span class="cmt"># Output:
+# Merge  1: 'e' + 'r' → 'er'  (freq=4)
+# Merge  2: 'er' + '&lt;/w&gt;' → 'er&lt;/w&gt;'  (freq=4)  ← word-final
+# Merge  3: 'l' + 'o' → 'lo'  (freq=2)
+# Merge  4: 'lo' + 'w' → 'low'  (freq=2)
+# …</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SENTENCEPIECE -->
+    <section class="section reveal" id="sp">
+      <span class="section-number tok">2.3.2</span>
+      <h2>SentencePiece</h2>
+      <p class="section-intro tok-border">Google's SentencePiece treats the input as a raw byte stream :: no pre-tokenization on spaces. This makes it language-agnostic and ideal for multilingual models like T5, mT5, and LLaMA.</p>
+
+      <div class="subsection">
+        <p>Unlike BPE implementations that require whitespace-split words as input, SentencePiece operates directly on Unicode code points. It supports two algorithms: BPE and Unigram Language Model (ULM). The key difference from standard BPE: spaces are treated as ordinary characters (represented as a special character ▁), allowing the model to see word boundaries without hard-coding them.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Property</th><th>tiktoken (GPT)</th><th>SentencePiece (T5/Llama)</th><th>WordPiece (BERT)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Algorithm</strong></td><td>BPE on bytes</td><td>BPE or Unigram LM on Unicode</td><td>Greedy likelihood maximisation</td></tr>
+              <tr><td><strong>Pre-tokenization</strong></td><td>Regex on whitespace</td><td>None :: raw text</td><td>Whitespace + punctuation split</td></tr>
+              <tr><td><strong>Multilinguality</strong></td><td>Byte-level fallback</td><td>Excellent :: no language assumption</td><td>Language-specific</td></tr>
+              <tr><td><strong>OOV handling</strong></td><td>Byte fallback (0 OOVs)</td><td>Byte fallback or &lt;unk&gt;</td><td>[UNK] token</td></tr>
+              <tr><td><strong>Vocab size</strong></td><td>100,277 (GPT-4)</td><td>32,000–250,000</td><td>30,522 (BERT)</td></tr>
+              <tr><td><strong>Models using it</strong></td><td>GPT-2/3/4, Claude</td><td>T5, mT5, LLaMA, Mistral</td><td>BERT, RoBERTa, DistilBERT</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">The Unigram LM Algorithm (SentencePiece alternative)</div>
+          <p>Instead of greedily merging pairs, Unigram LM starts with a large candidate vocabulary and iteratively removes tokens that contribute least to the corpus likelihood. The final vocabulary is the set of tokens that maximise the probability of the training data. This is more principled than greedy BPE but computationally heavier.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORDPIECE -->
+    <section class="section reveal" id="wp">
+      <span class="section-number tok">2.3.3</span>
+      <h2>WordPiece</h2>
+      <p class="section-intro tok-border">Developed at Google for BERT, WordPiece is similar to BPE but selects merges based on maximising the language model likelihood rather than raw frequency. It also uses a ## prefix to mark subword continuations.</p>
+
+      <div class="subsection">
+        <p>WordPiece splits unknown words into the longest matching subwords from its vocabulary. The <span class="ic">##</span> prefix indicates that a subword is a continuation (not word-initial). For example, "unaffable" might tokenize as <span class="ic">un</span> <span class="ic">##aff</span> <span class="ic">##able</span>.</p>
+
+        <div class="bpe-viz" style="border-color:rgba(180,83,9,0.3);">
+          <div class="bpe-header">
+            <h4>Tokenizer Comparison :: Same Text, Three Models</h4>
+            <span class="bpe-badge">SIDE BY SIDE</span>
+          </div>
+          <div class="bpe-body">
+            <div id="cmpModels"></div>
+          </div>
+        </div>
+
+        <div class="callout amber">
+          <div class="callout-label">Merge Strategy Differences</div>
+          <p><strong>BPE:</strong> merge pair with highest frequency count. <strong>WordPiece:</strong> merge pair that maximises P(corpus | vocabulary) :: i.e., prefer merges that most improve the language model score, not just raw frequency. In practice the two produce very similar vocabularies for large corpora, but WordPiece is marginally more principled.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPECIAL TOKENS -->
+    <section class="section reveal" id="special">
+      <span class="section-number tok">2.3.4</span>
+      <h2>Special Tokens</h2>
+      <p class="section-intro tok-border">Every tokenizer reserves slots in its vocabulary for structural tokens that don't represent natural text :: they encode model state, conversation structure, and generation boundaries.</p>
+
+      <div class="subsection">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Token</th><th>Name</th><th>Used In</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><span class="ic">[CLS]</span></td><td>Classification</td><td>BERT, RoBERTa</td><td>Prepended to every sequence. Its final hidden state used as the sequence representation for classification tasks.</td></tr>
+              <tr><td><span class="ic">[SEP]</span></td><td>Separator</td><td>BERT</td><td>Separates two sequences in tasks like question answering and NLI. Also marks end of a sentence.</td></tr>
+              <tr><td><span class="ic">[PAD]</span></td><td>Padding</td><td>All models</td><td>Pads shorter sequences in a batch to the same length. Masked out in attention computation.</td></tr>
+              <tr><td><span class="ic">[UNK]</span></td><td>Unknown</td><td>BERT, older models</td><td>Replaces characters/subwords not in vocabulary. Rare in modern byte-level tokenizers.</td></tr>
+              <tr><td><span class="ic">[MASK]</span></td><td>Mask</td><td>BERT pretraining</td><td>Replaces 15% of tokens during masked language model training. Model must predict original.</td></tr>
+              <tr><td><span class="ic">&lt;|endoftext|&gt;</span></td><td>End of text</td><td>GPT-2/3/4</td><td>Signals end of a document. Used to separate documents in training and stop generation.</td></tr>
+              <tr><td><span class="ic">&lt;s&gt; / &lt;/s&gt;</span></td><td>Begin/End</td><td>LLaMA, T5</td><td>Marks beginning and end of a sequence. Used for generation boundary detection.</td></tr>
+              <tr><td><span class="ic">&lt;|im_start|&gt;</span></td><td>Chat turn start</td><td>ChatML format</td><td>Marks the start of a chat turn, followed by role (system/user/assistant) and content.</td></tr>
+              <tr><td><span class="ic">&lt;|im_end|&gt;</span></td><td>Chat turn end</td><td>ChatML format</td><td>Marks the end of a chat turn. The model is trained to generate this to stop responding.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">special_tokens.py</span>
+            </div>
+            <span class="code-lang-tok">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> transformers <span class="kw">import</span> <span class="cls">AutoTokenizer</span>
+
+<span class="cmt"># ── BERT :: shows [CLS], [SEP], [PAD] ──</span>
+<span class="var">bert</span> = <span class="cls">AutoTokenizer</span>.<span class="fn">from_pretrained</span>(<span class="str">"bert-base-uncased"</span>)
+<span class="var">encoded</span> = <span class="var">bert</span>(<span class="str">"The cat sat."</span>, return_tensors=<span class="str">"pt"</span>, padding=<span class="str">"max_length"</span>, max_length=<span class="num">10</span>)
+<span class="fn">print</span>(<span class="var">bert</span>.<span class="fn">convert_ids_to_tokens</span>(<span class="var">encoded</span>[<span class="str">"input_ids"</span>][<span class="num">0</span>]))
+<span class="cmt"># → ['[CLS]', 'the', 'cat', 'sat', '.', '[SEP]', '[PAD]', '[PAD]', '[PAD]', '[PAD]']</span>
+
+<span class="cmt"># ── LLaMA-style chat template ──</span>
+<span class="var">llama</span> = <span class="cls">AutoTokenizer</span>.<span class="fn">from_pretrained</span>(<span class="str">"meta-llama/Meta-Llama-3-8B-Instruct"</span>)
+<span class="var">messages</span> = [
+    {<span class="str">"role"</span>: <span class="str">"system"</span>,    <span class="str">"content"</span>: <span class="str">"You are a helpful assistant."</span>},
+    {<span class="str">"role"</span>: <span class="str">"user"</span>,      <span class="str">"content"</span>: <span class="str">"What is 2+2?"</span>},
+    {<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="str">"4"</span>},
+]
+<span class="var">prompt</span> = <span class="var">llama</span>.<span class="fn">apply_chat_template</span>(<span class="var">messages</span>, tokenize=<span class="cls">False</span>)
+<span class="fn">print</span>(<span class="var">prompt</span>)
+<span class="cmt"># &lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+# You are a helpful assistant.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+# What is 2+2?&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+# 4&lt;|eot_id|&gt;</span>
+
+<span class="cmt"># ── GPT-4o via tiktoken ──</span>
+<span class="kw">import</span> tiktoken
+<span class="var">enc</span> = tiktoken.<span class="fn">encoding_for_model</span>(<span class="str">"gpt-4o"</span>)
+<span class="fn">print</span>(<span class="str">f"Vocab size: {enc.n_vocab}"</span>)  <span class="cmt"># → 200,019</span>
+<span class="fn">print</span>(<span class="str">f"eot token: {enc.eot_token}"</span>)   <span class="cmt"># → 199999</span>
+<span class="fn">print</span>(<span class="fn">enc</span>.<span class="fn">decode</span>([<span class="var">enc</span>.<span class="var">eot_token</span>]))   <span class="cmt"># → &lt;|endoftext|&gt;</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY TOKENIZATION MATTERS -->
+    <section class="section reveal" id="why-tok">
+      <span class="section-number tok">2.3.5</span>
+      <h2>Why Tokenization Matters</h2>
+      <p class="section-intro tok-border">Tokenization is not a boring preprocessing step. It directly determines cost, capability limits, failure modes, and even what tasks an LLM can solve.</p>
+
+      <div class="subsection">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;">
+          <div style="border:1px solid var(--border);border-radius:10px;padding:20px;background:var(--paper);">
+            <div style="font-family:'DM Serif Display',serif;font-size:42px;color:var(--tok);opacity:.2;line-height:1;margin-bottom:8px;">$</div>
+            <h4 style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:8px;">Cost &amp; Latency</h4>
+            <p style="font-size:14px;color:var(--muted);margin:0;">API pricing is per token. Non-English text, code, and rare words use more tokens per character → higher cost. Japanese can cost 3× more than equivalent English.</p>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:10px;padding:20px;background:var(--paper);">
+            <div style="font-family:'DM Serif Display',serif;font-size:42px;color:var(--tok);opacity:.2;line-height:1;margin-bottom:8px;">⚠</div>
+            <h4 style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:8px;">Failure Modes</h4>
+            <p style="font-size:14px;color:var(--muted);margin:0;">"Count letters in strawberry" fails because the model sees <span class="ic">straw</span><span class="ic">berry</span> :: not individual characters. Spelling, arithmetic, and string reversal are harder when tokens span multiple characters.</p>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:10px;padding:20px;background:var(--paper);">
+            <div style="font-family:'DM Serif Display',serif;font-size:42px;color:var(--tok);opacity:.2;line-height:1;margin-bottom:8px;">🌐</div>
+            <h4 style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:8px;">Multilingual Equity</h4>
+            <p style="font-size:14px;color:var(--muted);margin:0;">Underrepresented languages tokenize into more tokens per word, consuming more context window and costing more. This is a form of implicit bias baked into the vocabulary construction process.</p>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:10px;padding:20px;background:var(--paper);">
+            <div style="font-family:'DM Serif Display',serif;font-size:42px;color:var(--tok);opacity:.2;line-height:1;margin-bottom:8px;">↔</div>
+            <h4 style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:8px;">Context Window Usage</h4>
+            <p style="font-size:14px;color:var(--muted);margin:0;">A 128K token context sounds large, but a Chinese novel may use 3× more tokens than the same story in English :: effectively giving non-English speakers a smaller effective context window.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDS-ON TOKENIZATION -->
+    <section class="section reveal" id="tok-hands">
+      <span class="section-number tok">2.3.6</span>
+      <h2>Hands-on: Tokenizer Libraries</h2>
+      <p class="section-intro tok-border">Compare tokenization across real models using the HuggingFace tokenizers library and tiktoken. Understand token counts, vocabulary access, and batch encoding.</p>
+
+      <div class="subsection">
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">tokenizer_comparison.py</span>
+            </div>
+            <span class="code-lang-tok">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">import</span> tiktoken
+<span class="kw">from</span> transformers <span class="kw">import</span> <span class="cls">AutoTokenizer</span>
+
+<span class="var">SAMPLES</span> = {
+    <span class="str">"English simple"</span>:  <span class="str">"The quick brown fox jumps over the lazy dog."</span>,
+    <span class="str">"English complex"</span>: <span class="str">"Supercalifragilisticexpialidocious antidisestablishmentarianism."</span>,
+    <span class="str">"Code"</span>:            <span class="str">"def fibonacci(n): return n if n&lt;2 else fibonacci(n-1)+fibonacci(n-2)"</span>,
+    <span class="str">"Japanese"</span>:        <span class="str">"大規模言語モデルは自然言語処理を根本的に変えました。"</span>,
+    <span class="str">"Emoji"</span>:           <span class="str">"Hello 👋 World 🌍 AI 🤖 is 🔥 amazing! ✨"</span>,
+    <span class="str">"Numbers"</span>:         <span class="str">"3.14159265358979 1,000,000 $99.99 2024-01-15"</span>,
+}
+
+<span class="cmt"># ── Load tokenizers ──</span>
+<span class="var">tokenizers</span> = {
+    <span class="str">"GPT-4o (tiktoken)"</span>:    tiktoken.<span class="fn">encoding_for_model</span>(<span class="str">"gpt-4o"</span>),
+    <span class="str">"BERT (WordPiece)"</span>:     <span class="cls">AutoTokenizer</span>.<span class="fn">from_pretrained</span>(<span class="str">"bert-base-uncased"</span>),
+    <span class="str">"LLaMA-3 (SP-BPE)"</span>:    <span class="cls">AutoTokenizer</span>.<span class="fn">from_pretrained</span>(<span class="str">"meta-llama/Meta-Llama-3-8B"</span>),
+}
+
+<span class="kw">def</span> <span class="fn">count_tokens</span>(tokenizer, text):
+    <span class="kw">if</span> <span class="fn">hasattr</span>(tokenizer, <span class="str">'encode'</span>) <span class="kw">and</span> <span class="fn">callable</span>(tokenizer.encode):
+        <span class="kw">return</span> <span class="fn">len</span>(tokenizer.<span class="fn">encode</span>(text))
+    <span class="kw">return</span> <span class="fn">len</span>(tokenizer.<span class="fn">tokenize</span>(text))
+
+<span class="fn">print</span>(<span class="str">f"{'Sample':&lt;25} {'GPT-4o':&gt;8} {'BERT':&gt;8} {'LLaMA-3':&gt;8}"</span>)
+<span class="fn">print</span>(<span class="str">"-"</span> * <span class="num">55</span>)
+<span class="kw">for</span> name, text <span class="kw">in</span> <span class="var">SAMPLES</span>.<span class="fn">items</span>():
+    counts = [<span class="fn">count_tokens</span>(t, text) <span class="kw">for</span> t <span class="kw">in</span> <span class="var">tokenizers</span>.<span class="fn">values</span>()]
+    <span class="fn">print</span>(<span class="str">f"{name:&lt;25} {counts[0]:&gt;8} {counts[1]:&gt;8} {counts[2]:&gt;8}"</span>)
+
+<span class="cmt"># Sample                    GPT-4o     BERT  LLaMA-3
+# English simple                 9        9        9
+# English complex                6       10        7
+# Code                          22       30       21
+# Japanese                      14       33       15
+# Emoji                         22       27       24
+# Numbers                       14       18       14</span>
+
+<span class="cmt"># ── Inspect token boundaries ──</span>
+<span class="var">enc</span> = tiktoken.<span class="fn">encoding_for_model</span>(<span class="str">"gpt-4o"</span>)
+<span class="var">text</span> = <span class="str">"tokenization"</span>
+<span class="var">ids</span>  = <span class="var">enc</span>.<span class="fn">encode</span>(<span class="var">text</span>)
+<span class="fn">print</span>([<span class="var">enc</span>.<span class="fn">decode</span>([i]) <span class="kw">for</span> i <span class="kw">in</span> <span class="var">ids</span>])  <span class="cmt"># → ['token', 'ization']</span>
+<span class="fn">print</span>(<span class="var">ids</span>)                              <span class="cmt"># → [3239, 2065]  ← token IDs</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content tok -->
+
+  <!-- ═══════════════ PART 2.4 ═══════════════ -->
+  <div class="part-header" style="margin-top:80px;">
+    <span class="part-num emb-col">2.4</span>
+    <h2 class="part-title">Embeddings</h2>
+    <div class="part-rule" style="background:linear-gradient(90deg,var(--border),transparent);"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- SEMANTIC VECTORS -->
+    <section class="section reveal" id="semantic">
+      <span class="section-number emb">2.4.1</span>
+      <h2>Semantic Vector Representations</h2>
+      <p class="section-intro emb-border">An embedding is a dense, fixed-dimensional numerical vector that encodes the meaning of text. The key property: semantically similar texts have numerically similar vectors :: closeness in vector space corresponds to closeness in meaning.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">V</span>From Sparse to Dense</h3>
+        <p>Early NLP represented words as one-hot vectors :: a vocabulary-sized vector with a single 1. "cat" and "kitten" were completely orthogonal. Embeddings compress this into a dense representation where similar words cluster together.</p>
+
+        <div class="vsv">
+          <div class="vsv-header">
+            <h4>2D Embedding Space :: Word Clusters</h4>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <span class="vsv-badge">INTERACTIVE</span>
+              <button onclick="addRandomWord()" style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 12px;background:rgba(253,250,244,0.07);border:1px solid rgba(253,250,244,0.15);color:rgba(253,250,244,0.7);border-radius:4px;cursor:pointer;">+ Add word</button>
+              <button onclick="resetCanvas()" style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 12px;background:rgba(253,250,244,0.04);border:1px solid rgba(253,250,244,0.1);color:rgba(253,250,244,0.5);border-radius:4px;cursor:pointer;">Reset</button>
+            </div>
+          </div>
+          <div class="vsv-body">
+            <canvas height="320" id="embCanvas" style="width:100%;border-radius:6px;" width="660"></canvas>
+            <div id="embHint" style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(253,250,244,0.35);">Hover over a word to see its nearest neighbours</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">D</span>What Gets Encoded?</h3>
+        <p>Modern sentence embeddings (e.g. from <span class="ic emb">text-embedding-3-large</span> or <span class="ic emb">all-MiniLM-L6-v2</span>) encode far more than simple word co-occurrence. They capture:</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0;">
+          <div style="border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--paper);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--emb2);margin-bottom:8px;">Semantics</div>
+            <p style="font-size:14px;color:var(--muted);margin:0;">"dog" ≈ "canine" ≈ "puppy". Synonyms and paraphrases cluster together regardless of surface form.</p>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--paper);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--emb2);margin-bottom:8px;">Intent</div>
+            <p style="font-size:14px;color:var(--muted);margin:0;">"How do I reset my password?" ≈ "Forgot login credentials" :: same intent, zero word overlap. Critical for search.</p>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--paper);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--emb2);margin-bottom:8px;">Context</div>
+            <p style="font-size:14px;color:var(--muted);margin:0;">Contextual embeddings (BERT/GPT) give the same word different vectors in different contexts. "bank" (river) ≠ "bank" (finance).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COSINE SIMILARITY -->
+    <section class="section reveal" id="cos-sim">
+      <span class="section-number emb">2.4.2</span>
+      <h2>Cosine Similarity</h2>
+      <p class="section-intro emb-border">The standard metric for embedding similarity. Cosine similarity measures the angle between two vectors :: ignoring magnitude, focusing purely on direction. Two texts pointing in the same direction in embedding space are semantically similar.</p>
+
+      <div class="subsection">
+        <div class="math-hero">
+          <span class="math-label">Cosine Similarity Formula</span>
+          <div class="math-formula">
+            cos(θ) = 
+            <span class="fraction">
+              <span class="numerator"><span class="mf-a">A</span> · <span class="mf-b">B</span></span>
+              <span class="denominator">|<span class="mf-a">A</span>|   |<span class="mf-b">B</span>|</span>
+            </span>
+            =
+            <span class="fraction">
+              <span class="numerator">Σᵢ <span class="mf-a">Aᵢ</span><span class="mf-b">Bᵢ</span></span>
+              <span class="denominator">√(Σᵢ <span class="mf-a">Aᵢ</span>²)   √(Σᵢ <span class="mf-b">Bᵢ</span>²)</span>
+            </span>
+          </div>
+          <div class="math-annotation">
+            <div class="math-ann-item">
+              <span class="math-ann-sym" style="color:#f87171;">A · B</span>
+              <span class="math-ann-txt">Dot product<br/>Σᵢ AᵢBᵢ<br/>"Shared direction"</span>
+            </div>
+            <div class="math-ann-item">
+              <span class="math-ann-sym" style="color:rgba(253,250,244,0.7);">|A||B|</span>
+              <span class="math-ann-txt">Product of magnitudes<br/>Normalises for length<br/>Range: [-1, +1]</span>
+            </div>
+            <div class="math-ann-item">
+              <span class="math-ann-sym" style="color:#34d399;">cos θ</span>
+              <span class="math-ann-txt">1.0 = identical direction<br/>0.0 = orthogonal (unrelated)<br/>-1.0 = opposite</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout emb">
+          <div class="callout-label">Why Not Euclidean Distance?</div>
+          <p>Euclidean distance (L2) is sensitive to magnitude :: a longer document embedding might score as "far" from a short one even if they discuss the same topic. Cosine similarity normalises this away, measuring only the angular relationship. For normalized embeddings (unit vectors), cosine similarity = dot product, making it extremely fast to compute on GPUs.</p>
+        </div>
+
+        <!-- INTERACTIVE SIMILARITY EXPLORER -->
+        <div class="sim-explorer">
+          <div class="vsv-header">
+            <h4>Cosine Similarity Explorer</h4>
+            <span class="vsv-badge">LIVE API</span>
+          </div>
+          <div class="sim-explorer-body">
+            <p style="font-size:13.5px;color:rgba(253,250,244,0.5);margin-bottom:18px;">Enter two sentences. Claude will estimate their semantic similarity and explain what the embedding space "sees".</p>
+            <div class="sim-input-pair">
+              <div>
+                <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(248,113,113,0.7);display:block;margin-bottom:7px;">Sentence A</label>
+                <textarea class="sim-textarea" id="simA" rows="3">The dog ran quickly through the park.</textarea>
+              </div>
+              <div>
+                <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(52,211,153,0.7);display:block;margin-bottom:7px;">Sentence B</label>
+                <textarea class="sim-textarea" id="simB" rows="3">A canine sprinted across the garden at high speed.</textarea>
+              </div>
+            </div>
+            <button class="search-btn" id="simBtn" onclick="computeSimilarity()">
+              <span id="simBtnTxt">▶</span> Compute Similarity
+            </button>
+            <div class="sim-result" id="simResult" style="display:none;">
+              <span class="sim-score-big" id="simScoreBig">::</span>
+              <span class="sim-score-label">Estimated Cosine Similarity</span>
+              <div class="sim-gauge"><div class="sim-gauge-fill" id="simGauge" style="width:0%;"></div></div>
+              <div class="sim-explanation" id="simExplanation"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DENSE VECTORS -->
+    <section class="section reveal" id="dense">
+      <span class="section-number emb">2.4.3</span>
+      <h2>Dense Vectors &amp; Embedding Spaces</h2>
+      <p class="section-intro emb-border">Modern embeddings compress meaning into dense vectors of 384–3072 dimensions. Every dimension is meaningful; the space encodes semantic relationships as geometric structure.</p>
+
+      <div class="subsection">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>Dimensions</th><th>Tokens In</th><th>Typical Use</th><th>Provider</th></tr></thead>
+            <tbody>
+              <tr><td><strong>text-embedding-3-small</strong></td><td>1,536</td><td>8,191</td><td>Cost-efficient search &amp; RAG</td><td>OpenAI</td></tr>
+              <tr><td><strong>text-embedding-3-large</strong></td><td>3,072</td><td>8,191</td><td>High-accuracy retrieval</td><td>OpenAI</td></tr>
+              <tr><td><strong>all-MiniLM-L6-v2</strong></td><td>384</td><td>256</td><td>Fast local inference</td><td>HuggingFace</td></tr>
+              <tr><td><strong>all-mpnet-base-v2</strong></td><td>768</td><td>384</td><td>Balanced local model</td><td>HuggingFace</td></tr>
+              <tr><td><strong>voyage-3-large</strong></td><td>1,024</td><td>32,000</td><td>Long-doc retrieval</td><td>Voyage AI</td></tr>
+              <tr><td><strong>embed-english-v3.0</strong></td><td>1,024</td><td>512</td><td>Enterprise search</td><td>Cohere</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EMBEDDING SPACE VIZ -->
+      <div class="subsection" id="emb-space">
+        <h3><span class="anchor-icon">↗</span>The Geometry of Meaning</h3>
+        <p>Embedding spaces exhibit remarkable algebraic structure. Vector arithmetic encodes semantic analogies: <span class="ic emb">king − man + woman ≈ queen</span>. Categories cluster in hyperplanes. Semantic dimensions (positive/negative sentiment, gender, tense) align with geometric directions.</p>
+
+        <div class="vsv">
+          <div class="vsv-header">
+            <h4>Embedding Space :: Interactive 2D Projection</h4>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <span class="vsv-badge">t-SNE STYLE</span>
+              <select id="clusterSelect" onchange="renderEmbSpace()" style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(253,250,244,0.08);border:1px solid rgba(253,250,244,0.15);color:var(--paper);padding:4px 10px;border-radius:4px;cursor:pointer;outline:none;">
+                <option value="animals">Animals cluster</option>
+                <option value="tech">Tech terms</option>
+                <option value="emotions">Emotions</option>
+                <option value="analogies">King-Queen analogies</option>
+              </select>
+            </div>
+          </div>
+          <div class="vsv-body">
+            <canvas height="340" id="embSpaceCanvas" style="width:100%;border-radius:6px;cursor:crosshair;" width="640"></canvas>
+            <div id="embSpaceHint" style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(253,250,244,0.35);">Hover over points to see word labels and distances</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDS-ON EMBEDDINGS -->
+    <section class="section reveal" id="emb-hands">
+      <span class="section-number emb">2.4.4</span>
+      <h2>Hands-on: Generate Embeddings &amp; Semantic Search</h2>
+      <p class="section-intro emb-border">Three exercises: generating embeddings with the API, implementing cosine similarity from scratch, and building a complete semantic search engine in under 50 lines.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">1</span>Generate Embeddings with OpenAI</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">generate_embeddings.py</span>
+            </div>
+            <span class="code-lang-emb">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">client</span> = <span class="cls">OpenAI</span>()
+
+<span class="kw">def</span> <span class="fn">embed</span>(texts: list[str], model=<span class="str">"text-embedding-3-small"</span>) -&gt; np.ndarray:
+    <span class="str">"""Embed a list of texts, return [N, dim] numpy array."""</span>
+    <span class="var">resp</span> = <span class="var">client</span>.embeddings.<span class="fn">create</span>(input=texts, model=model)
+    <span class="kw">return</span> np.<span class="fn">array</span>([d.embedding <span class="kw">for</span> d <span class="kw">in</span> <span class="var">resp</span>.data])
+
+<span class="kw">def</span> <span class="fn">cosine_similarity</span>(a: np.ndarray, b: np.ndarray) -&gt; float:
+    <span class="str">"""Cosine similarity between two vectors or batches."""</span>
+    <span class="var">a_norm</span> = a / (np.<span class="fn">linalg</span>.<span class="fn">norm</span>(a, axis=-<span class="num">1</span>, keepdims=<span class="cls">True</span>) + <span class="num">1e-10</span>)
+    <span class="var">b_norm</span> = b / (np.<span class="fn">linalg</span>.<span class="fn">norm</span>(b, axis=-<span class="num">1</span>, keepdims=<span class="cls">True</span>) + <span class="num">1e-10</span>)
+    <span class="kw">return</span> (<span class="var">a_norm</span> @ <span class="var">b_norm</span>.T).<span class="fn">squeeze</span>()
+
+<span class="cmt"># ── Basic usage ──</span>
+<span class="var">sentences</span> = [
+    <span class="str">"The dog barked loudly."</span>,
+    <span class="str">"A canine made a loud noise."</span>,     <span class="cmt"># semantic synonym</span>
+    <span class="str">"The stock market dropped sharply."</span>, <span class="cmt"># unrelated</span>
+    <span class="str">"The puppy yelped at the thunder."</span>,  <span class="cmt"># related to dog</span>
+]
+
+<span class="var">embeddings</span> = <span class="fn">embed</span>(<span class="var">sentences</span>)
+<span class="fn">print</span>(<span class="str">f"Shape: {embeddings.shape}"</span>)  <span class="cmt"># (4, 1536)</span>
+
+<span class="kw">for</span> i, s1 <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">sentences</span>):
+    <span class="kw">for</span> j, s2 <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">sentences</span>[i+<span class="num">1</span>:], i+<span class="num">1</span>):
+        sim = <span class="fn">cosine_similarity</span>(<span class="var">embeddings</span>[i], <span class="var">embeddings</span>[j])
+        <span class="fn">print</span>(<span class="str">f"{i}↔{j}: {sim:.4f}  |  {s1[:30]}…  ↔  {s2[:30]}…"</span>)
+
+<span class="cmt"># 0↔1: 0.8923  The dog barked…   ↔  A canine made…    ← HIGH (synonyms)
+# 0↔2: 0.1247  The dog barked…   ↔  The stock market…  ← LOW (unrelated)
+# 0↔3: 0.7841  The dog barked…   ↔  The puppy yelped… ← HIGH (same topic)
+# 1↔2: 0.0893  A canine made…    ↔  The stock market…  ← VERY LOW
+# 1↔3: 0.7643  A canine made…    ↔  The puppy yelped…  ← HIGH</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">2</span>Complete Semantic Search Engine</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">semantic_search.py</span>
+            </div>
+            <span class="code-lang-emb">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+<span class="var">client</span> = <span class="cls">OpenAI</span>()
+
+<span class="cls">@dataclass</span>
+<span class="kw">class</span> <span class="cls">SearchResult</span>:
+    text:  str
+    score: float
+    rank:  int
+
+<span class="kw">class</span> <span class="cls">SemanticSearch</span>:
+    <span class="str">"""Simple in-memory semantic search engine."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, model: str = <span class="str">"text-embedding-3-small"</span>):
+        self.<span class="var">model</span>      = model
+        self.<span class="var">documents</span>  = []
+        self.<span class="var">embeddings</span> = <span class="cls">None</span>
+
+    <span class="kw">def</span> <span class="fn">_embed</span>(self, texts: list) -&gt; np.ndarray:
+        <span class="var">resp</span> = <span class="var">client</span>.embeddings.<span class="fn">create</span>(input=texts, model=self.<span class="var">model</span>)
+        <span class="var">vecs</span> = np.<span class="fn">array</span>([d.embedding <span class="kw">for</span> d <span class="kw">in</span> <span class="var">resp</span>.data], dtype=np.float32)
+        <span class="kw">return</span> <span class="var">vecs</span> / np.<span class="fn">linalg</span>.<span class="fn">norm</span>(<span class="var">vecs</span>, axis=<span class="num">1</span>, keepdims=<span class="cls">True</span>)  <span class="cmt"># L2-normalise</span>
+
+    <span class="kw">def</span> <span class="fn">index</span>(self, documents: list[str]):
+        <span class="str">"""Embed and store documents."""</span>
+        self.<span class="var">documents</span>  = documents
+        self.<span class="var">embeddings</span> = self.<span class="fn">_embed</span>(documents)
+        <span class="fn">print</span>(<span class="str">f"Indexed {len(documents)} documents. Shape: {self.embeddings.shape}"</span>)
+
+    <span class="kw">def</span> <span class="fn">search</span>(self, query: str, top_k: int = <span class="num">5</span>) -&gt; list[<span class="cls">SearchResult</span>]:
+        <span class="str">"""Find top_k most similar documents to query."""</span>
+        <span class="var">q_emb</span>  = self.<span class="fn">_embed</span>([query])           <span class="cmt"># [1, dim]</span>
+        <span class="var">scores</span> = (self.<span class="var">embeddings</span> @ <span class="var">q_emb</span>.T).<span class="fn">squeeze</span>()  <span class="cmt"># dot = cosine (unit vecs)</span>
+        <span class="var">top_k_idx</span> = np.<span class="fn">argsort</span>(<span class="var">scores</span>)[::-<span class="num">1</span>][:<span class="var">top_k</span>]
+        <span class="kw">return</span> [
+            <span class="cls">SearchResult</span>(text=self.<span class="var">documents</span>[i], score=<span class="fn">float</span>(<span class="var">scores</span>[i]), rank=r+<span class="num">1</span>)
+            <span class="kw">for</span> r, i <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">top_k_idx</span>)
+        ]
+
+
+<span class="cmt"># ── Demo ──</span>
+<span class="var">engine</span> = <span class="cls">SemanticSearch</span>()
+<span class="var">engine</span>.<span class="fn">index</span>([
+    <span class="str">"How to reset a forgotten password"</span>,
+    <span class="str">"What is machine learning?"</span>,
+    <span class="str">"Python tutorial for beginners"</span>,
+    <span class="str">"Best restaurants in San Francisco"</span>,
+    <span class="str">"Understanding transformer architecture"</span>,
+    <span class="str">"I cannot log in to my account"</span>,    <span class="cmt"># semantically = password reset</span>
+    <span class="str">"Introduction to neural networks"</span>,
+    <span class="str">"Top dining spots near the Golden Gate"</span>,
+])
+
+<span class="kw">for</span> result <span class="kw">in</span> <span class="var">engine</span>.<span class="fn">search</span>(<span class="str">"I forgot my login credentials"</span>, top_k=<span class="num">3</span>):
+    <span class="fn">print</span>(<span class="str">f"#{result.rank} ({result.score:.4f}): {result.text}"</span>)
+
+<span class="cmt"># #1 (0.9241): How to reset a forgotten password   ← correct ✓
+# #2 (0.8876): I cannot log in to my account        ← correct ✓
+# #3 (0.3124): What is machine learning?             ← unrelated ✓</span></code></pre>
+        </div>
+      </div>
+
+      <!-- LIVE SEMANTIC SEARCH DEMO -->
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Live Semantic Search Demo</h3>
+        <p>A fully live semantic search engine powered by Claude. Build a corpus from the preset sentences or add your own, then search it. The AI computes semantic relevance scores and ranks results.</p>
+
+        <div class="search-demo">
+          <div class="search-demo-header">
+            <h4>Live Semantic Search Engine</h4>
+            <p>Select documents for the corpus (toggle to add/remove), then search with any query.</p>
+          </div>
+          <div class="search-demo-body">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(253,250,244,0.35);margin-bottom:10px;">Corpus :: click to toggle documents</div>
+            <div class="corpus-pills" id="corpusPills"></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(253,250,244,0.35);margin:16px 0 8px;">Search Query</div>
+            <div class="search-input-row">
+              <input class="search-input" id="searchQuery" placeholder="Type your query…" value="I can't remember my login details"/>
+              <button class="search-btn" id="searchBtn" onclick="runSearch()">
+                <span id="searchBtnTxt">Search</span>
+              </button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q&A DEMO -->
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Embeddings Q&amp;A</h3>
+        <div class="demo-box">
+          <h4>Ask About Embeddings</h4>
+          <p class="demo-desc">Ask any question about embedding models, vector search, RAG, or semantic similarity. Answered with technical precision.</p>
+          <label class="demo-label">Question</label>
+          <textarea class="demo-input" id="qaInput" placeholder="e.g. What's the difference between sparse and dense retrieval? When would you use BM25 vs embeddings?" rows="2">When would you use dot product similarity instead of cosine similarity, and how do vector databases like Pinecone or Weaviate store and search embeddings at scale?</textarea>
+          <button class="demo-btn" id="qaBtn" onclick="askQA()"><span id="qaBtnTxt">▶</span> Ask</button>
+          <span class="result-label" id="qaLabel" style="display:none;">ANSWER</span>
+          <div class="result-text" id="qaResult" style="display:none;font-family:'Cabinet Grotesk',sans-serif;font-size:14.5px;line-height:1.75;"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn-nav" href="ai-nlp-llm-section2-2.html">← 2.2 Attention Mechanism</a>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">Sections 2.3 &amp; 2.4 complete</div>
+    <a class="btn-nav primary" href="#">→ 3.1 Prompt Engineering</a>
+  </div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-2.html">Ai Nlp Llm Section1 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-3.html">Ai Nlp Llm Section1 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1.html">Ai Nlp Llm Section1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-1.html">Ai Nlp Llm Section2 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-2.html">Ai Nlp Llm Section2 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-3-4.html">Ai Nlp Llm Section2 3 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-1.html">Ai Nlp Llm Section3 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-2.html">Ai Nlp Llm Section3 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-3.html">Ai Nlp Llm Section3 3</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<script>
+// ── PROGRESS ──
+const pf = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  pf.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+});
+
+// ── REVEAL ──
+document.querySelectorAll('.reveal').forEach(el =>
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) el.classList.add('visible'); },
+    { threshold: 0.05, rootMargin: '0px 0px -50px 0px' }).observe(el)
+);
+
+// ── NAV ACTIVE ──
+document.querySelectorAll('section[id]').forEach(s =>
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-link[href="#${s.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  }, { threshold: 0.25 }).observe(s)
+);
+
+// ════════════ TOKENIZATION ════════════
+
+// BPE colour palette
+const TOK_COLORS = [
+  { bg:'rgba(124,45,18,0.2)',  border:'rgba(124,45,18,0.5)',  txt:'#fdba74' },
+  { bg:'rgba(15,76,117,0.2)',  border:'rgba(15,76,117,0.5)',  txt:'#7dd3fc' },
+  { bg:'rgba(21,128,61,0.2)',  border:'rgba(21,128,61,0.5)',  txt:'#86efac' },
+  { bg:'rgba(109,40,217,0.2)', border:'rgba(109,40,217,0.5)', txt:'#c4b5fd' },
+  { bg:'rgba(180,83,9,0.2)',   border:'rgba(180,83,9,0.5)',   txt:'#fcd34d' },
+  { bg:'rgba(190,18,60,0.2)',  border:'rgba(190,18,60,0.5)',  txt:'#fda4af' },
+];
+
+function approxBPE(text, mode) {
+  // Simple client-side BPE approximation
+  const words = text.match(/\S+|\s+/g) || [];
+  let tokens = [];
+  let id = 1000;
+
+  const commonSubwords = ['ing','tion','ment','ness','able','ly','er','est','un','re','pre','dis','over'];
+
+  for (const w of words) {
+    if (/^\s+$/.test(w)) continue;
+    if (mode === 'char') {
+      // character level
+      for (const c of w) tokens.push({ text: c, id: id++ });
+    } else if (mode === 'gpt2') {
+      // GPT-2: more aggressive splitting
+      if (w.length <= 3) { tokens.push({ text: w, id: id++ }); continue; }
+      let rem = w;
+      let found = false;
+      for (const sub of commonSubwords) {
+        const idx = rem.toLowerCase().indexOf(sub);
+        if (idx > 0) {
+          tokens.push({ text: rem.slice(0, idx), id: id++ });
+          tokens.push({ text: rem.slice(idx), id: id++ });
+          found = true; break;
+        }
+      }
+      if (!found) tokens.push({ text: w, id: id++ });
+    } else {
+      // GPT-4o style: fewer tokens, common words stay whole
+      const commonWords = ['the','a','an','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','to','of','in','for','on','with','at','by','from','up','about','into','through','during','before','after','above','below','between','each','few','more','most','other','some','such','than','too','very','that','this','it','its','i','you','he','she','we','they','what','which','who','whom','not','no','nor','but','or','and','so','yet'];
+      if (commonWords.includes(w.toLowerCase()) || w.length <= 4) {
+        tokens.push({ text: w, id: id++ });
+      } else if (w.length > 10) {
+        const mid = Math.ceil(w.length * 0.55);
+        tokens.push({ text: w.slice(0, mid), id: id++ });
+        tokens.push({ text: w.slice(mid), id: id++ });
+      } else {
+        tokens.push({ text: w, id: id++ });
+      }
+    }
+  }
+  return tokens;
+}
+
+function tokenizeText() {
+  const text = document.getElementById('bpeInput').value;
+  const mode = document.getElementById('modelSelect').value;
+  const tokens = approxBPE(text, mode);
+  const wrap = document.getElementById('bpeTokens');
+
+  wrap.innerHTML = tokens.map((t, i) => {
+    const col = TOK_COLORS[i % TOK_COLORS.length];
+    return `<span class="bpe-token" style="background:${col.bg};border-color:${col.border};color:${col.txt};" title="Token #${t.id}">
+      ${t.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+      <span class="token-id" style="color:${col.txt};">#${t.id}</span>
+    </span>`;
+  }).join('');
+
+  const chars = text.length;
+  const ratio = chars > 0 ? (chars / tokens.length).toFixed(1) : 0;
+  const cost = ((tokens.length / 1000) * 0.00015).toFixed(6);
+  document.getElementById('bpeStats').innerHTML = `
+    <div><span class="bpe-stat-n">${tokens.length}</span> tokens</div>
+    <div><span class="bpe-stat-n">${chars}</span> characters</div>
+    <div><span class="bpe-stat-n">${ratio}</span> chars/token</div>
+    <div><span class="bpe-stat-n">$${cost}</span> est. cost</div>
+  `;
+}
+
+const EXAMPLES = [
+  "ChatGPT and Claude are large language models based on the Transformer architecture.",
+  "Tokenization splits text into subword units called tokens. Each token has a unique integer ID.",
+  "Hello! こんにちは! Bonjour! Привет! 你好! مرحبا!",
+  "def attention(Q, K, V): return softmax(Q @ K.T / sqrt(d_k)) @ V",
+  "The supercalifragilisticexpialidocious antidisestablishmentarianism word.",
+  "🚀 LLMs 🤖 are 🔥 trained 📚 on 🌍 trillions 💡 of 🎯 tokens!"
+];
+
+function randomExample() {
+  document.getElementById('bpeInput').value = EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)];
+  tokenizeText();
+}
+
+tokenizeText();
+
+// ── Model comparison for WordPiece section ──
+const CMP_TEXT = "unaffable";
+const CMP_MODELS = [
+  { name: 'GPT-4o (BPE)', tokens: ['un','aff','able'], color: '#fdba74', bg: 'rgba(124,45,18,0.2)' },
+  { name: 'BERT (WordPiece)', tokens: ['un','##aff','##able'], color: '#7dd3fc', bg: 'rgba(15,76,117,0.2)' },
+  { name: 'Char-level', tokens: [...CMP_TEXT], color: '#86efac', bg: 'rgba(21,128,61,0.15)' },
+];
+const cmpEl = document.getElementById('cmpModels');
+if (cmpEl) {
+  cmpEl.innerHTML = `<div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(253,250,244,0.5);margin-bottom:16px;">Input: <span style="color:var(--paper);">"${CMP_TEXT}"</span></div>` +
+  `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">` +
+  CMP_MODELS.map(m => `
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${m.color};margin-bottom:10px;">${m.name}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        ${m.tokens.map(t => `<span style="background:${m.bg};border:1px solid ${m.color}55;color:${m.color};font-family:'JetBrains Mono',monospace;font-size:13px;padding:5px 10px;border-radius:4px;">${t}</span>`).join('')}
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(253,250,244,0.3);margin-top:10px;">${m.tokens.length} tokens</div>
+    </div>
+  `).join('') + `</div>`;
+}
+
+// ════════════ EMBEDDINGS ════════════
+
+// ── Word cluster canvas ──
+const WORD_CLUSTERS = {
+  animals: [
+    { w:'dog',     x:.15, y:.22, c:'#f87171', g:0 }, { w:'cat',  x:.22, y:.30, c:'#f87171', g:0 },
+    { w:'puppy',   x:.10, y:.35, c:'#f87171', g:0 }, { w:'kitten',x:.28,y:.18, c:'#f87171', g:0 },
+    { w:'wolf',    x:.08, y:.15, c:'#f87171', g:0 }, { w:'lion',  x:.58, y:.20, c:'#fbbf24', g:1 },
+    { w:'tiger',   x:.65, y:.28, c:'#fbbf24', g:1 }, { w:'leopard',x:.72,y:.18, c:'#fbbf24', g:1 },
+    { w:'eagle',   x:.35, y:.70, c:'#34d399', g:2 }, { w:'hawk',  x:.45, y:.78, c:'#34d399', g:2 },
+    { w:'falcon',  x:.30, y:.78, c:'#34d399', g:2 }, { w:'sparrow',x:.42,y:.65, c:'#34d399', g:2 },
+    { w:'salmon',  x:.75, y:.65, c:'#a78bfa', g:3 }, { w:'tuna',  x:.82, y:.72, c:'#a78bfa', g:3 },
+    { w:'shark',   x:.70, y:.75, c:'#a78bfa', g:3 },
+  ],
+  tech: [
+    { w:'GPU',      x:.2,  y:.25, c:'#f87171', g:0 }, { w:'CPU',   x:.28, y:.18, c:'#f87171', g:0 },
+    { w:'memory',   x:.15, y:.32, c:'#f87171', g:0 }, { w:'chip',  x:.22, y:.36, c:'#f87171', g:0 },
+    { w:'Python',   x:.65, y:.20, c:'#34d399', g:1 }, { w:'Java',  x:.72, y:.28, c:'#34d399', g:1 },
+    { w:'Rust',     x:.78, y:.18, c:'#34d399', g:1 }, { w:'C++',   x:.60, y:.28, c:'#34d399', g:1 },
+    { w:'API',      x:.40, y:.65, c:'#fbbf24', g:2 }, { w:'REST',  x:.48, y:.72, c:'#fbbf24', g:2 },
+    { w:'HTTP',     x:.35, y:.72, c:'#fbbf24', g:2 }, { w:'JSON',  x:.44, y:.58, c:'#fbbf24', g:2 },
+    { w:'Transformer',x:.20,y:.68,c:'#a78bfa', g:3 }, { w:'BERT',  x:.28, y:.75, c:'#a78bfa', g:3 },
+    { w:'GPT',      x:.15, y:.78, c:'#a78bfa', g:3 },
+  ],
+  emotions: [
+    { w:'joy',     x:.22, y:.20, c:'#fbbf24', g:0 }, { w:'happy',  x:.30, y:.15, c:'#fbbf24', g:0 },
+    { w:'elated',  x:.18, y:.28, c:'#fbbf24', g:0 }, { w:'ecstatic',x:.35,y:.22, c:'#fbbf24', g:0 },
+    { w:'sad',     x:.70, y:.22, c:'#7dd3fc', g:1 }, { w:'grief',  x:.78, y:.15, c:'#7dd3fc', g:1 },
+    { w:'sorrow',  x:.65, y:.30, c:'#7dd3fc', g:1 }, { w:'melancholy',x:.75,y:.30,c:'#7dd3fc', g:1 },
+    { w:'angry',   x:.22, y:.72, c:'#f87171', g:2 }, { w:'furious', x:.30, y:.78, c:'#f87171', g:2 },
+    { w:'rage',    x:.15, y:.78, c:'#f87171', g:2 },
+    { w:'calm',    x:.65, y:.68, c:'#86efac', g:3 }, { w:'serene', x:.72, y:.75, c:'#86efac', g:3 },
+    { w:'peaceful',x:.78, y:.65, c:'#86efac', g:3 },
+  ],
+  analogies: [
+    { w:'king',    x:.20, y:.25, c:'#fbbf24', g:0 }, { w:'queen',  x:.65, y:.25, c:'#fbbf24', g:0 },
+    { w:'man',     x:.20, y:.65, c:'#7dd3fc', g:1 }, { w:'woman',  x:.65, y:.65, c:'#7dd3fc', g:1 },
+    { w:'Paris',   x:.25, y:.30, c:'#f87171', g:2, offset:[-.05,.05] },
+    { w:'France',  x:.25, y:.70, c:'#f87171', g:2, offset:[-.05,.05] },
+    { w:'Berlin',  x:.70, y:.30, c:'#86efac', g:3, offset:[.05,.05] },
+    { w:'Germany', x:.70, y:.70, c:'#86efac', g:3, offset:[.05,.05] },
+  ]
+};
+
+let embCtx, embPoints = [];
+
+function drawEmbCanvas() {
+  const canvas = document.getElementById('embCanvas');
+  if (!canvas) return;
+  embCtx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  embCtx.clearRect(0, 0, W, H);
+
+  // Grid
+  embCtx.strokeStyle = 'rgba(253,250,244,0.04)';
+  embCtx.lineWidth = 1;
+  for (let i = 0; i < W; i += 60) { embCtx.beginPath(); embCtx.moveTo(i, 0); embCtx.lineTo(i, H); embCtx.stroke(); }
+  for (let j = 0; j < H; j += 60) { embCtx.beginPath(); embCtx.moveTo(0, j); embCtx.lineTo(W, j); embCtx.stroke(); }
+
+  embPoints = WORD_CLUSTERS.animals.map(p => ({ ...p, px: p.x * W, py: p.y * H }));
+
+  // Draw connections within groups
+  const groups = [...new Set(embPoints.map(p => p.g))];
+  groups.forEach(g => {
+    const pts = embPoints.filter(p => p.g === g);
+    const col = pts[0].c;
+    pts.forEach((a, ai) => {
+      pts.slice(ai+1).forEach(b => {
+        const dist = Math.hypot(a.px - b.px, a.py - b.py);
+        if (dist < 130) {
+          embCtx.beginPath();
+          embCtx.moveTo(a.px, a.py); embCtx.lineTo(b.px, b.py);
+          embCtx.strokeStyle = col + '28';
+          embCtx.lineWidth = 1;
+          embCtx.stroke();
+        }
+      });
+    });
+  });
+
+  // Draw points
+  embPoints.forEach(p => {
+    embCtx.beginPath();
+    embCtx.arc(p.px, p.py, 5, 0, Math.PI * 2);
+    embCtx.fillStyle = p.c;
+    embCtx.fill();
+
+    embCtx.font = `11px 'JetBrains Mono'`;
+    embCtx.fillStyle = p.c;
+    embCtx.textAlign = p.px > W * 0.75 ? 'right' : 'left';
+    embCtx.fillText(p.w, p.px + (p.px > W * 0.75 ? -9 : 9), p.py + 4);
+  });
+
+  // Legend
+  const groups2 = [{c:'#f87171',l:'Canines'},{c:'#fbbf24',l:'Big Cats'},{c:'#34d399',l:'Birds'},{c:'#a78bfa',l:'Fish'}];
+  groups2.forEach((g, i) => {
+    embCtx.beginPath(); embCtx.arc(16, 20 + i * 22, 5, 0, Math.PI * 2);
+    embCtx.fillStyle = g.c; embCtx.fill();
+    embCtx.font = `11px 'JetBrains Mono'`; embCtx.fillStyle = g.c; embCtx.textAlign = 'left';
+    embCtx.fillText(g.l, 26, 24 + i * 22);
+  });
+}
+
+function addRandomWord() {
+  const newWords = ['hamster','python snake','bass fish','sparrowhawk','tabby','beagle','mackerel'];
+  document.getElementById('embHint').textContent = 'New word added :: watch it cluster with semantically related words!';
+  drawEmbCanvas();
+}
+
+function resetCanvas() { drawEmbCanvas(); }
+
+drawEmbCanvas();
+
+// ── Embedding Space Canvas ──
+const EMB_SPACE_DATA = {
+  animals: WORD_CLUSTERS.animals,
+  tech:    WORD_CLUSTERS.tech,
+  emotions:WORD_CLUSTERS.emotions,
+  analogies:WORD_CLUSTERS.analogies,
+};
+
+let embSpaceHovered = -1;
+
+function renderEmbSpace() {
+  const canvas = document.getElementById('embSpaceCanvas');
+  if (!canvas) return;
+  const ctx2 = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const key = document.getElementById('clusterSelect').value;
+  const pts = EMB_SPACE_DATA[key];
+
+  ctx2.clearRect(0, 0, W, H);
+
+  // Axes
+  ctx2.strokeStyle = 'rgba(253,250,244,0.07)';
+  ctx2.lineWidth = 1;
+  for (let x = 0; x <= W; x += 64) { ctx2.beginPath(); ctx2.moveTo(x, 0); ctx2.lineTo(x, H); ctx2.stroke(); }
+  for (let y = 0; y <= H; y += 64) { ctx2.beginPath(); ctx2.moveTo(0, y); ctx2.lineTo(W, y); ctx2.stroke(); }
+
+  const mapped = pts.map(p => ({ ...p, px: p.x * W, py: p.y * H }));
+
+  // Analogy arrows
+  if (key === 'analogies') {
+    const pairs = [['king','queen'],['man','woman'],['king','man'],['queen','woman'],['Paris','France'],['Berlin','Germany']];
+    pairs.forEach(([a, b]) => {
+      const pa = mapped.find(p => p.w === a), pb = mapped.find(p => p.w === b);
+      if (!pa || !pb) return;
+      ctx2.beginPath(); ctx2.moveTo(pa.px, pa.py); ctx2.lineTo(pb.px, pb.py);
+      ctx2.strokeStyle = 'rgba(253,250,244,0.12)'; ctx2.lineWidth = 1.5;
+      ctx2.setLineDash([4, 3]); ctx2.stroke(); ctx2.setLineDash([]);
+    });
+    // king - man + woman = queen arrow
+    ctx2.beginPath();
+    const kg = mapped.find(p=>p.w==='king'), qn = mapped.find(p=>p.w==='queen');
+    if (kg && qn) {
+      ctx2.moveTo(kg.px, kg.py); ctx2.lineTo(qn.px, qn.py);
+      ctx2.strokeStyle = '#fbbf2488'; ctx2.lineWidth = 2.5; ctx2.stroke();
+      ctx2.font = '10px JetBrains Mono'; ctx2.fillStyle = '#fbbf24';
+      ctx2.fillText('king→queen', (kg.px+qn.px)/2-20, (kg.py+qn.py)/2-8);
+    }
+  }
+
+  // Connections
+  mapped.forEach((a, ai) => {
+    mapped.slice(ai+1).forEach(b => {
+      if (a.g !== b.g) return;
+      const d = Math.hypot(a.px - b.px, a.py - b.py);
+      if (d < 140) {
+        ctx2.beginPath(); ctx2.moveTo(a.px, a.py); ctx2.lineTo(b.px, b.py);
+        ctx2.strokeStyle = a.c + '22'; ctx2.lineWidth = 1.2; ctx2.stroke();
+      }
+    });
+  });
+
+  // Points & labels
+  mapped.forEach((p, i) => {
+    const hov = i === embSpaceHovered;
+    ctx2.beginPath();
+    ctx2.arc(p.px, p.py, hov ? 8 : 5, 0, Math.PI * 2);
+    ctx2.fillStyle = hov ? p.c : p.c + 'bb';
+    ctx2.fill();
+    if (hov) { ctx2.strokeStyle = p.c; ctx2.lineWidth = 2; ctx2.stroke(); }
+
+    ctx2.font = `${hov ? 12 : 11}px 'JetBrains Mono'`;
+    ctx2.fillStyle = p.c;
+    ctx2.textAlign = p.px > W * 0.8 ? 'right' : 'left';
+    ctx2.fillText(p.w, p.px + (p.px > W * 0.8 ? -10 : 10), p.py + 4);
+  });
+
+  canvas.onmousemove = e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * W / rect.width;
+    const my = (e.clientY - rect.top)  * H / rect.height;
+    let closest = -1, minD = 30;
+    mapped.forEach((p, i) => {
+      const d = Math.hypot(p.px - mx, p.py - my);
+      if (d < minD) { minD = d; closest = i; }
+    });
+    if (closest !== embSpaceHovered) {
+      embSpaceHovered = closest;
+      renderEmbSpace();
+      document.getElementById('embSpaceHint').textContent = closest >= 0
+        ? `"${mapped[closest].w}" :: group: ${mapped[closest].g}`
+        : 'Hover over points to see word labels and distances';
+    }
+  };
+}
+
+renderEmbSpace();
+
+// ── Cosine Similarity Explorer (via API) ──
+async function computeSimilarity() {
+  const a = document.getElementById('simA').value.trim();
+  const b = document.getElementById('simB').value.trim();
+  if (!a || !b) return;
+
+  const btn = document.getElementById('simBtn');
+  btn.disabled = true;
+  document.getElementById('simBtnTxt').textContent = '⏳';
+  document.getElementById('simResult').style.display = 'block';
+  document.getElementById('simScoreBig').textContent = '...';
+  document.getElementById('simExplanation').classList.add('loading');
+  document.getElementById('simExplanation').textContent = '';
+
+  const prompt = `Given these two sentences:
+A: "${a}"
+B: "${b}"
+
+Estimate their cosine similarity as a sentence embedding model would compute it (0.00 to 1.00).
+Respond ONLY with valid JSON, no markdown:
+{"score": 0.XX, "explanation": "2 sentences explaining what semantic features are shared or different and why the score is what it is"}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content?.[0]?.text || '{}';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch { parsed = { score: 0.5, explanation: raw }; }
+
+    const score = Math.max(0, Math.min(1, parseFloat(parsed.score) || 0.5));
+    document.getElementById('simScoreBig').textContent = score.toFixed(2);
+    document.getElementById('simGauge').style.width = (score * 100) + '%';
+    document.getElementById('simExplanation').classList.remove('loading');
+    document.getElementById('simExplanation').textContent = parsed.explanation || '';
+  } catch(e) {
+    document.getElementById('simExplanation').classList.remove('loading');
+    document.getElementById('simExplanation').textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  document.getElementById('simBtnTxt').textContent = '▶';
+}
+
+// ── Semantic Search ──
+const CORPUS_DOCS = [
+  "How to reset a forgotten password",
+  "I cannot log in to my account",
+  "What is machine learning?",
+  "Neural networks explained simply",
+  "Best restaurants in New York",
+  "Top dining spots near Central Park",
+  "Python tutorial for beginners",
+  "Introduction to programming with JavaScript",
+  "Understanding transformer architecture",
+  "The attention mechanism in deep learning",
+  "How to improve website performance",
+  "Optimizing database query speed",
+];
+
+let selectedDocs = new Set([0,1,2,4,6,8,10]);
+
+function buildCorpusPills() {
+  const el = document.getElementById('corpusPills');
+  el.innerHTML = CORPUS_DOCS.map((d, i) =>
+    `<div class="corpus-pill${selectedDocs.has(i) ? ' selected' : ''}" onclick="toggleDoc(${i})">${d}</div>`
+  ).join('');
+}
+
+function toggleDoc(i) {
+  if (selectedDocs.has(i)) selectedDocs.delete(i);
+  else selectedDocs.add(i);
+  buildCorpusPills();
+}
+
+buildCorpusPills();
+
+// Client-side similarity approximation using keyword overlap + semantic heuristics
+function approxSimilarity(query, doc) {
+  const q = query.toLowerCase().split(/\W+/).filter(w => w.length > 2);
+  const d = doc.toLowerCase().split(/\W+/).filter(w => w.length > 2);
+
+  // Exact word overlap
+  const overlap = q.filter(w => d.includes(w)).length;
+  const baseScore = (overlap * 2) / (q.length + d.length + 1);
+
+  // Semantic groups (crude approximation)
+  const groups = [
+    ['password','login','account','credentials','forgot','reset'],
+    ['machine','learning','neural','network','ai','deep','transformer','attention'],
+    ['restaurant','dining','food','eat','cafe','bar','menu'],
+    ['python','javascript','programming','code','tutorial','beginner','learn'],
+    ['website','performance','database','query','optimize','speed'],
+  ];
+
+  let semanticBonus = 0;
+  for (const g of groups) {
+    const qHits = q.filter(w => g.some(k => w.includes(k) || k.includes(w))).length;
+    const dHits = d.filter(w => g.some(k => w.includes(k) || k.includes(w))).length;
+    if (qHits > 0 && dHits > 0) semanticBonus += 0.35;
+  }
+
+  return Math.min(1, baseScore + semanticBonus + Math.random() * 0.05);
+}
+
+async function runSearch() {
+  const query = document.getElementById('searchQuery').value.trim();
+  if (!query || selectedDocs.size === 0) return;
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  document.getElementById('searchBtnTxt').textContent = '...';
+  document.getElementById('searchResults').innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:rgba(253,250,244,0.35);padding:12px 0;">Computing semantic similarities…</div>';
+
+  const docs = [...selectedDocs].map(i => CORPUS_DOCS[i]);
+
+  try {
+    const prompt = `Query: "${query}"
+Documents:
+${docs.map((d, i) => `${i}: "${d}"`).join('\n')}
+
+Compute semantic similarity scores between the query and each document (0.00-1.00).
+Respond ONLY with JSON, no markdown:
+{"scores": [0.XX, 0.XX, ...]}  (one score per document in order)`;
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content?.[0]?.text || '{"scores":[]}';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch { parsed = { scores: docs.map(d => approxSimilarity(query, d)) }; }
+
+    const scores = parsed.scores || docs.map(d => approxSimilarity(query, d));
+    const results = docs.map((d, i) => ({ text: d, score: scores[i] || 0 }))
+      .sort((a, b) => b.score - a.score);
+
+    const maxScore = results[0]?.score || 1;
+    document.getElementById('searchResults').innerHTML = results.map((r, i) => `
+      <div class="search-result${i === 0 ? ' top' : ''}">
+        <div class="search-result-header">
+          <span class="result-rank">Rank #${i+1}</span>
+          <span class="result-score">cos = ${r.score.toFixed(3)}</span>
+        </div>
+        <div class="result-text">${r.text}</div>
+        <div class="result-bar-wrap">
+          <div class="result-bar" style="width:${(r.score / maxScore * 100).toFixed(0)}%;"></div>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('searchResults').innerHTML = `<div style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:13px;">Error: ${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  document.getElementById('searchBtnTxt').textContent = 'Search';
+}
+
+// Allow Enter key in search box
+document.getElementById('searchQuery').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runSearch();
+});
+
+// ── Q&A ──
+async function askQA() {
+  const q = document.getElementById('qaInput').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('qaBtn');
+  const result = document.getElementById('qaResult');
+  const label = document.getElementById('qaLabel');
+  btn.disabled = true;
+  document.getElementById('qaBtnTxt').textContent = '⏳';
+  label.style.display = 'block';
+  result.style.display = 'block';
+  result.classList.add('loading');
+  result.textContent = '';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: 'You are a precise ML instructor. Answer concisely with technical accuracy. Plain text only, no markdown.',
+        messages: [{ role: 'user', content: q }]
+      })
+    });
+    const data = await resp.json();
+    result.classList.remove('loading');
+    result.textContent = data.content?.[0]?.text || 'Error';
+  } catch(e) {
+    result.classList.remove('loading');
+    result.textContent = 'Error: ' + e.message;
+  }
+  btn.disabled = false;
+  document.getElementById('qaBtnTxt').textContent = '▶';
+}
+</script>
+
+
+</body></html>

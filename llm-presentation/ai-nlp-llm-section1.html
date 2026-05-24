@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Section 1 :: Introduction to AI, NLP &amp; LLMs</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Cabinet+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --cream: #ede8da;
+    --accent: #c84b2f;
+    --accent2: #2f6bc8;
+    --accent3: #2da06b;
+    --gold: #c89a2f;
+    --muted: #6b6456;
+    --code-bg: #1a1612;
+    --code-text: #e8dcc8;
+    --border: #c8bfae;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Cabinet Grotesk', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 40px 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    border-right: 3px solid var(--accent);
+  }
+
+  .sidebar-logo {
+    padding: 0 28px 32px;
+    border-bottom: 1px solid rgba(245,240,232,0.15);
+  }
+
+  .sidebar-logo .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-logo h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    line-height: 1.3;
+    color: var(--paper);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 0;
+  }
+
+  .nav-section {
+    padding: 0 28px;
+    margin-bottom: 4px;
+  }
+
+  .nav-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 16px 0 8px;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 7px 12px;
+    margin: 1px -12px;
+    border-radius: 4px;
+    color: rgba(245,240,232,0.75);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    background: rgba(200,75,47,0.18);
+    color: var(--paper);
+  }
+
+  .nav-link.active {
+    color: #f0a090;
+    border-left: 2px solid var(--accent);
+    padding-left: 10px;
+  }
+
+  .sidebar-footer {
+    padding: 20px 28px;
+    border-top: 1px solid rgba(245,240,232,0.1);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 80px 80px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -100px;
+    top: -100px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(200,75,47,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(40px, 5vw, 64px);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    max-width: 700px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: #f0a090;
+  }
+
+  .hero-desc {
+    font-size: 17px;
+    color: rgba(245,240,232,0.7);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    background: rgba(245,240,232,0.08);
+    border: 1px solid rgba(245,240,232,0.15);
+    color: rgba(245,240,232,0.75);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    width: 0%;
+    transition: width 0.1s;
+  }
+
+  /* ── CONTENT AREA ── */
+  .content {
+    padding: 0 80px 80px;
+    max-width: 1100px;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-top: 72px;
+    padding-top: 72px;
+    border-top: 1px solid var(--border);
+    animation: fadeInUp 0.5s ease both;
+  }
+
+  .section:first-child { border-top: none; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 3.5vw, 42px);
+    line-height: 1.15;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .section-intro {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 48px;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+  }
+
+  /* ── SUBSECTIONS ── */
+  .subsection {
+    margin-bottom: 56px;
+  }
+
+  .subsection h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .subsection h3 .anchor-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  p { margin-bottom: 14px; }
+
+  /* ── COMPARISON GRID ── */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 32px 0;
+  }
+
+  .comp-cell {
+    background: var(--paper);
+    padding: 24px 20px;
+  }
+
+  .comp-cell.header {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .comp-cell h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .comp-cell .comp-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .comp-cell p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .comp-example {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--cream);
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: var(--accent2);
+  }
+
+  /* ── VENN / HIERARCHY VISUAL ── */
+  .hierarchy-visual {
+    margin: 32px 0;
+    text-align: center;
+  }
+
+  .hierarchy-visual svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* ── CALLOUT BOX ── */
+  .callout {
+    background: var(--cream);
+    border-left: 4px solid var(--accent2);
+    border-radius: 0 8px 8px 0;
+    padding: 20px 24px;
+    margin: 28px 0;
+  }
+
+  .callout.warn { border-left-color: var(--gold); }
+  .callout.success { border-left-color: var(--accent3); }
+  .callout.accent { border-left-color: var(--accent); }
+
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--accent2);
+  }
+
+  .callout.warn .callout-label { color: var(--gold); }
+  .callout.success .callout-label { color: var(--accent3); }
+  .callout.accent .callout-label { color: var(--accent); }
+
+  .callout p { margin-bottom: 0; font-size: 15px; }
+
+  /* ── DISCRIMINATIVE VS GENERATIVE ── */
+  .disc-gen-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 32px 0;
+  }
+
+  .model-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .model-card-header {
+    padding: 18px 20px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .model-card-header.disc {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .model-card-header.gen {
+    background: var(--accent);
+    color: white;
+  }
+
+  .model-card-body {
+    padding: 20px;
+    background: var(--paper);
+  }
+
+  .model-card-body ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .model-card-body li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .model-card-body li:last-child { border-bottom: none; }
+
+  .li-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  /* ── APP CARDS ── */
+  .apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+
+  .app-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s;
+  }
+
+  .app-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+  .app-card:hover::before { transform: scaleX(1); }
+
+  .app-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 14px;
+  }
+
+  .app-card h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .app-card p {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .app-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin: 32px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 7px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--paper);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .timeline-item h4 {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .timeline-item p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 0;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-container {
+    margin: 32px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+
+  .code-header {
+    background: #12100e;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .code-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .code-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .code-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .code-dot.red { background: #ff5f57; }
+  .code-dot.yellow { background: #febc2e; }
+  .code-dot.green { background: #28c840; }
+
+  .code-filename {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(245,240,232,0.5);
+  }
+
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    background: rgba(200,75,47,0.25);
+    color: #f0a090;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  pre {
+    background: var(--code-bg);
+    padding: 28px;
+    overflow-x: auto;
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    color: var(--code-text);
+  }
+
+  .kw { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .fn { color: #82aaff; }
+  .var { color: #eeffa7; }
+  .key { color: #89ddff; }
+  .cls { color: #ffcb6b; }
+
+  /* ── INTERACTIVE DEMO ── */
+  .demo-box {
+    background: var(--ink);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 32px 0;
+    color: var(--paper);
+  }
+
+  .demo-box h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: var(--paper);
+  }
+
+  .demo-box .demo-desc {
+    font-size: 14px;
+    color: rgba(245,240,232,0.55);
+    margin-bottom: 24px;
+  }
+
+  .demo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .demo-form label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .demo-input {
+    width: 100%;
+    background: rgba(245,240,232,0.06);
+    border: 1px solid rgba(245,240,232,0.15);
+    color: var(--paper);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .demo-input:focus {
+    border-color: var(--accent);
+    background: rgba(245,240,232,0.08);
+  }
+
+  .demo-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .demo-select {
+    width: 100%;
+    background: rgba(245,240,232,0.06);
+    border: 1px solid rgba(245,240,232,0.15);
+    color: var(--paper);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .demo-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 13px 28px;
+    border-radius: 6px;
+    font-family: 'Cabinet Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+  }
+
+  .demo-btn:hover { background: #b03d22; transform: translateY(-1px); }
+  .demo-btn:active { transform: translateY(0); }
+  .demo-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .demo-output {
+    margin-top: 20px;
+    background: rgba(245,240,232,0.04);
+    border: 1px solid rgba(245,240,232,0.1);
+    border-radius: 6px;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    min-height: 80px;
+    color: rgba(245,240,232,0.85);
+    display: none;
+  }
+
+  .demo-output.visible { display: block; }
+
+  .demo-output .output-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .demo-output.loading .output-text::after {
+    content: '▋';
+    animation: blink 0.8s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .demo-usage {
+    margin-top: 12px;
+    font-size: 11px;
+    color: rgba(245,240,232,0.35);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── KEY FACTS ── */
+  .facts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 32px 0;
+  }
+
+  .fact-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    background: var(--paper);
+  }
+
+  .fact-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .fact-label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 32px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  th {
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  td {
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--cream); }
+
+  /* ── STEP LIST ── */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+  }
+
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 24px 52px;
+    border-left: 2px solid var(--border);
+    margin-left: 16px;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: -18px;
+    top: 0;
+    width: 34px;
+    height: 34px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .steps li:last-child { border-left: none; }
+
+  .steps li h4 {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  .steps li p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 0;
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    margin-top: 80px;
+    padding: 40px 80px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--cream);
+  }
+
+  .btn-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .btn-nav.primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+
+  /* ── INLINE CODE ── */
+  .ic {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 28px; padding-right: 28px; }
+    .comparison-grid, .facts-grid { grid-template-columns: 1fr; }
+    .disc-gen-grid { grid-template-columns: 1fr; }
+    .demo-row { grid-template-columns: 1fr; }
+    .bottom-nav { flex-direction: column; gap: 16px; padding: 28px; }
+  }
+
+  /* ── SCROLL ANIMATIONS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s, transform 0.5s;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="eyebrow">Course Material</div>
+    <h2>AI, NLP &amp; LLMs</h2>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Section 1</div>
+      <a class="nav-link active" href="#intro">1.0 Introduction</a>
+      <a class="nav-link" href="#ai-ml-dl">1.1 AI vs ML vs DL</a>
+      <a class="nav-link" href="#generative">1.2 Generative AI</a>
+      <a class="nav-link" href="#disc-vs-gen">1.3 Discriminative vs Generative</a>
+      <a class="nav-link" href="#why-llms">1.4 Why LLMs Matter</a>
+      <a class="nav-link" href="#applications">1.5 Real-world Applications</a>
+      <a class="nav-link" href="#examples">1.6 Examples &amp; Tools</a>
+      <a class="nav-link" href="#handson">1.7 Hands-on: OpenAI API</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    Section 1 of 8  ·  ~45 min read
+  </div>
+</nav>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- HERO -->
+  <section class="hero" id="intro">
+    <div class="hero-label">Section 1 :: Foundation</div>
+    <h1>Introduction to <em>AI, NLP,</em><br/>and Large Language Models</h1>
+    <p class="hero-desc">Understand the landscape of modern artificial intelligence :: from foundational concepts to the generative revolution powering tools like ChatGPT, Claude, and Copilot.</p>
+    <div class="hero-tags">
+      <span class="tag">Artificial Intelligence</span>
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Generative AI</span>
+      <span class="tag">LLMs</span>
+      <span class="tag">NLP</span>
+      <span class="tag">OpenAI API</span>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- 1.1 AI vs ML vs DL -->
+    <section class="section reveal" id="ai-ml-dl">
+      <span class="section-number">1.1</span>
+      <h2>Artificial Intelligence vs Machine Learning vs Deep Learning</h2>
+      <p class="section-intro">These three terms are often used interchangeably, but they describe different scopes within the same field. Understanding their relationship is foundational to everything that follows.</p>
+
+      <div class="subsection">
+        <p>Think of the three as <strong>nested circles</strong> :: AI is the broadest concept, ML lives inside it, and Deep Learning is a specialized subfield of ML.</p>
+
+        <!-- SVG HIERARCHY -->
+        <div class="hierarchy-visual">
+          <svg style="max-width:580px;" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="#f5f0e8" height="280" width="600"></rect>
+            <!-- AI circle -->
+            <ellipse cx="300" cy="140" fill="none" rx="280" ry="125" stroke="#0d0d0d" stroke-width="2"></ellipse>
+            <text fill="#0d0d0d" font-family="'DM Serif Display', serif" font-size="14" x="52" y="58">Artificial Intelligence</text>
+            <!-- ML circle -->
+            <ellipse cx="310" cy="148" fill="rgba(200,75,47,0.06)" rx="190" ry="84" stroke="#c84b2f" stroke-width="2"></ellipse>
+            <text fill="#c84b2f" font-family="'DM Serif Display', serif" font-size="13" x="148" y="85">Machine Learning</text>
+            <!-- DL circle -->
+            <ellipse cx="320" cy="156" fill="rgba(200,75,47,0.14)" rx="100" ry="48" stroke="#c84b2f" stroke-dasharray="5,3" stroke-width="2"></ellipse>
+            <text fill="#0d0d0d" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="middle" x="250" y="162">Deep Learning</text>
+            <!-- labels -->
+            <text fill="#6b6456" font-family="'JetBrains Mono', monospace" font-size="10" x="85" y="200">Rule-based, Expert Systems</text>
+            <text fill="#6b6456" font-family="'JetBrains Mono', monospace" font-size="10" x="146" y="232">Decision Trees, SVMs, Regression</text>
+            <text fill="#c84b2f" font-family="'JetBrains Mono', monospace" font-size="10" x="218" y="218">Neural Nets, LLMs</text>
+          </svg>
+        </div>
+
+        <div class="comparison-grid">
+          <div class="comp-cell header">Concept</div>
+          <div class="comp-cell header">What It Is</div>
+          <div class="comp-cell header">Example</div>
+
+          <div class="comp-cell">
+            <h4>Artificial Intelligence</h4>
+            <span class="comp-tag">AI</span>
+            <p>The broad science of creating machines that can simulate human intelligence :: reasoning, problem-solving, perceiving, and learning.</p>
+          </div>
+          <div class="comp-cell">
+            <p>Any technique that enables a computer to mimic cognitive functions. Includes rule-based systems, search algorithms, planning, and learning-based approaches.</p>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-example">Chess engine (Deep Blue)<br/>Voice assistants (Siri)</div>
+          </div>
+
+          <div class="comp-cell">
+            <h4>Machine Learning</h4>
+            <span class="comp-tag">ML</span>
+            <p>A subset of AI where systems <em>learn from data</em> to improve at tasks without being explicitly programmed for each rule.</p>
+          </div>
+          <div class="comp-cell">
+            <p>Algorithms detect patterns in training data and generalize to unseen inputs. Three paradigms: supervised, unsupervised, and reinforcement learning.</p>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-example">Spam filters<br/>Recommendation systems<br/>Fraud detection</div>
+          </div>
+
+          <div class="comp-cell">
+            <h4>Deep Learning</h4>
+            <span class="comp-tag">DL</span>
+            <p>A subset of ML using <em>multi-layer artificial neural networks</em> to learn hierarchical representations of data automatically.</p>
+          </div>
+          <div class="comp-cell">
+            <p>Inspired by the brain, neural networks with many layers (hence "deep") can learn complex features directly from raw data like pixels or tokens :: no manual feature engineering.</p>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-example">Image recognition (CNNs)<br/>Text generation (LLMs)<br/>AlphaFold</div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">Key Insight</div>
+          <p>The rise of deep learning after 2012 (ImageNet breakthrough) and the explosion of compute &amp; data are what make modern AI :: including LLMs :: possible. Deep learning removes the need for hand-crafted features; the model learns representations end-to-end.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.2 GENERATIVE AI -->
+    <section class="section reveal" id="generative">
+      <span class="section-number">1.2</span>
+      <h2>Generative AI Overview</h2>
+      <p class="section-intro">Generative AI is a category of AI that can create new content :: text, images, audio, code, video :: rather than just classifying or predicting existing data.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">G</span>What Makes AI "Generative"?</h3>
+        <p>Traditional ML models are primarily <strong>analytical</strong>: they take input data and produce a prediction or classification. A spam classifier predicts "spam or not spam". A credit scoring model predicts default probability.</p>
+        <p>Generative models, by contrast, learn the underlying <strong>distribution of data</strong> and can then <em>sample</em> from that distribution to produce new, realistic instances. They answer: <em>"What does this data look like?"</em> rather than <em>"Which bucket does this belong to?"</em></p>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <h4>2014 :: Generative Adversarial Networks (GANs)</h4>
+            <p>Goodfellow et al. propose a generator/discriminator setup where two networks compete. Enabled realistic image synthesis for the first time.</p>
+          </div>
+          <div class="timeline-item">
+            <h4>2017 :: Transformers ("Attention Is All You Need")</h4>
+            <p>Vaswani et al. at Google introduce the Transformer architecture :: the backbone of all modern LLMs. Attention mechanisms replace recurrence, enabling massive parallelism.</p>
+          </div>
+          <div class="timeline-item">
+            <h4>2018–2020 :: GPT-1, BERT, GPT-2, GPT-3</h4>
+            <p>OpenAI and Google demonstrate that pre-training large Transformers on internet text, then fine-tuning, achieves state-of-the-art on nearly every NLP benchmark.</p>
+          </div>
+          <div class="timeline-item">
+            <h4>2021–2022 :: DALL·E, Stable Diffusion, InstructGPT</h4>
+            <p>Generative AI explodes beyond text to images. RLHF (Reinforcement Learning from Human Feedback) makes LLMs safe and instruction-following.</p>
+          </div>
+          <div class="timeline-item">
+            <h4>2022–Present :: ChatGPT, GPT-4, Claude, Gemini, Llama</h4>
+            <p>Generative AI enters mainstream. Multimodal models handle text, image, audio, and video. Open-source models become competitive with proprietary ones.</p>
+          </div>
+        </div>
+
+        <div class="facts-grid">
+          <div class="fact-card">
+            <span class="fact-number">175B</span>
+            <span class="fact-label">Parameters in GPT-3 (2020)</span>
+          </div>
+          <div class="fact-card">
+            <span class="fact-number">~1T</span>
+            <span class="fact-label">Estimated GPT-4 parameters</span>
+          </div>
+          <div class="fact-card">
+            <span class="fact-number">100M+</span>
+            <span class="fact-label">ChatGPT users in 2 months</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.3 DISC vs GEN -->
+    <section class="section reveal" id="disc-vs-gen">
+      <span class="section-number">1.3</span>
+      <h2>Discriminative vs Generative Models</h2>
+      <p class="section-intro">Two fundamental paradigms in ML have very different goals, strengths, and use cases. Understanding this distinction clarifies where LLMs fit in the landscape.</p>
+
+      <div class="disc-gen-grid">
+        <div class="model-card">
+          <div class="model-card-header disc">
+            <span>🔍</span> Discriminative Models
+          </div>
+          <div class="model-card-body">
+            <ul>
+              <li><span class="li-bullet"></span>Learn decision boundaries between classes: P(Y|X)</li>
+              <li><span class="li-bullet"></span>Map inputs to outputs (labels, classes, values)</li>
+              <li><span class="li-bullet"></span>Optimized for classification and regression tasks</li>
+              <li><span class="li-bullet"></span>Generally simpler, faster, needs less data</li>
+              <li><span class="li-bullet"></span>Cannot generate new examples</li>
+            </ul>
+            <div style="margin-top:16px; padding:14px; background:var(--cream); border-radius:6px; font-size:13px;">
+              <strong>Examples:</strong><br/>Logistic Regression, SVM, Random Forests, BERT (for classification), CNNs for image classification
+            </div>
+          </div>
+        </div>
+        <div class="model-card">
+          <div class="model-card-header gen">
+            <span>✨</span> Generative Models
+          </div>
+          <div class="model-card-body">
+            <ul>
+              <li><span class="li-bullet"></span>Learn the full joint distribution of data: P(X, Y) or P(X)</li>
+              <li><span class="li-bullet"></span>Can sample new examples from learned distribution</li>
+              <li><span class="li-bullet"></span>Suited for content creation, data augmentation, simulation</li>
+              <li><span class="li-bullet"></span>Generally more complex, data-hungry, computationally expensive</li>
+              <li><span class="li-bullet"></span>Can perform classification via Bayes' rule</li>
+            </ul>
+            <div style="margin-top:16px; padding:14px; background:var(--cream); border-radius:6px; font-size:13px;">
+              <strong>Examples:</strong><br/>GPT-4, Claude, Gemini (text); DALL·E, Midjourney (images); Suno, MusicGen (audio); GANs, VAEs (general)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Discriminative</th>
+              <th>Generative</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Goal</strong></td>
+              <td>Separate classes / predict labels</td>
+              <td>Model data distribution, generate new data</td>
+            </tr>
+            <tr>
+              <td><strong>Learns</strong></td>
+              <td>P(Y | X) :: conditional</td>
+              <td>P(X, Y) or P(X) :: joint / marginal</td>
+            </tr>
+            <tr>
+              <td><strong>Output</strong></td>
+              <td>Label, class, score, value</td>
+              <td>New text, image, audio, code</td>
+            </tr>
+            <tr>
+              <td><strong>Training data</strong></td>
+              <td>Often labeled pairs (X, Y)</td>
+              <td>Large unlabeled corpora + optional fine-tuning</td>
+            </tr>
+            <tr>
+              <td><strong>Risk</strong></td>
+              <td>Poor on out-of-distribution inputs</td>
+              <td>Hallucination, reproducing training data</td>
+            </tr>
+            <tr>
+              <td><strong>Use case</strong></td>
+              <td>Spam detection, sentiment, fraud</td>
+              <td>Chatbots, code generation, image synthesis</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <div class="callout-label">Modern Trend</div>
+        <p>Many frontier models blur this boundary. GPT-4 and Claude are generative but can be fine-tuned as classifiers. BERT is discriminative but was pre-trained generatively (masked language modeling). The boundary is increasingly architectural rather than categorical.</p>
+      </div>
+    </section>
+
+    <!-- 1.4 WHY LLMs MATTER -->
+    <section class="section reveal" id="why-llms">
+      <span class="section-number">1.4</span>
+      <h2>Why LLMs Matter</h2>
+      <p class="section-intro">Large Language Models represent a paradigm shift :: not just in NLP, but in how software is built, how knowledge is accessed, and what automation is possible.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">?</span>What is an LLM?</h3>
+        <p>A <strong>Large Language Model</strong> is a deep learning model (specifically a Transformer) trained on massive text corpora to predict the next token given prior context. From this deceptively simple objective emerges remarkable emergent capability: reasoning, coding, translation, summarization, and conversation.</p>
+        <p>Key characteristics that define an LLM:</p>
+      </div>
+
+      <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+        <div class="comp-cell">
+          <h4>Scale</h4>
+          <span class="comp-tag">Billions of parameters</span>
+          <p>Trained on trillions of tokens from the web, books, and code. Scale alone drives emergent capabilities not present in smaller models.</p>
+        </div>
+        <div class="comp-cell">
+          <h4>Pretraining + RLHF</h4>
+          <span class="comp-tag">Two-phase training</span>
+          <p>Self-supervised pretraining on raw text, followed by fine-tuning with human feedback (RLHF) to make models helpful, harmless, and honest.</p>
+        </div>
+        <div class="comp-cell">
+          <h4>In-context Learning</h4>
+          <span class="comp-tag">No retraining needed</span>
+          <p>LLMs can perform new tasks from examples in the prompt alone :: zero-shot or few-shot :: without gradient updates. This is unprecedented in ML.</p>
+        </div>
+      </div>
+
+      <div class="subsection" style="margin-top:40px">
+        <h3><span class="anchor-icon">★</span>Why This Is a Paradigm Shift</h3>
+        <ol class="steps">
+          <li>
+            <h4>General-purpose foundation</h4>
+            <p>One model handles translation, summarization, coding, Q&amp;A, analysis :: previously each required a specialized model with custom training data.</p>
+          </li>
+          <li>
+            <h4>Natural language as interface</h4>
+            <p>For the first time, non-programmers can direct computers in plain English. This democratizes software capability to everyone with a keyboard.</p>
+          </li>
+          <li>
+            <h4>Knowledge compression at scale</h4>
+            <p>LLMs distill knowledge from billions of documents into model weights, enabling instant retrieval and synthesis across domains.</p>
+          </li>
+          <li>
+            <h4>Reasoning and planning</h4>
+            <p>Chain-of-thought prompting unlocks multi-step logical reasoning, enabling LLMs to tackle problems that require planning :: not just retrieval.</p>
+          </li>
+          <li>
+            <h4>Agentic automation</h4>
+            <p>LLMs can call tools, browse the web, write and execute code, and coordinate with other models :: enabling fully autonomous workflows (agents).</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-label">Limitations to Know</div>
+        <p>LLMs have a training cutoff and can hallucinate facts confidently. They don't have real-time access to data (unless augmented with retrieval/tools), struggle with precise arithmetic, and can be biased by training corpora. Knowing these limitations is as important as knowing capabilities.</p>
+      </div>
+    </section>
+
+    <!-- 1.5 APPLICATIONS -->
+    <section class="section reveal" id="applications">
+      <span class="section-number">1.5</span>
+      <h2>Real-world Applications</h2>
+      <p class="section-intro">LLMs are already embedded in consumer products, enterprise workflows, and developer tooling. Here's a cross-industry map of impact.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Industry</th>
+              <th>Application</th>
+              <th>LLM Capability Used</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Software Dev</strong></td>
+              <td>GitHub Copilot, Cursor, Codeium</td>
+              <td>Code completion, review, test generation</td>
+            </tr>
+            <tr>
+              <td><strong>Customer Support</strong></td>
+              <td>Intercom Fin, Zendesk AI, Salesforce Einstein</td>
+              <td>Ticket routing, response drafting, FAQ resolution</td>
+            </tr>
+            <tr>
+              <td><strong>Healthcare</strong></td>
+              <td>Med-PaLM 2, Nuance DAX</td>
+              <td>Clinical note summarization, diagnosis support</td>
+            </tr>
+            <tr>
+              <td><strong>Legal</strong></td>
+              <td>Harvey AI, Lexis+ AI</td>
+              <td>Contract review, case research, brief drafting</td>
+            </tr>
+            <tr>
+              <td><strong>Education</strong></td>
+              <td>Khan Academy Khanmigo, Duolingo Max</td>
+              <td>Tutoring, explanation, personalized curriculum</td>
+            </tr>
+            <tr>
+              <td><strong>Finance</strong></td>
+              <td>Bloomberg GPT, Klarna, Morgan Stanley</td>
+              <td>Earnings summaries, portfolio Q&amp;A, fraud narrative</td>
+            </tr>
+            <tr>
+              <td><strong>Search &amp; Knowledge</strong></td>
+              <td>Perplexity AI, Microsoft Copilot, Google AI Overviews</td>
+              <td>Retrieval-augmented generation, answer synthesis</td>
+            </tr>
+            <tr>
+              <td><strong>Content &amp; Marketing</strong></td>
+              <td>Jasper, Copy.ai, Notion AI</td>
+              <td>Blog writing, ad copy, product descriptions</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 1.6 EXAMPLES -->
+    <section class="section reveal" id="examples">
+      <span class="section-number">1.6</span>
+      <h2>Key Models &amp; Tools</h2>
+      <p class="section-intro">The LLM landscape is competitive and fast-moving. These are the most influential models and tools you should know :: each with a distinct design philosophy.</p>
+
+      <div class="apps-grid">
+        <div class="app-card">
+          <div class="app-icon" style="background:#10a37f20;">🤖</div>
+          <h4>ChatGPT</h4>
+          <p>OpenAI's conversational interface for GPT-4o. World's most-used LLM product. Excels at general tasks, code, and analysis.</p>
+          <span class="app-badge" style="background:#10a37f22; color:#10a37f;">OpenAI · GPT-4o</span>
+        </div>
+        <div class="app-card">
+          <div class="app-icon" style="background:#c84b2f20;">⚡</div>
+          <h4>Claude</h4>
+          <p>Anthropic's AI assistant. Known for long context windows (200K tokens), careful reasoning, and "Constitutional AI" safety design.</p>
+          <span class="app-badge" style="background:#c84b2f22; color:#c84b2f;">Anthropic · Claude 3.5</span>
+        </div>
+        <div class="app-card">
+          <div class="app-icon" style="background:#4285f420;">💎</div>
+          <h4>Gemini</h4>
+          <p>Google DeepMind's multimodal model. Natively trained on text, image, audio, and video. Powers Google Search AI Overviews.</p>
+          <span class="app-badge" style="background:#4285f420; color:#4285f4;">Google · Gemini 1.5</span>
+        </div>
+        <div class="app-card">
+          <div class="app-icon" style="background:#6e40c920;">🐙</div>
+          <h4>GitHub Copilot</h4>
+          <p>The first mass-market LLM developer tool. Trained on billions of lines of code. Integrates directly in VS Code, JetBrains, etc.</p>
+          <span class="app-badge" style="background:#6e40c920; color:#6e40c9;">GitHub · GPT-4o backend</span>
+        </div>
+        <div class="app-card">
+          <div class="app-icon" style="background:#c89a2f20;">🦙</div>
+          <h4>Llama 3</h4>
+          <p>Meta's open-source model. Downloadable and runnable locally. Enables privacy-first, cost-free deployment for developers.</p>
+          <span class="app-badge" style="background:#c89a2f22; color:#c89a2f;">Meta · Open Source</span>
+        </div>
+        <div class="app-card">
+          <div class="app-icon" style="background:#2da06b20;">🔍</div>
+          <h4>Perplexity AI</h4>
+          <p>LLM-powered search engine that retrieves live web sources and synthesizes answers with citations. The post-Google search paradigm.</p>
+          <span class="app-badge" style="background:#2da06b22; color:#2da06b;">RAG · Multi-model</span>
+        </div>
+      </div>
+
+      <div class="callout accent">
+        <div class="callout-label">Design Differences Matter</div>
+        <p>Each model reflects its creator's priorities. OpenAI optimizes for capability breadth. Anthropic emphasizes safety and instruction-following. Meta focuses on open access. Google leverages Search integration and multimodality. These aren't just marketing :: they reflect real architectural and training-philosophy differences.</p>
+      </div>
+    </section>
+
+    <!-- 1.7 HANDS-ON -->
+    <section class="section reveal" id="handson">
+      <span class="section-number">1.7</span>
+      <h2>Hands-on: Call the OpenAI API</h2>
+      <p class="section-intro">Theory becomes intuition when you make your first API call. Below is a complete, annotated example of generating text completions with OpenAI's Chat Completions API.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">1</span>Setup &amp; Installation</h3>
+        <p>Install the OpenAI Python library and set your API key as an environment variable. Never hardcode API keys in source code.</p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left">
+              <div class="code-dots">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+              </div>
+              <span class="code-filename">terminal</span>
+            </div>
+            <span class="code-lang">BASH</span>
+          </div>
+          <pre><code><span class="cmt"># Install the library</span>
+<span class="fn">pip</span> install openai
+
+<span class="cmt"># Set API key in your environment</span>
+<span class="kw">export</span> <span class="var">OPENAI_API_KEY</span>=<span class="str">"sk-your-key-here"</span>
+
+<span class="cmt"># Verify installation</span>
+<span class="fn">python</span> -c <span class="str">"import openai; print(openai.__version__)"</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">2</span>Basic Text Completion</h3>
+        <p>The core API call uses <span class="ic">chat.completions.create()</span>. Messages are structured as a list of role/content pairs.</p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left">
+              <div class="code-dots">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+              </div>
+              <span class="code-filename">basic_completion.py</span>
+            </div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+
+<span class="cmt"># Initialize client (reads OPENAI_API_KEY from env)</span>
+<span class="var">client</span> = <span class="cls">OpenAI</span>()
+
+<span class="cmt"># Create a chat completion</span>
+<span class="var">response</span> = <span class="var">client</span>.chat.completions.<span class="fn">create</span>(
+    <span class="key">model</span>=<span class="str">"gpt-4o"</span>,          <span class="cmt"># The model to use</span>
+    <span class="key">messages</span>=[
+        {
+            <span class="str">"role"</span>: <span class="str">"system"</span>,   <span class="cmt"># System sets the assistant's behavior</span>
+            <span class="str">"content"</span>: <span class="str">"You are a helpful AI tutor teaching students about machine learning."</span>
+        },
+        {
+            <span class="str">"role"</span>: <span class="str">"user"</span>,     <span class="cmt"># User is the human turn</span>
+            <span class="str">"content"</span>: <span class="str">"Explain what a neural network is in 3 sentences."</span>
+        }
+    ],
+    <span class="key">temperature</span>=<span class="num">0.7</span>,          <span class="cmt"># 0=deterministic, 1=creative, 2=chaotic</span>
+    <span class="key">max_tokens</span>=<span class="num">256</span>,           <span class="cmt"># Limit response length</span>
+)
+
+<span class="cmt"># Extract the assistant's reply</span>
+<span class="var">reply</span> = <span class="var">response</span>.choices[<span class="num">0</span>].message.content
+<span class="fn">print</span>(<span class="var">reply</span>)
+
+<span class="cmt"># Inspect token usage (cost awareness)</span>
+<span class="fn">print</span>(<span class="str">f"\nTokens used: {response.usage.total_tokens}"</span>)
+<span class="fn">print</span>(<span class="str">f"Prompt: {response.usage.prompt_tokens} | Completion: {response.usage.completion_tokens}"</span>)</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">3</span>Streaming Responses</h3>
+        <p>For real-time output (like ChatGPT's typing effect), use <span class="ic">stream=True</span>. Chunks arrive as Server-Sent Events.</p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left">
+              <div class="code-dots">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+              </div>
+              <span class="code-filename">streaming.py</span>
+            </div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+
+<span class="var">client</span> = <span class="cls">OpenAI</span>()
+
+<span class="cmt"># Enable streaming</span>
+<span class="var">stream</span> = <span class="var">client</span>.chat.completions.<span class="fn">create</span>(
+    <span class="key">model</span>=<span class="str">"gpt-4o"</span>,
+    <span class="key">messages</span>=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Write a haiku about neural networks."</span>}],
+    <span class="key">stream</span>=<span class="cls">True</span>,  <span class="cmt"># 👈 This is the key change</span>
+)
+
+<span class="kw">for</span> chunk <span class="kw">in</span> <span class="var">stream</span>:
+    <span class="kw">if</span> chunk.choices[<span class="num">0</span>].delta.content <span class="kw">is not</span> <span class="cls">None</span>:
+        <span class="fn">print</span>(chunk.choices[<span class="num">0</span>].delta.content, end=<span class="str">""</span>, flush=<span class="cls">True</span>)
+
+<span class="fn">print</span>()  <span class="cmt"># newline at end</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">4</span>Key Parameters Reference</h3>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Type</th>
+                <th>Range</th>
+                <th>Effect</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="ic">model</span></td>
+                <td>string</td>
+                <td>gpt-4o, gpt-4o-mini…</td>
+                <td>Which model to invoke. Affects cost, speed, capability.</td>
+              </tr>
+              <tr>
+                <td><span class="ic">temperature</span></td>
+                <td>float</td>
+                <td>0.0 – 2.0</td>
+                <td>Controls randomness. 0 = deterministic. Use low (0.2) for factual tasks, high (0.8+) for creative.</td>
+              </tr>
+              <tr>
+                <td><span class="ic">max_tokens</span></td>
+                <td>integer</td>
+                <td>1 – 128K</td>
+                <td>Max tokens to generate. Prevents runaway responses and controls cost.</td>
+              </tr>
+              <tr>
+                <td><span class="ic">top_p</span></td>
+                <td>float</td>
+                <td>0.0 – 1.0</td>
+                <td>Nucleus sampling :: only consider top p% probability mass. Alternative to temperature.</td>
+              </tr>
+              <tr>
+                <td><span class="ic">frequency_penalty</span></td>
+                <td>float</td>
+                <td>-2.0 – 2.0</td>
+                <td>Penalizes repetition of tokens already used. Positive = less repetition.</td>
+              </tr>
+              <tr>
+                <td><span class="ic">system</span> (message role)</td>
+                <td>string</td>
+                <td>::</td>
+                <td>Sets the assistant's persona and rules. Applied before user messages. Critical for prompt engineering.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE DEMO -->
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Live Demo :: Try It Here</h3>
+        <p>This demo calls the Anthropic API (Claude) to simulate an LLM text generation response directly in your browser. Experiment with different prompts and parameters.</p>
+
+        <div class="demo-box">
+          <h4>Text Generation Playground</h4>
+          <p class="demo-desc">Enter a prompt and see how an LLM responds. Adjust temperature to observe the effect on creativity vs. consistency.</p>
+          <div class="demo-form">
+            <div>
+              <label>System Prompt</label>
+              <textarea class="demo-input" id="systemPrompt" placeholder="e.g. You are a helpful AI tutor specializing in machine learning." rows="2">You are a knowledgeable AI tutor helping students learn about artificial intelligence and machine learning.</textarea>
+            </div>
+            <div>
+              <label>User Message</label>
+              <textarea class="demo-input" id="userPrompt" placeholder="Ask anything about AI, ML, or LLMs…" rows="3">Explain the difference between supervised and unsupervised learning in simple terms, with one real-world example of each.</textarea>
+            </div>
+            <div class="demo-row">
+              <div>
+                <label>Temperature: <span id="tempVal">0.7</span></label>
+                <input class="demo-input" id="tempSlider" max="1" min="0" oninput="document.getElementById('tempVal').textContent = this.value" step="0.1" style="padding:8px 0; background:none; border:none; cursor:pointer;" type="range" value="0.7"/>
+              </div>
+              <div>
+                <label>Max Tokens</label>
+                <select class="demo-select" id="maxTokens">
+                  <option value="150">150 :: brief</option>
+                  <option selected="" value="300">300 :: standard</option>
+                  <option value="500">500 :: detailed</option>
+                  <option value="800">800 :: comprehensive</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <button class="demo-btn" id="generateBtn" onclick="generateResponse()">
+                <span id="btnIcon">▶</span> Generate Response
+              </button>
+            </div>
+          </div>
+          <div class="demo-output" id="demoOutput">
+            <span class="output-label">ASSISTANT RESPONSE</span>
+            <div class="output-text" id="outputText"></div>
+            <div class="demo-usage" id="demoUsage"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">5</span>Error Handling Best Practices</h3>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left">
+              <div class="code-dots">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+              </div>
+              <span class="code-filename">robust_completion.py</span>
+            </div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">import</span> openai
+<span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+<span class="kw">import</span> time
+
+<span class="var">client</span> = <span class="cls">OpenAI</span>()
+
+<span class="kw">def</span> <span class="fn">safe_completion</span>(prompt: <span class="cls">str</span>, max_retries: <span class="cls">int</span> = <span class="num">3</span>) -&gt; <span class="cls">str</span>:
+    <span class="str">"""Robust API call with retry logic and error handling."""</span>
+    
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_retries):
+        <span class="kw">try</span>:
+            <span class="var">response</span> = <span class="var">client</span>.chat.completions.<span class="fn">create</span>(
+                <span class="key">model</span>=<span class="str">"gpt-4o"</span>,
+                <span class="key">messages</span>=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: prompt}],
+                <span class="key">timeout</span>=<span class="num">30</span>,  <span class="cmt"># 30s timeout</span>
+            )
+            <span class="kw">return</span> <span class="var">response</span>.choices[<span class="num">0</span>].message.content
+            
+        <span class="kw">except</span> openai.<span class="cls">RateLimitError</span>:
+            <span class="fn">print</span>(<span class="str">f"Rate limited. Waiting {2 ** attempt}s..."</span>)
+            time.<span class="fn">sleep</span>(<span class="num">2</span> ** attempt)  <span class="cmt"># exponential backoff</span>
+            
+        <span class="kw">except</span> openai.<span class="cls">AuthenticationError</span>:
+            <span class="kw">raise</span> <span class="cls">ValueError</span>(<span class="str">"Invalid API key. Check OPENAI_API_KEY."</span>)
+            
+        <span class="kw">except</span> openai.<span class="cls">BadRequestError</span> <span class="kw">as</span> e:
+            <span class="fn">print</span>(<span class="str">f"Bad request: {e}"</span>)  <span class="cmt"># content policy, token limit exceeded, etc.</span>
+            <span class="kw">break</span>
+            
+    <span class="kw">return</span> <span class="str">"Failed to generate response after retries."</span></code></pre>
+        </div>
+
+        <div class="callout success">
+          <div class="callout-label">Production Tip</div>
+          <p>Always implement exponential backoff for rate limits, set explicit timeouts, log token usage for cost monitoring, and never expose API keys in client-side code. Use environment variables or a secrets manager in all environments.</p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted);">Section 1 complete  ·  Next: Tokenization &amp; Embeddings</div>
+    <a class="btn-nav primary" href="#intro">→ Section 2: Tokenization &amp; Embeddings</a>
+  </div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-2.html">Ai Nlp Llm Section1 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-3.html">Ai Nlp Llm Section1 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1.html">Ai Nlp Llm Section1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-1.html">Ai Nlp Llm Section2 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-2.html">Ai Nlp Llm Section2 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-3-4.html">Ai Nlp Llm Section2 3 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-1.html">Ai Nlp Llm Section3 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-2.html">Ai Nlp Llm Section3 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-3.html">Ai Nlp Llm Section3 3</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<script>
+// ── SCROLL PROGRESS ──
+const fill = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  const total = document.body.scrollHeight - window.innerHeight;
+  fill.style.width = (window.scrollY / total * 100) + '%';
+});
+
+// ── REVEAL ON SCROLL ──
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+reveals.forEach(r => obs.observe(r));
+
+// ── NAV ACTIVE STATE ──
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+const navObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => navObs.observe(s));
+
+// ── LIVE DEMO ──
+async function generateResponse() {
+  const btn = document.getElementById('generateBtn');
+  const output = document.getElementById('demoOutput');
+  const outputText = document.getElementById('outputText');
+  const usage = document.getElementById('demoUsage');
+  const system = document.getElementById('systemPrompt').value.trim();
+  const user = document.getElementById('userPrompt').value.trim();
+  const temp = parseFloat(document.getElementById('tempSlider').value);
+  const maxTokens = parseInt(document.getElementById('maxTokens').value);
+
+  if (!user) { alert('Please enter a user message.'); return; }
+
+  btn.disabled = true;
+  document.getElementById('btnIcon').textContent = '⏳';
+  output.className = 'demo-output visible loading';
+  outputText.textContent = '';
+  usage.textContent = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        system: system || 'You are a helpful AI tutor.',
+        messages: [{ role: 'user', content: user }],
+      })
+    });
+
+    const data = await res.json();
+    output.classList.remove('loading');
+
+    if (data.content && data.content[0]) {
+      outputText.textContent = data.content[0].text;
+      if (data.usage) {
+        usage.textContent = `↑ ${data.usage.input_tokens} input tokens  ·  ↓ ${data.usage.output_tokens} output tokens  ·  model: claude-sonnet-4`;
+      }
+    } else {
+      outputText.textContent = 'Error: ' + (data.error?.message || JSON.stringify(data));
+    }
+  } catch (err) {
+    output.classList.remove('loading');
+    outputText.textContent = 'Error: ' + err.message;
+  }
+
+  btn.disabled = false;
+  document.getElementById('btnIcon').textContent = '▶';
+}
+</script>
+
+
+</body></html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>A Visual Guide to Causal Inference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: The infographic is structured as a top-down narrative to guide the user from a broad, fundamental concept to specific examples. It starts with a bold title and hook, immediately addresses the core problem (Correlation vs. Causation), introduces the vocabulary (Core Concepts), presents the main theoretical framework (Ladder of Causation), breaks down practical tools (Methods at a Glance), and concludes with the real-world significance (Why It Matters). This linear, storytelling structure is ideal for an infographic, ensuring the information builds logically and is easy to follow in a single scroll. -->
+    <!-- Visualization & Content Choices: 
+        1. Correlation vs Causation: Data Point -> Spurious correlation example. Goal -> Inform. Chosen Visualization -> Scatter Plot. Justification -> A scatter plot is the most direct way to visualize a correlation between two variables. Paired with a large text callout for the "confounder", it makes the core message clear. Library/Method -> Chart.js. (Confirming NO SVG).
+        2. Core Concepts: Data Point -> Definitions for Treatment, Counterfactual, Confounding. Goal -> Organize. Chosen Visualization -> Icon + Text Cards. Justification -> Cards visually separate distinct concepts for clarity. Unicode characters are used as lightweight, universally supported icons. Library/Method -> HTML/CSS. (Confirming NO SVG).
+        3. Ladder of Causation: Data Point -> Judea Pearl's 3 levels of reasoning. Goal -> Organize/Show a Process. Chosen Visualization -> Styled HTML/CSS Flow Chart. Justification -> A vertical flow chart clearly illustrates the hierarchical progression of the framework without requiring complex libraries or graphics. Library/Method -> HTML/CSS. (Confirming NO SVG, NO MERMAID JS).
+        4. Methods at a Glance: Data Point -> Simplified explanations of RCT, DiD, RDD, IV. Goal -> Compare. Chosen Visualization -> Grid of cards, each with a mini-chart. Justification -> This allows for a quick, at-a-glance comparison of the foundational ideas behind each method in a highly scannable format. Library/Method -> Chart.js. (Confirming NO SVG).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFEA;
+            color: #00537E;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        .mini-chart-container {
+             position: relative;
+             width: 100%;
+             max-width: 300px;
+             margin: 1rem auto 0;
+             height: 150px;
+             max-height: 150px;
+        }
+         @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .card {
+             background-color: white;
+             border-radius: 0.75rem;
+             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+             border: 1px solid #00CECB;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <main class="container mx-auto px-4 sm:px-6 py-12">
+
+        <section class="text-center mb-20" id="hero">
+            <h1 class="text-5xl md:text-7xl font-extrabold uppercase tracking-tight mb-4">The Power of <span style="color: #FF5E5B;">Why</span></h1>
+            <h2 class="text-2xl md:text-3xl font-semibold text-gray-700">A Visual Guide to Causal Inference</h2>
+            <p class="max-w-3xl mx-auto mt-4 text-lg">Moving beyond "what happened" to understand "why it happened." Causal inference is the science of identifying true cause-and-effect relationships from data.</p>
+        </section>
+
+        <section class="mb-20" id="correlation-vs-causation">
+            <div class="text-center mb-10">
+                <h3 class="text-4xl font-extrabold">The First Rule: Correlation is NOT Causation</h3>
+                <p class="max-w-2xl mx-auto mt-2 text-lg">Two trends can move together perfectly without one causing the other. This is the most common pitfall in data analysis.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="card p-6">
+                    <h4 class="text-xl font-bold text-center mb-4">Case Study: Ice Cream &amp; Drownings</h4>
+                    <p class="text-center mb-4">This chart shows a strong positive correlation. As ice cream sales rise, so do drowning incidents. Does ice cream cause drowning?</p>
+                    <div class="chart-container">
+                        <canvas id="correlationChart"></canvas>
+                    </div>
+                </div>
+                <div class="card p-8 bg-[#FFED66] border-[#FF5E5B]">
+                     <p class="text-2xl font-bold text-center">Of course not. The real cause is a...</p>
+                     <h4 class="text-5xl font-extrabold text-center my-4 text-[#FF5E5B]">HIDDEN CONFOUNDER</h4>
+                     <p class="text-xl font-semibold text-center">Hot weather! Higher temperatures cause people to buy more ice cream AND go swimming more often, leading to more drowning incidents. The heat is the true cause that links the two correlated events.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="concepts">
+            <div class="text-center mb-10">
+                 <h3 class="text-4xl font-extrabold">The Core Concepts</h3>
+                 <p class="max-w-2xl mx-auto mt-2 text-lg">To think causally, we need a specific vocabulary.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card p-6 text-center">
+                    <div class="text-6xl font-extrabold" style="color: #00CECB;">→</div>
+                    <h4 class="text-2xl font-bold my-2">Treatment</h4>
+                    <p>The intervention or variable whose effect we want to measure (e.g., a new drug, an ad campaign).</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <div class="text-6xl font-extrabold" style="color: #FF5E5B;">?</div>
+                    <h4 class="text-2xl font-bold my-2">Counterfactual</h4>
+                    <p>The "what if" scenario. What would have happened without the treatment? This is the unobservable outcome we try to estimate.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <div class="text-6xl font-extrabold" style="color: #FFED66;">⬨</div>
+                    <h4 class="text-2xl font-bold my-2">Confounding</h4>
+                    <p>A third variable that influences both the treatment and the outcome, creating a misleading correlation.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="ladder">
+             <div class="text-center mb-10">
+                 <h3 class="text-4xl font-extrabold">The Ladder of Causation</h3>
+                 <p class="max-w-2xl mx-auto mt-2 text-lg">A framework by Judea Pearl describing the three levels of causal reasoning.</p>
+            </div>
+            <div class="relative max-w-lg mx-auto p-4">
+                <div class="absolute top-0 bottom-0 left-1/2 -ml-0.5 w-1 bg-[#00CECB] opacity-30"></div>
+                <div class="relative mb-12">
+                    <div class="absolute top-1/2 -mt-4 left-1/2 -ml-4 w-8 h-8 rounded-full bg-[#00CECB] border-4 border-[#FFFFEA]"></div>
+                    <div class="ml-16 md:ml-0 md:text-right md:mr-24 card p-4">
+                        <h4 class="text-xl font-bold">1. Association (Seeing)</h4>
+                        <p>Observing how things are related. <br/><i>"How are X and Y correlated?"</i></p>
+                    </div>
+                </div>
+                <div class="relative mb-12">
+                     <div class="absolute top-1/2 -mt-4 left-1/2 -ml-4 w-8 h-8 rounded-full bg-[#00CECB] border-4 border-[#FFFFEA]"></div>
+                     <div class="mr-16 md:mr-0 md:text-left md:ml-24 card p-4">
+                        <h4 class="text-xl font-bold">2. Intervention (Doing)</h4>
+                        <p>Predicting the effect of a deliberate action. <br/><i>"What happens if I do X?"</i></p>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute top-1/2 -mt-4 left-1/2 -ml-4 w-8 h-8 rounded-full bg-[#00CECB] border-4 border-[#FFFFEA]"></div>
+                    <div class="ml-16 md:ml-0 md:text-right md:mr-24 card p-4">
+                        <h4 class="text-xl font-bold">3. Counterfactuals (Imagining)</h4>
+                        <p>Reasoning about "what if" scenarios. <br/><i>"Why did X happen? What if I had acted differently?"</i></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="methods">
+            <div class="text-center mb-10">
+                 <h3 class="text-4xl font-extrabold">Methods at a Glance</h3>
+                 <p class="max-w-2xl mx-auto mt-2 text-lg">How do we climb the ladder? Analysts use various methods to estimate causal effects.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="card p-6 text-center">
+                    <h4 class="text-xl font-bold">Randomized Controlled Trial</h4>
+                    <p class="text-sm h-16">Randomly assign groups to treatment or control. The "gold standard."</p>
+                    <div class="mini-chart-container"><canvas id="rctChart"></canvas></div>
+                </div>
+                 <div class="card p-6 text-center">
+                    <h4 class="text-xl font-bold">Difference-in-Differences</h4>
+                    <p class="text-sm h-16">Compare trends over time between a group that got a treatment and one that didn't.</p>
+                    <div class="mini-chart-container"><canvas id="didChart"></canvas></div>
+                </div>
+                 <div class="card p-6 text-center">
+                    <h4 class="text-xl font-bold">Regression Discontinuity</h4>
+                    <p class="text-sm h-16">Exploit a cutoff rule to compare those just above and just below the threshold.</p>
+                    <div class="mini-chart-container"><canvas id="rddChart"></canvas></div>
+                </div>
+                 <div class="card p-6 text-center">
+                    <h4 class="text-xl font-bold">Instrumental Variables</h4>
+                    <p class="text-sm h-16">Use a third variable (the "instrument") that affects treatment but not the outcome directly.</p>
+                     <div class="mini-chart-container"><canvas id="ivChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+         <section id="applications">
+            <div class="text-center mb-10">
+                 <h3 class="text-4xl font-extrabold">Why It Matters</h3>
+                 <p class="max-w-2xl mx-auto mt-2 text-lg">Causal inference drives better decision-making everywhere.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg p-6 text-center border-t-8 border-[#FF5E5B]">
+                    <h4 class="text-2xl font-bold mb-2">Medicine</h4>
+                    <p>Does a new drug work? Are vaccines effective?</p>
+                </div>
+                <div class="bg-white rounded-lg p-6 text-center border-t-8 border-[#00CECB]">
+                    <h4 class="text-2xl font-bold mb-2">Policy</h4>
+                    <p>Does a job training program increase employment?</p>
+                </div>
+                 <div class="bg-white rounded-lg p-6 text-center border-t-8 border-[#FFED66]">
+                    <h4 class="text-2xl font-bold mb-2">Business</h4>
+                    <p>Did our new feature actually cause user engagement to rise?</p>
+                </div>
+            </div>
+        </section>
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-for-business-economy.html">Causal Inference For Business Economy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-in-health-care.html">Causal Inference In Health Care</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-overview-info.html">Causal Inference Overview Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/causal-inference-overview.html">Causal Inference Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/causal-inference/why-layer-of-agentic-ai.html">Why Layer Of Agentic Ai</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const palette = {
+        red: '#FF5E5B',
+        blue: '#00537E',
+        cyan: '#00CECB',
+        yellow: '#FFED66',
+        offwhite: '#FFFFEA'
+    };
+
+    const defaultTooltipOptions = {
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                            return label.join(' ');
+                        } else {
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    function wrapLabels(label) {
+        const maxLength = 16;
+        if (typeof label !== 'string' || label.length <= maxLength) {
+            return label;
+        }
+        const words = label.split(' ');
+        let lines = [];
+        let currentLine = '';
+        words.forEach(word => {
+            if ((currentLine + ' ' + word).trim().length > maxLength) {
+                lines.push(currentLine.trim());
+                currentLine = word;
+            } else {
+                currentLine = (currentLine + ' ' + word).trim();
+            }
+        });
+        if (currentLine) {
+            lines.push(currentLine.trim());
+        }
+        return lines;
+    }
+
+
+    new Chart(document.getElementById('correlationChart').getContext('2d'), {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Data Points',
+                data: [{x: 2, y: 10}, {x: 2.5, y: 12}, {x: 3, y: 15}, {x: 5, y: 25}, {x: 6, y: 30}, {x: 7, y: 35}, {x: 8, y: 42}, {x: 9, y: 48}, {x: 10, y: 55}],
+                backgroundColor: palette.red,
+                borderColor: palette.red,
+                borderWidth: 1,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Ice Cream Sales' } },
+                y: { title: { display: true, text: 'Drowning Incidents' } }
+            },
+            plugins: { ...defaultTooltipOptions.plugins, legend: { display: false } }
+        }
+    });
+
+    new Chart(document.getElementById('rctChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Control', 'Treatment'],
+            datasets: [{ data: [15, 25], backgroundColor: [palette.cyan, palette.red] }]
+        },
+        options: {
+            maintainAspectRatio: false, responsive: true,
+            scales: { y: { beginAtZero: true, ticks: { display: false } }, x: { grid: { display: false } } },
+            plugins: { ...defaultTooltipOptions.plugins, legend: { display: false } }
+        }
+    });
+
+    new Chart(document.getElementById('didChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Before', 'After'],
+            datasets: [
+                { data: [10, 12], borderColor: palette.cyan, tension: 0.1 },
+                { data: [10, 18], borderColor: palette.red, tension: 0.1 }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false, responsive: true,
+            scales: { y: { beginAtZero: true, ticks: { display: false } }, x: { grid: { display: false } } },
+            plugins: { ...defaultTooltipOptions.plugins, legend: { display: false } }
+        }
+    });
+
+    new Chart(document.getElementById('rddChart').getContext('2d'), {
+        type: 'scatter',
+        data: {
+            datasets: [
+                { data: [{x: 45, y: 9}, {x: 48, y: 10}], backgroundColor: palette.cyan, pointRadius: 4 },
+                { data: [{x: 52, y: 16}, {x: 55, y: 17}], backgroundColor: palette.red, pointRadius: 4 }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false, responsive: true,
+            scales: {
+                x: { min: 40, max: 60, title: { text: 'Cutoff at 50', display: true }, grid: { display: false }, ticks: { display: false } },
+                y: { ticks: { display: false } }
+            },
+            plugins: { ...defaultTooltipOptions.plugins, legend: { display: false } }
+        }
+    });
+
+    new Chart(document.getElementById('ivChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Instrument'],
+            datasets: [
+                { label: 'Treatment', data: [70], backgroundColor: palette.red },
+                { label: 'Outcome', data: [30], backgroundColor: palette.cyan }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false, responsive: true,
+            indexAxis: 'y',
+            scales: { y: { grid: { display: false } }, x: { stacked: true, ticks: { display: false } } },
+            plugins: { ...defaultTooltipOptions.plugins, legend: { display: false } }
+        }
+    });
+});
+</script>
+
+
+
+</body></html>

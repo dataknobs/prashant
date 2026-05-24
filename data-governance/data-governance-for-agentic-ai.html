@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Data Governance for Agentic AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony (Gray, White, Indigo) -->
+    <!-- Application Structure Plan: The SPA is structured as a top-down narrative, guiding a user from the core problem to actionable solutions. It begins with (1) An Introduction to define the unique challenge. (2) A "Build vs. Buy" comparison, using tabs and a radar chart for a quick, high-level decision point. (3) A "Key Features" section, using a grid and a bar chart to detail what to look for. (4) An interactive "Evaluation Framework" process flow to guide selection. (5) A final "Purchasing Factors" accordion for a detailed checklist. This structure was chosen to mirror a logical decision-making process, making the complex topic digestible and allowing users to drill into sections relevant to their current needs. -->
+    <!-- Visualization & Content Choices: (1) Report Info: Build vs. Buy trade-offs. Goal: Compare. Viz: Radar Chart (Chart.js) + HTML Tabs. Interaction: Click tabs to see Pro/Con lists. Justification: Radar chart excels at multi-attribute comparison. (2) Report Info: Key solution features. Goal: Compare/Inform. Viz: Horizontal Bar Chart (Chart.js) + HTML cards. Interaction: Static chart for ranked importance, cards for detail. Justification: Bar chart is clearest for ranking. (3) Report Info: Evaluation process. Goal: Organize. Viz: HTML/Tailwind "Process Flow" diagram. Interaction: Click step to reveal details. Justification: Makes a linear process interactive and less dense. (4) Report Info: Purchasing factors. Goal: Inform. Viz: HTML/JS Accordion. Interaction: Click to expand/collapse details. Justification: Standard, space-saving UI for checklist/FAQ content. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: 500px;
+            transition: max-height 0.5s ease-in;
+        }
+        .accordion-item.open .accordion-chevron {
+            transform: rotate(180deg);
+        }
+        .process-step[aria-selected="true"] {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .step-detail[data-step-content] {
+            transition: opacity 0.3s ease-in-out;
+        }
+        nav a {
+            transition: color 0.2s, border-color 0.2s;
+        }
+        nav a:hover {
+            color: #4f46e5;
+        }
+        nav a.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Navigating Data Governance for Agentic AI</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">An interactive guide to approaches, features, and evaluation factors.</p>
+        </header>
+
+        <nav class="sticky top-0 z-10 bg-gray-50/90 backdrop-blur-sm border-b border-gray-200 mb-12">
+            <div class="flex justify-center space-x-4 md:space-x-8 py-4 overflow-x-auto whitespace-nowrap">
+                <a class="nav-link text-sm md:text-base font-medium text-gray-600 py-2 border-b-2 border-transparent" href="#intro">Introduction</a>
+                <a class="nav-link text-sm md:text-base font-medium text-gray-600 py-2 border-b-2 border-transparent" href="#approaches">Build vs. Buy</a>
+                <a class="nav-link text-sm md:text-base font-medium text-gray-600 py-2 border-b-2 border-transparent" href="#features">Key Features</a>
+                <a class="nav-link text-sm md:text-base font-medium text-gray-600 py-2 border-b-2 border-transparent" href="#evaluation">Evaluation</a>
+                <a class="nav-link text-sm md:text-base font-medium text-gray-600 py-2 border-b-2 border-transparent" href="#factors">Purchasing Factors</a>
+            </div>
+        </nav>
+
+        <main>
+            <section class="mb-16 p-6 md:p-8 bg-white rounded-lg shadow-sm scroll-mt-24" id="intro">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Why Agentic AI Changes the Game</h2>
+                <p class="text-lg text-gray-700 leading-relaxed">
+                    Traditional data governance was built for predictable, human-driven data flows. Agentic AI systems are different. They are autonomous, goal-driven, and can access, create, and modify data at a scale and speed that humans can't directly manage. This creates unprecedented risks in data privacy, security, and compliance. This guide helps you understand the solutions available to regain control, from internal tools to prebuilt platforms.
+                </p>
+            </section>
+
+            <section class="mb-16 scroll-mt-24" id="approaches">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">The Core Decision: Build vs. Buy</h2>
+                <p class="text-lg text-gray-700 leading-relaxed text-center max-w-3xl mx-auto mb-8">
+                    Your first major decision is whether to build a custom internal solution or purchase a prebuilt platform. Each path has significant trade-offs in cost, time, and flexibility. The chart below visualizes this comparison, while the tabs provide detailed pros and cons for each approach.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container w-full max-w-xl mx-auto h-80 md:h-96 max-h-[400px]">
+                        <canvas id="buildVsBuyChart"></canvas>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex border-b border-gray-200 mb-6">
+                            <button aria-selected="true" class="tab-button flex-1 py-3 px-4 text-center font-medium text-indigo-600 border-b-2 border-indigo-600" data-tab-target="#build">
+                                Build (Internal)
+                            </button>
+                            <button aria-selected="false" class="tab-button flex-1 py-3 px-4 text-center font-medium text-gray-500" data-tab-target="#buy">
+                                Buy (Prebuilt)
+                            </button>
+                        </div>
+
+                        <div data-tab-content="" id="build">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">Pros:</h3>
+                            <ul class="list-disc list-inside space-y-2 mb-4 text-gray-700">
+                                <li><strong>Full Customization:</strong> Tailored precisely to your unique data stack and agent behaviors.</li>
+                                <li><strong>Deep Integration:</strong> Can be woven directly into proprietary systems and workflows.</li>
+                                <li><strong>No Vendor Lock-in:</strong> Full control over the roadmap and technology.</li>
+                            </ul>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">Cons:</h3>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>High Upfront Cost &amp; Time:</strong> Requires a dedicated team of expert engineers.</li>
+                                <li><strong>Slow Time-to-Value:</strong> Can take 12-24+ months to build a minimum viable product.</li>
+                                <li><strong>High Maintenance Overhead:</strong> Constant updates needed to keep pace with new agents and regulations.</li>
+                            </ul>
+                        </div>
+
+                        <div class="hidden" data-tab-content="" id="buy">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">Pros:</h3>
+                            <ul class="list-disc list-inside space-y-2 mb-4 text-gray-700">
+                                <li><strong>Fast Deployment:</strong> Can be operational in weeks, not years.</li>
+                                <li><strong>Expert Features:</strong> Includes sophisticated, pre-built capabilities for lineage, audit, and compliance.</li>
+                                <li><strong>Lower TCO (Often):</strong> Predictable subscription cost vs. unpredictable R&amp;D spend.</li>
+                            </ul>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">Cons:</h3>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Potential for Lock-in:</strong> Can be difficult to migrate away from a deeply embedded platform.</li>
+                                <li><strong>Less Flexibility:</strong> May not cover 100% of your specific edge cases.</li>
+                                <li><strong>Integration Gaps:</strong> May require custom connectors for some internal systems.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16 bg-white p-6 md:p-8 rounded-lg shadow-sm scroll-mt-24" id="features">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">Must-Have Features &amp; Capabilities</h2>
+                <p class="text-lg text-gray-700 leading-relaxed text-center max-w-3xl mx-auto mb-8">
+                    Regardless of your approach, any effective governance solution for agentic AI must provide a core set of capabilities. The chart ranks these features by their typical importance, while the cards below offer more detail on what each feature entails.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-4">
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <h4 class="text-lg font-semibold text-indigo-700">1. Real-time Data Lineage</h4>
+                            <p class="text-gray-600">Track every piece of data an agent accesses, creates, or modifies, from source to destination.</p>
+                        </div>
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <h4 class="text-lg font-semibold text-indigo-700">2. Dynamic Access Control</h4>
+                            <p class="text-gray-600">Move beyond static roles. Policies must adapt based on agent context, task, and data sensitivity.</p>
+                        </div>
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <h4 class="text-lg font-semibold text-indigo-700">3. Immutable Audit &amp; Logging</h4>
+                            <p class="text-gray-600">A tamper-proof record of all agent decisions, queries, and actions for compliance and debugging.</p>
+                        </div>
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <h4 class="text-lg font-semibold text-indigo-700">4. Automated Compliance &amp; Masking</h4>
+                            <p class="text-gray-600">Automatically detect and redact PII, PHI, or other sensitive data before an agent can misuse it.</p>
+                        </div>
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <h4 class="text-lg font-semibold text-indigo-700">5. Agent &amp; Model Governance</h4>
+                            <p class="text-gray-600">Catalog agents like data. Track their models, versions, training data, and permissions.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container w-full max-w-xl mx-auto h-96 max-h-[450px]">
+                        <canvas id="featureImportanceChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16 scroll-mt-24" id="evaluation">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">An Interactive Evaluation Framework</h2>
+                <p class="text-lg text-gray-700 leading-relaxed text-center max-w-3xl mx-auto mb-8">
+                    Choosing the right solution requires a structured approach. This framework outlines a 5-step process. Click each step to see key questions and considerations for your team.
+                </p>
+
+                <div class="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0 md:space-x-2 mb-8">
+                    <div aria-selected="true" class="process-step flex-1 p-4 border-2 border-gray-300 rounded-lg text-center cursor-pointer transition" data-step="1">
+                        <span class="block text-xl font-bold text-indigo-600">Step 1</span>
+                        <span class="block text-lg font-medium">Define Needs</span>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-400 text-2xl md:rotate-0 rotate-90">▶</div>
+                    <div aria-selected="false" class="process-step flex-1 p-4 border-2 border-gray-300 rounded-lg text-center cursor-pointer transition" data-step="2">
+                        <span class="block text-xl font-bold text-indigo-600">Step 2</span>
+                        <span class="block text-lg font-medium">Map Integrations</span>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-400 text-2xl md:rotate-0 rotate-90">▶</div>
+                    <div aria-selected="false" class="process-step flex-1 p-4 border-2 border-gray-300 rounded-lg text-center cursor-pointer transition" data-step="3">
+                        <span class="block text-xl font-bold text-indigo-600">Step 3</span>
+                        <span class="block text-lg font-medium">Assess Security</span>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-400 text-2xl md:rotate-0 rotate-90">▶</div>
+                    <div aria-selected="false" class="process-step flex-1 p-4 border-2 border-gray-300 rounded-lg text-center cursor-pointer transition" data-step="4">
+                        <span class="block text-xl font-bold text-indigo-600">Step 4</span>
+                        <span class="block text-lg font-medium">Test Scalability</span>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-400 text-2xl md:rotate-0 rotate-90">▶</div>
+                    <div aria-selected="false" class="process-step flex-1 p-4 border-2 border-gray-300 rounded-lg text-center cursor-pointer transition" data-step="5">
+                        <span class="block text-xl font-bold text-indigo-600">Step 5</span>
+                        <span class="block text-lg font-medium">Run a PoC</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm min-h-[10rem]" id="evaluation-details">
+                    <div class="step-detail" data-step-content="1">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Step 1: Define Needs &amp; Risks</h3>
+                        <p class="text-gray-700">What specific problems are you trying to solve? Don't boil the ocean. Start with your top 3 risks. Is it PII leakage, accidental data deletion by an agent, or bad business decisions from agent "hallucinations"? Your needs will define your requirements.</p>
+                    </div>
+                    <div class="step-detail hidden" data-step-content="2">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Step 2: Map Integrations</h3>
+                        <p class="text-gray-700">Where does your data live? Where do your agents run? The solution MUST integrate with your entire stack: data warehouses (Snowflake, BigQuery), data lakes (Databricks), vector DBs (Pinecone), and agent frameworks (LangChain, AutoGen).</p>
+                    </div>
+                    <div class="step-detail hidden" data-step-content="3">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Step 3: Assess Security &amp; Compliance</h3>
+                        <p class="text-gray-700">How does the platform secure itself? Does it support your IAM provider (Okta, Entra ID)? Does it have certifications (SOC 2, ISO 27001, GDPR, CCPA)? This is non-negotiable for any enterprise-grade tool.</p>
+                    </div>
+                    <div class="step-detail hidden" data-step-content="4">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Step 4: Test Scalability &amp; Performance</h3>
+                        <p class="text-gray-700">Your agents will generate millions of log events. Can the governance platform handle this data velocity without adding unacceptable latency? Ask for performance benchmarks and test against your expected peak load, not just the average.</p>
+                    </div>
+                    <div class="step-detail hidden" data-step-content="5">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Step 5: Run a Proof of Concept (PoC)</h3>
+                        <p class="text-gray-700">Never buy blind. Run a 2-4 week PoC with a real, high-value use case. Can your team use the tool? Does it actually catch the risks you defined in Step 1? The PoC will answer 90% of your questions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="scroll-mt-24" id="factors">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">Final Purchasing Factors: A Checklist</h2>
+                <p class="text-lg text-gray-700 leading-relaxed text-center max-w-3xl mx-auto mb-8">
+                    Before you sign a contract, review these final factors. Use this as an interactive checklist to ensure you've covered all your bases with your team and the vendor. Click each factor to expand for details.
+                </p>
+
+                <div class="space-y-4 max-w-3xl mx-auto">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <h2>
+                            <button class="accordion-toggle flex justify-between items-center w-full p-5 text-left font-medium text-gray-800 text-lg">
+                                <span>Total Cost of Ownership (TCO)</span>
+                                <span class="accordion-chevron transition-transform duration-200">
+                                    <span class="block w-5 h-5">▼</span>
+                                </span>
+                            </button>
+                        </h2>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">Look beyond the sticker price. Ask about implementation fees, training costs, data egress charges, and per-user or per-agent licensing. A cheap license can be decimated by high data processing fees. Get the full pricing model in writing.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <h2>
+                            <button class="accordion-toggle flex justify-between items-center w-full p-5 text-left font-medium text-gray-800 text-lg">
+                                <span>Vendor Support &amp; Roadmap</span>
+                                <span class="accordion-chevron transition-transform duration-200">
+                                    <span class="block w-5 h-5">▼</span>
+                                </span>
+                            </button>
+                        </h2>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">You are not just buying a product; you are buying a partnership. How responsive is their support team? Do they offer a dedicated "solutions architect"? More importantly, what is their 6-12 month roadmap? This field is moving so fast that a stale roadmap is a major red flag.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <h2>
+                            <button class="accordion-toggle flex justify-between items-center w-full p-5 text-left font-medium text-gray-800 text-lg">
+                                <span>Ease of Integration &amp; Extensibility</span>
+                                <span class="accordion-chevron transition-transform duration-200">
+                                    <span class="block w-5 h-5">▼</span>
+                                </span>
+                            </button>
+                        </h2>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">Does the platform have a robust, API-first design? Can you programmatically add new policies, pull audit logs, and connect to internal tools? A closed, "black-box" system will break the moment your developers invent a new type of agent.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <h2>
+                            <button class="accordion-toggle flex justify-between items-center w-full p-5 text-left font-medium text-gray-800 text-lg">
+                                <span>User Experience (UX) for Your Team</span>
+                                <span class="accordion-chevron transition-transform duration-200">
+                                    <span class="block w-5 h-5">▼</span>
+                                </span>
+                            </button>
+                        </h2>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">A governance tool that no one uses is useless. Is the interface intuitive for your data stewards? Is it a "developer-first" experience for your engineers? If your team finds the tool clunky, they will build workarounds, and your governance will fail.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-first-ai-security.html">Data First Ai Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-agentic-ai.html">Data Governance For Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai-info.html">Data Governance For Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai.html">Data Governance For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-llm.html">Data Governance For Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant copy.html">Data Lineage Ai Assitant Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant.html">Data Lineage Ai Assitant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai-interactive.html">Data Lineage For Ai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai.html">Data Lineage For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info copy.html">Data Lineage Info Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info.html">Data Lineage Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage.html">Data Lineage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant-info.html">Privacy Ai Assistant Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant.html">Privacy Ai Assistant</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const buildVsBuyCtx = document.getElementById('buildVsBuyChart').getContext('2d');
+            new Chart(buildVsBuyCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Time-to-Deploy', 'Upfront Cost', 'Long-term TCO', 'Customization', 'Feature Breadth', 'Expertise Required'],
+                    datasets: [{
+                        label: 'Build (Internal)',
+                        data: [1, 10, 8, 10, 3, 10],
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(239, 68, 68, 1)'
+                    }, {
+                        label: 'Buy (Prebuilt)',
+                        data: [9, 3, 5, 5, 9, 2],
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(79, 70, 229, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { size: 12 } },
+                            ticks: {
+                                backdropColor: 'rgba(255, 255, 255, 0)',
+                                color: 'rgba(0, 0, 0, 0.5)',
+                                stepSize: 2
+                            },
+                            min: 0,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    let value = context.parsed.r;
+                                    if (value > 7) label += 'High';
+                                    else if (value > 3) label += 'Medium';
+                                    else label += 'Low';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const featureImportanceCtx = document.getElementById('featureImportanceChart').getContext('2d');
+            new Chart(featureImportanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Data Lineage', 'Access Control', 'Audit & Logging', 'Compliance', 'Model Governance'],
+                    datasets: [{
+                        label: 'Relative Importance',
+                        data: [95, 92, 90, 85, 75],
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.8)',
+                            'rgba(79, 70, 229, 0.7)',
+                            'rgba(79, 70, 229, 0.6)',
+                            'rgba(79, 70, 229, 0.5)',
+                            'rgba(79, 70, 229, 0.4)'
+                        ],
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Importance: ${context.parsed.x}/100`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('[data-tab-content]');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.tabTarget;
+                    const targetContent = document.querySelector(targetId);
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('text-indigo-600', 'border-indigo-600');
+                        btn.classList.add('text-gray-500');
+                        btn.setAttribute('aria-selected', 'false');
+                    });
+                    button.classList.add('text-indigo-600', 'border-indigo-600');
+                    button.classList.remove('text-gray-500');
+                    button.setAttribute('aria-selected', 'true');
+
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    targetContent.classList.remove('hidden');
+                });
+            });
+
+            const processSteps = document.querySelectorAll('.process-step');
+            const stepDetails = document.querySelectorAll('.step-detail');
+            processSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    const targetStep = step.dataset.step;
+
+                    processSteps.forEach(s => s.setAttribute('aria-selected', 'false'));
+                    step.setAttribute('aria-selected', 'true');
+
+                    stepDetails.forEach(detail => {
+                        if (detail.dataset.stepContent === targetStep) {
+                            detail.classList.remove('hidden');
+                        } else {
+                            detail.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const toggle = item.querySelector('.accordion-toggle');
+                toggle.addEventListener('click', () => {
+                    item.classList.toggle('open');
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section[id]');
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3 
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+</body></html>

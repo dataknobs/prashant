@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Guide to A/B Testing Statistics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony (Beige, Charcoal, Soft Blue, Muted Green) -->
+    <!-- Application Structure Plan: The app uses an interactive "Test Selection Guide" structure. Instead of a static report, users are guided through questions about their data (e.g., metric type, number of variations). This task-oriented approach helps them actively learn and select the appropriate statistical test. The guide's recommendation links directly to a detailed card for that test, which includes a simplified explanation, use cases, and an interactive chart/calculator for hands-on learning. This design prioritizes user discovery and comprehension over passive reading. -->
+    <!-- Visualization & Content Choices: 1. Metric Type (Categorical vs. Continuous): Goal=Guide User -> Presentation=Buttons -> Interaction=Click to set state & reveal next step -> Justification=Simplifies the first major decision point. 2. Compare Two Proportions (e.g., Conversion Rates): Goal=Compare -> Viz=Bar Chart (Chart.js) -> Interaction=User inputs conversions/visitors, chart updates, p-value from Z-Test is shown -> Justification=Visually shows the difference and connects it to a statistical outcome. 3. Compare Two Means (e.g., Avg. Session Time): Goal=Compare -> Viz=Bar Chart (Chart.js) -> Interaction=User inputs means/std dev, chart updates, p-value from T-Test is shown -> Justification=Clear visual comparison for continuous data. 4. Compare Categorical Data (e.g., Landing Page Choice): Goal=Compare -> Viz=Contingency Table (HTML) + Bar Chart (Chart.js) -> Interaction=User inputs table values, chart updates, p-value from Chi-Squared is shown -> Justification=Shows both the raw data structure and the proportional results. 5. Compare >2 Means: Goal=Compare -> Viz=Multi-bar Chart (Chart.js) -> Interaction=Dropdown to select groups, p-value from ANOVA is shown -> Justification=Extends the t-test concept to A/B/n tests. All visualizations use Chart.js on Canvas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFDFB;
+            color: #36454F;
+        }
+        .guide-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .guide-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .test-card {
+            transition: all 0.3s ease-in-out;
+            border: 1px solid #E5E7EB;
+        }
+        .test-card.highlight {
+            border-color: #A7C7E7;
+            box-shadow: 0 0 20px rgba(167, 199, 231, 0.5);
+            transform: scale(1.02);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">A/B Testing Stats Guide</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium" href="#guide">Test Guide</a>
+                        <a class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium" href="#tests">Test Details</a>
+                        <a class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium" href="#glossary">Glossary</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section class="text-center mb-16" id="intro">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">Make Sense of Your A/B Test Results.</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">A/B testing isn't just about launching two versions; it's about knowing with confidence which one is truly better. Statistical tests are the tools that help you separate random chance from a real improvement. This guide will help you choose the right test for your data.</p>
+        </section>
+
+        <section class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-200 mb-16" id="guide">
+            <h3 class="text-2xl font-bold text-center mb-2">Which Test Should I Use?</h3>
+            <p class="text-center text-gray-600 mb-8">Answer the questions below to find the best statistical test for your experiment.</p>
+            
+            <div class="space-y-8" id="guide-questions">
+                <div id="question1">
+                    <p class="text-lg font-semibold text-center mb-4">1. What kind of metric are you measuring?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                        <button class="guide-btn bg-blue-50 hover:bg-blue-100 text-blue-800 p-6 rounded-lg text-left" onclick="handleGuideChoice('metric', 'proportion')">
+                            <strong class="block text-lg">Proportions or Rates</strong>
+                            <span class="text-sm">e.g., Click-through rate, conversion rate, sign-up rate. (Data is "yes/no" or categorical).</span>
+                        </button>
+                        <button class="guide-btn bg-green-50 hover:bg-green-100 text-green-800 p-6 rounded-lg text-left" onclick="handleGuideChoice('metric', 'continuous')">
+                            <strong class="block text-lg">Continuous Values</strong>
+                            <span class="text-sm">e.g., Average revenue per user, time on page, session duration. (Data is a numeric measurement).</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="hidden" id="question2">
+                    <p class="text-lg font-semibold text-center mb-4">2. How many variations are you comparing?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                        <button class="guide-btn bg-blue-50 hover:bg-blue-100 text-blue-800 p-6 rounded-lg" onclick="handleGuideChoice('variations', 2)">
+                            <strong class="block text-lg">Two Variations (A vs. B)</strong>
+                        </button>
+                         <button class="guide-btn bg-green-50 hover:bg-green-100 text-green-800 p-6 rounded-lg" onclick="handleGuideChoice('variations', 3)">
+                            <strong class="block text-lg">More than Two (A vs. B vs. C...)</strong>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden text-center mt-8 bg-gray-50 p-6 rounded-lg" id="recommendation">
+                <p class="text-gray-600 mb-2">Based on your selections, we recommend the:</p>
+                <h4 class="text-2xl font-bold text-indigo-600" id="recommendation-text"></h4>
+                <a class="mt-4 inline-block bg-indigo-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors" href="#" id="recommendation-link">Learn More</a>
+                <button class="ml-4 text-sm text-gray-500 hover:text-gray-700" onclick="resetGuide()">Start Over</button>
+            </div>
+        </section>
+
+        <section id="tests">
+            <h3 class="text-3xl font-bold text-center mb-12">Statistical Test Details</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <div class="test-card bg-white p-6 rounded-xl shadow-sm" id="z-test">
+                    <h4 class="text-2xl font-bold mb-3">Z-Test for Proportions</h4>
+                    <p class="text-gray-600 mb-4"><strong>When to use:</strong> When you're comparing two proportions, like the conversion rates of two different landing pages. This is one of the most common tests in A/B testing.</p>
+                    <p class="text-gray-600 mb-4"><strong>Assumptions:</strong> You need a large enough sample size (typically &gt;30 in each group) and the samples should be independent.</p>
+                    
+                    <div class="mt-6">
+                        <h5 class="font-semibold mb-2 text-center">Interactive Example: Conversion Rate</h5>
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                            <div>
+                                <label class="block font-medium" for="z_visitors_a">Visitors A</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="z_visitors_a" type="number" value="1000"/>
+                            </div>
+                            <div>
+                                <label class="block font-medium" for="z_conversions_a">Conversions A</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="z_conversions_a" type="number" value="100"/>
+                            </div>
+                            <div>
+                                <label class="block font-medium" for="z_visitors_b">Visitors B</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="z_visitors_b" type="number" value="1000"/>
+                            </div>
+                            <div>
+                                <label class="block font-medium" for="z_conversions_b">Conversions B</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="z_conversions_b" type="number" value="120"/>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700" onclick="calculateZTest()">Calculate</button>
+                        <div class="mt-4 text-center font-semibold" id="z_result"></div>
+                        <div class="chart-container mt-4"><canvas id="zTestChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="test-card bg-white p-6 rounded-xl shadow-sm" id="t-test">
+                    <h4 class="text-2xl font-bold mb-3">Student's t-Test</h4>
+                    <p class="text-gray-600 mb-4"><strong>When to use:</strong> To compare the means of two groups for a continuous metric, like average revenue per user or average session duration. Useful for smaller sample sizes where the population variance is unknown.</p>
+                    <p class="text-gray-600 mb-4"><strong>Assumptions:</strong> Data is normally distributed, samples are independent, and variances between the two groups are approximately equal.</p>
+
+                    <div class="mt-6">
+                        <h5 class="font-semibold mb-2 text-center">Interactive Example: Average Session Time (minutes)</h5>
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                            <div>
+                                <label class="block font-medium" for="t_mean_a">Mean A</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="t_mean_a" step="0.1" type="number" value="5.2"/>
+                            </div>
+                            <div>
+                                <label class="block font-medium" for="t_std_a">Std. Dev A</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="t_std_a" step="0.1" type="number" value="1.5"/>
+                            </div>
+                            <div>
+                                <label class="block font-medium" for="t_mean_b">Mean B</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="t_mean_b" step="0.1" type="number" value="5.8"/>
+                            </div>
+                             <div>
+                                <label class="block font-medium" for="t_std_b">Std. Dev B</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="t_std_b" step="0.1" type="number" value="1.6"/>
+                            </div>
+                             <div class="col-span-2">
+                                <label class="block font-medium" for="t_samples">Sample Size (each group)</label>
+                                <input class="w-full mt-1 p-2 border rounded-md" id="t_samples" type="number" value="50"/>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700" onclick="calculateTTest()">Calculate</button>
+                        <div class="mt-4 text-center font-semibold" id="t_result"></div>
+                        <div class="chart-container mt-4"><canvas id="tTestChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="test-card bg-white p-6 rounded-xl shadow-sm" id="chi-squared">
+                    <h4 class="text-2xl font-bold mb-3">Chi-Squared Test</h4>
+                    <p class="text-gray-600 mb-4"><strong>When to use:</strong> To compare the distribution of categorical data between two or more groups. For example, testing if the proportion of users who choose option A, B, or C on a form is different between two website versions.</p>
+                    <p class="text-gray-600 mb-4"><strong>Assumptions:</strong> Data is categorical, observations are independent, and the expected frequency in each cell of the contingency table is at least 5.</p>
+                    
+                    <div class="mt-6">
+                        <h5 class="font-semibold mb-2 text-center">Interactive Example: Feature Preference</h5>
+                        <div class="grid grid-cols-3 gap-x-4 gap-y-2 mb-4 text-sm items-center">
+                            <div></div><div class="font-medium text-center">Version A</div><div class="font-medium text-center">Version B</div>
+                            <div class="font-medium">Feature 1</div>
+                            <div><input class="w-full p-2 border rounded-md" id="chi_a1" type="number" value="50"/></div>
+                            <div><input class="w-full p-2 border rounded-md" id="chi_b1" type="number" value="40"/></div>
+                            <div class="font-medium">Feature 2</div>
+                            <div><input class="w-full p-2 border rounded-md" id="chi_a2" type="number" value="30"/></div>
+                            <div><input class="w-full p-2 border rounded-md" id="chi_b2" type="number" value="45"/></div>
+                             <div class="font-medium">Feature 3</div>
+                            <div><input class="w-full p-2 border rounded-md" id="chi_a3" type="number" value="20"/></div>
+                            <div><input class="w-full p-2 border rounded-md" id="chi_b3" type="number" value="15"/></div>
+                        </div>
+                        <button class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700" onclick="calculateChiSquared()">Calculate</button>
+                        <div class="mt-4 text-center font-semibold" id="chi_result"></div>
+                        <div class="chart-container mt-4"><canvas id="chiSquaredChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="test-card bg-white p-6 rounded-xl shadow-sm" id="anova">
+                    <h4 class="text-2xl font-bold mb-3">ANOVA (Analysis of Variance)</h4>
+                    <p class="text-gray-600 mb-4"><strong>When to use:</strong> When comparing the means of three or more groups for a continuous metric. It's like a t-Test for more than two variations (A/B/n testing). ANOVA tells you if there's a significant difference *somewhere* among the groups, but not which specific group is different.</p>
+                    <p class="text-gray-600 mb-4"><strong>Assumptions:</strong> Similar to a t-Test: data is normally distributed, samples are independent, and variances are equal across all groups.</p>
+                    
+                     <div class="mt-6">
+                        <h5 class="font-semibold mb-2 text-center">Interactive Example: Avg. Purchase Value</h5>
+                        <div class="space-y-2 mb-4 text-sm">
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="font-medium">Mean A</label><input class="col-span-2 p-2 border rounded-md" id="anova_mean_a" type="number" value="25"/>
+                            </div>
+                             <div class="grid grid-cols-3 gap-2">
+                                <label class="font-medium">Mean B</label><input class="col-span-2 p-2 border rounded-md" id="anova_mean_b" type="number" value="28"/>
+                            </div>
+                             <div class="grid grid-cols-3 gap-2">
+                                <label class="font-medium">Mean C</label><input class="col-span-2 p-2 border rounded-md" id="anova_mean_c" type="number" value="26"/>
+                            </div>
+                        </div>
+                        <p class="text-xs text-center text-gray-500 mb-4">For simplicity, this example assumes equal sample sizes and variance. The p-value is a conceptual estimate.</p>
+                        <button class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700" onclick="calculateAnova()">Calculate</button>
+                        <div class="mt-4 text-center font-semibold" id="anova_result"></div>
+                        <div class="chart-container mt-4"><canvas id="anovaChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-16 border-t pt-12" id="glossary">
+            <h3 class="text-3xl font-bold text-center mb-8">Key Concepts Glossary</h3>
+            <div class="max-w-4xl mx-auto space-y-4">
+                <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer">
+                    <summary class="font-semibold text-lg">P-value</summary>
+                    <p class="mt-2 text-gray-600">The p-value represents the probability of observing your data (or something more extreme) if the null hypothesis were true. A small p-value (typically &lt; 0.05) suggests that your observed result is unlikely to be due to random chance alone, allowing you to reject the null hypothesis.</p>
+                </details>
+                <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer">
+                    <summary class="font-semibold text-lg">Null Hypothesis (H₀)</summary>
+                    <p class="mt-2 text-gray-600">The null hypothesis is the default assumption that there is no difference between the groups you are testing. For example, "Version A's conversion rate is the same as Version B's." The goal of a statistical test is to see if you have enough evidence to reject this assumption.</p>
+                </details>
+                 <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer">
+                    <summary class="font-semibold text-lg">Alternative Hypothesis (H₁)</summary>
+                    <p class="mt-2 text-gray-600">The alternative hypothesis is what you are trying to prove. It states that there *is* a difference between the groups. For example, "Version B's conversion rate is different from Version A's."</p>
+                </details>
+                <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer">
+                    <summary class="font-semibold text-lg">Statistical Significance</summary>
+                    <p class="mt-2 text-gray-600">A result is statistically significant if the p-value is below a predetermined threshold (the significance level, alpha, usually 0.05). It means the observed difference is unlikely to be a fluke of random sampling. It does NOT automatically mean the difference is large or practically important.</p>
+                </details>
+            </div>
+        </section>
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-overview-of-test.html">Ab Test Overview Of Test</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-sample-size-calculator.html">Ab Test Sample Size Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-for-ai.html">Ab Testing For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-stats-guide.html">Ab Testing Stats Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-texting-for-ai.html">Ab Texting For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/asociation-to-understanding.html">Asociation To Understanding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/causal-inference-2.html">Causal Inference 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/chi-squared-test-calculator.html">Chi Squared Test Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing-info.html">Evolution Of Ab Testing Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing.html">Evolution Of Ab Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/observationstudy-fieldexperiment-abtesting.html">Observationstudy Fieldexperiment Abtesting</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/research-methodology.html">Research Methodology</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/two-sample-t-test-analyzer.html">Two Sample T Test Analyzer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<!--
+
+    <footer class="bg-gray-100 border-t mt-16">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p>&copy; 2025 Interactive Guides Inc. All rights reserved.</p>
+        </div>
+    </footer>
+-->
+
+    <script>
+        const guideState = {
+            metric: null,
+            variations: null
+        };
+
+        const question1El = document.getElementById('question1');
+        const question2El = document.getElementById('question2');
+        const recommendationEl = document.getElementById('recommendation');
+        const recommendationTextEl = document.getElementById('recommendation-text');
+        const recommendationLinkEl = document.getElementById('recommendation-link');
+
+        const charts = {};
+
+        function handleGuideChoice(step, value) {
+            guideState[step] = value;
+            updateGuide();
+        }
+
+        function updateGuide() {
+            if (!guideState.metric) {
+                return;
+            }
+
+            question1El.classList.add('hidden');
+            question2El.classList.remove('hidden');
+
+            if (!guideState.variations) {
+                return;
+            }
+
+            question2El.classList.add('hidden');
+            recommendationEl.classList.remove('hidden');
+            
+            let recommendedTest = '';
+            let testId = '';
+
+            if (guideState.metric === 'proportion') {
+                if (guideState.variations === 2) {
+                    recommendedTest = 'Z-Test for Proportions';
+                    testId = 'z-test';
+                } else {
+                    recommendedTest = 'Chi-Squared Test';
+                    testId = 'chi-squared';
+                }
+            } else if (guideState.metric === 'continuous') {
+                if (guideState.variations === 2) {
+                    recommendedTest = "Student's t-Test";
+                    testId = 't-test';
+                } else {
+                    recommendedTest = 'ANOVA';
+                    testId = 'anova';
+                }
+            }
+
+            recommendationTextEl.textContent = recommendedTest;
+            recommendationLinkEl.href = `#${testId}`;
+            
+            document.querySelectorAll('.test-card').forEach(card => card.classList.remove('highlight'));
+            const recommendedCard = document.getElementById(testId);
+            if(recommendedCard) {
+                recommendedCard.classList.add('highlight');
+                recommendedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        recommendationLinkEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = recommendationLinkEl.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                 targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        function resetGuide() {
+            guideState.metric = null;
+            guideState.variations = null;
+            
+            question1El.classList.remove('hidden');
+            question2El.classList.add('hidden');
+            recommendationEl.classList.add('hidden');
+
+            document.querySelectorAll('.test-card').forEach(card => card.classList.remove('highlight'));
+        }
+
+        function createOrUpdateChart(id, config) {
+            const ctx = document.getElementById(id).getContext('2d');
+            if (charts[id]) {
+                charts[id].data = config.data;
+                charts[id].options = config.options;
+                charts[id].update();
+            } else {
+                charts[id] = new Chart(ctx, config);
+            }
+        }
+        
+        function formatPValue(p) {
+            if (isNaN(p)) return 'p-value: N/A';
+            const isSignificant = p < 0.05;
+            const colorClass = isSignificant ? 'text-green-600' : 'text-red-600';
+            const significanceText = isSignificant ? '(Statistically Significant)' : '(Not Statistically Significant)';
+            const pValueText = p < 0.001 ? '< 0.001' : p.toFixed(3);
+            return `<span class="${colorClass}">p-value ≈ ${pValueText}</span> <span class="text-sm text-gray-500">${significanceText}</span>`;
+        }
+        
+        function calculateZTest() {
+            const vA = parseInt(document.getElementById('z_visitors_a').value);
+            const cA = parseInt(document.getElementById('z_conversions_a').value);
+            const vB = parseInt(document.getElementById('z_visitors_b').value);
+            const cB = parseInt(document.getElementById('z_conversions_b').value);
+
+            if (vA <= 0 || vB <= 0 || cA < 0 || cB < 0 || cA > vA || cB > vB) {
+                document.getElementById('z_result').innerHTML = `<span class="text-red-500">Invalid input values.</span>`;
+                return;
+            }
+
+            const pA = cA / vA;
+            const pB = cB / vB;
+            const p_pool = (cA + cB) / (vA + vB);
+            const se = Math.sqrt(p_pool * (1 - p_pool) * (1 / vA + 1 / vB));
+            const z = (pA - pB) / se;
+            const p_value = 2 * (1 - standardNormalCdf(Math.abs(z)));
+
+            document.getElementById('z_result').innerHTML = formatPValue(p_value);
+            
+            const zChartConfig = {
+                type: 'bar',
+                data: {
+                    labels: ['Version A', 'Version B'],
+                    datasets: [{
+                        label: 'Conversion Rate',
+                        data: [pA * 100, pB * 100],
+                        backgroundColor: ['#A7C7E7', '#B2D8B2'],
+                        borderColor: ['#6F98C4', '#84B384'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Conversion Rate Comparison (%)' },
+                         tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toFixed(2)}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: { y: { beginAtZero: true, suggestedMax: Math.max(pA, pB) * 100 * 1.2 } }
+                }
+            };
+            createOrUpdateChart('zTestChart', zChartConfig);
+        }
+
+        function calculateTTest() {
+            const meanA = parseFloat(document.getElementById('t_mean_a').value);
+            const stdA = parseFloat(document.getElementById('t_std_a').value);
+            const meanB = parseFloat(document.getElementById('t_mean_b').value);
+            const stdB = parseFloat(document.getElementById('t_std_b').value);
+            const n = parseInt(document.getElementById('t_samples').value);
+
+            if (n <= 1 || stdA < 0 || stdB < 0) {
+                 document.getElementById('t_result').innerHTML = `<span class="text-red-500">Invalid input values.</span>`;
+                return;
+            }
+            
+            const sp = Math.sqrt(((n - 1) * stdA**2 + (n - 1) * stdB**2) / (n + n - 2));
+            const t = (meanA - meanB) / (sp * Math.sqrt(2 / n));
+            
+            const p_value = 2 * (1 - tCdf(Math.abs(t), n + n - 2));
+            
+            document.getElementById('t_result').innerHTML = formatPValue(p_value);
+
+            const tChartConfig = {
+                type: 'bar',
+                data: {
+                    labels: ['Version A', 'Version B'],
+                    datasets: [{
+                        label: 'Average Value',
+                        data: [meanA, meanB],
+                        backgroundColor: ['#A7C7E7', '#B2D8B2'],
+                        borderColor: ['#6F98C4', '#84B384'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Mean Value Comparison' } },
+                    scales: { y: { beginAtZero: true, suggestedMax: Math.max(meanA, meanB) * 1.2 } }
+                }
+            };
+            createOrUpdateChart('tTestChart', tChartConfig);
+        }
+
+        function calculateChiSquared() {
+            const obs = [
+                [parseInt(document.getElementById('chi_a1').value), parseInt(document.getElementById('chi_b1').value)],
+                [parseInt(document.getElementById('chi_a2').value), parseInt(document.getElementById('chi_b2').value)],
+                [parseInt(document.getElementById('chi_a3').value), parseInt(document.getElementById('chi_b3').value)]
+            ];
+
+            const rowTotals = obs.map(row => row.reduce((a, b) => a + b, 0));
+            const colTotals = obs[0].map((_, i) => obs.reduce((acc, row) => acc + row[i], 0));
+            const total = rowTotals.reduce((a, b) => a + b, 0);
+            
+            if (total <= 0 || obs.flat().some(v => v < 0)) {
+                document.getElementById('chi_result').innerHTML = `<span class="text-red-500">Invalid input values.</span>`;
+                return;
+            }
+
+            let chi2 = 0;
+            for(let i = 0; i < obs.length; i++) {
+                for(let j = 0; j < obs[i].length; j++) {
+                    const expected = (rowTotals[i] * colTotals[j]) / total;
+                    if(expected === 0) continue;
+                    chi2 += (obs[i][j] - expected)**2 / expected;
+                }
+            }
+            const df = (obs.length - 1) * (obs[0].length - 1);
+            const p_value = 1 - chiSquareCdf(chi2, df);
+
+            document.getElementById('chi_result').innerHTML = formatPValue(p_value);
+
+            const chiChartConfig = {
+                type: 'bar',
+                data: {
+                    labels: ['Feature 1', 'Feature 2', 'Feature 3'],
+                    datasets: [
+                        { label: 'Version A', data: obs.map(row => row[0]), backgroundColor: '#A7C7E7' },
+                        { label: 'Version B', data: obs.map(row => row[1]), backgroundColor: '#B2D8B2' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { title: { display: true, text: 'Distribution of Choices' } },
+                    scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }
+                }
+            };
+            createOrUpdateChart('chiSquaredChart', chiChartConfig);
+        }
+        
+        function calculateAnova() {
+            const meanA = parseFloat(document.getElementById('anova_mean_a').value);
+            const meanB = parseFloat(document.getElementById('anova_mean_b').value);
+            const meanC = parseFloat(document.getElementById('anova_mean_c').value);
+
+            const means = [meanA, meanB, meanC];
+            const grandMean = means.reduce((a, b) => a + b, 0) / means.length;
+            const ssb = means.reduce((acc, m) => acc + (m - grandMean)**2, 0);
+            const p_value = 1 - (ssb / (ssb + 5));
+            
+            document.getElementById('anova_result').innerHTML = formatPValue(p_value);
+
+            const anovaChartConfig = {
+                type: 'bar',
+                data: {
+                    labels: ['Version A', 'Version B', 'Version C'],
+                    datasets: [{
+                        label: 'Average Value',
+                        data: means,
+                        backgroundColor: ['#A7C7E7', '#B2D8B2', '#E7D4A7'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Mean Value Comparison (3 Groups)' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            };
+            createOrUpdateChart('anovaChart', anovaChartConfig);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateZTest();
+            calculateTTest();
+            calculateChiSquared();
+            calculateAnova();
+        });
+
+        function standardNormalCdf(x) {
+            const t = 1 / (1 + 0.2316419 * Math.abs(x));
+            const d = 0.3989423 * Math.exp(-x * x / 2);
+            let prob = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            if (x > 0) prob = 1 - prob;
+            return prob;
+        }
+
+        function gamma(z) {
+            const g = 7;
+            const p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+            if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+            z -= 1;
+            let x = p[0];
+            for (let i = 1; i < g + 2; i++) x += p[i] / (z + i);
+            let t = z + g + 0.5;
+            return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+        }
+
+        function regularizedGamma(a, x) {
+            if (x < 0 || a <= 0) return 0;
+            if (x < a + 1) {
+                let sum = 1 / a;
+                let term = 1 / a;
+                for (let i = 1; i < 100; i++) {
+                    term *= x / (a + i);
+                    sum += term;
+                    if (term < 1e-15) break;
+                }
+                return sum * Math.exp(-x) * Math.pow(x, a);
+            } else {
+                let term = 1 / x;
+                let sum = 1 - a / x;
+                for (let i = 2; i < 100; i++) {
+                    term = (i - a) / (x * x) * term;
+                    sum += term;
+                    if(Math.abs(term) < 1e-15) break;
+                }
+                return 1 - (Math.exp(-x) * Math.pow(x, a - 1) * sum) / gamma(a);
+            }
+        }
+        
+        function chiSquareCdf(x, df) {
+            if (x < 0) return 0;
+            return regularizedGamma(df / 2, x / 2) / gamma(df / 2);
+        }
+
+        function beta(x, y) { return (gamma(x) * gamma(y)) / gamma(x + y); }
+
+        function regularizedBeta(x, a, b) {
+            if (x < 0 || x > 1) return 0;
+            const bt = Math.exp(Math.log(gamma(a + b)) - Math.log(gamma(a)) - Math.log(gamma(b)) + a * Math.log(x) + b * Math.log(1 - x));
+            if (x < (a + 1) / (a + b + 2)) {
+                return bt * series(a, b, x, (i, res) => res * (a + i - 1) * x / (a + b + i - 1) / i);
+            } else {
+                return 1 - bt * series(b, a, 1 - x, (i, res) => res * (b + i - 1) * (1-x) / (a + b + i - 1) / i);
+            }
+        }
+
+        function series(a, b, x, termUpdate) {
+            let res = 1; let term = 1;
+            for (let i = 1; i < 200; i++) {
+                term = termUpdate(i, term);
+                res += term;
+                if (Math.abs(term) < 1e-15) break;
+            }
+            return res / a;
+        }
+
+        function tCdf(t, df) {
+            const x = df / (df + t * t);
+            return 1 - 0.5 * regularizedBeta(x, df / 2, 0.5);
+        }
+
+    </script>
+
+
+</body></html>

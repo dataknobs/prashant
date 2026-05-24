@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Data Mesh for Data Product Development with AI and Generative AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .nav-active {
+            color: #16a34a;
+            font-weight: 600;
+            border-left: 3px solid #16a34a;
+            background-color: #f0fdf4;
+        }
+        .nav-item {
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background-color: #f9fafb;
+            border-left: 3px solid #d1d5db;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Mermaid container styling */
+        .mermaid {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        /* Details/Summary styling */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Mobile Header -->
+    <div class="lg:hidden sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center shadow-sm">
+        <div class="font-bold text-lg text-slate-800 truncate">Data Mesh &amp; AI</div>
+        <button class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg" id="mobile-menu-btn">
+            <i data-lucide="menu"></i>
+        </button>
+    </div>
+
+    <div class="flex max-w-[1600px] mx-auto">
+        <!-- Sidebar Navigation -->
+        <aside class="fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:static lg:block w-72 bg-white border-r border-gray-200 h-screen overflow-y-auto z-40 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none" id="sidebar">
+            <div class="p-6">
+                <h2 class="text-xl font-bold tracking-tight text-slate-900 mb-6 flex items-center gap-2">
+                    <i class="text-brand-600" data-lucide="database"></i>
+                    Data Mesh Guide
+                </h2>
+                <nav class="space-y-1 text-sm font-medium text-slate-600" id="toc">
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item nav-active" href="#exec-summary">Executive Summary</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#principles">Core Principles</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#lifecycle">Products &amp; Lifecycle</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#roles">Roles &amp; Org Design</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#architecture">Architecture Patterns</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#governance">Governance &amp; Metadata</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#ai-integration">AI Integration Patterns</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#implementation">Implementation &amp; Roadmap</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#templates">Templates &amp; Checklists</a>
+                    <a class="block px-4 py-2.5 rounded-r-lg nav-item" href="#references">References</a>
+                </nav>
+            </div>
+            <!-- Close button for mobile -->
+            <button class="lg:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600" id="close-sidebar-btn">
+                <i data-lucide="x"></i>
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 px-4 sm:px-8 lg:px-16 py-8 lg:py-12 max-w-5xl overflow-hidden w-full">
+            
+            <!-- Hero / Exec Summary -->
+            <section class="mb-16 scroll-mt-24" id="exec-summary">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-sm font-medium mb-6">
+                    <i class="w-4 h-4" data-lucide="sparkles"></i> Strategic Report
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-8">
+                    Data Mesh for Data Product Development with AI and Generative AI
+                </h1>
+                
+                <div class="prose prose-lg text-slate-600 max-w-none">
+                    <p class="lead text-xl text-slate-700 font-medium mb-6">
+                        Data mesh is best understood as a sociotechnical paradigm that intentionally couples organizational design with a distributed data architecture to increase value from analytical data at scale.
+                    </p>
+                    <p class="mb-4">
+                        Zhamak Dehghani frames it as an approach optimizing both technical excellence and the experience of data providers, users, and owners. The “data product” is the atomic unit of the mesh: an autonomous, independently managed package that combines data with the code, metadata, policies, and infrastructure declarations needed to serve it reliably.
+                    </p>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm my-8">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <i class="text-brand-600" data-lucide="cpu"></i> How AI &amp; GenAI Amplify Data Products
+                        </h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-brand-100 p-1 rounded text-brand-700"><i class="w-4 h-4" data-lucide="zap"></i></div>
+                                <div><strong>Create faster:</strong> Generate pipeline scaffolds, transformations, documentation, tests, and contracts. Constrained by automated checks to avoid unsafe logic.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-brand-100 p-1 rounded text-brand-700"><i class="w-4 h-4" data-lucide="blocks"></i></div>
+                                <div><strong>Enhance products:</strong> Deliver new “AI-native” output ports (features for ML, embeddings for retrieval, model-ready datasets) enabling RAG-style experiences.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-brand-100 p-1 rounded text-brand-700"><i class="w-4 h-4" data-lucide="activity"></i></div>
+                                <div><strong>Operate effectively:</strong> Automated metadata enrichment, anomaly summarization, incident triage copilots, and policy drift detection.</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <p class="text-sm text-slate-500 italic border-l-4 border-gray-300 pl-4 py-1">
+                        Note: Recommendations regarding architecture, costs, and timelines are parameterized depending on industry, organizational scale, and cloud posture.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Definitions & Principles -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="principles">
+                <h2 class="text-3xl font-bold text-slate-900 mb-8">Definitions and Core Principles</h2>
+                <p class="text-lg text-slate-600 mb-8">
+                    Data mesh focuses on <strong>analytical data</strong> (historical, aggregated, OLAP-oriented) and recognizes the divide between operational and analytical planes. It aims to prevent the fragile architectures of complex centralized ETL pipelines.
+                </p>
+
+                <div class="grid sm:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="network"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">Domain Ownership</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Accountability for analytical data shifts to business domains closest to the data (source or main consumers), aligning business, technology, and analytical data to reduce centralized bottlenecks.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-4">
+                            <i class="w-6 h-6" data-lucide="package"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">Data as a Product</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Analytical data is shared directly with users. Must be discoverable, addressable, understandable, trustworthy, natively accessible, and secure. Encapsulated in an autonomous "data quantum".</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center mb-4">
+                            <i class="w-6 h-6" data-lucide="settings"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">Self-serve Data Platform</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Provides enabling services for domains to build, deploy, and maintain data products with reduced cognitive load. Surfaces an emergent knowledge graph and manages life cycles.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center mb-4">
+                            <i class="w-6 h-6" data-lucide="shield-check"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">Computational Governance</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Federated accountability structure relying on codifying and automating policies (security, privacy) for each product via platform services to counter decentralization risks.</p>
+                    </div>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-5 rounded-r-lg">
+                    <h4 class="text-red-800 font-bold mb-2 flex items-center gap-2">
+                        <i class="w-5 h-5" data-lucide="alert-triangle"></i> Anti-Pattern: The "Data Mess"
+                    </h4>
+                    <p class="text-red-700 text-sm">
+                        Adopting the vocabulary of decentralization without the platform and governance to support it leads directly to a "data mess". A lack of a proper playbook and central data teams becoming bottlenecks are the primary drivers for pipeline breakage and data validity issues.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Data Products & Lifecycle -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="lifecycle">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Data Products and Lifecycle</h2>
+                <p class="text-slate-600 mb-6">
+                    A data product is a building block of a data mesh. The best design method is to <strong>work backwards from concrete use cases</strong>, assign domain ownership, and define SLOs. If you cannot describe a data product concisely in one or two sentences, it’s likely not well-defined.
+                </p>
+
+                <div class="flex items-center gap-4 text-sm font-semibold text-slate-700 bg-slate-100 p-4 rounded-lg overflow-x-auto whitespace-nowrap mb-8">
+                    <span>Discover</span> <i class="w-4 h-4 text-slate-400" data-lucide="arrow-right"></i>
+                    <span>Design</span> <i class="w-4 h-4 text-slate-400" data-lucide="arrow-right"></i>
+                    <span>Build</span> <i class="w-4 h-4 text-slate-400" data-lucide="arrow-right"></i>
+                    <span>Publish</span> <i class="w-4 h-4 text-slate-400" data-lucide="arrow-right"></i>
+                    <span class="text-brand-600">Operate</span> <i class="w-4 h-4 text-slate-400" data-lucide="arrow-right"></i>
+                    <span>Evolve/Deprecate</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Where GenAI fits in the Lifecycle</h3>
+                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                    <table class="w-full text-left text-sm whitespace-nowrap lg:whitespace-normal">
+                        <thead class="bg-gray-50 text-slate-700 uppercase font-semibold">
+                            <tr>
+                                <th class="px-6 py-4 border-b">Lifecycle Stage</th>
+                                <th class="px-6 py-4 border-b">AI/GenAI Accelerators</th>
+                                <th class="px-6 py-4 border-b w-1/3">Key Risks &amp; Controls</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Discover &amp; Ideate</td>
+                                <td class="px-6 py-4 text-slate-600">LLM-driven discovery over catalog; summarization of needs</td>
+                                <td class="px-6 py-4 text-slate-600 text-xs">Hallucination → require grounding on metadata, human review. Prevent sensitive metadata leaks.</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors bg-slate-50/50">
+                                <td class="px-6 py-4 font-medium text-slate-900">Design</td>
+                                <td class="px-6 py-4 text-slate-600">Draft data contracts, propose SLOs, generate semantics</td>
+                                <td class="px-6 py-4 text-slate-600 text-xs">Incorrect clauses → gate via review + policy-as-code. Ensure SLOs are measurable.</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Build</td>
+                                <td class="px-6 py-4 text-slate-600">Generate transformation scaffolds, suggest tests/expectations</td>
+                                <td class="px-6 py-4 text-slate-600 text-xs">Unsafe code paths → CI security scanning, least-privilege, reproducible builds.</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors bg-slate-50/50">
+                                <td class="px-6 py-4 font-medium text-slate-900">Publish</td>
+                                <td class="px-6 py-4 text-slate-600">Auto-generate release notes, derive impact summaries</td>
+                                <td class="px-6 py-4 text-slate-600 text-xs">Wrong impact analysis → verify lineage completeness with OpenLineage events.</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Operate</td>
+                                <td class="px-6 py-4 text-slate-600">Ops copilot: anomaly explanation, ticket triage, drift detection</td>
+                                <td class="px-6 py-4 text-slate-600 text-xs">Prompt injection &amp; overreliance → sandbox tool access, implement OWASP controls.</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors bg-slate-50/50">
+                                <td class="px-6 py-4 font-medium text-slate-900">Evolve</td>
+                                <td class="px-6 py-4 text-slate-600">Generate migration SQL, crowd-test with synthetic consumers</td>
+                                <td class="px-6 py-4 text-slate-600 text-xs">Breaking changes → enforce contract versioning, backward compatibility checks.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Roles & Operating Model -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="roles">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Roles &amp; Operating Model</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-6">
+                        <div class="pl-4 border-l-4 border-brand-500">
+                            <h4 class="font-bold text-slate-900 mb-1">Domain Data Product Team</h4>
+                            <p class="text-sm text-slate-600">Owns the domain’s analytical data products end-to-end, including quality and lifecycle. Decentralizes ownership to business domains closest to the data.</p>
+                        </div>
+                        <div class="pl-4 border-l-4 border-brand-500">
+                            <h4 class="font-bold text-slate-900 mb-1">Data Product Owner</h4>
+                            <p class="text-sm text-slate-600">Accountable for SLOs, adoption, and consumer satisfaction. Treats consumers as customers.</p>
+                        </div>
+                        <div class="pl-4 border-l-4 border-blue-500">
+                            <h4 class="font-bold text-slate-900 mb-1">Self-serve Data Platform Team</h4>
+                            <p class="text-sm text-slate-600">Builds paved roads (templates, CI/CD, catalog integration) to reduce friction and total cost of decentralization.</p>
+                        </div>
+                        <div class="pl-4 border-l-4 border-purple-500">
+                            <h4 class="font-bold text-slate-900 mb-1">Federated Governance Group</h4>
+                            <p class="text-sm text-slate-600">Domain reps + platform + SMEs. Sets interoperability standards codified as policies.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-800 rounded-xl p-6 text-slate-200">
+                        <h3 class="text-lg font-bold text-white mb-4 border-b border-slate-600 pb-2">AI-Specific Role Extensions</h3>
+                        <ul class="space-y-4 text-sm">
+                            <li>
+                                <strong class="text-blue-300 block mb-1">ML/LLM Platform (MLOps/LLMOps) Team</strong>
+                                Owns shared AI platform components (model registry, pipelines, serving, evaluation harnesses) such as MLflow.
+                            </li>
+                            <li>
+                                <strong class="text-blue-300 block mb-1">AI Governance &amp; Risk</strong>
+                                Maps AI practices to risk controls (e.g., NIST AI RMF).
+                            </li>
+                            <li>
+                                <strong class="text-blue-300 block mb-1">Prompt/Agent Engineering &amp; Evaluation</strong>
+                                Disciplined practice of establishing success criteria and empirical evaluation methods before iterating.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Architecture Patterns -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="architecture">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Architecture &amp; Tech Stack</h2>
+                <p class="text-slate-600 mb-6">The platform comprises multi-planes: user-facing onboarding, control functions, data plane, and the newly critical AI plane.</p>
+                
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Reference Architecture</h3>
+                <div class="mermaid">
+                    flowchart TB
+                      subgraph Domains["Business domains (cross-functional teams)"]
+                        D1["Domain A team\n(owns Product A1, A2)"]
+                        D2["Domain B team\n(owns Product B1)"]
+                        D3["Domain C team\n(owns Product C1)"]
+                      end
+                      subgraph SSP["Self-serve data platform (paved roads)"]
+                        CI["CI/CD for data products\n(build, test, publish)"]
+                        Prov["Provisioning &amp; templates\n(IaC, pipelines)"]
+                        Catalog["Catalog / metadata"]
+                        Lineage["Lineage collection"]
+                        Policy["Policy enforcement"]
+                        Obs["Observability\n(SLOs/SLIs)"]
+                      end
+                      subgraph DataPlane["Data plane (storage + compute + serving)"]
+                        Lake["Lakehouse / warehouse storage"]
+                        Stream["Event streaming / CDC"]
+                        Compute["Batch + stream compute"]
+                        Query["Query federation"]
+                        APIs["Serving ports"]
+                      end
+                      subgraph AIPlane["AI/GenAI plane"]
+                        FS["Feature store"]
+                        Emb["Embedding pipeline + vector index"]
+                        Train["Training pipelines + eval"]
+                        Registry["Model registry"]
+                        Serve["Model/LLM serving"]
+                      end
+                      D1 --&gt; CI
+                      D2 --&gt; CI
+                      D3 --&gt; CI
+                      CI --&gt; Compute
+                      Prov --&gt; DataPlane
+                      Compute --&gt; Lake
+                      Stream --&gt; Lake
+                      Lake --&gt; Query
+                      Query --&gt; APIs
+                      Catalog --&gt; D1
+                      Catalog --&gt; D2
+                      Catalog --&gt; D3
+                      Lineage --&gt; Catalog
+                      Policy --&gt; APIs
+                      Obs --&gt; D1
+                      Obs --&gt; D2
+                      Obs --&gt; D3
+                      Lake --&gt; FS
+                      Lake --&gt; Emb
+                      FS --&gt; Train
+                      Emb --&gt; Serve
+                      Registry --&gt; Serve
+                      Train --&gt; Registry
+                </div>
+
+                <div class="mt-10 grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold text-slate-900 mb-3">Mesh Architecture Patterns</h4>
+                        <ul class="space-y-4 text-sm text-slate-600">
+                            <li class="bg-white border rounded p-3"><strong>Lakehouse-based:</strong> Open formats, multi-engine access, cost-efficient. Risk: Requires disciplined metadata/governance. (Iceberg/Delta)</li>
+                            <li class="bg-white border rounded p-3"><strong>Warehouse-centered:</strong> Fast BI/SQL. Risk: Centralizing schemas, bottlenecking platform.</li>
+                            <li class="bg-white border rounded p-3"><strong>Streaming-first:</strong> Real-time loops (Kafka). Risk: Streams alone rarely satisfy analytic product needs.</li>
+                            <li class="bg-white border rounded p-3"><strong>Federated query:</strong> Rapid integration across heterogeneous sources (Trino). Risk: Can become an integration crutch hiding poor design.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 mb-3">Open Table Formats</h4>
+                        <ul class="space-y-4 text-sm text-slate-600">
+                            <li class="flex flex-col border-l-2 border-brand-400 pl-3">
+                                <strong class="text-slate-900">Apache Iceberg</strong>
+                                Multi-engine interoperability; safe schema/partition evolution. Good default for multi-engine meshes.
+                            </li>
+                            <li class="flex flex-col border-l-2 border-brand-400 pl-3">
+                                <strong class="text-slate-900">Delta Lake</strong>
+                                ACID transactions, scalable metadata, unifies batch/stream. Strong for concurrency and reliability.
+                            </li>
+                            <li class="flex flex-col border-l-2 border-brand-400 pl-3">
+                                <strong class="text-slate-900">Apache Hudi</strong>
+                                Incremental processing (upserts/deletes). Ideal for domains needing record-level updates/CDC.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Governance, Metadata, Security -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="governance">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Governance &amp; Quality Backbone</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="col-span-1 md:col-span-2 prose prose-slate text-sm">
+                        <p><strong>Make it computational or it won’t scale.</strong> Governance must be codified into:</p>
+                        <ul>
+                            <li><strong>Data Contracts:</strong> Schema + semantics + SLOs + access model (e.g., ODCS standard).</li>
+                            <li><strong>Policy-as-code:</strong> Consistent evaluation at build/run time (e.g., Open Policy Agent/OPA).</li>
+                            <li><strong>Automated CI/CD checks.</strong></li>
+                        </ul>
+                        <p>Without metadata, a mesh is undiscoverable and unsafe. Solutions like <strong>DataHub</strong> or <strong>OpenMetadata</strong> provide the mesh-level discovery layer, while <strong>OpenLineage</strong> standardizes lineage collection.</p>
+                    </div>
+                    <div class="col-span-1 bg-amber-50 rounded-xl p-5 border border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                            <i class="w-4 h-4" data-lucide="shield"></i> Security &amp; Compliance
+                        </h4>
+                        <ul class="text-amber-800 text-xs space-y-2">
+                            <li><strong>Least Privilege:</strong> Central permissioning with domain publication.</li>
+                            <li><strong>AI Act (EU):</strong> Track requirements, enforce via policy-as-code.</li>
+                            <li><strong>GDPR/HIPAA:</strong> Enforce data masking, tokenization, and de-identification via paved roads.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Integration -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="ai-integration">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">AI/GenAI Integration Patterns</h2>
+                <p class="text-slate-600 mb-6">
+                    In a data mesh, treat AI capabilities as both <strong>consumers</strong> (needing features/labels) and <strong>producers</strong> (creating predictions, embeddings, synthetic data) of data products.
+                </p>
+
+                <h3 class="text-xl font-bold text-slate-900 mb-4 mt-10">RAG: Turning Products into "Knowledge Products"</h3>
+                <p class="text-sm text-slate-600 mb-4">A pragmatic integration translates data products into embedding pipelines and vector indices (e.g., pgvector, Milvus, FAISS) for GenAI applications.</p>
+                <div class="mermaid">
+                    flowchart LR
+                      subgraph Domain["Domain data products"]
+                        DP["Data Product: Policies/Procedures"]
+                        KP["Data Product: Knowledge Corpus"]
+                      end
+                      subgraph Indexing["Indexing pipeline (platform road)"]
+                        Clean["Clean &amp; normalize"]
+                        Chunk["Chunk + enrich metadata"]
+                        Embed["Embed (model vN)"]
+                        Store["Vector store / index"]
+                      end
+                      subgraph Runtime["Runtime (GenAI app)"]
+                        Query["User query"]
+                        Retrieve["Retriever (top-k)"]
+                        Context["Context pack"]
+                        LLM["LLM/GenAI model"]
+                        Answer["Answer + citations"]
+                      end
+                      DP --&gt; KP
+                      KP --&gt; Clean
+                      Clean --&gt; Chunk
+                      Chunk --&gt; Embed
+                      Embed --&gt; Store
+                      Query --&gt; Retrieve
+                      Retrieve --&gt; Store
+                      Retrieve --&gt; Context
+                      Context --&gt; LLM
+                      LLM --&gt; Answer
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+                    <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <i class="text-blue-500 mb-2" data-lucide="database"></i>
+                        <h4 class="font-bold text-sm mb-1">Feature Stores</h4>
+                        <p class="text-xs text-slate-500">Connect domain products to consistent online/offline features (e.g., Feast). Platform handles PIT correctness.</p>
+                    </div>
+                    <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <i class="text-green-500 mb-2" data-lucide="tags"></i>
+                        <h4 class="font-bold text-sm mb-1">Labels as Products</h4>
+                        <p class="text-xs text-slate-500">Treat labels and synthetic datasets (SDV, Label Studio) as governed products with lineage back to raw sources.</p>
+                    </div>
+                    <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <i class="text-purple-500 mb-2" data-lucide="terminal"></i>
+                        <h4 class="font-bold text-sm mb-1">Prompt Engineering</h4>
+                        <p class="text-xs text-slate-500">Treat prompts, tool access, and retrieval policies as versioned artifacts. Mitigate OWASP Top 10 risks (prompt injection).</p>
+                    </div>
+                    <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <i class="text-orange-500 mb-2" data-lucide="server"></i>
+                        <h4 class="font-bold text-sm mb-1">Model Serving</h4>
+                        <p class="text-xs text-slate-500">Serve models as products via KServe or Triton with runtime SLOs, lineage tracking, and controlled downstream access.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Roadmap & Implementation -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="implementation">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Implementation Roadmap</h2>
+                <p class="text-slate-600 mb-6">
+                    A practical roadmap builds the <strong>minimum viable mesh</strong> (platform + governance + first products), then scales by replication. Decentralization without the platform drastically increases costs.
+                </p>
+
+                <div class="mermaid overflow-hidden rounded-xl">
+                    gantt
+                      title Data Mesh + AI Roadmap (Illustrative)
+                      dateFormat YYYY-MM-DD
+                      axisFormat %b '%y
+                      
+                      section Foundation
+                      Domain mapping + charter           :a1, 2026-03-01, 40d
+                      Governance minimum standards       :a2, 2026-03-15, 40d
+                      
+                      section Platform MVP
+                      Paved road (CI/CD + catalog)       :b1, 2026-04-15, 70d
+                      Lineage + observability            :b2, 2026-05-01, 70d
+                      Security baseline                  :b3, 2026-04-15, 80d
+                      
+                      section First Products
+                      3-6 products in 1-2 domains        :c1, 2026-05-15, 90d
+                      Consumer onboarding                :c2, 2026-06-15, 80d
+                      
+                      section AI Enablement
+                      Feature store integration          :d1, 2026-07-01, 80d
+                      RAG/embedding pilot                :d2, 2026-08-01, 80d
+                      Model serving + registry           :d3, 2026-08-15, 90d
+                </div>
+
+                <div class="mt-10 overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <caption class="bg-slate-50 p-4 font-bold text-slate-700 text-left border-b">Estimated Effort (FTE-Months) Based on Scale</caption>
+                        <thead class="bg-white text-slate-700 font-semibold">
+                            <tr>
+                                <th class="px-6 py-4 border-b">Organization Profile</th>
+                                <th class="px-6 py-4 border-b">Platform MVP</th>
+                                <th class="px-6 py-4 border-b">First 3-6 Products</th>
+                                <th class="px-6 py-4 border-b">AI Enablement Pilot</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white text-slate-600">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-slate-900">Small <span class="text-xs font-normal text-slate-500 block">(2-4 domains, &lt;50 practitioners)</span></td>
+                                <td class="px-6 py-4 text-center text-slate-700">12 – 25</td>
+                                <td class="px-6 py-4 text-center text-slate-700">12 – 30</td>
+                                <td class="px-6 py-4 text-center text-slate-700">8 – 20</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 bg-slate-50/50">
+                                <td class="px-6 py-4 font-medium text-slate-900">Medium <span class="text-xs font-normal text-slate-500 block">(5-12 domains, 50-200 practitioners)</span></td>
+                                <td class="px-6 py-4 text-center font-semibold text-brand-600">25 – 60</td>
+                                <td class="px-6 py-4 text-center font-semibold text-brand-600">30 – 80</td>
+                                <td class="px-6 py-4 text-center font-semibold text-brand-600">20 – 50</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-slate-900">Large <span class="text-xs font-normal text-slate-500 block">(12+ domains, 200+ practitioners)</span></td>
+                                <td class="px-6 py-4 text-center text-slate-700">60 – 120</td>
+                                <td class="px-6 py-4 text-center text-slate-700">80 – 200</td>
+                                <td class="px-6 py-4 text-center text-slate-700">50 – 120</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Templates & Checklists -->
+            <section class="mb-16 scroll-mt-24 pt-8 border-t border-gray-200" id="templates">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Templates &amp; Checklists</h2>
+                
+                <details class="group bg-white border border-gray-200 rounded-xl mb-4 shadow-sm hover:shadow-md transition-all cursor-pointer">
+                    <summary class="flex items-center justify-between p-5 font-bold text-slate-800">
+                        <span class="flex items-center gap-2"><i class="text-brand-600" data-lucide="file-text"></i> Data Product Design Template</span>
+                        <i class="transition-transform group-open:rotate-180 text-slate-400" data-lucide="chevron-down"></i>
+                    </summary>
+                    <div class="p-5 pt-0 text-sm text-slate-600 border-t border-gray-100 mt-2 bg-slate-50 rounded-b-xl">
+                        <div class="grid md:grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">Identity &amp; Ownership</h4>
+                                <ul class="list-disc pl-5 space-y-1 mb-4">
+                                    <li>Product name and unique address (URI)</li>
+                                    <li>Owning domain, accountable owner(s), escalation path</li>
+                                    <li>Consumer personas and use cases (work backwards)</li>
+                                </ul>
+                                <h4 class="font-bold text-slate-800 mb-2">Contract</h4>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Inputs and output ports (SQL, APIs, streams)</li>
+                                    <li>Schema + semantics + glossary mapping</li>
+                                    <li>Change management policy (versioning)</li>
+                                    <li>Privacy/security classification &amp; access policy</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">SLOs &amp; Quality</h4>
+                                <ul class="list-disc pl-5 space-y-1 mb-4">
+                                    <li>Freshness, availability, completeness thresholds</li>
+                                    <li>Measurement mechanisms (catalog + dashboard)</li>
+                                    <li>Validation rules (e.g., Great Expectations)</li>
+                                    <li>Incident response runbook</li>
+                                </ul>
+                                <h4 class="font-bold text-slate-800 mb-2">Metadata &amp; Lineage</h4>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>Lineage instrumentation (OpenLineage events)</li>
+                                    <li>Required metadata fields (owner, description, samples)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="group bg-white border border-gray-200 rounded-xl mb-4 shadow-sm hover:shadow-md transition-all cursor-pointer">
+                    <summary class="flex items-center justify-between p-5 font-bold text-slate-800">
+                        <span class="flex items-center gap-2"><i class="text-brand-600" data-lucide="check-square"></i> AI Integration Checklist</span>
+                        <i class="transition-transform group-open:rotate-180 text-slate-400" data-lucide="chevron-down"></i>
+                    </summary>
+                    <div class="p-5 pt-0 text-sm text-slate-600 border-t border-gray-100 mt-2 bg-slate-50 rounded-b-xl">
+                        <ul class="space-y-3 mt-4">
+                            <li class="flex items-start gap-2">
+                                <i class="w-4 h-4 mt-0.5 text-blue-500" data-lucide="help-circle"></i>
+                                <span><strong>AI Purpose:</strong> Is product model input, output, feature, embedding, or evaluation artifact?</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="w-4 h-4 mt-0.5 text-blue-500" data-lucide="database"></i>
+                                <span><strong>Training Readiness:</strong> Datasheet exists. Privacy rules satisfied. PIT correctness checked.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="w-4 h-4 mt-0.5 text-blue-500" data-lucide="git-branch"></i>
+                                <span><strong>MLOps:</strong> CI/CD/CT pipeline defined. Model registry entry created. Model cards created.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="w-4 h-4 mt-0.5 text-blue-500" data-lucide="server"></i>
+                                <span><strong>Serving:</strong> Serving SLOs defined. Serving platform selected (KServe/Triton). Edge evaluated.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="w-4 h-4 mt-0.5 text-blue-500" data-lucide="cpu"></i>
+                                <span><strong>GenAI / RAG:</strong> Embedding pipeline versioned. Vector store selected. Prompt eval harness exists. OWASP controls active.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+            </section>
+            
+            <!-- References -->
+            <section class="mb-8 scroll-mt-24 pt-8 border-t border-gray-200" id="references">
+                <details class="group bg-slate-100 border border-slate-200 rounded-xl cursor-pointer">
+                    <summary class="flex items-center justify-between p-4 font-bold text-slate-700">
+                        <span class="flex items-center gap-2"><i data-lucide="link"></i> Source References &amp; Links</span>
+                        <i class="transition-transform group-open:rotate-180" data-lucide="chevron-down"></i>
+                    </summary>
+                    <div class="p-4 pt-0 text-xs text-slate-500 mt-2 bg-white rounded-b-xl max-h-96 overflow-y-auto font-mono leading-relaxed space-y-2">
+                        <p>[1,2,5,7,8,10,11,16,23,24,29,41,44,71,73,74] <a class="text-blue-500 hover:underline break-all" href="https://www.thoughtworks.com/content/dam/thoughtworks/documents/books/bk_data_mesh_excerpt.pdf" target="_blank">Thoughtworks Data Mesh Excerpt</a></p>
+                        <p>[3,62] <a class="text-blue-500 hover:underline break-all" href="https://developers.openai.com/api/docs/guides/prompting" target="_blank">OpenAI Prompting Guide</a></p>
+                        <p>[4,55] <a class="text-blue-500 hover:underline break-all" href="https://cloud.google.com/blog/products/application-development/five-best-practices-for-prompt-engineering" target="_blank">Google Cloud Prompt Engineering</a></p>
+                        <p>[6,81] <a class="text-blue-500 hover:underline break-all" href="https://docs.feast.dev/getting-started/components/offline-store" target="_blank">Feast Feature Store</a></p>
+                        <p>[9,22,28] <a class="text-blue-500 hover:underline break-all" href="https://martinfowler.com/articles/data-mesh-principles.html" target="_blank">Martin Fowler: Data Mesh Principles</a></p>
+                        <p>[12,70] <a class="text-blue-500 hover:underline break-all" href="https://raw.githubusercontent.com/skrinak/reinvent24/main/HelloFresh’s%20data%20journey_%20Insights%20from%20scaling%20to%201%20billion%20meals%20(SEG207)_20241219_161223.md" target="_blank">HelloFresh re:Invent Summary</a></p>
+                        <p>[13,31] <a class="text-blue-500 hover:underline break-all" href="https://medium.com/ssense-tech/ssense-data-mesh-going-from-vision-to-value-part-1-of-2-583bbae48e1a" target="_blank">SSENSE Data Mesh Journey</a></p>
+                        <p>[14,15,33] <a class="text-blue-500 hover:underline break-all" href="https://martinfowler.com/articles/designing-data-products.html" target="_blank">Martin Fowler: Designing Data Products</a></p>
+                        <p>[17,20,78] <a class="text-blue-500 hover:underline break-all" href="https://openlineage.io/" target="_blank">OpenLineage Home</a></p>
+                        <p>[18,38] <a class="text-blue-500 hover:underline break-all" href="https://bitol-io.github.io/open-data-contract-standard/v3.0.1/home/" target="_blank">Open Data Contract Standard (ODCS)</a></p>
+                        <p>[21,63,75,76] <a class="text-blue-500 hover:underline break-all" href="https://owasp.org/www-project-top-10-for-large-language-model-applications/" target="_blank">OWASP Top 10 for LLM Applications</a></p>
+                        <p>[26,51] <a class="text-blue-500 hover:underline break-all" href="https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10" target="_blank">NIST AI RMF</a></p>
+                        <p>[43,72] <a class="text-blue-500 hover:underline break-all" href="https://datahub.com/blog/enabling-data-discovery-in-a-data-mesh-the-saxo-journey/" target="_blank">Saxo Bank DataHub Journey</a></p>
+                        <p>[52,82] <a class="text-blue-500 hover:underline break-all" href="https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning" target="_blank">Google Cloud MLOps Arch</a></p>
+                        <p><em>(List truncated for UI clarity. Full URL references available in source data.)</em></p>
+                    </div>
+                </details>
+            </section>
+            
+            <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-ai-report.html">Data Mesh Ai Report</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-genai-interactive.html">Data Mesh Genai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-with-ai.html">Data Mesh With Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-with-genai.html">Data Mesh With Genai</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'base',
+            themeVariables: {
+                fontFamily: 'Inter, sans-serif',
+                primaryColor: '#f0fdf4',
+                primaryTextColor: '#14532d',
+                primaryBorderColor: '#22c55e',
+                lineColor: '#94a3b8',
+                secondaryColor: '#f1f5f9',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+
+        // Close sidebar on mobile when a link is clicked
+        const navLinks = sidebar.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) { // lg breakpoint in tailwind is 1024px
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
+        });
+
+        // Scroll Spy / Intersection Observer for Navigation Highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navItems = document.querySelectorAll('#toc a');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -60% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    
+                    navItems.forEach(item => {
+                        item.classList.remove('nav-active');
+                        item.classList.add('text-slate-600');
+                        if (item.getAttribute('href') === `#${id}`) {
+                            item.classList.add('nav-active');
+                            item.classList.remove('text-slate-600');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+
+</body></html>

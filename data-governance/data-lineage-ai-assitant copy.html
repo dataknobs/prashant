@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Indispensable Blueprint: Data Lineage for AI Assistants</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: "Calm Harmony" -->
+    <!-- Application Structure Plan: The SPA is designed as a top-down narrative dashboard, guiding the user from the "Why" (foundational importance) through the "How" (technical architecture like RAG), "What" (tools and regulations), and finally to the "Future" and "Strategic Takeaways". This thematic, scrolling structure is more engaging than the original report's linear chapters. It allows different personas (technical, business, compliance) to quickly navigate to relevant sections. Key interactions include a step-by-step RAG diagram to simplify complex architecture, a comparative radar chart (AI vs. BI) for impactful analysis, and interactive cards for exploring tools and regulations. This structure prioritizes user journey and comprehension over strict adherence to the source document's layout. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core concepts of lineage. Goal: Inform. Viz: Interactive cards with icons. Interaction: Hover effects. Justification: Digestible way to present definitions. Library: HTML/Tailwind.
+        - Report Info: RAG Architecture. Goal: Explain a process. Viz: Step-by-step interactive diagram. Interaction: Clicking steps reveals details. Justification: Simplifies a complex workflow into a manageable, interactive learning experience. Library: HTML/CSS/JS.
+        - Report Info: AI vs. BI Lineage comparison. Goal: Compare. Viz: Radar Chart. Interaction: Tooltips on hover. Justification: A radar chart provides a powerful visual for multi-dimensional comparison, more impactful than a table. Library: Chart.js.
+        - Report Info: Tooling landscape. Goal: Organize & Compare. Viz: Filterable interactive cards. Interaction: Clicking a card reveals details. Justification: Allows users to explore tools without being overwhelmed by a large table. Library: JS/Tailwind.
+        - Report Info: Regulatory compliance. Goal: Inform & Relate. Viz: Tabbed interface. Interaction: Clicking a regulation (e.g., GDPR) shows its connection to lineage. Justification: Connects abstract legal principles to concrete technical solutions effectively. Library: JS/Tailwind.
+        - Report Info: ROI of Lineage. Goal: Persuade. Viz: Bar Chart. Interaction: Tooltips. Justification: Visually separates and highlights different types of ROI (Hard vs. Soft) to strengthen the business case. Library: Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1f2937;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #3b82f6;
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .rag-step {
+            transition: all 0.3s ease-in-out;
+        }
+        .rag-step.active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm" id="header">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-blue-600">Data Lineage for AI</span>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a class="nav-link text-gray-600 hover:text-blue-600 font-medium" href="#why">Why It Matters</a>
+                    <a class="nav-link text-gray-600 hover:text-blue-600 font-medium" href="#how">How It Works</a>
+                    <a class="nav-link text-gray-600 hover:text-blue-600 font-medium" href="#tools">Tools</a>
+                    <a class="nav-link text-gray-600 hover:text-blue-600 font-medium" href="#governance">Governance</a>
+                    <a class="nav-link text-gray-600 hover:text-blue-600 font-medium" href="#future">Future</a>
+                    <a class="nav-link text-gray-600 hover:text-blue-600 font-medium" href="#strategy">Strategy</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section class="text-center py-16" id="hero">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-800 tracking-tight">The Indispensable Blueprint</h1>
+            <p class="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-gray-500">An interactive exploration of why data lineage is the foundational pillar for building trustworthy, compliant, and intelligent AI assistants.</p>
+        </section>
+
+        <section class="py-16 scroll-mt-20" id="why">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-800">Why Data Lineage is Critical for AI</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-500">In the AI era, data lineage transcends its traditional role. It's the core mechanism that enables transparency, trust, and control over complex intelligent systems. This section introduces the foundational concepts that every leader must understand.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-semibold text-lg text-gray-900">What is Data Lineage?</h3>
+                    <p class="mt-2 text-gray-600">It's the complete, auditable lifecycle of data—mapping its origin, transformations, and usage. For AI, it answers: "How did the AI arrive at this specific answer?"</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-semibold text-lg text-gray-900">Lineage vs. Provenance</h3>
+                    <p class="mt-2 text-gray-600">Lineage tracks the *path* and *transformations* (the "what" and "how"). Provenance covers the *origin* and *ownership* (the "who" and "why"). Both are vital for complete AI governance.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-semibold text-lg text-gray-900">The Need for Real-Time</h3>
+                    <p class="mt-2 text-gray-600">Unlike batch BI reports, AI assistants operate in a dynamic environment. Their lineage can't be a static map; it must be a living system, updated in near real-time to reflect constant change.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-slate-50 rounded-2xl scroll-mt-20" id="how">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-800">How It Works: Architectures for Intelligent AI</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-500">Understanding data lineage requires looking at the architectures that power modern AI. This section provides an interactive look at Retrieval-Augmented Generation (RAG), the key pattern for building fact-based assistants, and highlights the dramatic differences between AI and traditional BI lineage.</p>
+            </div>
+            
+            <div class="mb-16">
+                <h3 class="text-2xl font-semibold text-center text-gray-800 mb-2">The RAG Workflow: A Lineage Perspective</h3>
+                <p class="text-center text-gray-500 mb-8">Click each step to see why lineage is critical. This process grounds AI in facts, but without lineage, it's an untraceable black box.</p>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-start" id="rag-diagram">
+                    <!-- RAG Steps will be injected here by JS -->
+                </div>
+                <div class="mt-6 bg-white p-6 rounded-lg shadow-inner min-h-[100px] text-gray-700" id="rag-details">
+                    Select a step above to see details.
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-semibold text-center text-gray-800 mb-8">Lineage in AI vs. Traditional BI: A New Level of Complexity</h3>
+                <div class="chart-container">
+                    <canvas id="aiVsBiChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 scroll-mt-20" id="tools">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-800">The Modern Lineage Toolkit</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-500">No single tool can provide complete coverage. The future is a federated "lineage fabric" that weaves together open standards, cloud-native services, and commercial platforms. Explore some of the key players below.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="tools-container">
+                 <!-- Tools will be injected here by JS -->
+            </div>
+        </section>
+
+        <section class="py-16 bg-slate-50 rounded-2xl scroll-mt-20" id="governance">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-800">From Technical Practice to Governance Imperative</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-500">Data lineage is the foundation of trustworthy AI and the key to navigating a complex regulatory landscape. It provides the auditable proof needed to ensure fairness, explainability, and compliance.</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Meeting Regulatory Demands</h3>
+                     <p class="text-gray-600 mb-6">Laws like GDPR and the EU AI Act make lineage a legal necessity. Click each regulation to see how lineage provides the required capabilities.</p>
+                    <div id="compliance-tabs">
+                        <!-- Tabs and content injected by JS -->
+                    </div>
+                </div>
+                <div>
+                     <h3 class="text-2xl font-semibold text-gray-800 mb-4">Calculating the Return on Investment (ROI)</h3>
+                     <p class="text-gray-600 mb-6">The business case for lineage is built on both operational savings and strategic risk mitigation. This chart visualizes the key components of its value.</p>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-16 scroll-mt-20" id="future">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-800">Future Horizons: Autonomous &amp; Complex Data</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-500">The challenges and opportunities for data lineage are evolving as rapidly as AI itself. The future involves tackling highly complex data and building intelligent, self-governing systems.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                     <h3 class="font-semibold text-xl text-gray-900 mb-3">The Challenge of Complex Data</h3>
+                     <p class="text-gray-600">Lineage must evolve to track concepts within unstructured text, and map semantic relationships in multimodal data (image, audio, video). This requires a convergence with knowledge graph technologies to map meaning, not just data flow.</p>
+                </div>
+                 <div class="bg-white p-8 rounded-xl shadow-lg">
+                     <h3 class="font-semibold text-xl text-gray-900 mb-3">The Dawn of Agentic AI</h3>
+                     <p class="text-gray-600">The future is a multi-agent system where a "Data Lineage Agent" acts as the central nervous system. This enables revolutionary capabilities like self-healing data pipelines, where data issues are detected, diagnosed, and remediated autonomously in seconds.</p>
+                </div>
+            </div>
+        </section>
+
+         <section class="py-16 bg-blue-600 text-white rounded-2xl scroll-mt-20" id="strategy">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight">Strategic Recommendations for Leadership</h2>
+                 <p class="mt-2 max-w-2xl mx-auto text-lg text-blue-100">For C-level executives, translating technical understanding into a compelling business strategy is paramount. Here are five actionable recommendations to guide your organization.</p>
+            </div>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                 <div class="bg-blue-700/50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg">1. Elevate to a Strategic Priority</h4>
+                    <p class="mt-2 text-blue-200">Treat lineage not as a feature, but a C-level priority. Secure executive sponsorship and dedicated funding.</p>
+                 </div>
+                 <div class="bg-blue-700/50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg">2. Invest in a Federated Fabric</h4>
+                    <p class="mt-2 text-blue-200">Don't seek a single monolithic tool. Build a federated architecture based on an open standard like OpenLineage.</p>
+                 </div>
+                 <div class="bg-blue-700/50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg">3. Prioritize by Risk</h4>
+                    <p class="mt-2 text-blue-200">Roll out lineage with a risk-based approach, focusing first on high-risk AI systems under regulations like the EU AI Act.</p>
+                 </div>
+                 <div class="bg-blue-700/50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg">4. Redefine Your Data Team</h4>
+                    <p class="mt-2 text-blue-200">Upskill your teams from manual operators to strategic supervisors of autonomous, agentic data systems.</p>
+                 </div>
+                 <div class="bg-blue-700/50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg">5. Frame ROI Around Risk</h4>
+                    <p class="mt-2 text-blue-200">Lead the business case with strategic risk management. Lineage is the insurance policy against catastrophic AI failures.</p>
+                 </div>
+             </div>
+        </section>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-first-ai-security.html">Data First Ai Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-agentic-ai.html">Data Governance For Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai-info.html">Data Governance For Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-ai.html">Data Governance For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-governance-for-llm.html">Data Governance For Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant copy.html">Data Lineage Ai Assitant Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-ai-assitant.html">Data Lineage Ai Assitant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai-interactive.html">Data Lineage For Ai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-for-ai.html">Data Lineage For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info copy.html">Data Lineage Info Copy</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage-info.html">Data Lineage Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/data-lineage.html">Data Lineage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant-info.html">Privacy Ai Assistant Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-governance/privacy-ai-assistant.html">Privacy Ai Assistant</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const ragData = [
+                { id: 'query', title: '1. User Query', detail: 'The process starts with a user prompt. Lineage must capture this prompt as a first-class data asset, linking it to the entire downstream process for auditability.' },
+                { id: 'embedding', title: '2. Embedding', detail: 'The query is converted into a vector. Lineage must track the exact embedding model and version used, as this is critical for reproducibility. A different model version will produce a different result.' },
+                { id: 'retrieval', title: '3. Retrieval', detail: 'The system searches a vector database for relevant data chunks. Lineage provides the crucial link, citing the exact source documents retrieved to generate the answer and auditing access controls.' },
+                { id: 'augmentation', title: '4. Augmentation', detail: 'The retrieved data is combined with the original prompt. Lineage must record how this context was constructed, as it directly influences the final output.' },
+                { id: 'generation', title: '5. Generation', detail: 'The LLM synthesizes an answer from the augmented prompt. End-to-end lineage connects this final output back to the user query and all intermediate data sources, ensuring full explainability.' }
+            ];
+
+            const ragDiagram = document.getElementById('rag-diagram');
+            const ragDetails = document.getElementById('rag-details');
+            ragData.forEach((step, index) => {
+                const stepEl = document.createElement('div');
+                stepEl.className = 'rag-step bg-white p-4 rounded-lg shadow cursor-pointer border-2 border-transparent';
+                stepEl.innerHTML = `<h4 class="font-semibold text-center">${step.title}</h4>`;
+                stepEl.dataset.id = step.id;
+                ragDiagram.appendChild(stepEl);
+
+                stepEl.addEventListener('click', () => {
+                    ragDiagram.querySelectorAll('.rag-step').forEach(el => el.classList.remove('active'));
+                    stepEl.classList.add('active');
+                    const selectedData = ragData.find(d => d.id === step.id);
+                    ragDetails.innerText = selectedData.detail;
+                });
+            });
+
+            const toolsData = [
+                { name: 'OpenLineage', desc: 'An open standard and API for collecting lineage metadata, fostering an interoperable ecosystem.', type: 'standard' },
+                { name: 'Marquez', desc: 'The reference implementation of OpenLineage. A metadata server for collecting, storing, and visualizing lineage.', type: 'tool' },
+                { name: 'Egeria', desc: 'A comprehensive open metadata and governance platform for federating metadata across the enterprise.', type: 'platform' },
+                { name: 'Spline', desc: 'An automated lineage tracking tool with deep, native integration for Apache Spark workloads.', type: 'tool' },
+                { name: 'Databricks Unity Catalog', desc: 'A native, first-class lineage solution within the Databricks ecosystem, with APIs to import external lineage.', type: 'platform' },
+                { name: 'Microsoft Purview', desc: 'A unified data governance solution deeply integrated into the Azure cloud, with automated scanning.', type: 'platform' },
+                { name: 'AI for Lineage Parsing', desc: 'Using LLMs to parse complex or proprietary code (e.g., MQuery) to extract lineage where direct instrumentation fails.', type: 'technique' }
+            ];
+
+            const toolsContainer = document.getElementById('tools-container');
+            toolsData.forEach(tool => {
+                const toolCard = document.createElement('div');
+                toolCard.className = 'bg-white p-6 rounded-lg shadow hover:shadow-xl transition-shadow';
+                toolCard.innerHTML = `
+                    <h4 class="font-bold text-lg">${tool.name}</h4>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-blue-500">${tool.type}</span>
+                    <p class="mt-2 text-gray-600">${tool.desc}</p>
+                `;
+                toolsContainer.appendChild(toolCard);
+            });
+            
+            const complianceData = [
+                { id: 'gdpr', name: 'GDPR', summary: 'Requires a clear trail of Personally Identifiable Information (PII) to fulfill Data Subject Access Requests (DSARs).', detail: 'Data lineage provides the end-to-end map of PII flow, allowing organizations to instantly locate an individual\'s data across all systems, prove compliant handling, and fulfill access or deletion requests accurately.' },
+                { id: 'eu-ai-act', name: 'EU AI Act', summary: 'Imposes strict data governance, transparency, and oversight rules for high-risk AI systems.', detail: 'Lineage is indispensable for compliance. It verifies data quality for training (Art. 10), provides transparency for users (Art. 13) via citations, and enables effective human oversight (Art. 14) by explaining the data that influenced a decision.' },
+                { id: 'hipaa', name: 'HIPAA / BCBS 239', summary: 'Industry-specific rules for healthcare (HIPAA) and finance (BCBS 239) mandate data integrity and security.', detail: 'In both domains, data lineage is the key to demonstrating that sensitive data (patient health info, risk data) is being handled with the required accuracy, integrity, and security throughout its lifecycle, providing a crucial audit trail for regulators.' }
+
+            ];
+            
+            const complianceTabs = document.getElementById('compliance-tabs');
+            const tabButtons = document.createElement('div');
+            tabButtons.className = 'flex border-b mb-4';
+            const tabContent = document.createElement('div');
+            
+            complianceData.forEach((tab, index) => {
+                const button = document.createElement('button');
+                button.textContent = tab.name;
+                button.className = `py-2 px-4 font-medium text-gray-500 hover:text-blue-600 focus:outline-none ${index === 0 ? 'border-b-2 border-blue-600 text-blue-600' : ''}`;
+                button.dataset.tab = tab.id;
+                tabButtons.appendChild(button);
+
+                const content = document.createElement('div');
+                content.id = tab.id;
+                content.className = index === 0 ? '' : 'hidden';
+                content.innerHTML = `<h5 class="font-semibold text-gray-800">${tab.summary}</h5><p class="mt-2 text-gray-600">${tab.detail}</p>`;
+                tabContent.appendChild(content);
+
+                button.addEventListener('click', () => {
+                    tabButtons.querySelectorAll('button').forEach(btn => {
+                        btn.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+                        btn.classList.add('text-gray-500');
+                    });
+                    button.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+
+                    tabContent.querySelectorAll('div').forEach(div => div.classList.add('hidden'));
+                    tabContent.querySelector(`#${tab.id}`).classList.remove('hidden');
+                });
+            });
+
+            complianceTabs.append(tabButtons, tabContent);
+
+
+            const aiVsBiCtx = document.getElementById('aiVsBiChart').getContext('2d');
+            new Chart(aiVsBiCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Data Complexity', 'Processing Logic', 'Update Cadence', 'Governance Focus', 'Purpose'],
+                    datasets: [{
+                        label: 'Traditional BI',
+                        data: [3, 9, 3, 5, 6],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                    }, {
+                        label: 'Modern AI Assistant',
+                        data: [9, 3, 9, 9, 9],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        pointBackgroundColor: 'rgb(54, 162, 235)',
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: { font: { size: 12 }, color: '#4b5563' },
+                            ticks: { display: false, stepSize: 2 },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.r !== null) {
+                                        label += 'Score ' + context.parsed.r;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const roiCtx = document.getElementById('roiChart').getContext('2d');
+            new Chart(roiCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['"Hard" ROI (Quantifiable)', '"Soft" ROI (Strategic)'],
+                    datasets: [
+                        { label: 'Reduced Operational Costs', data: [80, 0], backgroundColor: '#60a5fa' },
+                        { label: 'Increased Productivity', data: [70, 0], backgroundColor: '#3b82f6' },
+                        { label: 'Risk & Fine Avoidance', data: [0, 95], backgroundColor: '#fca5a5' },
+                        { label: 'Increased Trust & Adoption', data: [0, 85], backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { display: false } },
+                        y: { stacked: true, grid: { display: false }, ticks: { font: { size: 14, weight: '500' }, color: '#374151' } }
+                    },
+                    plugins: {
+                        legend: { display: true, position: 'bottom' },
+                        title: { display: true, text: 'Components of Data Lineage ROI', font: { size: 16 } },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.formattedValue + '% Impact';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</body></html>

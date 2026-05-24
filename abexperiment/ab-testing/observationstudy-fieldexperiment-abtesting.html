@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Research Methodologies Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive decision hub. It starts with a high-level selection of core research methods (cards), which dynamically populates a detailed view with tabs (Overview, Pros/Cons, Use Cases, Implementation). This task-oriented flow allows users to focus on one method at a time. Below this, a dynamic Radar Chart provides direct visual comparison across key factors (Control, Cost, etc.), which users can customize via checkboxes. This is more effective than a static table for understanding trade-offs. Finally, an accordion section explains the decision criteria themselves, providing foundational knowledge. This layered structure guides the user from broad exploration to detailed analysis and finally to conceptual understanding, making complex information digestible and actionable. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core research methods (Observational Study, Field-Experiment, A/B Testing). Goal: Organize & Inform. Viz/Method: Interactive HTML cards. Interaction: Click to update detail view. Justification: Intuitive, focused navigation. Library: HTML/CSS/JS.
+        - Report Info: Detailed attributes of each method (pros, cons, use cases). Goal: Inform. Viz/Method: Tabbed content area. Interaction: Click tabs to switch content. Justification: Organizes dense information cleanly. Library: HTML/CSS/JS.
+        - Report Info: Comparison of methods across multiple factors (Control, Cost, Scalability, etc.). Goal: Compare. Viz/Method: Radar Chart. Interaction: Checkboxes to add/remove methods from the chart. Justification: Radar charts excel at showing multi-dimensional strengths and weaknesses in a single, comparable view. Library: Chart.js (Canvas).
+        - Report Info: Definitions of decision factors. Goal: Inform & Organize. Viz/Method: Accordion panels. Interaction: Click to expand/collapse. Justification: Prevents information overload, allows self-paced learning. Library: HTML/CSS/JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .method-card.active {
+            border-color: #0d9488; /* teal-600 */
+            box-shadow: 0 4px 14px 0 rgba(13, 148, 136, 0.2);
+            transform: translateY(-2px);
+        }
+        .detail-tab.active {
+            border-bottom-color: #0d9488; /* teal-600 */
+            color: #0f172a; /* slate-900 */
+            font-weight: 600;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .accordion-button.open + .accordion-content {
+            max-height: 500px;
+        }
+        .accordion-button .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-button.open .icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 mb-3">Research Methodology Navigator</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">An interactive guide to select the right research method for your product, feature, or hypothesis.</p>
+        </header>
+
+        <main>
+            <!-- Section 1: Interactive Method Selector -->
+            <section class="mb-12" id="method-selector">
+                <h2 class="text-2xl font-bold text-slate-800 text-center mb-2">1. Choose a Method to Explore</h2>
+                <p class="text-center text-slate-600 mb-8">Click on a card to see detailed information, use cases, and implementation steps.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="method-cards-container">
+                </div>
+            </section>
+
+            <!-- Section 2: Dynamic Detail Display -->
+            <section class="bg-white rounded-lg shadow-lg p-6 sm:p-8 mb-12 min-h-[400px]" id="method-details">
+                <div id="details-content-container">
+                </div>
+            </section>
+
+            <!-- Section 3: Comparison Matrix -->
+            <section class="mb-12" id="comparison-tool">
+                 <h2 class="text-2xl font-bold text-slate-800 text-center mb-2">2. Compare Methods Side-by-Side</h2>
+                 <p class="text-center text-slate-600 mb-8">Select which methods to compare on the interactive chart. This helps visualize the trade-offs between control, cost, scalability, and other key factors.</p>
+
+                <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="w-full md:w-1/3">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Select Methods to Compare:</h3>
+                            <div class="space-y-3" id="comparison-checkboxes">
+                            </div>
+                        </div>
+                        <div class="w-full md:w-2/3">
+                            <div class="chart-container">
+                                <canvas id="comparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 4: Decision Criteria -->
+            <section class="mb-12" id="decision-factors">
+                <h2 class="text-2xl font-bold text-slate-800 text-center mb-2">3. Understand Key Decision Factors</h2>
+                <p class="text-center text-slate-600 mb-8">The best method depends on your goals and constraints. Explore these factors to make an informed choice.</p>
+                <div class="space-y-4 max-w-4xl mx-auto" id="factors-accordion-container">
+                </div>
+            </section>
+
+            <!-- Section 5: Other Methods -->
+            <section id="other-methods">
+                 <h2 class="text-2xl font-bold text-slate-800 text-center mb-2">4. Explore Other Common Methods</h2>
+                 <p class="text-center text-slate-600 mb-8">Beyond the core methods, these are also valuable tools in a researcher's toolkit.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="other-methods-container">
+                </div>
+            </section>
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-overview-of-test.html">Ab Test Overview Of Test</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-sample-size-calculator.html">Ab Test Sample Size Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-for-ai.html">Ab Testing For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-stats-guide.html">Ab Testing Stats Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-texting-for-ai.html">Ab Texting For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/asociation-to-understanding.html">Asociation To Understanding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/causal-inference-2.html">Causal Inference 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/chi-squared-test-calculator.html">Chi Squared Test Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing-info.html">Evolution Of Ab Testing Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing.html">Evolution Of Ab Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/observationstudy-fieldexperiment-abtesting.html">Observationstudy Fieldexperiment Abtesting</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/research-methodology.html">Research Methodology</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/two-sample-t-test-analyzer.html">Two Sample T Test Analyzer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+        <!--
+        <footer class="text-center mt-16 py-6 border-t border-slate-200">
+            <p class="text-slate-500">Interactive Guide created by AI. For educational purposes.</p>
+        </footer>
+        -->
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const data = {
+            methods: {
+                "observational-study": {
+                    id: "observational-study",
+                    name: "Observational Study",
+                    icon: '&#128269;',
+                    tagline: "Understand user behavior in its natural context without intervention.",
+                    details: {
+                        overview: `
+                            <p class="mb-4">Observational studies involve watching users interact with a product or system in their natural environment without any interference from the researcher. The goal is to gain insights into existing behaviors, pain points, and usage patterns.</p>
+                            <p>This method is purely correlational; it can show you <strong>what</strong> users do, but not definitively <strong>why</strong> they do it or what would happen if you changed something. It's foundational for forming hypotheses.</p>
+                        `,
+                        prosCons: `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-semibold text-teal-700 mb-2">Pros</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>High ecological validity (real-world behavior).</li>
+                                        <li>Excellent for hypothesis generation.</li>
+                                        <li>Identifies unforeseen problems and use cases.</li>
+                                        <li>Relatively low cost to get started (e.g., analytics).</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-amber-700 mb-2">Cons</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Cannot determine causality (correlation ≠ causation).</li>
+                                        <li>Prone to observer bias if not done carefully.</li>
+                                        <li>Can be time-consuming to collect and analyze data.</li>
+                                        <li>Doesn't measure the impact of changes.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `,
+                        useCases: `
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Discovery Phase:</strong> Understanding how users currently solve a problem before designing a solution.</li>
+                                <li><strong>Feature Improvement:</strong> Observing how an existing feature is used to identify pain points and opportunities.</li>
+                                <li><strong>Market Research:</strong> Analyzing trends and behaviors in a target user group.</li>
+                                <li><strong>Validating Personas:</strong> Ensuring user personas accurately reflect real-world behavior.</li>
+                            </ul>
+                        `,
+                        implementation: `
+                            <ol class="list-decimal list-inside space-y-2">
+                                <li><strong>Define Goals:</strong> What specific behaviors or questions are you trying to understand?</li>
+                                <li><strong>Choose Method:</strong> Will you use analytics data, session recordings, or direct field observation?</li>
+                                <li><strong>Collect Data:</strong> Gather data over a statistically relevant period.</li>
+                                <li><strong>Analyze & Synthesize:</strong> Look for patterns, trends, and anomalies. Cluster findings into themes.</li>
+                                <li><strong>Formulate Hypotheses:</strong> Use insights to create testable hypotheses for experiments.</li>
+                            </ol>
+                        `
+                    },
+                    scores: { 'Control': 1, 'Causal Strength': 1, 'Ecological Validity': 5, 'Scalability': 4, 'Cost': 2, 'Time': 3 }
+                },
+                "field-experiment": {
+                    id: "field-experiment",
+                    name: "Field Experiment",
+                    icon: '&#127757;',
+                    tagline: "Test the causal impact of a change in a real-world setting.",
+                    details: {
+                        overview: `
+                            <p class="mb-4">A field experiment applies experimental principles (like randomization and control groups) to a real-world environment. Users are randomly assigned to different groups (e.g., one group sees a new feature, the other doesn't), but they are unaware they are in a study.</p>
+                            <p>This method bridges the gap between the lab and the real world, allowing you to measure the <strong>causal impact</strong> of a specific change while maintaining high ecological validity.</p>
+                        `,
+                        prosCons: `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-semibold text-teal-700 mb-2">Pros</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Strong causal inference (can say X caused Y).</li>
+                                        <li>High ecological validity as it's in a real context.</li>
+                                        <li>Results are more generalizable than lab experiments.</li>
+                                        <li>Users behave naturally, avoiding Hawthorne effect.</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-amber-700 mb-2">Cons</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Less control over extraneous variables than a lab.</li>
+                                        <li>Can be complex and costly to implement correctly.</li>
+                                        <li>Ethical considerations are important.</li>
+                                        <li>May require significant engineering effort.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `,
+                        useCases: `
+                             <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Testing New Features:</strong> Rolling out a feature to a small, random subset of users to measure its impact on key metrics before a full launch.</li>
+                                <li><strong>Price Elasticity:</strong> Offering different prices to different user groups to understand demand.</li>
+                                <li><strong>Marketing Campaigns:</strong> Testing the effectiveness of different messaging in a real market.</li>
+                                <li><strong>Algorithmic Changes:</strong> Evaluating a new recommendation algorithm's effect on user engagement.</li>
+                            </ul>
+                        `,
+                        implementation: `
+                           <ol class="list-decimal list-inside space-y-2">
+                                <li><strong>Define Hypothesis:</strong> State a clear, measurable hypothesis (e.g., "Changing the button color to green will increase clicks by 10%").</li>
+                                <li><strong>Randomize Subjects:</strong> Randomly assign users to a control group (no change) and one or more treatment groups.</li>
+                                <li><strong>Deploy Intervention:</strong> Implement the change for the treatment group(s).</li>
+                                <li><strong>Measure Outcomes:</strong> Collect data on key metrics for all groups over a defined period.</li>
+                                <li><strong>Analyze Results:</strong> Use statistical tests (e.g., t-test) to determine if the difference between groups is significant.</li>
+                            </ol>
+                        `
+                    },
+                    scores: { 'Control': 4, 'Causal Strength': 4, 'Ecological Validity': 5, 'Scalability': 3, 'Cost': 4, 'Time': 4 }
+                },
+                "ab-testing": {
+                    id: "ab-testing",
+                    name: "A/B Testing",
+                    icon: '&#128202;',
+                    tagline: "Directly compare two or more versions of a page or feature to see which performs better.",
+                    details: {
+                        overview: `
+                           <p class="mb-4">A/B testing (or split testing) is a type of randomized controlled experiment where two or more variants of a variable (web page, UI element, etc.) are shown to different segments of users simultaneously to determine which one leaves the maximum impact and drives business metrics.</p>
+                           <p>It's a highly controlled and widely used method in digital product development to make data-driven decisions about changes, from simple copy tweaks to complete redesigns. It is a specific, often highly automated, type of field experiment.</p>
+                        `,
+                        prosCons: `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-semibold text-teal-700 mb-2">Pros</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Very strong causal inference for specific changes.</li>
+                                        <li>Highly scalable with modern testing platforms.</li>
+                                        <li>Relatively low cost per test once a framework is in place.</li>
+                                        <li>Provides clear, quantitative results.</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-amber-700 mb-2">Cons</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Only measures short-term impact ("local maxima").</li>
+                                        <li>Requires significant traffic for statistical significance.</li>
+                                        <li>Can't explain the "why" behind user choices.</li>
+                                        <li>Only good for comparing small, incremental changes.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `,
+                        useCases: `
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Conversion Rate Optimization (CRO):</strong> Testing different headlines, button colors, or layouts on a landing page.</li>
+                                <li><strong>UI/UX Tweaks:</strong> Comparing different icons, labels, or navigation flows.</li>
+                                <li><strong>Email Marketing:</strong> Testing different subject lines or email content.</li>
+                                <li><strong>Onboarding Flows:</strong> Optimizing the steps in a new user's first experience to improve activation.</li>
+                            </ul>
+                        `,
+                        implementation: `
+                           <ol class="list-decimal list-inside space-y-2">
+                                <li><strong>Identify Goal & Hypothesis:</strong> E.g., "Change the 'Sign Up' button text to 'Get Started' will increase registrations."</li>
+                                <li><strong>Create Variations:</strong> Create version 'A' (control) and version 'B' (treatment).</li>
+                                <li><strong>Split Traffic:</strong> Randomly assign users to see either A or B. 50/50 is common.</li>
+                                <li><strong>Run Test & Collect Data:</strong> Run the test until you reach statistical significance (enough data to be confident in the results).</li>
+                                <li><strong>Analyze Results:</strong> Determine which version was the winner and if the result is statistically significant. Implement the winner.</li>
+                            </ol>
+                        `
+                    },
+                    scores: { 'Control': 5, 'Causal Strength': 5, 'Ecological Validity': 4, 'Scalability': 5, 'Cost': 3, 'Time': 2 }
+                }
+            },
+            factors: [
+                {
+                    name: "Causal Strength",
+                    description: "The ability to confidently state that a change in one variable (A) caused a change in another variable (B). High causal strength requires controlling for confounding factors. Experiments excel at this; observational studies do not."
+                },
+                {
+                    name: "Ecological Validity",
+                    description: "The extent to which research findings can be generalized to real-life settings. Studies conducted in a natural environment (like field experiments and observational studies) have high ecological validity. Lab experiments often have lower validity."
+                },
+                {
+                    name: "Control",
+                    description: "The degree to which the researcher can manage and isolate variables to ensure that only the independent variable is affecting the outcome. Lab experiments and A/B tests offer the highest control."
+                },
+                {
+                    name: "Scalability",
+                    description: "How easily the method can be applied to a large number of participants. Digital methods like A/B testing and analytics-based observational studies are highly scalable."
+                },
+                {
+                    name: "Cost",
+                    description: "The monetary and resource investment required. This includes tools, engineering time, and participant recruitment. A/B tests can have high setup costs but are cheap to run, while in-person studies can be expensive per participant."
+                },
+                {
+                    name: "Time",
+                    description: "The duration required to plan, execute, and analyze the research. A/B tests can be relatively quick, while longitudinal observational studies can take months or years."
+                },
+            ],
+            otherMethods: [
+                 {
+                    name: "Lab Experiment",
+                    description: "Conducted in a controlled, artificial setting. Offers maximum control over variables but lacks real-world context (low ecological validity). Best for isolating specific cognitive or usability issues."
+                },
+                {
+                    name: "Survey / Questionnaire",
+                    description: "Gathers self-reported data on attitudes, opinions, and beliefs from a large sample. It's scalable and cost-effective but relies on what people say, not what they do, and is prone to biases."
+                },
+                {
+                    name: "User Interview",
+                    description: "A qualitative method involving one-on-one conversations to gain deep insights into a user's motivations, needs, and pain points. Excellent for understanding the 'why' but not scalable or generalizable."
+                }
+            ]
+        };
+
+        const methodCardsContainer = document.getElementById('method-cards-container');
+        const detailsContentContainer = document.getElementById('details-content-container');
+        const comparisonCheckboxes = document.getElementById('comparison-checkboxes');
+        const factorsAccordionContainer = document.getElementById('factors-accordion-container');
+        const otherMethodsContainer = document.getElementById('other-methods-container');
+        let comparisonChart;
+        let activeMethodId = Object.keys(data.methods)[0];
+
+        function renderMethodCards() {
+            methodCardsContainer.innerHTML = '';
+            Object.values(data.methods).forEach(method => {
+                const card = document.createElement('div');
+                card.className = `method-card p-6 bg-white rounded-lg shadow-md cursor-pointer border-2 border-transparent transition-all duration-300 hover:shadow-xl hover:border-teal-500 ${method.id === activeMethodId ? 'active' : ''}`;
+                card.dataset.id = method.id;
+                card.innerHTML = `
+                    <div class="text-4xl mb-4">${method.icon}</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">${method.name}</h3>
+                    <p class="text-slate-600">${method.tagline}</p>
+                `;
+                card.addEventListener('click', () => {
+                    activeMethodId = method.id;
+                    renderMethodCards();
+                    renderDetails();
+                });
+                methodCardsContainer.appendChild(card);
+            });
+        }
+
+        function renderDetails(activeTab = 'overview') {
+            const method = data.methods[activeMethodId];
+            detailsContentContainer.innerHTML = `
+                <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
+                     <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-slate-800">${method.name}</h3>
+                        <p class="text-lg text-slate-500">${method.tagline}</p>
+                     </div>
+                </div>
+
+                <div class="border-b border-slate-200 mb-6">
+                    <nav class="flex space-x-4 sm:space-x-8 -mb-px">
+                        <button data-tab="overview" class="detail-tab py-3 px-1 border-b-2 font-medium text-sm sm:text-base text-slate-500 border-transparent hover:text-slate-700 hover:border-slate-300 whitespace-nowrap ${activeTab === 'overview' ? 'active' : ''}">Overview</button>
+                        <button data-tab="prosCons" class="detail-tab py-3 px-1 border-b-2 font-medium text-sm sm:text-base text-slate-500 border-transparent hover:text-slate-700 hover:border-slate-300 whitespace-nowrap ${activeTab === 'prosCons' ? 'active' : ''}">Pros & Cons</button>
+                        <button data-tab="useCases" class="detail-tab py-3 px-1 border-b-2 font-medium text-sm sm:text-base text-slate-500 border-transparent hover:text-slate-700 hover:border-slate-300 whitespace-nowrap ${activeTab === 'useCases' ? 'active' : ''}">Use Cases</button>
+                        <button data-tab="implementation" class="detail-tab py-3 px-1 border-b-2 font-medium text-sm sm:text-base text-slate-500 border-transparent hover:text-slate-700 hover:border-slate-300 whitespace-nowrap ${activeTab === 'implementation' ? 'active' : ''}">Implementation</button>
+                    </nav>
+                </div>
+
+                <div id="detail-content" class="prose max-w-none prose-slate">
+                    ${method.details[activeTab]}
+                </div>
+            `;
+
+            detailsContentContainer.querySelectorAll('.detail-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    renderDetails(tab.dataset.tab);
+                });
+            });
+        }
+        
+        function renderComparisonCheckboxes() {
+            comparisonCheckboxes.innerHTML = '';
+            Object.values(data.methods).forEach((method, index) => {
+                const checkboxContainer = document.createElement('div');
+                checkboxContainer.className = 'flex items-center';
+                const id = `compare-${method.id}`;
+                checkboxContainer.innerHTML = `
+                    <input id="${id}" type="checkbox" ${index < 3 ? 'checked' : ''} class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+                    <label for="${id}" class="ml-3 block text-sm font-medium text-gray-700">${method.name}</label>
+                `;
+                comparisonCheckboxes.appendChild(checkboxContainer);
+                checkboxContainer.querySelector('input').addEventListener('change', renderComparisonChart);
+            });
+        }
+
+        function renderComparisonChart() {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            const labels = Object.keys(data.methods['observational-study'].scores);
+            const selectedMethods = Array.from(comparisonCheckboxes.querySelectorAll('input:checked'))
+                .map(input => input.id.replace('compare-', ''));
+
+            const datasets = selectedMethods.map((methodId, index) => {
+                const method = data.methods[methodId];
+                const colors = [
+                    'rgba(13, 148, 136, 0.7)', // teal-600
+                    'rgba(217, 119, 6, 0.7)',  // amber-600
+                    'rgba(71, 85, 105, 0.7)'   // slate-600
+                ];
+                const borderColors = [
+                    'rgb(13, 148, 136)',
+                    'rgb(217, 119, 6)',
+                    'rgb(71, 85, 105)'
+                ];
+                return {
+                    label: method.name,
+                    data: Object.values(method.scores),
+                    backgroundColor: colors[index % colors.length].replace('0.7', '0.2'),
+                    borderColor: borderColors[index % borderColors.length],
+                    pointBackgroundColor: borderColors[index % borderColors.length],
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: borderColors[index % borderColors.length]
+                };
+            });
+
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+
+            comparisonChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels.map(label => label.replace(/([A-Z])/g, ' $1').trim()),
+                    datasets: datasets
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { 
+                                font: { size: 12, weight: '500' },
+                                color: '#334155' // slate-700
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 5,
+                                stepSize: 1,
+                                backdropColor: 'rgba(255, 255, 255, 0.75)',
+                                color: '#64748b' // slate-500
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#334155', // slate-700
+                                font: { weight: '500' }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.r !== null) {
+                                        label += context.parsed.r;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderFactors() {
+            factorsAccordionContainer.innerHTML = '';
+            data.factors.forEach(factor => {
+                const factorEl = document.createElement('div');
+                factorEl.className = 'bg-white rounded-lg shadow-sm border border-slate-200';
+                factorEl.innerHTML = `
+                    <h3>
+                        <button type="button" class="accordion-button flex w-full items-center justify-between p-4 sm:p-5 text-left font-semibold text-slate-800 hover:bg-slate-50">
+                            <span>${factor.name}</span>
+                            <span class="icon ml-6 flex-shrink-0 h-5 w-5 text-slate-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                            </span>
+                        </button>
+                    </h3>
+                    <div class="accordion-content">
+                        <div class="p-4 sm:p-5 border-t border-slate-200">
+                            <p class="text-slate-600">${factor.description}</p>
+                        </div>
+                    </div>
+                `;
+                factorsAccordionContainer.appendChild(factorEl);
+            });
+            
+            factorsAccordionContainer.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const isOpen = button.classList.contains('open');
+                    factorsAccordionContainer.querySelectorAll('.accordion-button').forEach(b => b.classList.remove('open'));
+                    if (!isOpen) {
+                        button.classList.add('open');
+                    }
+                });
+            });
+        }
+        
+        function renderOtherMethods() {
+            otherMethodsContainer.innerHTML = '';
+            data.otherMethods.forEach(method => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md p-6 border-2 border-transparent';
+                card.innerHTML = `
+                    <h3 class="font-bold text-slate-800 text-lg mb-2">${method.name}</h3>
+                    <p class="text-slate-600">${method.description}</p>
+                `;
+                otherMethodsContainer.appendChild(card);
+            });
+        }
+
+        function init() {
+            renderMethodCards();
+            renderDetails();
+            renderComparisonCheckboxes();
+            renderComparisonChart();
+            renderFactors();
+            renderOtherMethods();
+        }
+
+        init();
+    });
+    </script>
+
+
+</body></html>

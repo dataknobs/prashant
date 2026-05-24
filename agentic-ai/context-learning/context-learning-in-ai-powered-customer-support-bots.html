@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Context Learning in AI-Powered Customer Support Bots</title>
+    <style>
+        /* --- Base Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        h1, h2, h3 {
+            color: #003366;
+            margin-bottom: 0.5em;
+            margin-top: 1.5em;
+        }
+        h1 {
+            font-size: 2.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        h3 {
+            font-size: 1.3em;
+            color: #0056b3;
+        }
+        p, li {
+            margin-bottom: 1em;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 1em 0;
+        }
+        .example-box {
+            background-color: #e6f7ff;
+            border-left: 4px solid #0056b3;
+            padding: 15px;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+        .example-box p {
+            margin: 0;
+        }
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: "Courier New", Courier, monospace;
+            white-space: pre-wrap;
+            margin: 1em 0;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: sticky;
+            top: 0;
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        nav .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #0056b3;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        nav a:hover {
+            background-color: #e6f0ff;
+        }
+
+        /* --- Interactive Tabs --- */
+        .tab-container {
+            margin-top: 1.5em;
+        }
+        .tab-links {
+            display: flex;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab-link {
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            border-radius: 6px 6px 0 0;
+            margin-right: 5px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .tab-link:hover {
+            background-color: #ddd;
+        }
+        .tab-link.active {
+            background-color: #ffffff;
+            border-bottom: 2px solid #ffffff;
+            position: relative;
+            top: 2px;
+            color: #003366;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            background-color: #ffffff;
+            border-radius: 0 0 6px 6px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- Interactive Accordion --- */
+        .accordion-item {
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .accordion-title {
+            background-color: #f1f1f1;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #003366;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .accordion-title:hover {
+            background-color: #ddd;
+        }
+        .accordion-title::after {
+            content: '+';
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .accordion-title.active::after {
+            content: '−';
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 20px;
+            background-color: #ffffff;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .accordion-content-inner {
+            padding: 20px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <a href="#intro">Introduction</a>
+            <a href="#memory-types">Memory Types</a>
+            <a href="#best-practices">Best Practices</a>
+            <a href="#prompting">Prompting</a>
+            <a href="#integration">Integration</a>
+            <a href="#architectures">Architectures</a>
+            <a href="#multi-turn">Multi-Turn</a>
+            <a href="#tools">Tools</a>
+            <a href="#conclusion">Conclusion</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Context Learning in AI-Powered Customer Support Bots</h1>
+        </header>
+
+        <main>
+            <section id="intro">
+                <p>AI-powered customer support bots have revolutionized how businesses handle inquiries by maintaining context over multi-turn conversations. Effective use of <strong>context learning</strong> – the ability for a chatbot to “remember” and utilize past interactions – is crucial for providing coherent, personalized support.</p>
+                <p>This report explores best practices for conversation memory handling, techniques for short-term and long-term context retention, prompt engineering strategies, and integration of bots with knowledge bases or CRM systems. We also discuss architectural patterns for agent memory (e.g. windowed memory, retrieval-augmented generation, memory modules), how to handle multi-turn dialogues, and ways to manage evolving customer states. Notable tools, frameworks, and real-world case studies are highlighted to illustrate these concepts in practice.</p>
+            </section>
+
+            <hr/>
+
+            <section id="memory-types">
+                <h2>Short-Term vs. Long-Term Conversation Memory</h2>
+                
+                <div class="tab-container" id="memory-tabs">
+                    <div class="tab-links">
+                        <button class="tab-link active" data-tab="short-term">Short-Term Memory</button>
+                        <button class="tab-link" data-tab="long-term">Long-Term Memory</button>
+                    </div>
+
+                    <div class="tab-content active" id="short-term">
+                        <h3>Short-Term Memory</h3>
+                        <p><strong>Short-term memory</strong> refers to a bot’s ability to use recent dialogue context within the immediate session. Large Language Model (LLM) chatbots like GPT-4 or Claude maintain a context window of a fixed number of tokens (for example, a few thousand tokens) – within this window the conversation history is remembered verbatim. This “windowed memory” means the bot will incorporate the last N user and assistant messages when formulating a response. It allows continuity over several turns, enabling the bot to understand follow-up questions or pronouns referring to recent topics.</p>
+                        <div class="example-box">
+                            <p>For instance, an AI support agent can answer “Where is my order?” and then handle “Can I change the delivery address?” in the next turn by recalling the order details provided earlier.</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="long-term">
+                        <h3>Long-Term Memory</h3>
+                        <p><strong>Long-term memory</strong> goes beyond the immediate context window, preserving information across lengthy conversations or even between sessions. Because base LLMs don’t permanently store dialogue (they are stateless), implementing long-term context requires external strategies. Common approaches include:</p>
+                        <ul>
+                            <li><strong>Conversation Summarization:</strong> Periodically summarize older parts of the chat and feed the summary into the prompt once the full history can’t fit in the window. This condenses past context so the bot retains relevant facts (like customer preferences or case details) without exceeding token limits.</li>
+                            <li><strong>Episodic Memory via Knowledge Base:</strong> Store conversation transcripts or extracted facts in an external <strong>vector database</strong> or memory repository. When needed, retrieve the most relevant pieces and supply them to the model. This is a form of retrieval-augmented generation allowing the bot to remember interactions and maintain personalization over time. For example, a support bot might store that a customer’s last call was about “billing issue” and later proactively reference that context in a new query.</li>
+                            <li><strong>Persistent User Profiles:</strong> Keep key customer data (account status, past orders, etc.) in a CRM or profile store, which the chatbot can query to recall long-term information (e.g. “I see you contacted us last month about a refund”).</li>
+                            <li><strong>Memory Modules:</strong> Advanced implementations use dedicated memory networks or modules – components trained or designed to store and retrieve information separate from the main LLM. Examples include recurrent GPT architectures, external memory neural networks (like Attention mechanisms that read/write from a memory matrix), or plug-ins that provide the model with an extended memory beyond its context window.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1em;">By combining short-term and long-term memory techniques, support bots achieve both <strong>recency awareness</strong> (attending to the latest user input) and <strong>historical awareness</strong> (leveraging past interactions or known customer details). This leads to more coherent dialogues and a personalized experience even in complex, multi-turn support scenarios. Modern conversational AI is <strong>context-aware</strong> enough to remember prior interactions and provide continuity in responses, grasping context even if the user’s phrasing changes or contains errors.</p>
+            </section>
+
+            <hr/>
+
+            <section id="best-practices">
+                <h2>Best Practices for Conversation Memory Handling</h2>
+                <p>Designing a bot to manage conversation memory requires balancing the richness of context with efficiency and accuracy. Key best practices include:</p>
+                
+                <div class="accordion-container" id="practices-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-title">Limit and Refresh the Context Window</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>For short-term memory, decide how many recent turns to include. Too little context and the bot loses the thread; too much and you risk hitting token limits or irrelevant details. A common practice is a rolling <strong>windowed context</strong> of the last several messages. As the conversation grows, older turns are dropped or moved to long-term storage (e.g. summarized). This ensures the model always has the most pertinent recent information.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-title">Summarize or Truncate Older History</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Don’t blindly carry an ever-growing log of the entire conversation in each prompt. Instead, use techniques like <strong>summarization</strong> for older segments. For example, after 20 turns, summarize the first 15 turns into a concise paragraph and include that summary plus the last 5 turns going forward. The summary should preserve key facts (problem described, actions taken, resolutions or promises made). This <strong>compressed memory</strong> approach retains important context while keeping prompt size manageable.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Relevant Memory Retrieval</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>If using a vector store or knowledge base for memory, use the current user query to <strong>retrieve only the most relevant facts</strong> from past interactions or documentation. This is often implemented via embedding-based similarity search. By injecting only relevant memory snippets, the prompt stays focused. This technique is a cornerstone of <strong>Retrieval-Augmented Generation (RAG)</strong> – the bot augments the LLM with retrieved knowledge or conversation context on the fly, rather than relying purely on the model’s internal weights. It ensures the bot’s answers stay grounded in factual context (e.g. actual account data or product info) and reduces hallucinations.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Memory Validation</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>When retrieving past context, validate that it indeed pertains to the current query. Mismatched context can confuse the model. Some implementations include the conversation turn ID or topic tags with stored memory to filter retrievals by topic, preventing irrelevant old info from bleeding into the answer.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Erase or Reset Context when Appropriate</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>There are times to intentionally <strong>reset the memory</strong> – for instance, if the user starts a completely new issue or if a long gap occurs between sessions. Clear separation between sessions prevents unintended carry-over of context. Many systems implement a timeout or explicit user command (like “start over”) to flush memory.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Data Privacy in Memory</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Ensure that sensitive personal information fetched from CRM or memory is handled in compliance with privacy rules. For example, a bot should verify user identity (authentication) before retrieving account-specific context from a CRM. Also, avoid logging or exposing more history than necessary, especially if conversations include personal data.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 1em;">By following these practices, the bot maintains a useful working memory: enough context to be helpful and coherent, but not so much that it becomes error-prone or exceeds system limits.</p>
+            </section>
+
+            <hr/>
+
+            <section id="prompting">
+                <h2>Prompt Engineering Strategies for Context</h2>
+                <p><strong>Prompt engineering</strong> is crucial to guide LLM-based support agents in utilizing context effectively. Strategies include:</p>
+
+                <div class="tab-container" id="prompting-tabs">
+                    <div class="tab-links">
+                        <button class="tab-link active" data-tab="p-system">System Instructions</button>
+                        <button class="tab-link" data-tab="p-fewshot">Few-Shot Examples</button>
+                        <button class="tab-link" data-tab="p-tags">Placeholders/Tags</button>
+                        <button class="tab-link" data-tab="p-other">Other Strategies</button>
+                    </div>
+
+                    <div class="tab-content active" id="p-system">
+                        <h3>System and Role Instructions</h3>
+                        <p>Use the system prompt to establish how the bot should handle context. Clear instructions help the model know that referencing prior dialogue or external data is not just allowed but expected.</p>
+                        <div class="code-block">
+                            “You are a customer support assistant. Always consider the conversation history and the provided knowledge base snippets when answering.”
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="p-fewshot">
+                        <h3>Few-Shot Examples</h3>
+                        <p>To teach the model how to incorporate memory, one can include example dialogues in the prompt (if length allows). This demonstrates the pattern of using past context in a response.</p>
+                        <div class="code-block">
+                            User: "I need to return my product."<br/>
+                            Assistant: "Sure, I see we discussed your order (#12345) last week. Let me help with that return."
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="p-tags">
+                        <h3>Placeholder or Tags for Memory Insertion</h3>
+                        <p>Structure the prompt with dedicated sections. By segmenting the prompt or using delimiters (e.g. “Relevant info:” before inserting retrieved facts), you reduce confusion for the model. The model learns to draw information from those sections when formulating its answer.</p>
+                        <div class="code-block">
+                           &lt;Conversation History&gt; ... &lt;User’s latest question&gt; ... &lt;Knowledge Base Info&gt; ... &lt;Answer&gt;.
+                        </div>
+                        <p>For example, if the knowledge base snippet says “Premium members get 2-year warranty” and the user asks about warranty, the prompt can include that snippet labeled as such, increasing the chance the bot uses it.</p>
+                    </div>
+                    
+                    <div class="tab-content" id="p-other">
+                        <h3>Other Key Strategies</h3>
+                        <ul>
+                            <li><strong>Emphasize Important Context:</strong> If certain context must be strongly remembered (like an override or a critical detail), reassert it in the prompt. You might prepend a line in the system message: “The user’s account status is Gold Tier (do not ask again, this is confirmed).” This ensures essential context isn’t overlooked as the conversation grows.</li>
+                            <li><strong>Avoid Prompt Overload:</strong> While providing context is good, overloading the prompt with irrelevant history or excessive instructions can confuse the model (and waste tokens). Be judicious: include the <strong>most relevant pieces of context</strong> only. If the conversation veered off-topic and back, you might exclude the irrelevant detour from the prompt to keep it focused.</li>
+                            <li><strong>Dynamic Prompting:</strong> Adjust prompts dynamically based on conversation state. For example, if the conversation is in a delicate stage (customer upset, or complex multi-step issue), you might add a softer tone instruction or a summarizing statement of what’s been done so far ( “The issue remains unresolved after two fixes.” ) to keep the model on track. Prompt engineering thus isn’t one-time; it can adapt as context evolves.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1em;">Through careful prompt design, you <strong>steer the model</strong> to properly utilize conversation memory and external knowledge, producing answers that are contextually coherent and helpful. In essence, the prompt becomes the orchestrator that stitches together short-term memory, long-term knowledge, and the model’s own reasoning ability.</p>
+            </section>
+            
+            <hr/>
+
+            <section id="integration">
+                <h2>Integration with Knowledge Bases and CRM Systems</h2>
+                <p>One of the most powerful applications of context learning in support bots is tying the bot into existing <strong>knowledge bases (KB)</strong>, FAQs, and CRM databases. By doing so, the bot can pull in factual context – product details, customer records, policy documents – at runtime to augment its answers.</p>
+                <p>This <strong>integration of external knowledge</strong> typically works as follows:</p>
+                <ol>
+                    <li><strong>Retrieval:</strong> The user’s query is used to search the knowledge base or CRM. For example, if a customer asks, “What is my current order status?”, the bot’s system can query the order database for that customer’s latest order. Or if asked, “How do I reset my password?”, the bot searches the help center articles for “reset password”. This can use keyword search or vector similarity search on document embeddings.</li>
+                    <li><strong>Injecting Relevant Info:</strong> The most relevant snippets or data records are then inserted into the LLM’s prompt context. The bot essentially says to the model: “Here is some information that might help answer the question.” For instance, <code class="code-block" style="display:inline-block; padding: 5px 10px; margin: 0;">&lt;KB Article Excerpt&gt;: “To reset your password, click ‘Forgot Password’ on the login page and check your email for a reset link.”</code></li>
+                    <li><strong>Grounded Response Generation:</strong> The LLM uses this retrieved context to formulate its answer. It’s important that the bot be instructed to prioritize provided data. The result is a <strong>retrieval-augmented response</strong> that is both fluent and backed by actual reference text, achieving better accuracy. In practice, an NLP chatbot integrated with a comprehensive knowledge base can quickly provide accurate answers to user queries – the knowledge base content ensures factual correctness while the LLM provides natural language phrasing.</li>
+                </ol>
+
+                
+                <p><em>Example: A support chatbot retrieves information from a knowledge base. Here the user asks about pricing plans, and the bot’s answer is augmented by content from the “Pricing” page (right side) to provide accurate details.</em></p>
+
+                <h3>CRM Integration</h3>
+                <p>Integration with <strong>CRM systems</strong> works similarly. The bot can retrieve a user’s profile or past tickets to personalize support. For example, when a returning customer asks a question, the bot might look up the CRM and find that this customer had an open issue yesterday. It can then respond with awareness:</p>
+                <div class="example-box">
+                    <p>“Hi [Name], regarding the issue you reported yesterday (ticket #7890), I see the tech team is still working on it. Today you’re asking about a related matter – let me check that for you.”</p>
+                </div>
+                <p>This level of context usage greatly improves the customer experience.</p>
+                
+                <h3>Best Practices for KB/CRM Integration</h3>
+                
+                <div class="accordion-container" id="integration-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-title">Ensure Data Freshness</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>The bot’s answers are only as good as the data it retrieves. Keep the knowledge base up to date with the latest product info and ensure the bot queries the live data (or a frequently synchronized cache). For CRM, live integration is ideal so that order statuses, account changes, etc., are reflected in real-time.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Secure and Filtered Access</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Integrate securely via APIs. The bot should only retrieve data the user is authorized to know. For instance, if a user asks about their account balance, the bot should authenticate the user (perhaps through a prior login or by requesting verification) before pulling that from CRM. Also, filter the fields – e.g. do not accidentally expose internal notes or unnecessary personal data in the prompt. Using field-level controls or sanitized knowledge base excerpts is critical.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Handle Retrieval Failures Gracefully</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>If no relevant article or record is found, the bot should have a fallback. It might either ask a clarifying question or default to a polite response (or escalate to a human). The integration system could return a “no data” signal which the bot can detect and then say something like “I’m sorry, I don’t have that information. Let me connect you to a human agent.” rather than guessing.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Blend Retrieved Text with Reasoning</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Ideally, the bot should not just parrot a knowledge base article verbatim (which can sound robotic). Prompt engineering can be used so that the LLM <strong>summarizes or contextualizes</strong> the retrieved snippet in the answer. For example, rather than quoting a 5-step password reset instruction in full, the bot might summarize: “Sure! You can reset your password by clicking ‘Forgot Password’ on the login page. The system will then email you a link to create a new password. Just follow that link and choose a new password.” – the key info is conveyed in a conversational tone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1.5em;">Real-World Case Studies</h3>
+                <p>Real-world <strong>case studies</strong> show the effectiveness of this approach. For instance, Intercom’s Fin chatbot and similar support AI agents use GPT-4 combined with the company’s help center documents to resolve customer questions without human intervention. This kind of bot quickly pulls up relevant FAQ pages or policy texts and weaves them into answers. Salesforce’s Einstein GPT for CRM is another example – it integrates with the Salesforce CRM platform to generate responses that incorporate customer data, providing personalized answers and even drafting emails using CRM context. These systems demonstrate significantly improved resolution rates by leveraging enterprise knowledge stores.</p>
+                <p>In summary, integrating support bots with <strong>knowledge bases or CRM systems</strong> enables <strong>retrieval-augmented generation</strong>, where the bot’s responses are grounded in up-to-date external information. This yields accurate, context-rich assistance that feels tailored to the user’s situation, a key factor in successful customer support automation.</p>
+            </section>
+            
+            <hr/>
+
+            <section id="architectures">
+                <h2>Architectural Patterns for Agent Memory</h2>
+                <p>Developers have adopted several architectural patterns to implement memory in conversational agents. The main patterns include:</p>
+
+                <div class="tab-container" id="architecture-tabs">
+                    <div class="tab-links">
+                        <button class="tab-link active" data-tab="a-window">Windowed Memory</button>
+                        <button class="tab-link" data-tab="a-summary">Summarization</button>
+                        <button class="tab-link" data-tab="a-rag">KB + RAG</button>
+                        <button class="tab-link" data-tab="a-modules">Memory Modules</button>
+                        <button class="tab-link" data-tab="a-hybrid">Hybrid</button>
+                    </div>
+
+                    <div class="tab-content active" id="a-window">
+                        <h3>Windowed Memory (Sliding Context Window)</h3>
+                        <p>The simplest approach where the system always includes the last N user and assistant messages in the prompt. As new turns happen, older ones slide out. This keeps recent context verbatim. It is easy to implement (just string concatenation of recent chat history) and works well for keeping continuity over short spans. However, anything beyond the window is forgotten unless handled by another mechanism. Windowed memory alone is limited by the LLM’s context size (which, while growing – e.g. some models support 100k tokens – is still finite). It may also accumulate irrelevant context if the conversation drifts, so careful window sizing and cleaning (e.g. drop irrelevant older turns) are needed.</p>
+                    </div>
+
+                    <div class="tab-content" id="a-summary">
+                        <h3>Summarization Memory</h3>
+                        <p>In this pattern, the agent maintains a <strong>running summary</strong> of the dialogue. When the conversation becomes too long, older parts are distilled into a summary, which is then kept in the prompt (often at the top or as a system note) while the detailed exchange is pruned. Summarization can be recursive or ongoing – e.g., summarize every 10 turns, or use hierarchical summaries (summary of summaries). This acts as a <strong>compressed long-term memory</strong>. It preserves key information (like problem description, user preferences, decisions made) in natural language form. The model can refer to the summary as if it were a condensed conversation. The challenge is ensuring the summary captures all relevant details and is updated correctly as the context evolves. If done well, summarization memory greatly extends effective context length at the cost of some detail loss.</p>
+                    </div>
+
+                    <div class="tab-content" id="a-rag">
+                        <h3>Knowledge Base + RAG (Retrieval-Augmented Generation)</h3>
+                        <p>Here the agent offloads memory to an external <strong>knowledge base or vector store</strong>. Instead of trying to keep everything in the prompt, the agent indexes conversation content (or related documents) in a retrievable form. When needed, it fetches the top relevant pieces and inserts them into the prompt. This pattern treats the knowledge base as an extension of memory. It’s very scalable: an effectively unlimited amount of info can be stored, yet the prompt stays small because only a few relevant items are pulled in for each turn. As noted, this requires a good retrieval strategy (to find the correct pieces of info for a given query) and the ability to integrate those pieces into a cohesive answer. Many production systems use RAG as it allows bots to handle long dialogues or vast info by querying the right snippets instead of relying on the LLM alone.</p>
+                    </div>
+                    
+                    <div class="tab-content" id="a-modules">
+                        <h3>Memory Modules (Neural or Programmatic)</h3>
+                        <p>This pattern involves specialized components dedicated to memory. For example, a <strong>vector memory module</strong> might continuously update an embedding-based record of facts the user has mentioned (names, dates, preferences) and facts the assistant has provided. On each turn, a module could be called to return any relevant stored facts. Another example is using a <strong>neural memory network</strong>: a smaller neural net that is trained to read conversation context and store an internal state that the main model can query. In practical terms, memory modules could also be simple caches or databases that track conversation state variables (e.g., problem status = “pending resolution”). An <strong>agent architecture</strong> might separate the conversation handling and memory handling into distinct modules that communicate. This modular approach can be more complex but provides flexibility – each memory module can be tuned or scaled independently (for example, using a high-performance database for memory, or a domain-specific state machine for certain contexts).</p>
+                    </div>
+                    
+                    <div class="tab-content" id="a-hybrid">
+                        <h3>Hybrid Patterns</h3>
+                        <p>Often, real systems combine multiple patterns. A common architecture is to use a <strong>short-term window + long-term retrieval hybrid</strong>. The short-term window handles immediate context for coherence in phrasing, while a retrieval mechanism brings in older or external info as needed. Another combination is <strong>summaries stored in a knowledge base</strong> – e.g., after ending a support chat, the system might save a summary of it in a customer support log. Next time the customer comes, the bot retrieves that summary to quickly recall the past issue. This is effectively mixing summarization and retrieval strategies.</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1.5em;">Frameworks for Memory</h3>
+                <p><strong>Frameworks</strong> like <strong>LangChain</strong> provide built-in support for such memory patterns. LangChain, for instance, offers a <code>ConversationBufferMemory</code> (windowed memory), <code>ConversationSummaryMemory</code> (auto-summarizing memory), and <code>VectorStoreRetrieverMemory</code> (which uses a vector database to fetch relevant past sentences) as modular components. Similarly, <strong>LlamaIndex (GPT Index)</strong> allows creation of indices over conversation history so an LLM can query its own chat logs. Microsoft’s <strong>Semantic Kernel</strong> has a concept of semantic memory where you can store key–value or vector-based memories and later query them via prompt templates. These tools abstract a lot of the architectural complexity and implement best practices (like automatic summarization triggers or embedding management) for you.</p>
+                <p>In summary, there is no one-size-fits-all memory architecture – the choice depends on factors like conversation length, domain knowledge requirements, technical resources, and tolerance for error. Simpler windowed memory might suffice for brief FAQ chats, whereas a complex customer support scenario spanning multiple interactions and data sources will benefit from a combination of retrieval and specialized memory modules. The end goal is the same: enabling the chatbot to <strong>access the right information at the right time</strong> to maintain context and assist the customer effectively.</p>
+            </section>
+            
+            <hr/>
+
+            <section id="multi-turn">
+                <h2>Handling Multi-Turn Conversations and Evolving Customer States</h2>
+                <p>Multi-turn conversations – where a user and bot engage in a back-and-forth dialogue – demand careful context tracking and state management. Beyond just factual memory, the bot must manage the <strong>state of the conversation</strong>: what the user is trying to achieve, what has been done so far, and how the user’s emotional state or intent might be changing.</p>
+                <p>Here are strategies to handle these aspects:</p>
+
+                <div class="accordion-container" id="multiturn-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-title">Dialogue State Tracking</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>In complex support flows (like troubleshooting an issue or processing a return), the bot should keep track of the <strong>state</strong> or phase of the conversation. This can be as simple as setting flags (e.g., “user has provided account number”, “awaiting user to upload a photo”) or as formal as maintaining a slot-filling form. The state ensures the bot’s next response is appropriate – for example, not asking for the same information twice or skipping important steps. LLM-based bots can do implicit state tracking by summarizing what’s been accomplished (e.g., “The user has explained their problem and I have given one suggestion which did not work yet.”).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-title">Contextual Clarification and Memory Checks</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Over many turns, there’s risk of confusion. The bot should proactively clarify ambiguous references. If a user says “It still doesn’t work,” the bot should infer from context what “it” refers to (e.g., the Wi-Fi connection issue) or ask for clarification if uncertain. It can use memory: “You mean the solution I gave for your Wi-Fi issue still doesn’t work?”. Periodically, the bot can echo or confirm context: “So to recap, you’re trying to reset your router but you can’t find the reset button, correct?” – this ensures shared understanding, especially in long troubleshooting sessions.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Managing Topic Switches</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Customers might change topic mid-conversation (intentionally or unintentionally). A robust system can detect this (via intent detection or abrupt change in query) and handle it smoothly. If the new topic is unrelated, the bot might start a new context thread (and possibly summarize/close out the old topic if needed: “Sure, we can address that new question. Just to close the previous issue: your refund will be processed in 5 days. Now, regarding your new question…”). Some advanced designs treat each topic as a sub-conversation with its own memory context, allowing the bot to <strong>swap contexts</strong> when the subject changes.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Evolving Customer Emotion and Tone</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Customer support chats aren’t just about factual Q&amp;A – the user’s emotional state (frustration, confusion, relief) can evolve, and the bot should adapt its tone accordingly. For example, if a user grows frustrated after multiple unsuccessful attempts, the bot should recognize this change and respond with more empathy or offer to escalate to a human. Techniques include built-in <strong>sentiment analysis</strong> on user messages, which can tag the conversation with an emotion state. The prompt or system instructions can then adjust: <code class="code-block" style="display:inline-block; padding: 5px 10px; margin: 0;">if frustration_detected: adopt apologetic tone and offer reassurance</code>. Empathy and emotional context are a form of “state” as well – many bots have a <strong>persona management module</strong> ensuring the style matches the situation (calm and factual vs. friendly vs. apologetic).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-title">Recovering from Errors or Misunderstandings</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>In multi-turn dialogues, mistakes or misunderstandings can happen (e.g., the bot misinterprets a request). A best practice is to have <strong>graceful error recovery</strong> prompts. The bot might notice if the user says “That’s not what I meant” or if the conversation is looping. At that point, injecting a clarification step helps: “Apologies for the confusion. Could you clarify what you need regarding [topic]?”. Designing fallback flows for when the context handling breaks down is vital to avoid user frustration.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-title">Multi-Session Continuity</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>If applicable, consider whether the bot should remember context <strong>between sessions</strong> (with user consent and proper authentication). For instance, a customer might chat today and then come back next week. A truly context-aware support bot could recall the previous session (e.g., via a saved summary or CRM log) and greet the user with awareness: “Welcome back! Last time we spoke, you were setting up your new router. Are you needing help with that or something new today?”. Storing conversation summaries in CRM or ticket systems can enable this long-term continuity.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 1em;">By managing these aspects, AI support bots maintain not just factual context but conversational <strong>state awareness</strong>. They guide customers through multi-turn resolutions more effectively and adjust to the customer’s journey (both problem-solving progress and emotional journey). The result is a more human-like, responsive interaction where the user feels heard and helped at each step.</p>
+            </section>
+            
+            <hr/>
+
+            <section id="tools">
+                <h2>Tools, Frameworks, and Case Studies</h2>
+                <p>A variety of tools and frameworks have emerged to help implement context learning in support bots:</p>
+                
+                <div class="tab-container" id="tools-tabs">
+                    <div class="tab-links">
+                        <button class="tab-link active" data-tab="t-langchain">LangChain</button>
+                        <button class="tab-link" data-tab="t-llama">LlamaIndex</button>
+                        <button class="tab-link" data-tab="t-semantic">Semantic Kernel</button>
+                        <button class="tab-link" data-tab="t-vector">Vector DBs</button>
+                        <button class="tab-link" data-tab="t-openai">OpenAI Tools</button>
+                    </div>
+
+                    <div class="tab-content active" id="t-langchain">
+                        <h3>LangChain</h3>
+                        <p>A popular framework for developing LLM-powered applications, which provides out-of-the-box memory components (short-term buffer, summary, vectorstore memory) and easy integration with knowledge bases. LangChain’s memory abstractions simplify adding conversation history handling without needing to implement from scratch. For example, a developer can attach a <code>ConversationBufferWindowMemory</code> to keep the last N turns and a <code>VectorStoreMemory</code> to store older turns in a Pinecone or FAISS vector database for retrieval. LangChain also supports <strong>agent</strong> architectures where an LLM uses tools; one tool can be a search over a knowledge base, enabling retrieval-augmented answers.</p>
+                    </div>
+
+                    <div class="tab-content" id="t-llama">
+                        <h3>LlamaIndex (GPT Index)</h3>
+                        <p>This framework specializes in connecting LLMs with external data. It can index documents (like knowledge base articles or past chat logs) and provides query interfaces so that when a question comes in, relevant pieces of those documents are fed to the LLM. In a support bot scenario, you could index your entire FAQ and product manuals; when a user asks something, LlamaIndex retrieves the top relevant sections for the LLM to craft the answer. It effectively handles the RAG pattern for you.</p>
+                    </div>
+
+                    <div class="tab-content" id="t-semantic">
+                        <h3>Semantic Kernel (Microsoft)</h3>
+                        <p>An SDK that allows building complex AI agents with <strong>pluggable memory</strong> and skills. Semantic Kernel has a concept of semantic memory which can be backed by various stores (SQL DB, vector DB, etc.). It also supports orchestrating prompts with contexts. Microsoft has used similar technology in its own products (e.g. Copilot in Dynamics 365 customer service) to combine LLMs with business data.</p>
+                    </div>
+                    
+                    <div class="tab-content" id="t-vector">
+                        <h3>Pinecone, Weaviate, and Other Vector Databases</h3>
+                        <p>These are often used alongside the above frameworks to handle long-term memory. A vector DB allows you to store text embeddings and query by similarity, which is ideal for both knowledge base retrieval and conversation memory retrieval. Many enterprise bots use a vector DB to store every user query and answer, enabling them to later retrieve “similar” past Q&amp;A pairs if a question repeats, or to fetch relevant details mentioned earlier. This effectively gives the bot a form of <strong>episodic memory</strong>.</p>
+                    </div>
+                    
+                    <div class="tab-content" id="t-openai">
+                        <h3>OpenAI Functions / Tools</h3>
+                        <p>If using OpenAI’s API, one can leverage the function-calling capability to implement memory or knowledge retrieval. For example, define a function <code>lookup_customer_info(name)</code> that the model can call when needed; the function, implemented by the developer, hits the CRM and returns data which the model then incorporates into its reply. This pattern turns integration tasks into “tools” the model can decide to use.</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1.5em;">Case Studies</h3>
+                <ul>
+                    <li><strong>Intercom Fin:</strong> Intercom, a customer service platform, deployed an AI bot named Fin that can answer customer questions by looking up information in a company’s existing knowledge base. It uses OpenAI’s GPT-4 under the hood with retrieval augmentation. A reported outcome was that Fin was able to resolve a significant percentage of common queries instantly by providing users with answers sourced from help center articles – effectively deflecting those from human support. This showcases how <strong>effective context use (knowledge base integration + conversational memory)</strong> can handle a large volume of queries with high accuracy, since Fin always quotes or summarizes the company’s official docs (ensuring correctness and consistency).</li>
+                    <li><strong>Ada and Zendesk bots:</strong> Ada is a chatbot platform that integrates with CRMs and ticketing systems. It can recall a user’s previous tickets or whether the user is VIP, etc., to tailor responses. Similarly, Zendesk’s Answer Bot and Salesforce’s Einstein Bots utilize context by pulling data from the customer support platform (like the status of the user’s open tickets, or their entitlement level) and by maintaining conversation state through forms.</li>
+                    <li><strong>Microsoft’s Virtual Agent for Customer Service:</strong> Microsoft’s AI-powered support agent (part of Dynamics 365) employs adaptive cards and memory. It uses the <strong>Bot Framework</strong> and now integrates with the Azure OpenAI service. One notable feature is that it can seamlessly escalate to live agents with full context transfer – meaning the conversation memory (summary of chat and key extracted info) is handed over so the human agent immediately sees the context.</li>
+                </ul>
+                <p>In evaluating these tools and approaches, it’s clear that <strong>effective context learning is a multi-disciplinary effort</strong>: it involves good system design (what to remember or retrieve when), data engineering (setting up knowledge sources), and prompt/program logic (ensuring the LLM uses the context properly). Nonetheless, when done right, the payoff is a support chatbot that feels <strong>intelligent and attentive</strong>, seamlessly handling multi-turn inquiries and delivering accurate, personalized help.</p>
+            </section>
+            
+            <hr/>
+
+            <section id="conclusion">
+                <h2>Conclusion</h2>
+                <p>Context learning enables AI customer support bots to move beyond rote, one-shot interactions to truly conversational assistants that recall past details, understand follow-up questions, and adapt to the user’s situation. By employing a combination of short-term memory (sliding context windows) and long-term memory (summaries, knowledge base integration, vector-store recall), these bots maintain continuity and relevance even in extended dialogues. Prompt engineering strategies guide the AI to use available context effectively, while integration with enterprise knowledge bases and CRMs grounds the conversation in real data, boosting accuracy and usefulness.</p>
+                <p>Under the hood, different architectural patterns – from simple windowed memory to advanced memory modules – can be used to implement these capabilities, often aided by frameworks like LangChain or LlamaIndex. Crucially, handling multi-turn conversations also means tracking the state and emotional tone: the best bots not only solve the problem but do so in a way that is responsive to the customer’s journey, escalating or empathizing when needed.</p>
+                <p>Real-world applications and tools have demonstrated that when context learning is applied well, AI support bots can significantly reduce workload on human agents and increase customer satisfaction by providing fast, context-rich assistance around the clock.</p>
+                <p>In designing your own AI support agent, start with a clear plan for memory: decide what the bot should remember (and for how long), how it will fetch any external info, and how to keep the conversation focused and personalized. Leverage existing platforms and their best practices, but also keep the specific needs of your customer scenarios in mind – for instance, a bot in healthcare support might need to persist medical history context more carefully (and securely) than a bot doing retail order tracking. By thoughtfully combining these techniques, you can create a customer support chatbot that truly learns from context, delivering an experience that feels both smart and human-friendly in every conversation.</p>
+            </section>
+            
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/agentic-ai/context-learning/context-learning-in-ai-powered-customer-support-bots.html">Context Learning In Ai Powered Customer Support Bots</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/agentic-ai/context-learning/context-learning.html">Context Learning</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- Tab Functionality ---
+            function setupTabs(containerId) {
+                const tabContainer = document.getElementById(containerId);
+                if (!tabContainer) return;
+
+                const tabLinks = tabContainer.querySelectorAll('.tab-link');
+                const tabContents = tabContainer.querySelectorAll('.tab-content');
+
+                tabLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        const tabId = link.getAttribute('data-tab');
+
+                        // Deactivate all links and content
+                        tabLinks.forEach(item => item.classList.remove('active'));
+                        tabContents.forEach(item => item.classList.remove('active'));
+
+                        // Activate the clicked link and corresponding content
+                        link.classList.add('active');
+                        tabContainer.querySelector('#' + tabId).classList.add('active');
+                    });
+                });
+            }
+
+            // Initialize all tab groups
+            setupTabs('memory-tabs');
+            setupTabs('prompting-tabs');
+            setupTabs('architecture-tabs');
+            setupTabs('tools-tabs');
+
+            // --- Accordion Functionality ---
+            function setupAccordions(containerId) {
+                const accordionContainer = document.getElementById(containerId);
+                if (!accordionContainer) return;
+
+                const accordionTitles = accordionContainer.querySelectorAll('.accordion-title');
+
+                accordionTitles.forEach(title => {
+                    title.addEventListener('click', () => {
+                        const content = title.nextElementSibling;
+                        const isActive = title.classList.contains('active');
+
+                        // Toggle active class on the title
+                        title.classList.toggle('active');
+
+                        // Set max-height for smooth transition
+                        if (!isActive) {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                            content.style.paddingTop = '1px'; // Fix for margin collapse
+                        } else {
+                            content.style.maxHeight = '0';
+                            content.style.paddingTop = '0';
+                        }
+                    });
+                });
+            }
+
+            // Initialize all accordion groups
+            setupAccordions('practices-accordion');
+            setupAccordions('integration-accordion');
+            setupAccordions('multiturn-accordion');
+
+        });
+    </script>
+
+
+</body></html>

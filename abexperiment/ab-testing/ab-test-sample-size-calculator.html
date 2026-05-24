@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    
+    <!-- Meta Description & Keywords -->
+    <meta content="Interactive A/B Testing Sample Size Calculator. Visualize statistical power, significance, and minimum detectable effect (MDE) to plan accurate experiments with real-time hypothesis graphs." name="description"/>
+    <meta content="ab testing calculator, sample size formula, statistical significance, power analysis, conversion rate optimization, cro tools, hypothesis testing, z-test visualization" name="keywords"/>
+    
+    <title>A/B Testing Sample Size Calculator &amp; Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #FDFBF7; color: #1F2937; }
+        
+        /* Custom Range Input Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #2563EB;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #E5E7EB;
+            border-radius: 2px;
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .section-intro {
+            border-left: 4px solid #3B82F6;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (FDFBF7) background, Slate (1F2937) text, Royal Blue (2563EB) primary action, Teal/Amber for data visualization accents. -->
+    <!-- Application Structure Plan: 
+         1. Header: Clear title and purpose.
+         2. Educational Context: "The Parameters" - Interactive cards defining Alpha, Power, MDE, etc.
+         3. The Calculator Lab: A split-screen dashboard. Left side controls, Right side dynamic visualizations (Bell curves showing hypothesis overlap).
+         4. Trade-off Analysis: A chart showing Sample Size vs MDE cost.
+         5. Methodology: Explanation of the Z-test math.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Hypothesis Distributions (Chart.js Line): Shows Null vs. Alternative hypothesis bell curves. Fixed logic to use 'linear' x-axis for proper rendering.
+         2. Sensitivity Curve (Chart.js Line): X-axis MDE, Y-axis Sample Size.
+         3. Interactive Cards: Explanations of statistical terms.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Experiment Sample Size Calculator</h1>
+            <p class="mt-2 text-lg text-gray-600">Plan your A/B tests with statistical rigor. Calculate the required audience size to detect meaningful changes.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Section 1: Education / Parameters -->
+        <section>
+            <div class="section-intro">
+                <h2 class="text-2xl font-bold text-gray-900">1. Define Your Parameters</h2>
+                <p class="text-gray-600 mt-1 max-w-3xl">Before calculating, understand the levers of your experiment. Adjusting these values trades off between certainty, speed, and risk.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card: Baseline -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 card-hover transition duration-200">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="text-2xl">📊</span>
+                        <h3 class="font-semibold text-gray-900">Baseline Rate</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2">The current conversion rate of your control group.</p>
+                    <div class="text-xs bg-blue-50 text-blue-700 p-2 rounded">
+                        <strong>Why it matters:</strong> Events closer to 50% variance require smaller samples than rare events (e.g., 1%).
+                    </div>
+                </div>
+
+                <!-- Card: MDE -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 card-hover transition duration-200">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="text-2xl">🎯</span>
+                        <h3 class="font-semibold text-gray-900">MDE</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2">Minimum Detectable Effect. The smallest lift you care to find.</p>
+                    <div class="text-xs bg-amber-50 text-amber-700 p-2 rounded">
+                        <strong>Trade-off:</strong> Detecting tiny changes requires massive sample sizes.
+                    </div>
+                </div>
+
+                <!-- Card: Alpha -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 card-hover transition duration-200">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="text-2xl">🛡️</span>
+                        <h3 class="font-semibold text-gray-900">Significance (α)</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2">The risk of a "False Positive" (Type I error). Usually 5%.</p>
+                    <div class="text-xs bg-green-50 text-green-700 p-2 rounded">
+                        <strong>Standard:</strong> 95% Confidence Level means α = 0.05.
+                    </div>
+                </div>
+
+                <!-- Card: Power -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 card-hover transition duration-200">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="text-2xl">🔋</span>
+                        <h3 class="font-semibold text-gray-900">Power (1 - β)</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2">The probability of detecting a real effect (Type II error avoidance).</p>
+                    <div class="text-xs bg-purple-50 text-purple-700 p-2 rounded">
+                        <strong>Standard:</strong> 80% is the industry standard balance of effort vs. risk.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Calculator -->
+        <section class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="p-6 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-2xl font-bold text-gray-900">2. Sample Size Calculator</h2>
+                <p class="text-gray-600 text-sm">Adjust the inputs to see how sample size requirements change dynamically.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+                
+                <!-- Left: Controls -->
+                <div class="lg:col-span-4 p-6 space-y-8 border-r border-gray-200 bg-white">
+                    
+                    <!-- Input: Baseline -->
+                    <div>
+                        <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                            <span>Baseline Conversion Rate (%)</span>
+                            <span class="text-blue-600 font-bold" id="lbl-baseline">20%</span>
+                        </label>
+                        <input id="input-baseline" max="99" min="0.1" step="0.1" type="range" value="20"/>
+                        <input class="mt-2 w-full p-2 text-sm border border-gray-300 rounded" id="num-baseline" max="99" min="0.1" step="0.1" type="number" value="20"/>
+                    </div>
+
+                    <!-- Input: MDE -->
+                    <div>
+                        <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                            <span>Minimum Detectable Effect (Relative %)</span>
+                            <span class="text-blue-600 font-bold" id="lbl-mde">10%</span>
+                        </label>
+                        <input id="input-mde" max="50" min="0.5" step="0.5" type="range" value="10"/>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-400">Target Rate: <span id="val-target-rate">22.00%</span></span>
+                            <input class="w-24 p-2 text-sm border border-gray-300 rounded text-right" id="num-mde" max="100" min="0.5" step="0.5" type="number" value="10"/>
+                        </div>
+                    </div>
+
+                    <!-- Input: Power & Alpha -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 uppercase">Power (%)</label>
+                            <select class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border" id="input-power">
+                                <option selected="" value="0.80">80%</option>
+                                <option value="0.90">90%</option>
+                                <option value="0.95">95%</option>
+                                <option value="0.99">99%</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 uppercase">Confidence Level</label>
+                            <select class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border" id="input-confidence">
+                                <option value="0.90">90% (α=0.10)</option>
+                                <option selected="" value="0.95">95% (α=0.05)</option>
+                                <option value="0.99">99% (α=0.01)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Input: Sides -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 uppercase mb-2">Test Type</label>
+                        <div class="flex bg-gray-100 p-1 rounded-lg">
+                            <button class="flex-1 py-1.5 text-sm font-medium rounded-md shadow-sm bg-white text-gray-900" id="btn-two-sided">Two-Sided</button>
+                            <button class="flex-1 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-900" id="btn-one-sided">One-Sided</button>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2 italic" id="txt-sides">Testing if B is different from A (better or worse).</p>
+                    </div>
+
+                </div>
+
+                <!-- Right: Visuals & Results -->
+                <div class="lg:col-span-8 p-6 bg-gray-50 flex flex-col justify-between">
+                    
+                    <!-- Result Cards -->
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <div class="flex-1 bg-white p-5 rounded-lg border border-blue-100 shadow-sm text-center">
+                            <span class="block text-gray-500 text-sm font-medium uppercase tracking-wide">Sample Per Variant</span>
+                            <span class="block text-4xl font-extrabold text-blue-600 mt-2" id="res-sample-per-variant">1,203</span>
+                            <span class="block text-xs text-gray-400 mt-1">visitors</span>
+                        </div>
+                        <div class="flex-1 bg-white p-5 rounded-lg border border-gray-200 shadow-sm text-center">
+                            <span class="block text-gray-500 text-sm font-medium uppercase tracking-wide">Total Required</span>
+                            <span class="block text-4xl font-extrabold text-gray-800 mt-2" id="res-total-sample">2,406</span>
+                            <span class="block text-xs text-gray-400 mt-1">visitors (Control + Variant)</span>
+                        </div>
+                    </div>
+
+                    <!-- Chart: Visualizing the Hypothesis -->
+                    <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex-grow">
+                        <div class="mb-2">
+                            <h3 class="text-sm font-bold text-gray-700">Hypothesis Visualization (Standardized Z-Score)</h3>
+                            <p class="text-xs text-gray-500">Visualizing the overlap between the Null Hypothesis (A) and Alternative Hypothesis (B). As Sample Size increases (calculated above), these curves separate, reducing overlap errors.</p>
+                        </div>
+                        <div class="chart-container h-64">
+                            <canvas id="hypothesisChart"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Sensitivity Analysis -->
+        <section>
+            <div class="section-intro">
+                <h2 class="text-2xl font-bold text-gray-900">3. The Cost of Certainty</h2>
+                <p class="text-gray-600 mt-1">How does changing the Minimum Detectable Effect impact the required sample size? Notice the exponential growth as you try to detect smaller improvements.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow border border-gray-100">
+                <div class="chart-container">
+                    <canvas id="sensitivityChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Methodology Footer -->
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-overview-of-test.html">Ab Test Overview Of Test</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-sample-size-calculator.html">Ab Test Sample Size Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-for-ai.html">Ab Testing For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-stats-guide.html">Ab Testing Stats Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-texting-for-ai.html">Ab Texting For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/asociation-to-understanding.html">Asociation To Understanding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/causal-inference-2.html">Causal Inference 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/chi-squared-test-calculator.html">Chi Squared Test Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing-info.html">Evolution Of Ab Testing Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing.html">Evolution Of Ab Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/observationstudy-fieldexperiment-abtesting.html">Observationstudy Fieldexperiment Abtesting</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/research-methodology.html">Research Methodology</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/two-sample-t-test-analyzer.html">Two Sample T Test Analyzer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    </main>
+
+    <script>
+        // --- Logic & State Management ---
+
+        const state = {
+            baseline: 0.20, // 20%
+            mde: 0.10,      // 10% relative
+            power: 0.80,
+            confidence: 0.95,
+            sides: 2,       // 1 or 2
+        };
+
+        // DOM Elements
+        const els = {
+            rangeBaseline: document.getElementById('input-baseline'),
+            numBaseline: document.getElementById('num-baseline'),
+            lblBaseline: document.getElementById('lbl-baseline'),
+            
+            rangeMde: document.getElementById('input-mde'),
+            numMde: document.getElementById('num-mde'),
+            lblMde: document.getElementById('lbl-mde'),
+            valTargetRate: document.getElementById('val-target-rate'),
+            
+            selPower: document.getElementById('input-power'),
+            selConfidence: document.getElementById('input-confidence'),
+            
+            btnTwoSided: document.getElementById('btn-two-sided'),
+            btnOneSided: document.getElementById('btn-one-sided'),
+            txtSides: document.getElementById('txt-sides'),
+            
+            resPerVariant: document.getElementById('res-sample-per-variant'),
+            resTotal: document.getElementById('res-total-sample')
+        };
+
+        // --- Math Helpers ---
+
+        // Inverse Normal Distribution (Probit) approximation
+        // Source: Beasley-Springer-Moro Algorithm (Standard in JS stats)
+        function getZScore(p) {
+            const a1 =  -39.69683028665376;
+            const a2 =   220.9460984245205;
+            const a3 =  -275.9285104469687;
+            const a4 =   138.3577518672690;
+            const a5 =  -30.66479073740312;
+            const a6 =   2.506628277459239;
+
+            const b1 =  -54.47609879822406;
+            const b2 =   161.5858368580409;
+            const b3 =  -155.6989798598866;
+            const b4 =   66.80131188771972;
+            const b5 =  -13.28068155288572;
+
+            const c1 =  -0.007784894002430293;
+            const c2 =  -0.3223964580411365;
+            const c3 =  -2.400758277161838;
+            const c4 =  -2.549732539343734;
+            const c5 =   4.374664141464968;
+            const c6 =   2.938163982698783;
+
+            const d1 =   0.007784695709041462;
+            const d2 =   0.3224671290700398;
+            const d3 =   2.445134137142996;
+            const d4 =   3.754408661907416;
+
+            let q = Math.min(p, 1 - p);
+            let x_val = 0;
+
+            if (q > 0.02425) {
+                const r = Math.sqrt(-2 * Math.log(q));
+                x_val = (((((c1 * r + c2) * r + c3) * r + c4) * r + c5) * r + c6) /
+                        ((((d1 * r + d2) * r + d3) * r + d4) * r + 1);
+            } else {
+                const r = Math.sqrt(-2 * Math.log(q));
+                x_val = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) /
+                        (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1);
+            }
+
+            if (p < 0.5) return x_val;
+            return -x_val;
+        }
+
+        // Standard Normal PDF
+        function normalPDF(x, mean, stdDev) {
+            return (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
+        }
+
+        function calculateSampleSize() {
+            const p1 = state.baseline;
+            const delta = state.baseline * state.mde;
+            const p2 = p1 + delta;
+
+            const alpha = 1 - state.confidence;
+            const beta = 1 - state.power;
+
+            // Z scores
+            // For 2-sided: alpha/2. For 1-sided: alpha.
+            const zAlpha = Math.abs(getZScore(state.sides === 2 ? alpha / 2 : alpha));
+            const zBeta = Math.abs(getZScore(beta));
+
+            // Pooled variance isn't strictly used in the standard "design" formula often found in simple tools,
+            // but let's use the unpooled variance for Sample Size Formula (Evan Miller's approach or similar).
+            // n = (Zα*sqrt(2*p_bar*(1-p_bar)) + Zβ*sqrt(p1(1-p1) + p2(1-p2)))^2 / (p2-p1)^2
+            // Simplification: n = (Zα + Zβ)^2 * (p1(1-p1) + p2(1-p2)) / (p1 - p2)^2
+            
+            const sd1 = p1 * (1 - p1);
+            const sd2 = p2 * (1 - p2);
+            
+            const numerator = Math.pow(zAlpha + zBeta, 2) * (sd1 + sd2);
+            const denominator = Math.pow(p2 - p1, 2);
+            
+            const n = numerator / denominator;
+            
+            return Math.ceil(n);
+        }
+
+        // --- Chart Management ---
+
+        let hypChartInstance = null;
+        let sensChartInstance = null;
+
+        function initCharts() {
+            // Hypothesis Chart
+            const ctxHyp = document.getElementById('hypothesisChart').getContext('2d');
+            hypChartInstance = new Chart(ctxHyp, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Null Hypothesis (A)',
+                            borderColor: '#94A3B8', // Slate 400
+                            backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: true,
+                            data: [] // Will be {x, y}
+                        },
+                        {
+                            label: 'Alternative Hypothesis (B)',
+                            borderColor: '#2563EB', // Blue 600
+                            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: true,
+                            data: [] // Will be {x, y}
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 400 // Smooth out the transitions
+                    },
+                    scales: {
+                        x: { 
+                            type: 'linear', // CRITICAL FIX: Allows plotting numerical x-coordinates
+                            display: false 
+                        },
+                        y: { display: false }
+                    },
+                    plugins: {
+                        tooltip: { enabled: false },
+                        legend: { position: 'top' }
+                    },
+                    interaction: { mode: 'none' }
+                }
+            });
+
+            // Sensitivity Chart
+            const ctxSens = document.getElementById('sensitivityChart').getContext('2d');
+            sensChartInstance = new Chart(ctxSens, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Required Sample Size per Variation',
+                        borderColor: '#F59E0B', // Amber 500
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        data: []
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Minimum Detectable Effect (MDE %)' },
+                            grid: { display: false }
+                        },
+                        y: { 
+                            title: { display: true, text: 'Sample Size' },
+                            type: 'logarithmic', // Log scale because sample size explodes
+                            grid: { color: '#F3F4F6' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString() + ' visitors';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateHypothesisChart() {
+            // Plot distributions in Z-space (Standardized).
+            // Null H0 is centered at 0.
+            // Alt H1 is centered at Delta_Z = (Z_alpha + Z_beta).
+            
+            const alpha = 1 - state.confidence;
+            const beta = 1 - state.power;
+            const zAlpha = Math.abs(getZScore(state.sides === 2 ? alpha / 2 : alpha));
+            const zBeta = Math.abs(getZScore(beta));
+            
+            const separation = zAlpha + zBeta;
+            
+            // Generate curve points
+            // Range: -4 to separation + 4 ensures we see tails of both
+            const start = -4;
+            const end = separation + 4;
+            const steps = 100;
+            const stepSize = (end - start) / steps;
+            
+            const dataNull = [];
+            const dataAlt = [];
+            
+            for(let i=0; i<=steps; i++) {
+                const x = start + (i * stepSize);
+                dataNull.push({x: x, y: normalPDF(x, 0, 1)});
+                dataAlt.push({x: x, y: normalPDF(x, separation, 1)});
+            }
+            
+            hypChartInstance.data.datasets[0].data = dataNull;
+            hypChartInstance.data.datasets[1].data = dataAlt;
+            
+            // Adjust X axis range dynamically to keep curves centered/visible
+            hypChartInstance.options.scales.x.min = start;
+            hypChartInstance.options.scales.x.max = end;
+            
+            hypChartInstance.update();
+        }
+
+        function updateSensitivityChart() {
+            // Generate data points for MDE vs Sample Size
+            // Keep current Baseline, Power, Alpha constant. Change MDE.
+            
+            const dataPoints = [];
+            const labels = [];
+            
+            // MDEs from 1% to 20%
+            const mdeSteps = [1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30];
+            
+            const originalMDE = state.mde; // Store state
+            
+            mdeSteps.forEach(m => {
+                state.mde = m / 100;
+                const n = calculateSampleSize();
+                labels.push(m + '%');
+                dataPoints.push(n);
+            });
+            
+            state.mde = originalMDE; // Restore state
+            
+            sensChartInstance.data.labels = labels;
+            sensChartInstance.data.datasets[0].data = dataPoints;
+            sensChartInstance.update();
+        }
+
+        function updateUI() {
+            // Update labels
+            els.lblBaseline.innerText = (state.baseline * 100).toFixed(1) + '%';
+            els.lblMde.innerText = (state.mde * 100).toFixed(1) + '%';
+            
+            const target = state.baseline * (1 + state.mde);
+            els.valTargetRate.innerText = (target * 100).toFixed(2) + '%';
+            
+            // Calculate
+            const n = calculateSampleSize();
+            
+            // Check for NaN or Infinity (e.g. if Baseline is 0 or 100)
+            if(!isFinite(n) || n <= 0) {
+                els.resPerVariant.innerText = "-";
+                els.resTotal.innerText = "-";
+            } else {
+                els.resPerVariant.innerText = n.toLocaleString();
+                els.resTotal.innerText = (n * 2).toLocaleString();
+            }
+            
+            // Text updates
+            if (state.sides === 1) {
+                els.btnOneSided.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+                els.btnOneSided.classList.remove('text-gray-500');
+                els.btnTwoSided.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                els.btnTwoSided.classList.add('text-gray-500');
+                els.txtSides.innerText = "Only testing if B is BETTER than A. (Smaller sample, higher risk if B is actually worse).";
+            } else {
+                els.btnTwoSided.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+                els.btnTwoSided.classList.remove('text-gray-500');
+                els.btnOneSided.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                els.btnOneSided.classList.add('text-gray-500');
+                els.txtSides.innerText = "Testing if B is different from A (better OR worse). Standard scientific approach.";
+            }
+
+            // Sync Inputs
+            els.rangeBaseline.value = state.baseline * 100;
+            els.numBaseline.value = state.baseline * 100;
+            els.rangeMde.value = state.mde * 100;
+            els.numMde.value = state.mde * 100;
+            
+            // Update Charts
+            updateHypothesisChart();
+            updateSensitivityChart();
+        }
+
+        // --- Event Listeners ---
+
+        function setupListeners() {
+            // Baseline
+            const setBaseline = (val) => {
+                state.baseline = parseFloat(val) / 100;
+                updateUI();
+            };
+            els.rangeBaseline.addEventListener('input', (e) => setBaseline(e.target.value));
+            els.numBaseline.addEventListener('input', (e) => setBaseline(e.target.value));
+
+            // MDE
+            const setMde = (val) => {
+                state.mde = parseFloat(val) / 100;
+                updateUI();
+            };
+            els.rangeMde.addEventListener('input', (e) => setMde(e.target.value));
+            els.numMde.addEventListener('input', (e) => setMde(e.target.value));
+
+            // Power
+            els.selPower.addEventListener('change', (e) => {
+                state.power = parseFloat(e.target.value);
+                updateUI();
+            });
+
+            // Confidence
+            els.selConfidence.addEventListener('change', (e) => {
+                state.confidence = parseFloat(e.target.value);
+                updateUI();
+            });
+
+            // Sides
+            els.btnTwoSided.addEventListener('click', () => {
+                state.sides = 2;
+                updateUI();
+            });
+            els.btnOneSided.addEventListener('click', () => {
+                state.sides = 1;
+                updateUI();
+            });
+        }
+
+        // --- Init ---
+        
+        window.onload = function() {
+            initCharts();
+            setupListeners();
+            updateUI();
+        };
+
+    </script>
+
+</body></html>

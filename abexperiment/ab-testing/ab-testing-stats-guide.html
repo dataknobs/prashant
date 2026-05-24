@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Statistician's Guide to A/B Testing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: The infographic follows a narrative structure designed to guide the user from a high-level understanding to specific details. It starts with a hook (The Big Picture), presents key metrics (At a Glance), delves into the core statistical tests with visual comparisons (Test Deep Dive), illustrates the decision-making process (The A/B Test Workflow), and concludes with a forward-looking statement. This linear story-telling approach makes the complex topic of A/B testing statistics digestible for a broad audience. -->
+    <!-- Visualization & Content Choices: 1. Big Picture Stat (Conversion Uplift): Goal=Inform -> Viz=Single Big Number -> Justification=Immediately grabs attention with a key KPI. (HTML/CSS). 2. Key Metrics (Avg. Test Duration, etc.): Goal=Inform -> Viz=Icon + Number -> Justification=Provides quick, scannable insights into typical test parameters. (HTML/CSS + Unicode). 3. Test Comparison (Z-Test vs T-Test): Goal=Compare -> Viz=Bar Chart -> Justification=Directly compares the performance/suitability of tests for different data types (proportions vs means). (Chart.js/Canvas). 4. Multi-Variation Performance (ANOVA): Goal=Compare -> Viz=Doughnut Chart -> Justification=Shows the composition of winning variations when more than two are tested. (Chart.js/Canvas). 5. Categorical Choice Analysis (Chi-Squared): Goal=Compare -> Viz=Stacked Bar Chart -> Justification=Visualizes how user choices are distributed across different categories in two versions of a test. (Chart.js/Canvas). 6. Workflow: Goal=Organize -> Viz=Flow Chart -> Justification=Clearly outlines the step-by-step process of running a statistically sound A/B test. (Implemented with HTML/CSS with Tailwind, NO SVG/Mermaid). All visualizations use Chart.js on Canvas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .stat-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+                max-height: 350px;
+            }
+        }
+        .flow-step {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+        .flow-arrow {
+            font-size: 2.5rem;
+            color: #64748b;
+            transform: rotate(90deg);
+        }
+        @media (min-width: 768px) {
+           .flow-arrow {
+                transform: rotate(0deg);
+           }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center my-8 md:my-12">
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight" style="color: #073B4C;">The Statistician's Guide to A/B Testing</h1>
+            <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">From Hypothesis to Statistical Significance: A Visual Journey into Making Data-Driven Decisions with Confidence.</p>
+        </header>
+
+        <main class="space-y-16">
+
+            <section id="big-picture">
+                <div class="stat-card text-center p-8 md:p-12" style="background-color: #073B4C; color: white;">
+                    <p class="text-2xl font-medium tracking-wide uppercase" style="color: #FFD166;">Average Conversion Rate Uplift</p>
+                    <p class="text-7xl md:text-8xl font-extrabold my-2">12.7%</p>
+                    <p class="text-lg opacity-80">The average improvement seen in winning A/B test variations across e-commerce.</p>
+                </div>
+            </section>
+
+            <section id="at-a-glance">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                    <div class="stat-card text-center">
+                        <div class="text-5xl mb-2" style="color: #118AB2;">📊</div>
+                        <p class="text-3xl font-bold">95%</p>
+                        <p class="text-slate-500">Standard Confidence Level to Declare a Winner</p>
+                    </div>
+                    <div class="stat-card text-center">
+                        <div class="text-5xl mb-2" style="color: #06D6A0;">⏳</div>
+                        <p class="text-3xl font-bold">2-4 Weeks</p>
+                        <p class="text-slate-500">Typical Duration for a Reliable A/B Test</p>
+                    </div>
+                    <div class="stat-card text-center">
+                        <div class="text-5xl mb-2" style="color: #FFD166;">👥</div>
+                        <p class="text-3xl font-bold">1,000+</p>
+                        <p class="text-slate-500">Recommended Conversions Per Variation</p>
+                    </div>
+                    <div class="stat-card text-center">
+                        <div class="text-5xl mb-2" style="color: #FF6B6B;">📈</div>
+                        <p class="text-3xl font-bold">Z-Test</p>
+                        <p class="text-slate-500">Most Common Test for Conversion Rates</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-12" id="deep-dive">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold" style="color: #073B4C;">Test Deep Dive: Choosing Your Statistical Tool</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">The right test depends on your data. Here’s a breakdown of the most common statistical tests and what they're best for.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="stat-card">
+                        <h3 class="text-2xl font-bold mb-2" style="color: #118AB2;">Z-Test vs. T-Test</h3>
+                        <p class="text-slate-600 mb-4">These two tests are the workhorses of A/B testing, used to compare two variations. The main difference lies in the type of data you're analyzing. Z-Tests are for proportions (like conversion rates), while T-Tests are for continuous averages (like session duration).</p>
+                        <div class="chart-container">
+                            <canvas id="testComparisonChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3 class="text-2xl font-bold mb-2" style="color: #06D6A0;">Chi-Squared Test: Analyzing Choices</h3>
+                        <p class="text-slate-600 mb-4">When you want to see if there's a significant difference in how users are distributed across several categories (e.g., which plan they chose, which feature they used most), the Chi-Squared test is your tool. It compares the observed distribution to what you would expect by chance.</p>
+                        <div class="chart-container">
+                            <canvas id="chiSquaredChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="stat-card lg:col-span-2">
+                        <h3 class="text-2xl font-bold text-center mb-2" style="color: #FF6B6B;">ANOVA: Testing More Than Two Variations</h3>
+                        <p class="text-slate-600 text-center max-w-3xl mx-auto mb-4">Running an A/B/n test with three or more versions? Analysis of Variance (ANOVA) tells you if there's a statistically significant difference somewhere among the groups. It's a great way to test multiple ideas at once, but requires follow-up tests to find the specific winner.</p>
+                        <div class="chart-container max-w-sm">
+                            <canvas id="anovaChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="workflow">
+                 <div class="text-center mb-8">
+                    <h2 class="text-3xl md:text-4xl font-bold" style="color: #073B4C;">The A/B Test Workflow</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">A successful test is more than just code; it's a rigorous process from start to finish.</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0">
+                    <div class="flow-step" style="background-color: #E3F2FD; color: #118AB2;">1. Formulate Hypothesis</div>
+                    <div class="flow-arrow">➜</div>
+                    <div class="flow-step" style="background-color: #E0F8F0; color: #06D6A0;">2. Determine Sample Size</div>
+                    <div class="flow-arrow">➜</div>
+                    <div class="flow-step" style="background-color: #FFF6E0; color: #FFD166;">3. Run Experiment</div>
+                    <div class="flow-arrow">➜</div>
+                    <div class="flow-step" style="background-color: #FFE4E4; color: #FF6B6B;">4. Analyze Results</div>
+                </div>
+            </section>
+
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-overview-of-test.html">Ab Test Overview Of Test</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-test-sample-size-calculator.html">Ab Test Sample Size Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-for-ai.html">Ab Testing For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-testing-stats-guide.html">Ab Testing Stats Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/ab-texting-for-ai.html">Ab Texting For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/asociation-to-understanding.html">Asociation To Understanding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/causal-inference-2.html">Causal Inference 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/chi-squared-test-calculator.html">Chi Squared Test Calculator</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing-info.html">Evolution Of Ab Testing Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/evolution-of-ab-testing.html">Evolution Of Ab Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/observationstudy-fieldexperiment-abtesting.html">Observationstudy Fieldexperiment Abtesting</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/research-methodology.html">Research Methodology</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/abexperiment/ab-testing/two-sample-t-test-analyzer.html">Two Sample T Test Analyzer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+<!--
+        <footer class="text-center my-12 md:my-16 border-t pt-8">
+            <p class="text-2xl font-bold" style="color: #073B4C;">Ready to Test with Confidence?</p>
+            <p class="text-slate-500 mt-2">Use these principles to power your next experiment and turn data into decisions.</p>
+        </footer>
+-->
+
+    </div>
+
+    <script>
+        const wrapLabel = (label, maxWidth = 16) => {
+            if (label.length <= maxWidth) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > maxWidth) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine) {
+                lines.push(currentLine.trim());
+            }
+            return lines;
+        };
+        
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+        
+        const sharedChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 14 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#e2e8f0'
+                    },
+                    ticks: {
+                        font: { size: 12 }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { size: 12 }
+                    }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('testComparisonChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Conversion Rate (Proportions)', 'Avg. Time on Page (Means)'],
+                datasets: [{
+                    label: 'Recommended Test',
+                    data: [100, 100],
+                    backgroundColor: ['#118AB2', '#06D6A0'],
+                    barThickness: 50
+                }]
+            },
+            options: { ...sharedChartOptions,
+                plugins: {
+                     ...sharedChartOptions.plugins,
+                     tooltip: {
+                        ...sharedChartOptions.plugins.tooltip,
+                        callbacks: {
+                           ...sharedChartOptions.plugins.tooltip.callbacks,
+                            label: (context) => {
+                                return context.dataIndex === 0 ? 'Use Z-Test' : 'Use T-Test';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ...sharedChartOptions.scales.y,
+                        ticks: {
+                            callback: (value) => ''
+                        }
+                    },
+                    x: {
+                         ...sharedChartOptions.scales.x,
+                         ticks: {
+                            ...sharedChartOptions.scales.x.ticks,
+                            font: { size: 14, weight: 'bold' }
+                         }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('chiSquaredChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Free Plan', 'Pro Plan', 'Enterprise Plan'],
+                datasets: [{
+                    label: 'Version A (Old Pricing)',
+                    data: [120, 50, 10],
+                    backgroundColor: '#FFD166',
+                }, {
+                    label: 'Version B (New Pricing)',
+                    data: [90, 80, 20],
+                    backgroundColor: '#FF6B6B',
+                }]
+            },
+            options: {
+                ...sharedChartOptions,
+                scales: {
+                    x: { ...sharedChartOptions.scales.x, stacked: true },
+                    y: { ...sharedChartOptions.scales.y, stacked: true, ticks: { ...sharedChartOptions.scales.y.ticks, callback: (value) => value + ' Users' } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('anovaChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Version B (Winner)', 'Version A (Control)', 'Version C (Loser)'],
+                datasets: [{
+                    label: 'Avg. Purchase Value',
+                    data: [45.50, 42.10, 38.90],
+                    backgroundColor: ['#06D6A0', '#118AB2', '#FF6B6B'],
+                    borderColor: '#f8fafc',
+                    borderWidth: 4
+                }]
+            },
+            options: { ...sharedChartOptions,
+                cutout: '60%',
+                plugins: {
+                    ...sharedChartOptions.plugins,
+                    tooltip: {
+                         ...sharedChartOptions.plugins.tooltip,
+                         callbacks: {
+                            ...sharedChartOptions.plugins.tooltip.callbacks,
+                            label: (context) => `${context.label}: $${context.raw.toFixed(2)}`
+                         }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+
+</body></html>

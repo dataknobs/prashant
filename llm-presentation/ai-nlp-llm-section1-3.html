@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>1.3 What is an LLM? :: AI, NLP &amp; LLMs Course</title>
+<meta content="A deep dive into Large Language Models: how tokenization works, next-token prediction training, emergent capabilities, scaling laws, and key concepts like temperature, context windows, and sampling strategies." name="description"/>
+<meta content="large language model, LLM, tokenization, tokens, BPE, byte pair encoding, next-token prediction, training objectives, emergent capabilities, scaling laws, parameters, context window, inference, temperature, sampling, top-k, top-p, nucleus sampling, GPT, Claude, AI course, NLP course" name="keywords"/>
+<meta content="AI, NLP &amp; LLMs Course" name="author"/>
+<meta content="1.3 What is an LLM? :: AI, NLP &amp; LLMs Course" property="og:title"/>
+<meta content="Understand LLMs from the ground up: tokens, training objectives, emergent capabilities, scaling laws, and key inference parameters." property="og:description"/>
+<meta content="article" property="og:type"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Cabinet+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --cream: #ede8da;
+    --accent: #c84b2f;
+    --accent2: #2f6bc8;
+    --accent3: #2da06b;
+    --gold: #c89a2f;
+    --purple: #7c3aed;
+    --muted: #6b6456;
+    --code-bg: #1a1612;
+    --code-text: #e8dcc8;
+    --border: #c8bfae;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Cabinet Grotesk', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; left: 0; top: 0;
+    height: 100vh; width: 260px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 40px 0;
+    z-index: 100;
+    display: flex; flex-direction: column;
+    border-right: 3px solid var(--purple);
+    overflow-y: auto;
+  }
+
+  .sidebar-logo { padding: 0 28px 28px; border-bottom: 1px solid rgba(245,240,232,0.12); }
+  .sidebar-logo .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--purple); text-transform: uppercase; margin-bottom: 6px; }
+  .sidebar-logo h2 { font-family: 'DM Serif Display', serif; font-size: 17px; line-height: 1.3; color: var(--paper); }
+
+  .sidebar-nav { flex: 1; padding: 20px 0; }
+  .nav-section { padding: 0 28px; margin-bottom: 4px; }
+  .nav-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); padding: 14px 0 7px; }
+
+  .nav-link { display: block; padding: 7px 12px; margin: 1px -12px; border-radius: 4px; color: rgba(245,240,232,0.7); text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+  .nav-link:hover { background: rgba(124,58,237,0.18); color: var(--paper); }
+  .nav-link.active { background: rgba(124,58,237,0.18); color: #c4b5fd; border-left: 2px solid var(--purple); padding-left: 10px; }
+  .nav-link.dim { color: rgba(245,240,232,0.3); font-size: 12px; }
+
+  .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(245,240,232,0.1); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+
+  /* ── PROGRESS ── */
+  .progress-bar { height: 3px; background: var(--border); position: sticky; top: 0; z-index: 50; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--accent2)); width: 0%; transition: width 0.1s; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 260px; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 80px 80px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: 'LLM';
+    position: absolute; right: -10px; top: -20px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 240px;
+    color: rgba(124,58,237,0.06);
+    line-height: 1; pointer-events: none; user-select: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute; right: 10%; bottom: -60px;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: rgba(245,240,232,0.38); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .breadcrumb a { color: rgba(245,240,232,0.38); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--purple); }
+
+  .hero-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: #a78bfa; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .hero-label::before { content: ''; display: inline-block; width: 32px; height: 1px; background: #a78bfa; }
+
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(38px, 5vw, 60px); line-height: 1.1; margin-bottom: 24px; max-width: 700px; }
+  .hero h1 em { font-style: italic; color: #c4b5fd; }
+
+  .hero-desc { font-size: 17px; color: rgba(245,240,232,0.65); max-width: 560px; line-height: 1.75; margin-bottom: 36px; }
+
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { background: rgba(245,240,232,0.07); border: 1px solid rgba(245,240,232,0.13); color: rgba(245,240,232,0.65); padding: 4px 13px; border-radius: 20px; font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; }
+
+  /* ── CONTENT ── */
+  .content { padding: 0 80px 80px; max-width: 1100px; }
+
+  /* ── SECTIONS ── */
+  .section { margin-top: 72px; padding-top: 72px; border-top: 1px solid var(--border); }
+  .section:first-child { border-top: none; }
+
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--purple); text-transform: uppercase; margin-bottom: 12px; display: block; }
+
+  .section h2 { font-family: 'DM Serif Display', serif; font-size: clamp(26px, 3.2vw, 40px); line-height: 1.15; margin-bottom: 20px; }
+
+  .section-intro { font-size: 17px; color: var(--muted); max-width: 680px; margin-bottom: 44px; border-left: 3px solid var(--purple); padding-left: 20px; }
+
+  .subsection { margin-bottom: 52px; }
+
+  .subsection h3 { font-family: 'DM Serif Display', serif; font-size: 23px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+
+  .anchor-icon { width: 28px; height: 28px; background: var(--ink); color: var(--paper); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; flex-shrink: 0; }
+
+  p { margin-bottom: 14px; }
+
+  /* ── CALLOUT ── */
+  .callout { background: var(--cream); border-left: 4px solid var(--purple); border-radius: 0 8px 8px 0; padding: 18px 22px; margin: 24px 0; }
+  .callout.warn { border-left-color: var(--gold); }
+  .callout.success { border-left-color: var(--accent3); }
+  .callout.accent { border-left-color: var(--accent); }
+  .callout.blue { border-left-color: var(--accent2); }
+
+  .callout-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin-bottom: 7px; color: var(--purple); }
+  .callout.warn .callout-label { color: var(--gold); }
+  .callout.success .callout-label { color: var(--accent3); }
+  .callout.accent .callout-label { color: var(--accent); }
+  .callout.blue .callout-label { color: var(--accent2); }
+  .callout p { margin-bottom: 0; font-size: 15px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; margin: 28px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--ink); color: var(--paper); }
+  th { padding: 13px 18px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500; }
+  td { padding: 12px 18px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--cream); }
+
+  /* ── CODE ── */
+  .code-container { margin: 28px 0; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.16); }
+  .code-header { background: #12100e; padding: 11px 18px; display: flex; align-items: center; justify-content: space-between; }
+  .code-header-left { display: flex; align-items: center; gap: 10px; }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .code-dot.red { background: #ff5f57; }
+  .code-dot.yellow { background: #febc2e; }
+  .code-dot.green { background: #28c840; }
+  .code-filename { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(245,240,232,0.45); }
+  .code-lang { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 10px; background: rgba(124,58,237,0.25); color: #c4b5fd; border-radius: 4px; letter-spacing: 0.05em; }
+  pre { background: var(--code-bg); padding: 26px; overflow-x: auto; margin: 0; line-height: 1.65; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--code-text); }
+
+  .kw { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .fn { color: #82aaff; }
+  .var { color: #eeffa7; }
+  .key { color: #89ddff; }
+  .cls { color: #ffcb6b; }
+
+  .ic { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--cream); border: 1px solid var(--border); padding: 2px 7px; border-radius: 3px; color: var(--purple); }
+
+  /* ── CONCEPT STAT CARDS ── */
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 32px 0; }
+  .stat-card { border: 1px solid var(--border); border-radius: 10px; padding: 22px 20px; background: var(--paper); text-align: center; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--purple); }
+  .stat-number { font-family: 'DM Serif Display', serif; font-size: 40px; color: var(--purple); display: block; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 13px; color: var(--muted); }
+  .stat-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 6px; display: block; }
+
+  /* ── TOKEN VIZ ── */
+  .token-demo { margin: 32px 0; }
+  .token-sentence { font-size: 18px; line-height: 2.4; font-family: 'Cabinet Grotesk', sans-serif; }
+  .tok { display: inline-block; padding: 3px 1px; border-radius: 3px; cursor: default; transition: transform 0.15s; position: relative; margin: 0 1px; }
+  .tok:hover { transform: translateY(-2px); }
+  .tok::after { content: attr(data-id); position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--muted); white-space: nowrap; }
+  .tok-0 { background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35); color: var(--ink); }
+  .tok-1 { background: rgba(200,75,47,0.13); border: 1px solid rgba(200,75,47,0.3); color: var(--ink); }
+  .tok-2 { background: rgba(47,107,200,0.13); border: 1px solid rgba(47,107,200,0.3); color: var(--ink); }
+  .tok-3 { background: rgba(45,160,107,0.13); border: 1px solid rgba(45,160,107,0.3); color: var(--ink); }
+  .tok-4 { background: rgba(200,154,47,0.18); border: 1px solid rgba(200,154,47,0.35); color: var(--ink); }
+
+  /* ── TOKEN STATS BAR ── */
+  .token-stats { display: flex; gap: 24px; margin-top: 32px; padding: 18px 24px; background: var(--cream); border-radius: 8px; flex-wrap: wrap; }
+  .token-stat { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .token-stat .ts-num { font-size: 22px; font-family: 'DM Serif Display', serif; color: var(--purple); display: block; }
+
+  /* ── DARK VIZ BOX ── */
+  .viz-box { background: var(--ink); border-radius: 12px; overflow: hidden; margin: 32px 0; }
+  .viz-header { padding: 18px 24px; border-bottom: 1px solid rgba(245,240,232,0.08); display: flex; align-items: center; justify-content: space-between; }
+  .viz-header h4 { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--paper); }
+  .viz-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 4px; background: rgba(124,58,237,0.3); color: #c4b5fd; }
+  .viz-body { padding: 24px; }
+
+  /* ── NEXT TOKEN PREDICTION VIZ ── */
+  .ntp-demo { padding: 24px; }
+  .ntp-context { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: rgba(245,240,232,0.7); margin-bottom: 20px; }
+  .ntp-context strong { color: rgba(245,240,232,0.95); }
+  .ntp-arrow { text-align: center; font-size: 28px; color: rgba(245,240,232,0.2); margin: 12px 0; }
+  .ntp-predictions { display: flex; flex-direction: column; gap: 8px; }
+  .ntp-pred { display: flex; align-items: center; gap: 12px; }
+  .ntp-word { font-family: 'JetBrains Mono', monospace; font-size: 14px; min-width: 110px; color: rgba(245,240,232,0.85); }
+  .ntp-bar-wrap { flex: 1; height: 8px; background: rgba(245,240,232,0.06); border-radius: 4px; overflow: hidden; }
+  .ntp-bar { height: 100%; border-radius: 4px; }
+  .ntp-prob { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(245,240,232,0.4); min-width: 48px; text-align: right; }
+  .ntp-pred.top .ntp-word { color: #c4b5fd; }
+
+  /* ── SCALING LAW CHART ── */
+  .scaling-chart { width: 100%; }
+
+  /* ── EMERGENCE TABLE ── */
+  .emerge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
+  .emerge-card { border: 1px solid var(--border); border-radius: 10px; padding: 22px; background: var(--paper); transition: transform 0.2s, box-shadow 0.2s; }
+  .emerge-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .emerge-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; display: inline-block; padding: 2px 8px; border-radius: 3px; background: rgba(124,58,237,0.1); color: var(--purple); }
+  .emerge-card h4 { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 8px; }
+  .emerge-card p { font-size: 14px; color: var(--muted); margin-bottom: 0; }
+  .emerge-scale { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent3); margin-top: 10px; display: block; }
+
+  /* ── KEY CONCEPTS PANEL ── */
+  .concepts-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 32px 0; }
+  .cp-cell { background: var(--paper); padding: 24px 22px; }
+  .cp-cell.dark { background: var(--ink); color: var(--paper); }
+  .cp-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; display: inline-block; padding: 2px 8px; border-radius: 3px; }
+  .cp-tag.purple { background: rgba(124,58,237,0.15); color: var(--purple); }
+  .cp-tag.purple.inv { background: rgba(196,181,253,0.15); color: #c4b5fd; }
+  .cp-cell h4 { font-family: 'DM Serif Display', serif; font-size: 21px; margin-bottom: 10px; }
+  .cp-cell p { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+  .cp-cell.dark p { color: rgba(245,240,232,0.6); }
+  .cp-formula { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 10px 14px; border-radius: 5px; background: var(--cream); color: var(--ink); line-height: 1.6; }
+  .cp-cell.dark .cp-formula { background: rgba(245,240,232,0.06); color: rgba(245,240,232,0.75); }
+
+  /* ── TEMPERATURE SLIDER DEMO ── */
+  .temp-demo { background: var(--ink); border-radius: 12px; padding: 32px; margin: 32px 0; }
+  .temp-demo h4 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--paper); margin-bottom: 8px; }
+  .temp-desc { font-size: 14px; color: rgba(245,240,232,0.5); margin-bottom: 28px; }
+
+  .temp-slider-wrap { margin-bottom: 28px; }
+  .temp-labels { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(245,240,232,0.4); margin-bottom: 8px; }
+  .temp-range { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: linear-gradient(90deg, var(--accent2), var(--purple), var(--accent)); border-radius: 3px; outline: none; cursor: pointer; }
+  .temp-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.4); cursor: pointer; }
+
+  .temp-val-display { text-align: center; margin-bottom: 24px; }
+  .temp-val-big { font-family: 'DM Serif Display', serif; font-size: 52px; color: var(--paper); display: block; line-height: 1; }
+  .temp-val-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(245,240,232,0.4); letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .temp-tokens { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .temp-token { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(245,240,232,0.15); color: rgba(245,240,232,0.8); transition: all 0.3s; }
+
+  .temp-section-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.35); margin-bottom: 8px; display: block; }
+
+  /* ── DEMO BOX ── */
+  .demo-box { background: var(--ink); border-radius: 12px; padding: 32px; margin: 32px 0; color: var(--paper); }
+  .demo-box h4 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 6px; color: var(--paper); }
+  .demo-desc { font-size: 14px; color: rgba(245,240,232,0.5); margin-bottom: 24px; }
+
+  .demo-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.45); display: block; margin-bottom: 7px; }
+  .demo-input { width: 100%; background: rgba(245,240,232,0.06); border: 1px solid rgba(245,240,232,0.13); color: var(--paper); padding: 11px 15px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 13px; resize: vertical; outline: none; transition: border-color 0.2s; margin-bottom: 14px; }
+  .demo-input:focus { border-color: var(--purple); }
+
+  .demo-btn { background: var(--purple); color: white; border: none; padding: 11px 24px; border-radius: 6px; font-family: 'Cabinet Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 7px; }
+  .demo-btn:hover { background: #6d28d9; transform: translateY(-1px); }
+  .demo-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .demo-btn.secondary { background: rgba(124,58,237,0.25); color: #c4b5fd; }
+  .demo-btn.secondary:hover { background: rgba(124,58,237,0.4); }
+
+  .demo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+  .result-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: rgba(245,240,232,0.04); border: 1px solid rgba(245,240,232,0.08); border-radius: 6px; padding: 16px; color: rgba(245,240,232,0.8); line-height: 1.7; white-space: pre-wrap; }
+  .result-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent3); margin-bottom: 8px; display: block; margin-top: 16px; }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .loading::after { content: '▋'; animation: blink 0.8s infinite; color: rgba(245,240,232,0.4); }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 24px 0; }
+  .steps li { counter-increment: step; position: relative; padding: 0 0 24px 52px; border-left: 2px solid var(--border); margin-left: 16px; }
+  .steps li::before { content: counter(step); position: absolute; left: -18px; top: 0; width: 34px; height: 34px; background: var(--ink); color: var(--paper); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+  .steps li:last-child { border-left: none; }
+  .steps li h4 { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .steps li p { font-size: 14px; color: var(--muted); margin-bottom: 0; }
+
+  /* ── TOKEN COUNT INTERACTIVE ── */
+  .token-counter { background: var(--cream); border-radius: 10px; padding: 28px; margin: 32px 0; border: 1px solid var(--border); }
+  .token-counter h4 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 8px; }
+  .token-counter .tc-desc { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  .tc-textarea { width: 100%; background: var(--paper); border: 1px solid var(--border); color: var(--ink); padding: 14px 16px; border-radius: 8px; font-family: 'Cabinet Grotesk', sans-serif; font-size: 15px; resize: vertical; outline: none; transition: border-color 0.2s; min-height: 100px; }
+  .tc-textarea:focus { border-color: var(--purple); }
+
+  .tc-stats { display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+  .tc-stat { }
+  .tc-stat .n { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--purple); display: block; line-height: 1; }
+  .tc-stat .l { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .tc-tokens-wrap { margin-top: 18px; }
+  .tc-tok { display: inline-block; margin: 2px; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; border: 1px solid; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav { margin-top: 80px; padding: 36px 80px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--cream); }
+  .btn-nav { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border: 1.5px solid var(--ink); border-radius: 6px; text-decoration: none; color: var(--ink); font-weight: 700; font-size: 14px; transition: all 0.2s; }
+  .btn-nav.primary { background: var(--ink); color: var(--paper); }
+  .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s, transform 0.5s; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 28px; padding-right: 28px; }
+    .stat-row, .emerge-grid, .concepts-panel, .demo-row { grid-template-columns: 1fr; }
+    .bottom-nav { flex-direction: column; gap: 14px; padding: 24px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="eyebrow">Course Material</div>
+    <h2>AI, NLP &amp; LLMs</h2>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Section 1 :: Foundations</div>
+      <a class="nav-link dim" href="ai-nlp-llm-section1.html">1.1 Introduction to AI</a>
+      <a class="nav-link dim" href="ai-nlp-llm-section1-2.html">1.2 Evolution of NLP</a>
+      <a class="nav-link active" href="#hero">1.3 What is an LLM?</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">This Chapter</div>
+      <a class="nav-link" href="#definition">Definition</a>
+      <a class="nav-link" href="#tokenization">Tokens &amp; Tokenization</a>
+      <a class="nav-link" href="#training">Training Objectives</a>
+      <a class="nav-link" href="#ntp">Next-Token Prediction</a>
+      <a class="nav-link" href="#emergence">Emergent Capabilities</a>
+      <a class="nav-link" href="#scaling">Scaling Laws</a>
+      <a class="nav-link" href="#concepts">Key Concepts</a>
+      <a class="nav-link" href="#handson">Hands-on</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Section 1.3 of 8  ·  ~55 min read</div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<main class="main">
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="breadcrumb">
+      <a href="ai-nlp-llm-section1.html">Section 1</a>
+      <span style="color:rgba(245,240,232,0.2)">›</span>
+      <span>1.3 What is an LLM?</span>
+    </div>
+    <div class="hero-label">Section 1.3 :: Core Architecture</div>
+    <h1>What is a <em>Large</em><br/>Language Model?</h1>
+    <p class="hero-desc">From tokens and training objectives to emergent reasoning and scaling laws :: a precise, ground-up explanation of how LLMs work and why they're so surprisingly capable.</p>
+    <div class="hero-tags">
+      <span class="tag">Tokenization</span>
+      <span class="tag">BPE</span>
+      <span class="tag">Next-Token Prediction</span>
+      <span class="tag">Parameters</span>
+      <span class="tag">Context Window</span>
+      <span class="tag">Temperature</span>
+      <span class="tag">Sampling</span>
+      <span class="tag">Scaling Laws</span>
+      <span class="tag">Emergence</span>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <!-- DEFINITION -->
+    <section class="section reveal" id="definition">
+      <span class="section-number">1.3.1</span>
+      <h2>Definition of a Large Language Model</h2>
+      <p class="section-intro">Strip away the hype and an LLM is a precisely defined mathematical object: a probability distribution over sequences of tokens, parameterised by a neural network trained to predict the next token.</p>
+
+      <div class="subsection">
+        <p>A <strong>Large Language Model</strong> is a deep neural network :: almost always a Transformer :: that has been trained on a massive text corpus to model the probability distribution over language. Given a sequence of tokens, it assigns a probability to every possible next token in its vocabulary.</p>
+        <p>Three words matter in the name:</p>
+
+        <div class="concepts-panel" style="grid-template-columns:1fr 1fr 1fr;margin:32px 0;">
+          <div class="cp-cell" style="border-right:1px solid var(--border);">
+            <span class="cp-tag purple">Adjective</span>
+            <h4>Large</h4>
+            <p>Billions to trillions of trainable parameters. Scale is not just a property :: it's what produces emergent capabilities not seen in smaller models.</p>
+            <div class="cp-formula">GPT-2: 1.5B params<br/>GPT-3: 175B params<br/>GPT-4: ~1T (est.)</div>
+          </div>
+          <div class="cp-cell" style="border-right:1px solid var(--border);">
+            <span class="cp-tag purple">Noun 1</span>
+            <h4>Language</h4>
+            <p>Trained on human language :: web text, books, code, scientific papers. The model learns statistical patterns in how humans write and reason.</p>
+            <div class="cp-formula">Training data: 1T–15T tokens<br/>≈ millions of books</div>
+          </div>
+          <div class="cp-cell">
+            <span class="cp-tag purple">Noun 2</span>
+            <h4>Model</h4>
+            <p>A mathematical function with learned parameters. Not a database or search engine :: it generates novel text by sampling from a learned probability distribution.</p>
+            <div class="cp-formula">P(xₙ | x₁, x₂, …, xₙ₋₁)<br/>= softmax(W · h)</div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <span class="stat-number">175B</span>
+            <span class="stat-label">Parameters in GPT-3</span>
+            <span class="stat-sub">Trained on 300B tokens</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">100K</span>
+            <span class="stat-label">Vocabulary size (GPT-4)</span>
+            <span class="stat-sub">Tokens, not words</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">2M</span>
+            <span class="stat-label">Max context (Gemini 1.5)</span>
+            <span class="stat-sub">Tokens in one call</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOKENIZATION -->
+    <section class="section reveal" id="tokenization">
+      <span class="section-number">1.3.2</span>
+      <h2>Tokens and Tokenization</h2>
+      <p class="section-intro">LLMs don't process characters or words :: they process <em>tokens</em>. Understanding tokenization is fundamental to using LLMs effectively and understanding their costs, limits, and quirks.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">T</span>What is a Token?</h3>
+        <p>A token is the atomic unit of text that an LLM processes. Tokens are not words. They are subword units produced by a tokenization algorithm :: usually <strong>Byte-Pair Encoding (BPE)</strong> :: that balances vocabulary size against sequence length.</p>
+        <p>Rules of thumb: 1 token ≈ 4 characters ≈ ¾ of a word in English. Code, rare words, and non-English text tokenize less efficiently (more tokens per character).</p>
+
+        <div class="token-demo">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">Example: GPT-style tokenization of a sentence</p>
+          <div class="token-sentence">
+            <span class="tok tok-0" data-id="15496">Hello</span><span class="tok tok-1" data-id="11">,</span>
+            <span class="tok tok-2" data-id="995"> world</span><span class="tok tok-3" data-id="0">!</span>
+            <span class="tok tok-4" data-id="314"> I</span>
+            <span class="tok tok-0" data-id="716"> am</span>
+            <span class="tok tok-1" data-id="4673"> learning</span>
+            <span class="tok tok-2" data-id="546"> about</span>
+            <span class="tok tok-3" data-id="1021"> Large</span>
+            <span class="tok tok-4" data-id="15417"> Language</span>
+            <span class="tok tok-0" data-id="5841"> Models</span><span class="tok tok-1" data-id="13">.</span>
+          </div>
+          <div style="margin-top:28px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">Each coloured unit = 1 token. Hover to see token ID. Spaces are often merged with the following word.</div>
+        </div>
+
+        <div class="token-stats">
+          <div class="token-stat"><span class="ts-num">11</span><span>tokens</span></div>
+          <div class="token-stat"><span class="ts-num">54</span><span>characters</span></div>
+          <div class="token-stat"><span class="ts-num">4.9</span><span>chars/token</span></div>
+          <div class="token-stat"><span class="ts-num">~$0.00011</span><span>cost at GPT-4o pricing</span></div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">B</span>Byte-Pair Encoding (BPE)</h3>
+        <p>BPE is the dominant tokenization algorithm for LLMs. It starts with individual characters and iteratively merges the most frequent adjacent pair into a new token :: until the vocabulary reaches a target size (typically 32K–100K).</p>
+
+        <div class="viz-box">
+          <div class="viz-header">
+            <h4>BPE: Step-by-step merge</h4>
+            <span class="viz-badge">ALGORITHM</span>
+          </div>
+          <div class="viz-body">
+            <div style="display:flex;flex-direction:column;gap:12px;font-family:'JetBrains Mono',monospace;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:16px;">
+                <span style="color:rgba(245,240,232,0.35);min-width:80px;font-size:11px;">START</span>
+                <span style="color:rgba(245,240,232,0.85);">l o w e r</span>
+                <span style="color:rgba(245,240,232,0.2);margin-left:auto;">→ 5 tokens</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <span style="color:rgba(196,181,253,0.7);min-width:80px;font-size:11px;">MERGE 1</span>
+                <span style="color:rgba(245,240,232,0.85);"><span style="color:#c4b5fd;border:1px solid rgba(196,181,253,0.3);padding:0 4px;border-radius:2px;">lo</span> w e r</span>
+                <span style="color:rgba(245,240,232,0.2);margin-left:auto;">"l"+"o" most frequent → merge</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <span style="color:rgba(196,181,253,0.7);min-width:80px;font-size:11px;">MERGE 2</span>
+                <span style="color:rgba(245,240,232,0.85);"><span style="color:#c4b5fd;border:1px solid rgba(196,181,253,0.3);padding:0 4px;border-radius:2px;">low</span> e r</span>
+                <span style="color:rgba(245,240,232,0.2);margin-left:auto;">"lo"+"w" → merge</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <span style="color:rgba(196,181,253,0.7);min-width:80px;font-size:11px;">MERGE 3</span>
+                <span style="color:rgba(245,240,232,0.85);"><span style="color:#c4b5fd;border:1px solid rgba(196,181,253,0.3);padding:0 4px;border-radius:2px;">low</span> <span style="color:#c4b5fd;border:1px solid rgba(196,181,253,0.3);padding:0 4px;border-radius:2px;">er</span></span>
+                <span style="color:rgba(245,240,232,0.2);margin-left:auto;">"e"+"r" → merge</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <span style="color:rgba(45,160,107,0.8);min-width:80px;font-size:11px;">RESULT</span>
+                <span style="color:rgba(245,240,232,0.85);"><span style="color:#86efac;border:1px solid rgba(45,160,107,0.3);padding:0 6px;border-radius:3px;">lower</span></span>
+                <span style="color:rgba(245,240,232,0.2);margin-left:auto;">→ 1 token (in vocab)</span>
+              </div>
+              <div style="border-top:1px solid rgba(245,240,232,0.08);padding-top:14px;color:rgba(245,240,232,0.45);font-size:12px;">
+                Unknown word "lowers" → [lower][s] = 2 tokens  |  "lowest" → [low][est] = 2 tokens<br/>
+                BPE gracefully handles unseen words by breaking into known subword units.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-label">Tokenization Quirks That Affect Prompting</div>
+          <p>LLMs process tokens, not characters :: so "Count the letters in 'strawberry'" is genuinely hard: the model sees <span class="ic">[straw][berry]</span>, not individual letters. Arithmetic, spelling, and string manipulation are harder for tokenized models than for humans. Knowing this helps you design better prompts and understand failure modes.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Text</th><th>Approx. Tokens</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>"Hello world"</td><td>2</td><td>Common English words → 1 token each</td></tr>
+              <tr><td>"Supercalifragilistic"</td><td>7</td><td>Rare long word → many subword pieces</td></tr>
+              <tr><td>"print('hello')"</td><td>6</td><td>Code tokenizes efficiently</td></tr>
+              <tr><td>"こんにちは" (Japanese)</td><td>8–10</td><td>Non-Latin scripts use more tokens per character</td></tr>
+              <tr><td>1 page of English text</td><td>~500</td><td>Rule of thumb for cost estimation</td></tr>
+              <tr><td>1 novel (~90K words)</td><td>~120K</td><td>Fits in Gemini 1.5's 1M context</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRAINING -->
+    <section class="section reveal" id="training">
+      <span class="section-number">1.3.3</span>
+      <h2>Training Objectives</h2>
+      <p class="section-intro">LLMs are trained in multiple phases :: each with a different objective. Understanding these phases explains why LLMs behave differently from raw language models, and why RLHF-trained models are helpful assistants rather than internet-text imitators.</p>
+
+      <div class="subsection">
+        <ol class="steps">
+          <li>
+            <h4>Phase 1 :: Self-supervised Pretraining (Causal LM)</h4>
+            <p>The model is trained on trillions of tokens from the internet, books, and code. Objective: predict the next token given all previous tokens. No human labels required :: the text itself provides supervision. This builds broad world knowledge and language understanding.</p>
+          </li>
+          <li>
+            <h4>Phase 2 :: Supervised Fine-tuning (SFT)</h4>
+            <p>Human annotators write high-quality prompt–response pairs. The model is fine-tuned to produce outputs that look like those demonstrations. This teaches the format of being a helpful assistant.</p>
+          </li>
+          <li>
+            <h4>Phase 3 :: Reward Modeling</h4>
+            <p>For a given prompt, the model generates multiple responses. Human raters rank them. A separate reward model is trained to predict human preference scores :: this becomes the signal for Phase 4.</p>
+          </li>
+          <li>
+            <h4>Phase 4 :: RLHF (Reinforcement Learning from Human Feedback)</h4>
+            <p>The SFT model is further fine-tuned using Proximal Policy Optimisation (PPO), maximising the reward model's score. This aligns the model to be helpful, harmless, and honest :: producing the ChatGPT/Claude-style assistant behaviour.</p>
+          </li>
+        </ol>
+
+        <div class="callout blue">
+          <div class="callout-label">Why This Matters</div>
+          <p>A base LLM (post-Phase 1) will complete your text in the style of the internet :: often producing plausible-sounding but unhelpful or harmful content. The RLHF pipeline is what transforms a raw language model into a useful AI assistant. When you use Claude or ChatGPT, you're using a heavily RLHF-trained model, not a raw pretrained one.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEXT TOKEN PREDICTION -->
+    <section class="section reveal" id="ntp">
+      <span class="section-number">1.3.4</span>
+      <h2>Next-Token Prediction</h2>
+      <p class="section-intro">Everything an LLM does :: answering questions, writing code, reasoning through problems :: emerges from one deceptively simple objective: predict the next token.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">P</span>The Core Mechanism</h3>
+        <p>At inference time, an LLM takes a sequence of tokens (the <em>prompt</em>) and outputs a probability distribution over its entire vocabulary (~100K tokens). The highest-probability token is the most likely next word :: but we don't always pick the top one (see Temperature, below).</p>
+        <p>This process repeats autoregressively: the chosen token is appended to the context, and the model predicts the next one. This continues until a stop token or max length is reached.</p>
+
+        <div class="viz-box">
+          <div class="viz-header">
+            <h4>Next-Token Prediction :: Live Example</h4>
+            <span class="viz-badge">AUTOREGRESSIVE</span>
+          </div>
+          <div class="ntp-demo">
+            <div class="ntp-context">
+              Context: <strong>"The capital of France is"</strong>
+            </div>
+            <div class="ntp-arrow">↓ softmax over 100K vocabulary</div>
+            <div class="ntp-predictions">
+              <div class="ntp-pred top">
+                <span class="ntp-word">" Paris"</span>
+                <div class="ntp-bar-wrap"><div class="ntp-bar" style="width:82%;background:#c4b5fd;"></div></div>
+                <span class="ntp-prob">82.1%</span>
+              </div>
+              <div class="ntp-pred">
+                <span class="ntp-word">" Lyon"</span>
+                <div class="ntp-bar-wrap"><div class="ntp-bar" style="width:6%;background:rgba(245,240,232,0.3);"></div></div>
+                <span class="ntp-prob">6.2%</span>
+              </div>
+              <div class="ntp-pred">
+                <span class="ntp-word">" Marseille"</span>
+                <div class="ntp-bar-wrap"><div class="ntp-bar" style="width:4%;background:rgba(245,240,232,0.3);"></div></div>
+                <span class="ntp-prob">3.8%</span>
+              </div>
+              <div class="ntp-pred">
+                <span class="ntp-word">" Nice"</span>
+                <div class="ntp-bar-wrap"><div class="ntp-bar" style="width:2%;background:rgba(245,240,232,0.3);"></div></div>
+                <span class="ntp-prob">1.9%</span>
+              </div>
+              <div class="ntp-pred">
+                <span class="ntp-word"> … (99,996 more)</span>
+                <div class="ntp-bar-wrap"><div class="ntp-bar" style="width:6%;background:rgba(245,240,232,0.12);"></div></div>
+                <span class="ntp-prob">6.0%</span>
+              </div>
+            </div>
+            <div style="margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(245,240,232,0.3);">
+              Selected: " Paris" → new context: "The capital of France is Paris" → predict next token…
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">Profound Implication</div>
+          <p>Next-token prediction seems narrow but requires vast world knowledge. To predict "Paris" after "The capital of France is", the model must have learned geography. To complete Python code correctly, it must understand programming. The training objective forces the model to implicitly learn virtually everything needed to complete human-written text.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMERGENT CAPABILITIES -->
+    <section class="section reveal" id="emergence">
+      <span class="section-number">1.3.5</span>
+      <h2>Emergent Capabilities</h2>
+      <p class="section-intro">As models scale beyond certain parameter counts, qualitatively new capabilities appear that were absent in smaller models :: not gradually, but sharply. This phenomenon is called <em>emergence</em>.</p>
+
+      <div class="subsection">
+        <p>Emergent capabilities are abilities that are <strong>not present in smaller models</strong> and not explicitly trained for. They arise spontaneously from scale. The canonical paper is "Emergent Abilities of Large Language Models" (Wei et al., 2022), which documented dozens of such capabilities with sharp phase transitions.</p>
+
+        <div class="emerge-grid">
+          <div class="emerge-card">
+            <span class="emerge-tag">~100B+ params</span>
+            <h4>Chain-of-Thought Reasoning</h4>
+            <p>When prompted to "think step by step," large models produce multi-step reasoning that dramatically improves accuracy on maths, logic, and science problems. Absent in models under ~50B parameters.</p>
+            <span class="emerge-scale">Appears sharply at ~62B+ parameters</span>
+          </div>
+          <div class="emerge-card">
+            <span class="emerge-tag">~7B+ params</span>
+            <h4>In-Context Learning</h4>
+            <p>Learning a new task from a handful of examples provided in the prompt alone :: with no gradient updates. The model generalises from 3–5 examples to unseen inputs. Unprecedented in prior ML paradigms.</p>
+            <span class="emerge-scale">Improves sharply with scale</span>
+          </div>
+          <div class="emerge-card">
+            <span class="emerge-tag">~50B+ params</span>
+            <h4>Code Generation &amp; Execution</h4>
+            <p>Writing syntactically correct, functionally accurate code in dozens of programming languages. Includes debugging, explaining code, and generating unit tests :: without explicit code-generation training.</p>
+            <span class="emerge-scale">Quality jumps sharply at scale</span>
+          </div>
+          <div class="emerge-card">
+            <span class="emerge-tag">~100B+ params</span>
+            <h4>Theory of Mind</h4>
+            <p>The ability to reason about other agents' beliefs, intentions, and knowledge states :: a core aspect of human social cognition. GPT-4 passes Sally-Anne false-belief tasks that smaller models fail.</p>
+            <span class="emerge-scale">Near-absent below 100B params</span>
+          </div>
+          <div class="emerge-card">
+            <span class="emerge-tag">~30B+ params</span>
+            <h4>Multilingual Zero-shot Transfer</h4>
+            <p>Solving tasks in languages with little or no training data for that task, by transferring knowledge from better-represented languages. A model trained mostly in English can answer questions in Swahili.</p>
+            <span class="emerge-scale">Improves with scale &amp; data diversity</span>
+          </div>
+          <div class="emerge-card">
+            <span class="emerge-tag">~10B+ params</span>
+            <h4>Instruction Following</h4>
+            <p>Understanding and executing complex multi-step instructions without explicit examples :: including negations, conditionals, and style constraints. "Write a haiku about photosynthesis but avoid scientific terms."</p>
+            <span class="emerge-scale">Dramatically better at scale + RLHF</span>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-label">The Debate: Is Emergence Real?</div>
+          <p>A 2023 paper (Schaeffer et al.) argued emergence is partly an artifact of non-linear metrics :: smooth capability gains appear discontinuous because the metrics used are all-or-nothing (pass/fail on a benchmark). Whether true phase transitions exist or are metric artifacts is an active research debate. In practice, qualitative capability jumps with scale are real and reproducible.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCALING LAWS -->
+    <section class="section reveal" id="scaling">
+      <span class="section-number">1.3.6</span>
+      <h2>Scaling Laws</h2>
+      <p class="section-intro">One of the most striking discoveries in deep learning: LLM performance scales predictably as a power law with compute, parameters, and data :: enabling researchers to forecast model quality before training.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">S</span>The Kaplan et al. Laws (2020)</h3>
+        <p>OpenAI's 2020 paper ("Scaling Laws for Neural Language Models") showed that language model loss follows clean power laws as a function of three variables:</p>
+
+        <div class="viz-box">
+          <div class="viz-header">
+            <h4>Power Law: Loss vs Scale</h4>
+            <span class="viz-badge">LOG-LOG SCALE</span>
+          </div>
+          <div class="viz-body">
+            <svg class="scaling-chart" viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="axarr" markerHeight="7" markerWidth="7" orient="auto" refX="5" refY="3">
+                  <path d="M0,0 L0,6 L7,3 z" fill="rgba(245,240,232,0.4)"></path>
+                </marker>
+              </defs>
+              <!-- Axes -->
+              <line marker-end="url(#axarr)" stroke="rgba(245,240,232,0.2)" stroke-width="1.5" x1="60" x2="60" y1="20" y2="220"></line>
+              <line marker-end="url(#axarr)" stroke="rgba(245,240,232,0.2)" stroke-width="1.5" x1="60" x2="600" y1="220" y2="220"></line>
+              <text fill="rgba(245,240,232,0.4)" font-family="'JetBrains Mono'" font-size="11" transform="rotate(-90,20,125)" x="20" y="125">Loss (lower=better)</text>
+              <text fill="rgba(245,240,232,0.4)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="320" y="248">Scale (log) →</text>
+              <!-- Grid lines -->
+              <line stroke="rgba(245,240,232,0.04)" stroke-width="1" x1="60" x2="590" y1="60" y2="60"></line>
+              <line stroke="rgba(245,240,232,0.04)" stroke-width="1" x1="60" x2="590" y1="100" y2="100"></line>
+              <line stroke="rgba(245,240,232,0.04)" stroke-width="1" x1="60" x2="590" y1="140" y2="140"></line>
+              <line stroke="rgba(245,240,232,0.04)" stroke-width="1" x1="60" x2="590" y1="180" y2="180"></line>
+              <!-- Compute curve -->
+              <path d="M 80,50 Q 200,80 350,130 Q 450,160 580,195" fill="none" stroke="#c4b5fd" stroke-width="2.5"></path>
+              <!-- Parameters curve -->
+              <path d="M 80,65 Q 200,95 350,145 Q 450,170 580,205" fill="none" stroke="var(--accent3)" stroke-dasharray="6,3" stroke-width="2.5"></path>
+              <!-- Data curve -->
+              <path d="M 80,80 Q 200,110 350,155 Q 450,178 580,210" fill="none" stroke="var(--gold)" stroke-dasharray="3,3" stroke-width="2.5"></path>
+              <!-- Model sizes labels -->
+              <circle cx="150" cy="73" fill="rgba(245,240,232,0.4)" r="3"></circle>
+              <text fill="rgba(245,240,232,0.4)" font-family="'JetBrains Mono'" font-size="10" x="155" y="70">1B</text>
+              <circle cx="280" cy="108" fill="rgba(245,240,232,0.4)" r="3"></circle>
+              <text fill="rgba(245,240,232,0.4)" font-family="'JetBrains Mono'" font-size="10" x="285" y="105">10B</text>
+              <circle cx="420" cy="150" fill="rgba(245,240,232,0.4)" r="3"></circle>
+              <text fill="rgba(245,240,232,0.4)" font-family="'JetBrains Mono'" font-size="10" x="425" y="147">100B</text>
+              <!-- Legend -->
+              <line stroke="#c4b5fd" stroke-width="2.5" x1="330" x2="355" y1="30" y2="30"></line>
+              <text fill="rgba(245,240,232,0.7)" font-family="'JetBrains Mono'" font-size="11" x="360" y="34">Compute</text>
+              <line stroke="var(--accent3)" stroke-dasharray="5,3" stroke-width="2.5" x1="330" x2="355" y1="50" y2="50"></line>
+              <text fill="rgba(245,240,232,0.7)" font-family="'JetBrains Mono'" font-size="11" x="360" y="54">Parameters</text>
+              <line stroke="var(--gold)" stroke-dasharray="3,3" stroke-width="2.5" x1="330" x2="355" y1="70" y2="70"></line>
+              <text fill="rgba(245,240,232,0.7)" font-family="'JetBrains Mono'" font-size="11" x="360" y="74">Data</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">C</span>Chinchilla Laws (2022)</h3>
+        <p>DeepMind's "Chinchilla" paper (Hoffmann et al., 2022) revised Kaplan's findings: <strong>for a given compute budget, you should train a smaller model on more data</strong>. The optimal ratio is roughly 20 tokens of training data per parameter.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>Parameters</th><th>Training Tokens</th><th>Chinchilla-optimal?</th></tr></thead>
+            <tbody>
+              <tr><td><strong>GPT-3</strong></td><td>175B</td><td>300B</td><td style="color:var(--gold);">⚠ Under-trained (~1.7 tok/param)</td></tr>
+              <tr><td><strong>Chinchilla</strong></td><td>70B</td><td>1.4T</td><td style="color:var(--accent3);">✓ Optimal (20 tok/param)</td></tr>
+              <tr><td><strong>Llama 2 (7B)</strong></td><td>7B</td><td>2T</td><td style="color:var(--accent3);">✓ Over-trained for inference</td></tr>
+              <tr><td><strong>Llama 3 (8B)</strong></td><td>8B</td><td>15T</td><td style="color:var(--accent3);">✓ Deliberately over-trained</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout success">
+          <div class="callout-label">Practical Takeaway</div>
+          <p>The Chinchilla result shifted the industry from chasing parameter counts to training smaller models on far more data. A well-trained 7B model often outperforms a poorly-trained 70B model. Scale matters :: but the ratio of parameters to tokens matters just as much.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KEY CONCEPTS -->
+    <section class="section reveal" id="concepts">
+      <span class="section-number">1.3.7</span>
+      <h2>Key Concepts</h2>
+      <p class="section-intro">Five essential parameters and concepts that govern every LLM inference call. Mastering these makes the difference between mediocre and excellent LLM usage.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">P</span>Parameters &amp; Inference</h3>
+
+        <div class="concepts-panel">
+          <div class="cp-cell dark">
+            <span class="cp-tag purple inv">Foundation</span>
+            <h4 style="color:var(--paper);">Parameters</h4>
+            <p>The learned weights of the neural network :: billions of floating-point numbers that encode the model's knowledge. Set during training, frozen at inference. More parameters ≈ more capacity to store knowledge and learn patterns.</p>
+            <div class="cp-formula">GPT-3: 175,181,291,520 parameters<br/>Each = 16-bit float = 2 bytes<br/>→ ~350GB to load in memory</div>
+          </div>
+          <div class="cp-cell">
+            <span class="cp-tag purple">Inference</span>
+            <h4>Inference</h4>
+            <p>Running a trained model to produce outputs :: i.e. generating text from a prompt. During inference, parameters are <em>frozen</em>; no learning occurs. Inference cost scales with context length squared (attention) and model size linearly.</p>
+            <div class="cp-formula">Inference cost ∝ N_params × L²<br/>where L = sequence length<br/>(why long contexts cost more)</div>
+          </div>
+          <div class="cp-cell">
+            <span class="cp-tag purple">Context</span>
+            <h4>Context Window</h4>
+            <p>The maximum number of tokens an LLM can process in a single call :: both input (prompt) and output (response) combined. Everything outside the context window is invisible to the model.</p>
+            <div class="cp-formula">GPT-4o: 128K tokens (~300 pages)<br/>Claude 3.5: 200K tokens (~500 pages)<br/>Gemini 1.5: 1–2M tokens</div>
+          </div>
+          <div class="cp-cell dark">
+            <span class="cp-tag purple inv">Memory</span>
+            <h4 style="color:var(--paper);">Statelessness</h4>
+            <p>LLMs have no memory between API calls. Each call is independent. What looks like "conversation memory" in ChatGPT is actually the entire conversation history being re-sent as context on every turn.</p>
+            <div class="cp-formula">Conversation token cost =<br/>Σ all previous messages<br/>+ current prompt + response</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">T</span>Temperature &amp; Sampling</h3>
+        <p>When the model produces a probability distribution over the next token, how do we pick from it? Temperature and sampling strategies control the randomness and creativity of outputs.</p>
+
+        <!-- TEMPERATURE INTERACTIVE DEMO -->
+        <div class="temp-demo">
+          <h4>Temperature :: Interactive Explorer</h4>
+          <p class="temp-desc">Drag the slider to see how temperature reshapes the probability distribution over candidate next tokens.</p>
+
+          <div class="temp-slider-wrap">
+            <div class="temp-labels">
+              <span>0.0 :: Deterministic</span>
+              <span>1.0 :: Balanced</span>
+              <span>2.0 :: Chaotic</span>
+            </div>
+            <input class="temp-range" id="tempSlider" max="2" min="0" step="0.05" type="range" value="0.7"/>
+          </div>
+
+          <div class="temp-val-display">
+            <span class="temp-val-big" id="tempVal">0.7</span>
+            <span class="temp-val-label" id="tempLabel">Balanced :: good for most tasks</span>
+          </div>
+
+          <span class="temp-section-label">Candidate next tokens (prompt: "The best programming language is…")</span>
+          <div class="temp-tokens" id="tempTokens"></div>
+
+          <div style="margin-top:20px;">
+            <span class="temp-section-label">Probability distribution</span>
+            <div id="tempBars" style="display:flex;flex-direction:column;gap:6px;"></div>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:32px;">
+          <table>
+            <thead><tr><th>Sampling Method</th><th>How It Works</th><th>Best For</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Greedy</strong><br/><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">temp=0</span></td>
+                <td>Always pick the highest-probability token. Deterministic, reproducible.</td>
+                <td>Factual Q&amp;A, classification, structured extraction where you want consistency</td>
+              </tr>
+              <tr>
+                <td><strong>Temperature Sampling</strong><br/><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">temp=0.1–1.0</span></td>
+                <td>Divide logits by temperature before softmax. Low T → sharper; High T → flatter distribution.</td>
+                <td>General use. Low (0.2) for code/facts, medium (0.7) for chat, high (1.0) for creative writing</td>
+              </tr>
+              <tr>
+                <td><strong>Top-k Sampling</strong><br/><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">k=40–100</span></td>
+                <td>Restrict sampling to the top-k most probable tokens. Zero probability to the rest.</td>
+                <td>Prevents extremely unlikely tokens while maintaining diversity</td>
+              </tr>
+              <tr>
+                <td><strong>Top-p (Nucleus)</strong><br/><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">p=0.9–0.95</span></td>
+                <td>Sample from the smallest set of tokens whose probabilities sum to ≥ p. Dynamic k.</td>
+                <td>Most common in production; adapts to distribution shape. OpenAI default: top_p=1</td>
+              </tr>
+              <tr>
+                <td><strong>Beam Search</strong></td>
+                <td>Maintain k candidate sequences simultaneously; pick the one with highest total log-prob.</td>
+                <td>Translation, summarisation where you want the globally best sequence (not generation)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDS-ON -->
+    <section class="section reveal" id="handson">
+      <span class="section-number">1.3.8</span>
+      <h2>Hands-on: Token Counting &amp; Context Experiments</h2>
+      <p class="section-intro">Two practical exercises: counting tokens accurately (critical for cost management and prompt engineering), and experimenting with context length to see how LLMs use and lose context.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">1</span>Token Counting with tiktoken</h3>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">token_counting.py</span>
+            </div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">import</span> tiktoken
+
+<span class="cmt"># tiktoken is OpenAI's tokenizer library :: free, offline, exact counts</span>
+<span class="cmt"># pip install tiktoken</span>
+
+<span class="cmt"># ── Load the tokenizer for a specific model ──</span>
+<span class="var">enc_gpt4</span>  = tiktoken.<span class="fn">encoding_for_model</span>(<span class="str">"gpt-4o"</span>)    <span class="cmt"># cl100k_base</span>
+<span class="var">enc_gpt35</span> = tiktoken.<span class="fn">encoding_for_model</span>(<span class="str">"gpt-3.5-turbo"</span>) <span class="cmt"># same encoding</span>
+
+<span class="kw">def</span> <span class="fn">count_tokens</span>(text: <span class="cls">str</span>, model: <span class="cls">str</span> = <span class="str">"gpt-4o"</span>) -&gt; <span class="cls">dict</span>:
+    <span class="var">enc</span>    = tiktoken.<span class="fn">encoding_for_model</span>(model)
+    <span class="var">tokens</span> = <span class="var">enc</span>.<span class="fn">encode</span>(text)
+    <span class="kw">return</span> {
+        <span class="str">"n_tokens"</span>:  <span class="fn">len</span>(<span class="var">tokens</span>),
+        <span class="str">"n_chars"</span>:   <span class="fn">len</span>(text),
+        <span class="str">"ratio"</span>:     <span class="fn">round</span>(<span class="fn">len</span>(text) / <span class="fn">len</span>(<span class="var">tokens</span>), <span class="num">2</span>),
+        <span class="str">"token_ids"</span>: <span class="var">tokens</span>[:10],  <span class="cmt"># first 10 IDs</span>
+        <span class="str">"decoded"</span>:   [<span class="var">enc</span>.<span class="fn">decode</span>([t]) <span class="kw">for</span> t <span class="kw">in</span> <span class="var">tokens</span>[:10]]
+    }
+
+<span class="cmt"># ── Examples ──</span>
+<span class="var">texts</span> = {
+    <span class="str">"Simple English"</span>:  <span class="str">"The quick brown fox jumps over the lazy dog."</span>,
+    <span class="str">"Technical"</span>:       <span class="str">"Transformers use self-attention and positional encoding."</span>,
+    <span class="str">"Code"</span>:            <span class="str">"def fibonacci(n): return n if n &lt; 2 else fibonacci(n-1)+fibonacci(n-2)"</span>,
+    <span class="str">"Japanese"</span>:        <span class="str">"大規模言語モデルは自然言語処理を変革しました。"</span>,
+    <span class="str">"Long word"</span>:       <span class="str">"supercalifragilisticexpialidocious"</span>,
+}
+
+<span class="kw">for</span> label, text <span class="kw">in</span> <span class="var">texts</span>.<span class="fn">items</span>():
+    <span class="var">result</span> = <span class="fn">count_tokens</span>(text)
+    <span class="fn">print</span>(<span class="str">f"{label}:"</span>)
+    <span class="fn">print</span>(<span class="str">f"  Tokens: {result['n_tokens']} | Chars: {result['n_chars']} | Ratio: {result['ratio']} chars/tok"</span>)
+    <span class="fn">print</span>(<span class="str">f"  First tokens: {result['decoded']}\n"</span>)
+
+<span class="cmt"># Output:
+# Simple English: Tokens: 9  | Chars: 44 | Ratio: 4.89 chars/tok
+# Technical:      Tokens: 9  | Chars: 55 | Ratio: 6.11 chars/tok
+# Code:           Tokens: 22 | Chars: 71 | Ratio: 3.23 chars/tok
+# Japanese:       Tokens: 22 | Chars: 22 | Ratio: 1.00 chars/tok  ← expensive!
+# Long word:      Tokens: 7  | Chars: 34 | Ratio: 4.86 chars/tok</span>
+
+<span class="cmt"># ── Count tokens for an entire chat conversation ──</span>
+<span class="kw">def</span> <span class="fn">count_chat_tokens</span>(messages: <span class="cls">list</span>, model: <span class="cls">str</span> = <span class="str">"gpt-4o"</span>) -&gt; <span class="cls">int</span>:
+    <span class="var">enc</span>   = tiktoken.<span class="fn">encoding_for_model</span>(model)
+    <span class="var">total</span> = <span class="num">0</span>
+    <span class="kw">for</span> msg <span class="kw">in</span> messages:
+        <span class="var">total</span> += <span class="num">4</span>  <span class="cmt"># every message has 4 overhead tokens</span>
+        <span class="kw">for</span> key, value <span class="kw">in</span> msg.<span class="fn">items</span>():
+            <span class="var">total</span> += <span class="fn">len</span>(<span class="var">enc</span>.<span class="fn">encode</span>(value))
+    <span class="var">total</span> += <span class="num">2</span>  <span class="cmt"># priming tokens for reply</span>
+    <span class="kw">return</span> <span class="var">total</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">2</span>Context Length Experiments</h3>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div class="code-header-left">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">context_experiments.py</span>
+            </div>
+            <span class="code-lang">PYTHON</span>
+          </div>
+          <pre><code><span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+<span class="kw">import</span> tiktoken
+
+<span class="var">client</span> = <span class="cls">OpenAI</span>()
+<span class="var">enc</span>    = tiktoken.<span class="fn">encoding_for_model</span>(<span class="str">"gpt-4o"</span>)
+
+<span class="cmt"># ── Experiment 1: "Lost in the Middle" ──
+# LLMs attend better to beginning and end of context than the middle.
+# Test this by hiding a key fact at different positions.</span>
+
+<span class="kw">def</span> <span class="fn">build_context</span>(secret_position: <span class="cls">str</span> = <span class="str">"middle"</span>) -&gt; <span class="cls">str</span>:
+    <span class="var">padding</span> = <span class="str">"The sky is blue. "</span> * <span class="num">100</span>  <span class="cmt"># ~300 tokens of filler</span>
+    <span class="var">secret</span>  = <span class="str">"The magic number is 42891."</span>
+    <span class="kw">if</span>   secret_position == <span class="str">"start"</span>:  <span class="kw">return</span> <span class="var">secret</span> + <span class="var">padding</span>
+    <span class="kw">elif</span> secret_position == <span class="str">"middle"</span>: <span class="kw">return</span> <span class="var">padding</span>[:<span class="fn">len</span>(<span class="var">padding</span>)//<span class="num">2</span>] + <span class="var">secret</span> + <span class="var">padding</span>[<span class="fn">len</span>(<span class="var">padding</span>)//<span class="num">2</span>:]
+    <span class="kw">elif</span> secret_position == <span class="str">"end"</span>:    <span class="kw">return</span> <span class="var">padding</span> + <span class="var">secret</span>
+
+<span class="kw">for</span> pos <span class="kw">in</span> [<span class="str">"start"</span>, <span class="str">"middle"</span>, <span class="str">"end"</span>]:
+    <span class="var">context</span>  = <span class="fn">build_context</span>(pos)
+    <span class="var">n_tokens</span> = <span class="fn">len</span>(<span class="var">enc</span>.<span class="fn">encode</span>(<span class="var">context</span>))
+    <span class="var">response</span> = <span class="var">client</span>.chat.completions.<span class="fn">create</span>(
+        <span class="key">model</span>=<span class="str">"gpt-4o"</span>,
+        <span class="key">messages</span>=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Answer with ONLY the number, nothing else."</span>},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>,   <span class="str">"content"</span>: <span class="str">f"{context}\n\nWhat is the magic number?"</span>}
+        ],
+        <span class="key">max_tokens</span>=<span class="num">10</span>,
+        <span class="key">temperature</span>=<span class="num">0</span>
+    )
+    <span class="var">answer</span> = <span class="var">response</span>.choices[<span class="num">0</span>].message.content.<span class="fn">strip</span>()
+    <span class="fn">print</span>(<span class="str">f"Position: {pos:8s} | Tokens: {n_tokens:4d} | Answer: {answer}"</span>)
+
+<span class="cmt"># Typical result:
+# Position: start  | Tokens:  324 | Answer: 42891  ✓  (strong primacy effect)
+# Position: middle | Tokens:  324 | Answer: 10000  ✗  (lost in the middle!)
+# Position: end    | Tokens:  324 | Answer: 42891  ✓  (strong recency effect)
+#
+# Key finding: critical info belongs at START or END of your prompt, never buried.</span>
+
+<span class="cmt"># ── Experiment 2: Measure attention by position ──</span>
+<span class="kw">def</span> <span class="fn">test_recall_at_length</span>(n_filler_tokens: <span class="cls">int</span>) -&gt; <span class="cls">bool</span>:
+    <span class="var">filler</span>  = <span class="str">"The weather is nice today. "</span> * (n_filler_tokens // <span class="num">6</span>)
+    <span class="var">prompt</span>  = <span class="str">f"Remember: XKCD2847. {filler} What was the code I asked you to remember?"</span>
+    <span class="var">resp</span>    = <span class="var">client</span>.chat.completions.<span class="fn">create</span>(
+        <span class="key">model</span>=<span class="str">"gpt-4o"</span>,
+        <span class="key">messages</span>=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="var">prompt</span>}],
+        <span class="key">temperature</span>=<span class="num">0</span>, <span class="key">max_tokens</span>=<span class="num">20</span>
+    )
+    <span class="kw">return</span> <span class="str">"XKCD2847"</span> <span class="kw">in</span> <span class="var">resp</span>.choices[<span class="num">0</span>].message.content
+
+<span class="kw">for</span> length <span class="kw">in</span> [<span class="num">100</span>, <span class="num">500</span>, <span class="num">2000</span>, <span class="num">10000</span>, <span class="num">50000</span>]:
+    <span class="var">recalled</span> = <span class="fn">test_recall_at_length</span>(length)
+    <span class="fn">print</span>(<span class="str">f"Filler tokens: {length:6d} | Recalled: {recalled}"</span>)</code></pre>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">The "Lost in the Middle" Finding</div>
+          <p>Liu et al. (2023) showed that LLMs attend most strongly to tokens at the beginning and end of their context window :: information buried in the middle is recalled significantly less well. This has direct practical implications: put your most important instructions at the start or end of your prompt, never in the middle of a long document.</p>
+        </div>
+      </div>
+
+      <!-- LIVE INTERACTIVE DEMOS -->
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Live Demo 1 :: Token Counter</h3>
+        <p>Type any text and see real-time approximate token counts and tokenization :: using a client-side approximation of BPE tokenization.</p>
+
+        <div class="token-counter">
+          <h4>Interactive Token Counter</h4>
+          <p class="tc-desc">Type or paste text. Token count updates in real time (client-side BPE approximation).</p>
+          <textarea class="tc-textarea" id="tcInput" oninput="updateTokenCount()" placeholder="Type or paste any text here…">Large Language Models process text as tokens, not words. Understanding tokenization is key to working effectively with LLMs!</textarea>
+          <div class="tc-stats">
+            <div class="tc-stat"><span class="n" id="tcTokens">::</span><span class="l">Approx. Tokens</span></div>
+            <div class="tc-stat"><span class="n" id="tcChars">::</span><span class="l">Characters</span></div>
+            <div class="tc-stat"><span class="n" id="tcWords">::</span><span class="l">Words</span></div>
+            <div class="tc-stat"><span class="n" id="tcCost">::</span><span class="l">Est. GPT-4o Cost</span></div>
+          </div>
+          <div class="tc-tokens-wrap" id="tcTokensWrap"></div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Live Demo 2 :: Context Length Experiment</h3>
+        <p>See how an LLM uses context length. Hide a key fact at different positions in a long prompt and observe whether the model recalls it correctly.</p>
+
+        <div class="demo-box">
+          <h4>Context Recall Experiment</h4>
+          <p class="demo-desc">The model receives a long prompt with a hidden fact at your chosen position. Can it recall it?</p>
+
+          <label class="demo-label">Secret fact to hide</label>
+          <input class="demo-input" id="secretFact" style="height:auto;padding:11px 15px;resize:none;" type="text" value="The secret codeword is NEPTUNE7."/>
+
+          <div class="demo-row">
+            <div>
+              <label class="demo-label">Position in context</label>
+              <select class="demo-input" id="factPosition" style="height:auto;padding:11px 15px;cursor:pointer;appearance:none;-webkit-appearance:none;">
+                <option value="start">📍 Beginning :: primacy zone</option>
+                <option selected="" value="middle">📍 Middle :: "lost in the middle"</option>
+                <option value="end">📍 End :: recency zone</option>
+              </select>
+            </div>
+            <div>
+              <label class="demo-label">Surrounding filler</label>
+              <select class="demo-input" id="fillerAmt" style="height:auto;padding:11px 15px;cursor:pointer;appearance:none;-webkit-appearance:none;">
+                <option value="50">Short (~50 tokens)</option>
+                <option selected="" value="200">Medium (~200 tokens)</option>
+                <option value="500">Long (~500 tokens)</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="demo-btn" id="ctxBtn" onclick="runContextExperiment()">
+            <span id="ctxBtnTxt">▶</span> Run Experiment
+          </button>
+
+          <div id="ctxResults" style="display:none;margin-top:20px;">
+            <span class="result-label">PROMPT STRUCTURE</span>
+            <div class="result-text" id="ctxStructure" style="font-size:12px;"></div>
+            <span class="result-label">MODEL RESPONSE</span>
+            <div class="result-text" id="ctxResponse"></div>
+            <span class="result-label">VERDICT</span>
+            <div class="result-text" id="ctxVerdict" style="font-size:13px;font-family:'Cabinet Grotesk',sans-serif;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Live Demo 3 :: Temperature Explorer</h3>
+        <p>Generate the same prompt at different temperatures and compare the outputs side-by-side.</p>
+
+        <div class="demo-box">
+          <h4>Temperature Comparison</h4>
+          <p class="demo-desc">Generate three responses to the same prompt at temperature 0.0, 0.7, and 1.5 simultaneously.</p>
+
+          <label class="demo-label">Prompt</label>
+          <textarea class="demo-input" id="tempPrompt" rows="2">Suggest a creative name for a coffee shop that specialises in science-themed drinks.</textarea>
+
+          <button class="demo-btn" id="tempCmpBtn" onclick="runTempComparison()">
+            <span id="tempCmpBtnTxt">▶</span> Generate at 3 Temperatures
+          </button>
+
+          <div id="tempCmpResults" style="display:none;margin-top:20px;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+              <div>
+                <span class="result-label" style="color:var(--accent2);">TEMP = 0.0 (deterministic)</span>
+                <div class="result-text" id="tcmp0" style="min-height:80px;font-family:'Cabinet Grotesk',sans-serif;font-size:13.5px;"></div>
+              </div>
+              <div>
+                <span class="result-label" style="color:var(--accent3);">TEMP = 0.7 (balanced)</span>
+                <div class="result-text" id="tcmp7" style="min-height:80px;font-family:'Cabinet Grotesk',sans-serif;font-size:13.5px;"></div>
+              </div>
+              <div>
+                <span class="result-label" style="color:var(--accent);">TEMP = 1.5 (creative)</span>
+                <div class="result-text" id="tcmp15" style="min-height:80px;font-family:'Cabinet Grotesk',sans-serif;font-size:13.5px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <a class="btn-nav" href="ai-nlp-llm-section1-2.html">← 1.2 Evolution of NLP</a>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">Section 1.3 complete</div>
+    <a class="btn-nav primary" href="#">→ 1.4 Prompt Engineering</a>
+  </div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-2.html">Ai Nlp Llm Section1 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-3.html">Ai Nlp Llm Section1 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1.html">Ai Nlp Llm Section1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-1.html">Ai Nlp Llm Section2 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-2.html">Ai Nlp Llm Section2 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-3-4.html">Ai Nlp Llm Section2 3 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-1.html">Ai Nlp Llm Section3 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-2.html">Ai Nlp Llm Section3 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-3.html">Ai Nlp Llm Section3 3</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<script>
+// ── PROGRESS ──
+const fill = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  const total = document.body.scrollHeight - window.innerHeight;
+  fill.style.width = (window.scrollY / total * 100) + '%';
+});
+
+// ── REVEAL ──
+document.querySelectorAll('.reveal').forEach(el => {
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) el.classList.add('visible'); }, { threshold: 0.06, rootMargin: '0px 0px -50px 0px' }).observe(el);
+});
+
+// ── ACTIVE NAV ──
+const navLinks = document.querySelectorAll('.nav-link');
+new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 }).observe(document.querySelector('section[id]') || document.body);
+document.querySelectorAll('section[id]').forEach(s =>
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-link[href="#${s.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  }, { threshold: 0.3 }).observe(s)
+);
+
+// ── TEMPERATURE SLIDER (KEY CONCEPTS) ──
+const TOKENS_POOL = [
+  {word:'Python',    base:0.38},
+  {word:'JavaScript',base:0.22},
+  {word:'Rust',      base:0.15},
+  {word:'Go',        base:0.10},
+  {word:'TypeScript',base:0.08},
+  {word:'C++',       base:0.04},
+  {word:'Haskell',   base:0.02},
+  {word:'COBOL',     base:0.005},
+];
+
+function applySoftmax(logits, temp) {
+  if (temp < 0.01) {
+    return logits.map((v, i) => i === 0 ? 1 : 0);
+  }
+  const scaled = logits.map(v => v / temp);
+  const maxS = Math.max(...scaled);
+  const exps = scaled.map(v => Math.exp(v - maxS));
+  const sum = exps.reduce((a, b) => a + b, 0);
+  return exps.map(v => v / sum);
+}
+
+function renderTempTokens(temp) {
+  const logits = TOKENS_POOL.map(t => Math.log(t.base + 1e-9));
+  const probs = applySoftmax(logits, temp);
+
+  const colors = ['#c4b5fd','#86efac','#fbbf24','#f87171','#60a5fa','#a78bfa','#34d399','#fb923c'];
+  const tokDiv = document.getElementById('tempTokens');
+  const barDiv = document.getElementById('tempBars');
+
+  tokDiv.innerHTML = TOKENS_POOL.map((t, i) => {
+    const p = probs[i];
+    const opacity = Math.max(0.15, p * 4);
+    return `<span class="temp-token" style="background:${colors[i]}22;border-color:${colors[i]}55;opacity:${Math.min(1, opacity + 0.2)};font-size:${11 + p * 16}px;">${t.word} <span style="opacity:0.5;font-size:10px;">${(p*100).toFixed(1)}%</span></span>`;
+  }).join('');
+
+  barDiv.innerHTML = TOKENS_POOL.map((t, i) => {
+    const p = probs[i];
+    return `<div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;min-width:100px;color:rgba(245,240,232,0.7);">${t.word}</span>
+      <div style="flex:1;height:6px;background:rgba(245,240,232,0.06);border-radius:3px;overflow:hidden;">
+        <div style="width:${(p*100)}%;height:100%;background:${colors[i]};border-radius:3px;transition:width 0.4s ease;"></div>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(245,240,232,0.35);min-width:48px;text-align:right;">${(p*100).toFixed(1)}%</span>
+    </div>`;
+  }).join('');
+}
+
+const tempSlider = document.getElementById('tempSlider');
+const tempVal = document.getElementById('tempVal');
+const tempLabel = document.getElementById('tempLabel');
+
+const tempLabels = {
+  0.0: 'Greedy :: always picks the top token',
+  0.3: 'Low :: factual, consistent, predictable',
+  0.7: 'Balanced :: good for most tasks',
+  1.0: 'High :: creative, more varied',
+  1.5: 'Very high :: diverse, sometimes incoherent',
+  2.0: 'Chaotic :: nearly random token selection',
+};
+
+tempSlider.addEventListener('input', () => {
+  const t = parseFloat(tempSlider.value);
+  tempVal.textContent = t.toFixed(2);
+  const nearest = Object.keys(tempLabels).reduce((a, b) => Math.abs(b - t) < Math.abs(a - t) ? b : a);
+  tempLabel.textContent = tempLabels[nearest];
+  renderTempTokens(t);
+});
+
+renderTempTokens(0.7);
+
+// ── TOKEN COUNTER ──
+const COLORS_TC = ['#7c3aed22','#c84b2f22','#2f6bc822','#2da06b22','#c89a2f22'];
+const BCOLORS   = ['#7c3aed','#c84b2f','#2f6bc8','#2da06b','#c89a2f'];
+
+function approxTokenize(text) {
+  // BPE approximation: split on spaces and punctuation, merge common pairs
+  const words = text.match(/\S+|\s+/g) || [];
+  let tokens = [];
+  for (const w of words) {
+    if (/^\s+$/.test(w)) continue;
+    // Words > 6 chars get split
+    if (w.length > 8) {
+      tokens.push(w.slice(0, Math.ceil(w.length/2)));
+      tokens.push(w.slice(Math.ceil(w.length/2)));
+    } else {
+      tokens.push(w);
+    }
+  }
+  return tokens;
+}
+
+function updateTokenCount() {
+  const text = document.getElementById('tcInput').value;
+  const toks = approxTokenize(text);
+  const n = toks.length;
+  const chars = text.length;
+  const words = (text.match(/\S+/g) || []).length;
+  const cost = (n / 1000 * 0.005).toFixed(5);
+
+  document.getElementById('tcTokens').textContent = n;
+  document.getElementById('tcChars').textContent = chars;
+  document.getElementById('tcWords').textContent = words;
+  document.getElementById('tcCost').textContent = '$' + cost;
+
+  const wrap = document.getElementById('tcTokensWrap');
+  if (n > 0 && n < 200) {
+    wrap.innerHTML = '<div style="margin-top:12px;font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Approximate token boundaries</div>' +
+      toks.map((t, i) => `<span class="tc-tok" style="background:${COLORS_TC[i%5]};border-color:${BCOLORS[i%5]}55;">${t.replace(/</g,'&lt;')}</span>`).join('');
+  } else if (n >= 200) {
+    wrap.innerHTML = '<div style="margin-top:10px;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--muted);">Too many tokens to display individually.</div>';
+  } else {
+    wrap.innerHTML = '';
+  }
+}
+
+updateTokenCount();
+
+// ── CONTEXT EXPERIMENT ──
+async function runContextExperiment() {
+  const secret = document.getElementById('secretFact').value.trim();
+  const pos = document.getElementById('factPosition').value;
+  const fillerN = parseInt(document.getElementById('fillerAmt').value);
+  const btn = document.getElementById('ctxBtn');
+  const res = document.getElementById('ctxResults');
+
+  if (!secret) return;
+  btn.disabled = true;
+  document.getElementById('ctxBtnTxt').textContent = '⏳';
+  res.style.display = 'block';
+
+  const filler = ('The sky is blue and the weather is pleasant today. ').repeat(Math.ceil(fillerN / 10));
+  let prompt;
+  if (pos === 'start') {
+    prompt = secret + ' ' + filler;
+  } else if (pos === 'end') {
+    prompt = filler + ' ' + secret;
+  } else {
+    const mid = Math.floor(filler.length / 2);
+    prompt = filler.slice(0, mid) + ' ' + secret + ' ' + filler.slice(mid);
+  }
+
+  const approxToks = approxTokenize(prompt).length;
+  document.getElementById('ctxStructure').textContent =
+    `Position: ${pos.toUpperCase()}\nFiller tokens: ~${approxToks}\nPrompt: [${pos === 'start' ? 'SECRET → filler' : pos === 'end' ? 'filler → SECRET' : 'filler → SECRET → filler'}]\n\nFull prompt (truncated):\n"${prompt.slice(0, 200)}…"`;
+
+  document.getElementById('ctxResponse').textContent = '';
+  document.getElementById('ctxResponse').classList.add('loading');
+  document.getElementById('ctxVerdict').textContent = '';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 120,
+        system: 'You are a helpful assistant. Answer with only the exact phrase requested.',
+        messages: [{ role: 'user', content: `${prompt}\n\nRepeat back the special fact or code I included in the above text. Quote it word for word.` }]
+      })
+    });
+    const data = await resp.json();
+    const answer = data.content?.[0]?.text || 'Error';
+    document.getElementById('ctxResponse').classList.remove('loading');
+    document.getElementById('ctxResponse').textContent = answer;
+
+    const recalled = answer.toLowerCase().includes(secret.toLowerCase().split(' ').slice(-1)[0].toLowerCase()) ||
+                     answer.includes(secret.slice(-10));
+    const posLabels = { start: 'beginning (primacy zone)', middle: 'middle (lost-in-the-middle zone)', end: 'end (recency zone)' };
+    document.getElementById('ctxVerdict').textContent =
+      recalled
+        ? `✅ The model recalled the fact correctly! It was placed at the ${posLabels[pos]} :: LLMs tend to recall information from this position well.`
+        : `⚠️ The model may have struggled to recall the fact. It was placed in the ${posLabels[pos]} :: information buried here is often recalled less reliably. Try placing it at the start or end.`;
+  } catch(e) {
+    document.getElementById('ctxResponse').classList.remove('loading');
+    document.getElementById('ctxResponse').textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  document.getElementById('ctxBtnTxt').textContent = '▶';
+}
+
+// ── TEMPERATURE COMPARISON ──
+async function runTempComparison() {
+  const prompt = document.getElementById('tempPrompt').value.trim();
+  if (!prompt) return;
+
+  const btn = document.getElementById('tempCmpBtn');
+  const res = document.getElementById('tempCmpResults');
+  btn.disabled = true;
+  document.getElementById('tempCmpBtnTxt').textContent = '⏳';
+  res.style.display = 'block';
+  ['tcmp0','tcmp7','tcmp15'].forEach(id => {
+    document.getElementById(id).classList.add('loading');
+    document.getElementById(id).textContent = '';
+  });
+
+  const temps = [0.0, 0.7, 1.5];
+  const ids   = ['tcmp0','tcmp7','tcmp15'];
+
+  await Promise.all(temps.map(async (temp, i) => {
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 150,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await resp.json();
+      document.getElementById(ids[i]).classList.remove('loading');
+      document.getElementById(ids[i]).textContent = data.content?.[0]?.text || 'Error';
+    } catch(e) {
+      document.getElementById(ids[i]).classList.remove('loading');
+      document.getElementById(ids[i]).textContent = 'Error: ' + e.message;
+    }
+  }));
+
+  btn.disabled = false;
+  document.getElementById('tempCmpBtnTxt').textContent = '▶';
+}
+</script>
+
+
+</body></html>

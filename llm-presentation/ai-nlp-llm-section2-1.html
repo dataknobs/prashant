@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>2.1 Transformer Architecture :: AI, NLP &amp; LLMs Course</title>
+<meta content="Deep dive into the Transformer architecture: encoder vs decoder, self-attention, multi-head attention, positional encoding, feed-forward layers, residual connections, and layer normalization. Includes interactive diagrams and a PyTorch mini-attention implementation." name="description"/>
+<meta content="transformer architecture, self-attention, multi-head attention, encoder decoder, positional encoding, feed-forward network, residual connections, layer normalization, attention mechanism, BERT, GPT, PyTorch, deep learning, NLP, LLM course" name="keywords"/>
+<meta content="AI, NLP &amp; LLMs Course" name="author"/>
+<meta content="2.1 Transformer Architecture :: AI, NLP &amp; LLMs Course" property="og:title"/>
+<meta content="Master the Transformer architecture with interactive diagrams, animated attention visualizations, and hands-on PyTorch code." property="og:description"/>
+<meta content="article" property="og:type"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Cabinet+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0a0e1a;
+    --paper: #f0f4ff;
+    --cream: #e4eaff;
+    --accent: #e8430a;
+    --teal: #0ea5a0;
+    --gold: #d4930a;
+    --blue: #2563eb;
+    --muted: #5a6480;
+    --border: #c0cae8;
+    --code-bg: #080d1a;
+    --code-text: #d4e0ff;
+    --enc-col: #0ea5a0;
+    --dec-col: #d4930a;
+    --attn-col: #2563eb;
+    --ff-col: #7c3aed;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Cabinet Grotesk', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* blueprint grid background */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; left: 0; top: 0;
+    height: 100vh; width: 268px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 36px 0;
+    z-index: 100;
+    display: flex; flex-direction: column;
+    border-right: 2px solid var(--teal);
+    overflow-y: auto;
+  }
+
+  .sidebar-logo { padding: 0 26px 26px; border-bottom: 1px solid rgba(240,244,255,0.1); }
+  .sidebar-logo .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: var(--teal); text-transform: uppercase; margin-bottom: 6px; }
+  .sidebar-logo h2 { font-family: 'DM Serif Display', serif; font-size: 16px; line-height: 1.3; color: var(--paper); }
+
+  .sidebar-nav { flex: 1; padding: 18px 0; }
+  .nav-section { padding: 0 26px; }
+  .nav-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(240,244,255,0.3); padding: 14px 0 7px; display: block; }
+
+  .nav-link { display: block; padding: 6px 10px; margin: 1px -10px; border-radius: 4px; color: rgba(240,244,255,0.6); text-decoration: none; font-size: 12.5px; font-weight: 500; transition: all 0.2s; }
+  .nav-link:hover { background: rgba(14,165,160,0.15); color: var(--paper); }
+  .nav-link.active { background: rgba(14,165,160,0.18); color: #5eead4; border-left: 2px solid var(--teal); padding-left: 8px; }
+  .nav-link.dim { color: rgba(240,244,255,0.25); font-size: 12px; }
+
+  .sidebar-footer { padding: 16px 26px; border-top: 1px solid rgba(240,244,255,0.08); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,244,255,0.3); }
+
+  /* ── PROGRESS ── */
+  .progress-bar { height: 3px; background: var(--border); position: sticky; top: 0; z-index: 200; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue)); width: 0%; transition: width 0.1s; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 268px; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 80px 80px 64px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(14,165,160,0.3);
+  }
+
+  /* animated circuit lines */
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 47px, rgba(14,165,160,0.06) 47px, rgba(14,165,160,0.06) 48px),
+      repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(14,165,160,0.06) 47px, rgba(14,165,160,0.06) 48px);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '2.1';
+    position: absolute; right: 60px; top: 20px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 200px; line-height: 1;
+    color: rgba(14,165,160,0.05);
+    pointer-events: none; user-select: none;
+  }
+
+  .breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: rgba(240,244,255,0.3); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .breadcrumb a { color: rgba(240,244,255,0.3); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--teal); }
+
+  .hero-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--teal); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .hero-label::before { content: ''; display: inline-block; width: 32px; height: 1px; background: var(--teal); }
+
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(36px, 5vw, 58px); line-height: 1.1; margin-bottom: 22px; max-width: 700px; }
+  .hero h1 em { font-style: italic; color: #5eead4; }
+
+  .hero-desc { font-size: 17px; color: rgba(240,244,255,0.62); max-width: 560px; line-height: 1.75; margin-bottom: 36px; }
+
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { background: rgba(240,244,255,0.06); border: 1px solid rgba(240,244,255,0.12); color: rgba(240,244,255,0.6); padding: 4px 13px; border-radius: 20px; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; }
+
+  /* ── CONTENT ── */
+  .content { padding: 0 80px 80px; max-width: 1100px; }
+
+  /* ── SECTIONS ── */
+  .section { margin-top: 72px; padding-top: 72px; border-top: 1px solid var(--border); }
+  .section:first-child { border-top: none; padding-top: 60px; }
+
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--teal); text-transform: uppercase; margin-bottom: 10px; display: block; }
+  .section h2 { font-family: 'DM Serif Display', serif; font-size: clamp(26px, 3.2vw, 40px); line-height: 1.15; margin-bottom: 20px; }
+  .section-intro { font-size: 16.5px; color: var(--muted); max-width: 680px; margin-bottom: 44px; border-left: 3px solid var(--teal); padding-left: 20px; }
+
+  .subsection { margin-bottom: 52px; }
+  .subsection h3 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .anchor-icon { width: 28px; height: 28px; background: var(--ink); color: var(--paper); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; flex-shrink: 0; }
+
+  p { margin-bottom: 14px; }
+
+  /* ── CALLOUT ── */
+  .callout { background: var(--cream); border-left: 4px solid var(--teal); border-radius: 0 8px 8px 0; padding: 18px 22px; margin: 24px 0; }
+  .callout.warn { border-left-color: var(--gold); }
+  .callout.success { border-left-color: #16a34a; }
+  .callout.red { border-left-color: var(--accent); }
+  .callout.blue { border-left-color: var(--blue); }
+  .callout-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin-bottom: 7px; color: var(--teal); }
+  .callout.warn .callout-label { color: var(--gold); }
+  .callout.success .callout-label { color: #16a34a; }
+  .callout.red .callout-label { color: var(--accent); }
+  .callout.blue .callout-label { color: var(--blue); }
+  .callout p { margin-bottom: 0; font-size: 15px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; margin: 28px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--ink); color: var(--paper); }
+  th { padding: 13px 18px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500; }
+  td { padding: 12px 18px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--cream); }
+
+  /* ── CODE ── */
+  .code-container { margin: 28px 0; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 32px rgba(10,14,26,0.18); }
+  .code-header { background: #050810; padding: 11px 18px; display: flex; align-items: center; justify-content: space-between; }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .code-dot.red { background: #ff5f57; }
+  .code-dot.yellow { background: #febc2e; }
+  .code-dot.green { background: #28c840; }
+  .code-filename { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(212,224,255,0.4); margin-left: 10px; }
+  .code-lang { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 10px; background: rgba(14,165,160,0.22); color: #5eead4; border-radius: 4px; letter-spacing: 0.05em; }
+  pre { background: var(--code-bg); padding: 26px; overflow-x: auto; margin: 0; line-height: 1.65; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--code-text); }
+  .kw { color: #c792ea; } .str { color: #c3e88d; } .num { color: #f78c6c; }
+  .cmt { color: #4a5568; font-style: italic; } .fn { color: #82aaff; }
+  .var { color: #eeffa7; } .key { color: #89ddff; } .cls { color: #ffcb6b; }
+  .ic { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--cream); border: 1px solid var(--border); padding: 2px 7px; border-radius: 3px; color: var(--teal); }
+
+  /* ── DIAGRAM CONTAINERS ── */
+  .diagram-wrap {
+    background: var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 32px 0;
+    border: 1px solid rgba(14,165,160,0.2);
+  }
+
+  .diagram-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(240,244,255,0.07);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .diagram-header h4 { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--paper); }
+  .diagram-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 4px; background: rgba(14,165,160,0.2); color: #5eead4; letter-spacing: 0.05em; }
+
+  .diagram-body { padding: 28px; overflow-x: auto; }
+  .diagram-body svg { min-width: 480px; }
+
+  /* ── INTERACTIVE ATTENTION VIZ ── */
+  .attn-demo {
+    background: var(--ink);
+    border-radius: 12px;
+    margin: 32px 0;
+    overflow: hidden;
+    border: 1px solid rgba(37,99,235,0.25);
+  }
+
+  .attn-header { padding: 16px 24px; border-bottom: 1px solid rgba(240,244,255,0.07); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .attn-header h4 { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--paper); }
+
+  .attn-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  .attn-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 4px; border: 1px solid rgba(240,244,255,0.15); background: rgba(240,244,255,0.05); color: rgba(240,244,255,0.7); cursor: pointer; transition: all 0.2s; }
+  .attn-btn:hover, .attn-btn.active { background: rgba(37,99,235,0.3); border-color: var(--blue); color: var(--paper); }
+
+  .attn-body { padding: 28px; }
+  .attn-words { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+  .attn-word {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1.5px solid rgba(240,244,255,0.12);
+    background: rgba(240,244,255,0.04);
+    color: rgba(240,244,255,0.7);
+    cursor: pointer; transition: all 0.2s;
+    user-select: none;
+  }
+  .attn-word:hover { border-color: rgba(37,99,235,0.5); }
+  .attn-word.query { background: rgba(37,99,235,0.25); border-color: var(--blue); color: #93c5fd; box-shadow: 0 0 16px rgba(37,99,235,0.2); }
+
+  .attn-matrix-wrap { margin-top: 8px; }
+  .attn-matrix-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,244,255,0.3); margin-bottom: 14px; }
+
+  .attn-grid { display: flex; flex-direction: column; gap: 5px; }
+  .attn-row { display: flex; align-items: center; gap: 8px; }
+  .attn-row-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(240,244,255,0.5); min-width: 80px; text-align: right; }
+  .attn-cell { height: 28px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; transition: all 0.4s ease; min-width: 50px; }
+  .attn-hint { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(240,244,255,0.3); margin-top: 14px; }
+
+  /* ── ENC-DEC ARCHITECTURE TABS ── */
+  .arch-tabs { display: flex; gap: 2px; background: rgba(10,14,26,0.5); padding: 4px; border-radius: 8px; margin-bottom: 22px; width: fit-content; }
+  .arch-tab { padding: 8px 20px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; color: rgba(240,244,255,0.5); border: none; background: none; transition: all 0.2s; letter-spacing: 0.05em; }
+  .arch-tab.active { background: var(--teal); color: white; }
+
+  .arch-panel { display: none; }
+  .arch-panel.active { display: block; }
+
+  /* ── COMPONENT CARDS ── */
+  .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
+
+  .comp-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+  .comp-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(10,14,26,0.1); }
+
+  .comp-card-head { padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .comp-card-head h4 { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--paper); }
+  .comp-card-body { padding: 18px 20px; background: var(--paper); }
+  .comp-card-body p { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+  .comp-formula { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 10px 14px; border-radius: 5px; background: var(--cream); color: var(--ink); line-height: 1.7; border-left: 3px solid var(--border); }
+
+  /* ── POSITIONAL ENCODING VIZ ── */
+  .pe-canvas-wrap { margin: 28px 0; overflow-x: auto; border-radius: 10px; background: var(--ink); padding: 24px; border: 1px solid rgba(14,165,160,0.2); }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 24px 0; }
+  .steps li { counter-increment: step; position: relative; padding: 0 0 24px 52px; border-left: 2px solid var(--border); margin-left: 16px; }
+  .steps li::before { content: counter(step); position: absolute; left: -18px; top: 0; width: 34px; height: 34px; background: var(--ink); color: var(--paper); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+  .steps li:last-child { border-left: none; }
+  .steps li h4 { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .steps li p { font-size: 14px; color: var(--muted); margin-bottom: 0; }
+
+  /* ── DEMO BOX ── */
+  .demo-box { background: var(--ink); border-radius: 12px; padding: 32px; margin: 32px 0; color: var(--paper); border: 1px solid rgba(14,165,160,0.2); }
+  .demo-box h4 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 6px; color: var(--paper); }
+  .demo-desc { font-size: 14px; color: rgba(240,244,255,0.45); margin-bottom: 24px; }
+  .demo-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,244,255,0.4); display: block; margin-bottom: 7px; }
+  .demo-input { width: 100%; background: rgba(240,244,255,0.05); border: 1px solid rgba(240,244,255,0.12); color: var(--paper); padding: 11px 15px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 13px; resize: vertical; outline: none; transition: border-color 0.2s; margin-bottom: 14px; }
+  .demo-input:focus { border-color: var(--teal); }
+  .demo-btn { background: var(--teal); color: white; border: none; padding: 11px 24px; border-radius: 6px; font-family: 'Cabinet Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 7px; }
+  .demo-btn:hover { background: #0c8f8a; transform: translateY(-1px); }
+  .demo-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  .result-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--teal); margin-bottom: 8px; display: block; margin-top: 16px; }
+  .result-text { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; background: rgba(240,244,255,0.04); border: 1px solid rgba(240,244,255,0.08); border-radius: 6px; padding: 16px; color: rgba(240,244,255,0.8); line-height: 1.7; white-space: pre-wrap; }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .loading::after { content: '▋'; animation: blink 0.8s infinite; color: rgba(240,244,255,0.35); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.55s, transform 0.55s; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav { margin-top: 80px; padding: 36px 80px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--cream); }
+  .btn-nav { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border: 1.5px solid var(--ink); border-radius: 6px; text-decoration: none; color: var(--ink); font-weight: 700; font-size: 14px; transition: all 0.2s; }
+  .btn-nav.primary { background: var(--ink); color: var(--paper); }
+  .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(10,14,26,0.12); }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 28px; padding-right: 28px; }
+    .comp-grid { grid-template-columns: 1fr; }
+    .bottom-nav { flex-direction: column; gap: 14px; padding: 24px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="eyebrow">Course Material</div>
+    <h2>AI, NLP &amp; LLMs</h2>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <span class="nav-label">Section 1 :: Foundations</span>
+      <a class="nav-link dim" href="ai-nlp-llm-section1.html">1.1 Introduction to AI</a>
+      <a class="nav-link dim" href="ai-nlp-llm-section1-2.html">1.2 Evolution of NLP</a>
+      <a class="nav-link dim" href="ai-nlp-llm-section1-3.html">1.3 What is an LLM?</a>
+      <span class="nav-label">Section 2 :: Architecture</span>
+      <a class="nav-link active" href="#hero">2.1 Transformer Architecture</a>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">This Chapter</span>
+      <a class="nav-link" href="#enc-dec">Encoder vs Decoder</a>
+      <a class="nav-link" href="#self-attn">Self-Attention</a>
+      <a class="nav-link" href="#mha">Multi-Head Attention</a>
+      <a class="nav-link" href="#pos-enc">Positional Encoding</a>
+      <a class="nav-link" href="#ff">Feed-Forward Layers</a>
+      <a class="nav-link" href="#residual">Residual &amp; LayerNorm</a>
+      <a class="nav-link" href="#diagrams">Architecture Diagrams</a>
+      <a class="nav-link" href="#handson">Hands-on: PyTorch</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Section 2.1 · ~60 min read</div>
+</nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<main class="main">
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="breadcrumb">
+      <a href="#">Section 2</a>
+      <span style="color:rgba(240,244,255,0.18)">›</span>
+      <span>2.1 Transformer Architecture</span>
+    </div>
+    <div class="hero-label">Section 2 :: Model Architecture</div>
+    <h1>The <em>Transformer</em><br/>Architecture</h1>
+    <p class="hero-desc">The blueprint that powers every modern LLM. From the elegance of self-attention to residual streams :: understand the Transformer from circuit diagrams to working PyTorch code.</p>
+    <div class="hero-tags">
+      <span class="tag">Self-Attention</span>
+      <span class="tag">Multi-Head Attention</span>
+      <span class="tag">Encoder / Decoder</span>
+      <span class="tag">Positional Encoding</span>
+      <span class="tag">Feed-Forward</span>
+      <span class="tag">Residual Connections</span>
+      <span class="tag">Layer Norm</span>
+      <span class="tag">PyTorch</span>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <!-- ENCODER vs DECODER -->
+    <section class="section reveal" id="enc-dec">
+      <span class="section-number">2.1.1</span>
+      <h2>Encoder vs Decoder</h2>
+      <p class="section-intro">The original Transformer (Vaswani et al. 2017) combined two distinct sub-networks: an Encoder that reads the input, and a Decoder that generates the output. Modern LLMs use one or both halves depending on their task.</p>
+
+      <div class="subsection">
+        <div style="display:flex;gap:8px;margin-bottom:24px;">
+          <div class="arch-tabs">
+            <button class="arch-tab active" onclick="switchArch('full')">Full Encoder-Decoder</button>
+            <button class="arch-tab" onclick="switchArch('enc')">Encoder-Only</button>
+            <button class="arch-tab" onclick="switchArch('dec')">Decoder-Only</button>
+          </div>
+        </div>
+
+        <!-- FULL -->
+        <div class="arch-panel active" id="arch-full">
+          <div class="diagram-wrap">
+            <div class="diagram-header">
+              <h4>Encoder–Decoder (Seq2Seq)</h4>
+              <span class="diagram-badge">ORIGINAL TRANSFORMER</span>
+            </div>
+            <div class="diagram-body">
+              <svg style="width:100%;max-width:720px;" viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="ar" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="rgba(240,244,255,0.4)"></path></marker>
+                  <marker id="ar-teal" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="#5eead4"></path></marker>
+                  <marker id="ar-gold" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="#fcd34d"></path></marker>
+                </defs>
+
+                <!-- ENCODER COLUMN -->
+                <rect fill="rgba(14,165,160,0.06)" height="300" rx="8" stroke="rgba(14,165,160,0.35)" stroke-dasharray="5,3" stroke-width="1.5" width="280" x="30" y="20"></rect>
+                <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" letter-spacing="3" text-anchor="middle" x="170" y="45">ENCODER</text>
+
+                <!-- Encoder Input Embedding -->
+                <rect fill="rgba(14,165,160,0.15)" height="36" rx="4" stroke="rgba(14,165,160,0.4)" stroke-width="1" width="220" x="60" y="60"></rect>
+                <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="170" y="83">Input Embedding + Pos. Enc.</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="170" x2="170" y1="96" y2="114"></line>
+
+                <!-- Enc Self-Attention -->
+                <rect fill="rgba(37,99,235,0.18)" height="36" rx="4" stroke="rgba(37,99,235,0.45)" stroke-width="1" width="220" x="60" y="114"></rect>
+                <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="170" y="137">Multi-Head Self-Attention</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="170" x2="170" y1="150" y2="168"></line>
+
+                <!-- Enc Add & Norm -->
+                <rect fill="rgba(240,244,255,0.04)" height="28" rx="4" stroke="rgba(240,244,255,0.12)" stroke-width="1" width="220" x="60" y="168"></rect>
+                <text fill="rgba(240,244,255,0.5)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="170" y="187">Add &amp; LayerNorm</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="170" x2="170" y1="196" y2="214"></line>
+
+                <!-- Enc FFN -->
+                <rect fill="rgba(124,58,237,0.18)" height="36" rx="4" stroke="rgba(124,58,237,0.4)" stroke-width="1" width="220" x="60" y="214"></rect>
+                <text fill="#c4b5fd" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="170" y="237">Feed-Forward Network</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="170" x2="170" y1="250" y2="268"></line>
+
+                <!-- Enc Add & Norm 2 -->
+                <rect fill="rgba(240,244,255,0.04)" height="28" rx="4" stroke="rgba(240,244,255,0.12)" stroke-width="1" width="220" x="60" y="268"></rect>
+                <text fill="rgba(240,244,255,0.5)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="170" y="287">Add &amp; LayerNorm</text>
+
+                <!-- Residual enc -->
+                <path d="M 42 130 L 32 130 L 32 181 L 42 181" fill="none" stroke="rgba(14,165,160,0.25)" stroke-dasharray="3,2" stroke-width="1.5"></path>
+                <path d="M 42 230 L 32 230 L 32 281 L 42 281" fill="none" stroke="rgba(14,165,160,0.25)" stroke-dasharray="3,2" stroke-width="1.5"></path>
+
+                <!-- CROSS ATTENTION ARROW -->
+                <line marker-end="url(#ar-teal)" stroke="#5eead4" stroke-dasharray="5,3" stroke-width="2" x1="280" x2="408" y1="225" y2="225"></line>
+                <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="9" letter-spacing="1" text-anchor="middle" x="344" y="218">K, V</text>
+
+                <!-- DECODER COLUMN -->
+                <rect fill="rgba(212,147,10,0.06)" height="320" rx="8" stroke="rgba(212,147,10,0.3)" stroke-dasharray="5,3" stroke-width="1.5" width="280" x="410" y="20"></rect>
+                <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="11" letter-spacing="3" text-anchor="middle" x="550" y="45">DECODER</text>
+
+                <!-- Dec Input Embedding -->
+                <rect fill="rgba(212,147,10,0.15)" height="36" rx="4" stroke="rgba(212,147,10,0.35)" stroke-width="1" width="220" x="440" y="60"></rect>
+                <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="550" y="83">Output Embedding + Pos. Enc.</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="550" x2="550" y1="96" y2="114"></line>
+
+                <!-- Dec Masked Self-Attn -->
+                <rect fill="rgba(37,99,235,0.18)" height="36" rx="4" stroke="rgba(37,99,235,0.45)" stroke-width="1" width="220" x="440" y="114"></rect>
+                <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="550" y="132">Masked Multi-Head</text>
+                <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="550" y="146">Self-Attention</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="550" x2="550" y1="150" y2="168"></line>
+
+                <!-- Dec Add Norm -->
+                <rect fill="rgba(240,244,255,0.04)" height="28" rx="4" stroke="rgba(240,244,255,0.12)" stroke-width="1" width="220" x="440" y="168"></rect>
+                <text fill="rgba(240,244,255,0.5)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="550" y="187">Add &amp; LayerNorm</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="550" x2="550" y1="196" y2="214"></line>
+
+                <!-- Dec Cross Attention -->
+                <rect fill="rgba(14,165,160,0.18)" height="36" rx="4" stroke="rgba(14,165,160,0.4)" stroke-width="1" width="220" x="440" y="214"></rect>
+                <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="550" y="232">Cross-Attention</text>
+                <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="550" y="246">(Q from dec, K/V from enc)</text>
+                <line marker-end="url(#ar)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="550" x2="550" y1="250" y2="268"></line>
+
+                <!-- Dec Add Norm 2 -->
+                <rect fill="rgba(240,244,255,0.04)" height="28" rx="4" stroke="rgba(240,244,255,0.12)" stroke-width="1" width="220" x="440" y="268"></rect>
+                <text fill="rgba(240,244,255,0.5)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="550" y="287">Add &amp; LayerNorm → FFN → Output</text>
+
+                <!-- Input labels -->
+                <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="170" y="350">Source: "The cat"</text>
+                <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="550" y="350">Target: "Le chat" (shifted)</text>
+              </svg>
+            </div>
+          </div>
+          <div class="callout">
+            <div class="callout-label">Models using full Encoder–Decoder</div>
+            <p>T5, BART, MarianMT, mT5. The encoder processes the full input bidirectionally; the decoder generates outputs autoregressively with causal masking. Cross-attention lets the decoder query the encoder's representations at every step.</p>
+          </div>
+        </div>
+
+        <!-- ENCODER ONLY -->
+        <div class="arch-panel" id="arch-enc">
+          <div class="diagram-wrap">
+            <div class="diagram-header"><h4>Encoder-Only Architecture</h4><span class="diagram-badge">BERT-STYLE</span></div>
+            <div class="diagram-body">
+              <svg style="width:100%;max-width:500px;" viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+                <defs><marker id="ar2" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="rgba(240,244,255,0.35)"></path></marker></defs>
+                <!-- tokens in -->
+                <g>
+                  <rect fill="rgba(14,165,160,0.2)" height="30" rx="4" stroke="rgba(14,165,160,0.4)" stroke-width="1" width="60" x="20" y="170"></rect>
+                  <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="50" y="190">[CLS]</text>
+                  <rect fill="rgba(14,165,160,0.15)" height="30" rx="4" stroke="rgba(14,165,160,0.3)" stroke-width="1" width="60" x="90" y="170"></rect>
+                  <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="120" y="190">The</text>
+                  <rect fill="rgba(14,165,160,0.15)" height="30" rx="4" stroke="rgba(14,165,160,0.3)" stroke-width="1" width="60" x="160" y="170"></rect>
+                  <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="190" y="190">cat</text>
+                  <rect fill="rgba(14,165,160,0.15)" height="30" rx="4" stroke="rgba(14,165,160,0.3)" stroke-width="1" width="60" x="230" y="170"></rect>
+                  <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="260" y="190">sat</text>
+                  <rect fill="rgba(14,165,160,0.15)" height="30" rx="4" stroke="rgba(14,165,160,0.3)" stroke-width="1" width="60" x="300" y="170"></rect>
+                  <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="330" y="190">on</text>
+                  <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="390" y="190">…</text>
+                </g>
+                <!-- encoder block -->
+                <rect fill="rgba(14,165,160,0.1)" height="80" rx="6" stroke="rgba(14,165,160,0.35)" stroke-width="1.5" width="440" x="20" y="60"></rect>
+                <text fill="#5eead4" font-family="'DM Serif Display'" font-size="14" text-anchor="middle" x="240" y="88">Encoder Block × 12 (BERT-base)</text>
+                <text fill="rgba(240,244,255,0.5)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="240" y="108">Bidirectional Self-Attention → FFN → LayerNorm</text>
+                <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="240" y="126">ALL tokens attend to ALL other tokens simultaneously</text>
+                <!-- arrows up -->
+                <line marker-end="url(#ar2)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="50" x2="50" y1="170" y2="142"></line>
+                <line marker-end="url(#ar2)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="120" x2="120" y1="170" y2="142"></line>
+                <line marker-end="url(#ar2)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="190" x2="190" y1="170" y2="142"></line>
+                <line marker-end="url(#ar2)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="260" x2="260" y1="170" y2="142"></line>
+                <line marker-end="url(#ar2)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="330" x2="330" y1="170" y2="142"></line>
+                <!-- output labels -->
+                <line marker-end="url(#ar2)" stroke="rgba(14,165,160,0.4)" stroke-width="1.5" x1="50" x2="50" y1="60" y2="30"></line>
+                <line marker-end="url(#ar2)" stroke="rgba(14,165,160,0.4)" stroke-width="1.5" x1="120" x2="120" y1="60" y2="30"></line>
+                <line marker-end="url(#ar2)" stroke="rgba(14,165,160,0.4)" stroke-width="1.5" x1="190" x2="190" y1="60" y2="30"></line>
+                <line marker-end="url(#ar2)" stroke="rgba(14,165,160,0.4)" stroke-width="1.5" x1="260" x2="260" y1="60" y2="30"></line>
+                <text fill="rgba(14,165,160,0.7)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="50" y="20">h₁</text>
+                <text fill="rgba(14,165,160,0.7)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="120" y="20">h₂</text>
+                <text fill="rgba(14,165,160,0.7)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="190" y="20">h₃</text>
+                <text fill="rgba(14,165,160,0.7)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="260" y="20">h₄</text>
+                <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="380" y="20">Context vectors</text>
+              </svg>
+            </div>
+          </div>
+          <div class="callout">
+            <div class="callout-label">Models: BERT, RoBERTa, ALBERT, DeBERTa</div>
+            <p>Encoder-only models see the full sequence bidirectionally :: every token attends to every other token. Excellent for understanding tasks: classification, NER, question answering. Cannot generate text autoregressively.</p>
+          </div>
+        </div>
+
+        <!-- DECODER ONLY -->
+        <div class="arch-panel" id="arch-dec">
+          <div class="diagram-wrap">
+            <div class="diagram-header"><h4>Decoder-Only Architecture</h4><span class="diagram-badge">GPT-STYLE</span></div>
+            <div class="diagram-body">
+              <svg style="width:100%;max-width:560px;" viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="ar3" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="rgba(240,244,255,0.35)"></path></marker>
+                  <marker id="ar3-gold" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="#fcd34d"></path></marker>
+                </defs>
+                <!-- tokens -->
+                <g>
+                  <rect fill="rgba(212,147,10,0.2)" height="30" rx="4" stroke="rgba(212,147,10,0.4)" stroke-width="1" width="70" x="20" y="190"></rect>
+                  <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="55" y="210">The</text>
+                  <rect fill="rgba(212,147,10,0.2)" height="30" rx="4" stroke="rgba(212,147,10,0.4)" stroke-width="1" width="70" x="100" y="190"></rect>
+                  <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="135" y="210">cat</text>
+                  <rect fill="rgba(212,147,10,0.2)" height="30" rx="4" stroke="rgba(212,147,10,0.4)" stroke-width="1" width="70" x="180" y="190"></rect>
+                  <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="215" y="210">sat</text>
+                  <rect fill="rgba(212,147,10,0.2)" height="30" rx="4" stroke="rgba(212,147,10,0.4)" stroke-width="1" width="70" x="260" y="190"></rect>
+                  <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="295" y="210">on</text>
+                  <!-- Next predicted token -->
+                  <rect fill="rgba(232,67,10,0.2)" height="30" rx="4" stroke="rgba(232,67,10,0.5)" stroke-width="1.5" width="90" x="350" y="190"></rect>
+                  <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="395" y="210">the → ?</text>
+                </g>
+                <!-- causal mask diagram -->
+                <rect fill="rgba(212,147,10,0.08)" height="90" rx="6" stroke="rgba(212,147,10,0.3)" stroke-width="1.5" width="300" x="20" y="80"></rect>
+                <text fill="#fcd34d" font-family="'DM Serif Display'" font-size="14" text-anchor="middle" x="170" y="105">Decoder Block × N</text>
+                <text fill="rgba(240,244,255,0.5)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="170" y="125">Causal (Masked) Self-Attention</text>
+                <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="170" y="143">Each token attends only to LEFT (past) tokens</text>
+                <line marker-end="url(#ar3)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="55" x2="55" y1="190" y2="172"></line>
+                <line marker-end="url(#ar3)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="135" x2="135" y1="190" y2="172"></line>
+                <line marker-end="url(#ar3)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="215" x2="215" y1="190" y2="172"></line>
+                <line marker-end="url(#ar3)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="295" x2="295" y1="190" y2="172"></line>
+                <!-- output arrow to next token -->
+                <line marker-end="url(#ar3-gold)" stroke="#fcd34d" stroke-width="2" x1="320" x2="370" y1="125" y2="125"></line>
+                <rect fill="rgba(232,67,10,0.1)" height="80" rx="6" stroke="rgba(232,67,10,0.3)" stroke-width="1" width="160" x="370" y="105"></rect>
+                <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="450" y="135">Linear + Softmax</text>
+                <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="450" y="153">→ P(next token)</text>
+                <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="450" y="168">over vocabulary</text>
+                <!-- causal mask illustration -->
+                <text fill="rgba(240,244,255,0.25)" font-family="'JetBrains Mono'" font-size="10" x="20" y="52">Causal mask: "sat" can see [The, cat, sat] but NOT [on, …]</text>
+              </svg>
+            </div>
+          </div>
+          <div class="callout warn">
+            <div class="callout-label">Models: GPT-4, Claude, Llama, Gemini, Mistral</div>
+            <p>Decoder-only models use <strong>causal masking</strong> :: at position i, attention is allowed only to positions ≤ i. This enables autoregressive generation. The same architecture is used for both training (all positions in parallel with masking) and inference (one token at a time).</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Property</th><th>Encoder-Only</th><th>Decoder-Only</th><th>Encoder–Decoder</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Attention type</strong></td><td>Bidirectional</td><td>Causal (left-only)</td><td>Bidir enc + Causal dec</td></tr>
+              <tr><td><strong>Can generate?</strong></td><td>❌ No</td><td>✅ Yes</td><td>✅ Yes</td></tr>
+              <tr><td><strong>Context of output</strong></td><td>Full input context</td><td>Left context only</td><td>Full input, left output</td></tr>
+              <tr><td><strong>Best for</strong></td><td>Classification, NER, QA</td><td>Generation, chat, code</td><td>Translation, summarisation</td></tr>
+              <tr><td><strong>Examples</strong></td><td>BERT, RoBERTa</td><td>GPT-4, Claude, Llama</td><td>T5, BART</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SELF-ATTENTION -->
+    <section class="section reveal" id="self-attn">
+      <span class="section-number">2.1.2</span>
+      <h2>Self-Attention</h2>
+      <p class="section-intro">Self-attention allows every token in a sequence to directly query every other token :: computing pairwise relevance scores in a single matrix operation. It is the engine of the Transformer.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">Q</span>The Q, K, V Mechanism</h3>
+        <p>Each input token embedding is projected into three vectors via learned weight matrices:</p>
+        <ul style="list-style:none;padding:0;margin:0 0 16px;">
+          <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14.5px;"><strong style="color:var(--accent)">Q (Query)</strong> :: "What am I looking for?" Represents this token's information need.</li>
+          <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:14.5px;"><strong style="color:var(--gold)">K (Key)</strong> :: "What do I contain?" Acts as an index label for retrieval.</li>
+          <li style="padding:7px 0;font-size:14.5px;"><strong style="color:var(--teal)">V (Value)</strong> :: "What I actually contribute." The content aggregated into the output.</li>
+        </ul>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header"><h4>Scaled Dot-Product Attention :: Step by Step</h4><span class="diagram-badge">MECHANISM</span></div>
+          <div class="diagram-body">
+            <svg style="width:100%;max-width:700px;" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="ar4" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="rgba(240,244,255,0.35)"></path></marker>
+              </defs>
+              <!-- Step boxes -->
+              <!-- 1: Input X -->
+              <rect fill="rgba(14,165,160,0.15)" height="60" rx="5" stroke="rgba(14,165,160,0.4)" stroke-width="1.5" width="80" x="10" y="120"></rect>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="50" y="143">Input</text>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle" x="50" y="159">X</text>
+              <text fill="rgba(240,244,255,0.35)" font-family="'JetBrains Mono'" font-size="9" text-anchor="middle" x="50" y="175">[seq, d_model]</text>
+
+              <!-- Projection arrows -->
+              <line marker-end="url(#ar4)" stroke="rgba(232,67,10,0.6)" stroke-width="1.5" x1="90" x2="120" y1="140" y2="100"></line>
+              <line marker-end="url(#ar4)" stroke="rgba(212,147,10,0.6)" stroke-width="1.5" x1="90" x2="120" y1="150" y2="150"></line>
+              <line marker-end="url(#ar4)" stroke="rgba(14,165,160,0.6)" stroke-width="1.5" x1="90" x2="120" y1="160" y2="200"></line>
+
+              <!-- Q -->
+              <rect fill="rgba(232,67,10,0.18)" height="50" rx="4" stroke="rgba(232,67,10,0.5)" stroke-width="1" width="60" x="120" y="70"></rect>
+              <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="150" y="94">×Wq</text>
+              <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle" x="150" y="112">Q</text>
+
+              <!-- K -->
+              <rect fill="rgba(212,147,10,0.18)" height="50" rx="4" stroke="rgba(212,147,10,0.5)" stroke-width="1" width="60" x="120" y="125"></rect>
+              <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="150" y="149">×Wk</text>
+              <text fill="#fcd34d" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle" x="150" y="167">K</text>
+
+              <!-- V -->
+              <rect fill="rgba(14,165,160,0.18)" height="50" rx="4" stroke="rgba(14,165,160,0.5)" stroke-width="1" width="60" x="120" y="180"></rect>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="150" y="204">×Wv</text>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle" x="150" y="222">V</text>
+
+              <!-- Step 2: QK^T -->
+              <line marker-end="url(#ar4)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="180" x2="220" y1="95" y2="150"></line>
+              <line marker-end="url(#ar4)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="180" x2="220" y1="155" y2="155"></line>
+              <rect fill="rgba(37,99,235,0.18)" height="60" rx="4" stroke="rgba(37,99,235,0.4)" stroke-width="1" width="90" x="220" y="120"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="265" y="143">QKᵀ / √dₖ</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="265" y="159">dot-product</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="265" y="173">+ scale</text>
+
+              <!-- Masking (optional) -->
+              <rect fill="rgba(240,244,255,0.04)" height="36" rx="4" stroke="rgba(240,244,255,0.1)" stroke-dasharray="4,2" stroke-width="1" width="90" x="220" y="50"></rect>
+              <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="265" y="68">+ Mask</text>
+              <text fill="rgba(240,244,255,0.2)" font-family="'JetBrains Mono'" font-size="9" text-anchor="middle" x="265" y="82">(decoder only)</text>
+              <line marker-end="url(#ar4)" stroke="rgba(240,244,255,0.15)" stroke-dasharray="3,2" stroke-width="1" x1="265" x2="265" y1="86" y2="120"></line>
+
+              <!-- Step 3: Softmax -->
+              <line marker-end="url(#ar4)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="310" x2="350" y1="150" y2="150"></line>
+              <rect fill="rgba(124,58,237,0.18)" height="60" rx="4" stroke="rgba(124,58,237,0.4)" stroke-width="1" width="80" x="350" y="120"></rect>
+              <text fill="#c4b5fd" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="390" y="147">Softmax</text>
+              <text fill="rgba(240,244,255,0.35)" font-family="'JetBrains Mono'" font-size="9" text-anchor="middle" x="390" y="165">→ weights</text>
+
+              <!-- Step 4: × V -->
+              <line marker-end="url(#ar4)" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" x1="430" x2="470" y1="150" y2="150"></line>
+              <line marker-end="url(#ar4)" stroke="rgba(14,165,160,0.3)" stroke-dasharray="4,3" stroke-width="1.5" x1="180" x2="475" y1="205" y2="175"></line>
+              <rect fill="rgba(14,165,160,0.18)" height="60" rx="4" stroke="rgba(14,165,160,0.4)" stroke-width="1.5" width="80" x="470" y="120"></rect>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="510" y="143">× V</text>
+              <text fill="rgba(240,244,255,0.35)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="510" y="162">weighted sum</text>
+
+              <!-- Output -->
+              <line marker-end="url(#ar4)" stroke="rgba(240,244,255,0.3)" stroke-width="2" x1="550" x2="590" y1="150" y2="150"></line>
+              <rect fill="rgba(240,244,255,0.06)" height="60" rx="4" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" width="90" x="590" y="120"></rect>
+              <text fill="rgba(240,244,255,0.9)" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="635" y="148">Output</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="9" text-anchor="middle" x="635" y="165">[seq, d_model]</text>
+
+              <!-- Formula at bottom -->
+              <text fill="rgba(240,244,255,0.7)" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle" x="350" y="260">Attention(Q,K,V) = softmax( QKᵀ / √dₖ ) · V</text>
+              <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="350" y="280">dₖ = head dimension  |  √dₖ scaling prevents gradient vanishing in high dims</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE ATTENTION -->
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Interactive Attention Heatmap</h3>
+        <p>Click any word to see how attention weights distribute across the sentence. Different attention heads capture different relationships.</p>
+
+        <div class="attn-demo">
+          <div class="attn-header">
+            <h4>Attention Heatmap Explorer</h4>
+            <div class="attn-controls">
+              <button class="attn-btn active" onclick="setHead(0,this)">Head 1 :: Syntactic</button>
+              <button class="attn-btn" onclick="setHead(1,this)">Head 2 :: Semantic</button>
+              <button class="attn-btn" onclick="setHead(2,this)">Head 3 :: Positional</button>
+            </div>
+          </div>
+          <div class="attn-body">
+            <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,244,255,0.3);margin-bottom:12px;">Click a word to set it as the query token:</p>
+            <div class="attn-words" id="attnWords"></div>
+            <div class="attn-matrix-wrap">
+              <div class="attn-matrix-label">Attention weights for selected query → each key token</div>
+              <div class="attn-grid" id="attnGrid"></div>
+              <div class="attn-hint" id="attnHint">↑ Click a word above to see its attention pattern</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MULTI-HEAD ATTENTION -->
+    <section class="section reveal" id="mha">
+      <span class="section-number">2.1.3</span>
+      <h2>Multi-Head Attention</h2>
+      <p class="section-intro">A single attention head can only capture one type of relationship per token pair. Multi-head attention runs h attention heads in parallel :: each learning to attend to different aspects of the input.</p>
+
+      <div class="subsection">
+        <p>Each head uses its own Q, K, V projection matrices (smaller dimension <span class="ic">d_k = d_model / h</span>). The outputs are concatenated and projected back to <span class="ic">d_model</span>.</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header"><h4>Multi-Head Attention</h4><span class="diagram-badge">h=8 HEADS</span></div>
+          <div class="diagram-body">
+            <svg style="width:100%;max-width:680px;" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg">
+              <defs><marker id="ar5" markerHeight="7" markerWidth="7" orient="auto" refX="5" refY="3"><path d="M0,0 L0,6 L7,3z" fill="rgba(240,244,255,0.3)"></path></marker></defs>
+              <!-- Input -->
+              <rect fill="rgba(14,165,160,0.15)" height="40" rx="4" stroke="rgba(14,165,160,0.4)" stroke-width="1.5" width="70" x="20" y="120"></rect>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="55" y="144">Q,K,V</text>
+
+              <!-- Heads -->
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.15)" stroke-width="1.5" x1="90" x2="128" y1="135" y2="80"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.15)" stroke-width="1.5" x1="90" x2="128" y1="138" y2="120"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.15)" stroke-width="1.5" x1="90" x2="128" y1="140" y2="140"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.15)" stroke-width="1.5" x1="90" x2="128" y1="142" y2="160"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.15)" stroke-width="1.5" x1="90" x2="128" y1="145" y2="200"></line>
+
+              <!-- Head boxes -->
+              <rect fill="rgba(37,99,235,0.2)" height="34" rx="4" stroke="rgba(37,99,235,0.4)" stroke-width="1" width="100" x="128" y="60"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="178" y="82">Attn Head 1</text>
+
+              <rect fill="rgba(37,99,235,0.17)" height="34" rx="4" stroke="rgba(37,99,235,0.35)" stroke-width="1" width="100" x="128" y="104"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="178" y="126">Attn Head 2</text>
+
+              <rect fill="rgba(37,99,235,0.14)" height="34" rx="4" stroke="rgba(37,99,235,0.3)" stroke-width="1" width="100" x="128" y="122"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="178" y="144">Attn Head 3</text>
+
+              <rect fill="rgba(37,99,235,0.11)" height="34" rx="4" stroke="rgba(37,99,235,0.25)" stroke-width="1" width="100" x="128" y="140"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="178" y="162">Attn Head 4</text>
+
+              <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="178" y="195">…</text>
+
+              <rect fill="rgba(37,99,235,0.1)" height="34" rx="4" stroke="rgba(37,99,235,0.2)" stroke-width="1" width="100" x="128" y="196"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="178" y="218">Attn Head h</text>
+
+              <!-- Concat -->
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.12)" stroke-width="1.5" x1="228" x2="290" y1="77" y2="138"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.12)" stroke-width="1.5" x1="228" x2="290" y1="122" y2="139"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.12)" stroke-width="1.5" x1="228" x2="290" y1="140" y2="140"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.12)" stroke-width="1.5" x1="228" x2="290" y1="158" y2="141"></line>
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.12)" stroke-width="1.5" x1="228" x2="290" y1="214" y2="143"></line>
+
+              <rect fill="rgba(124,58,237,0.2)" height="56" rx="5" stroke="rgba(124,58,237,0.45)" stroke-width="1.5" width="100" x="290" y="112"></rect>
+              <text fill="#c4b5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="340" y="137">Concat</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="340" y="156">h × d_k = d_model</text>
+
+              <!-- Linear projection -->
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="390" x2="430" y1="140" y2="140"></line>
+              <rect fill="rgba(232,67,10,0.15)" height="56" rx="5" stroke="rgba(232,67,10,0.35)" stroke-width="1.5" width="100" x="430" y="112"></rect>
+              <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="480" y="137">Linear</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="480" y="155">× Wo → d_model</text>
+
+              <!-- Output -->
+              <line marker-end="url(#ar5)" stroke="rgba(240,244,255,0.3)" stroke-width="2" x1="530" x2="570" y1="140" y2="140"></line>
+              <rect fill="rgba(240,244,255,0.06)" height="50" rx="4" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" width="90" x="570" y="115"></rect>
+              <text fill="rgba(240,244,255,0.85)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="615" y="140">MHA</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="615" y="157">Output</text>
+
+              <!-- Formula -->
+              <text fill="rgba(240,244,255,0.6)" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="340" y="265">MultiHead(Q,K,V) = Concat(head₁,…,headₕ) Wᴼ</text>
+              <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="340" y="280">headᵢ = Attention(QWᵢQ, KWᵢK, VWᵢV)   |   GPT-4 uses 96 heads, d_model=12288</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="callout blue">
+          <div class="callout-label">Why Multiple Heads?</div>
+          <p>Different heads specialise in different linguistic relationships. Head 1 might track syntactic dependencies (subject–verb agreement). Head 2 might track coreference (which pronoun refers to which noun). Head 3 might track positional proximity. Single-head attention can only express one combination of these signals per token pair; multiple heads express all simultaneously.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- POSITIONAL ENCODING -->
+    <section class="section reveal" id="pos-enc">
+      <span class="section-number">2.1.4</span>
+      <h2>Positional Encoding</h2>
+      <p class="section-intro">Self-attention is permutation-invariant :: it produces the same output regardless of token order. Positional encoding injects sequence position information so the model can distinguish "the cat sat" from "sat cat the".</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">P</span>Sinusoidal Positional Encoding</h3>
+        <p>The original Transformer uses fixed sinusoidal functions of different frequencies. Each position pos and dimension i gets a unique encoding value, added to the token embedding before the first layer.</p>
+
+        <div class="comp-grid">
+          <div class="comp-card">
+            <div class="comp-card-head" style="background:rgba(37,99,235,0.25);">
+              <h4>Even dimensions (2i)</h4>
+            </div>
+            <div class="comp-card-body">
+              <p>Sine function :: produces smooth oscillations. Frequency decreases with depth (lower dimensions oscillate faster).</p>
+              <div class="comp-formula">PE(pos, 2i) = sin(pos / 10000^(2i/d_model))</div>
+            </div>
+          </div>
+          <div class="comp-card">
+            <div class="comp-card-head" style="background:rgba(14,165,160,0.25);">
+              <h4>Odd dimensions (2i+1)</h4>
+            </div>
+            <div class="comp-card-body">
+              <p>Cosine function :: shifted by π/2 from the sine. Together sine+cosine provide a complete phase representation at each frequency.</p>
+              <div class="comp-formula">PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Positional Encoding Heatmap Canvas -->
+        <div class="pe-canvas-wrap">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(240,244,255,0.3);margin-bottom:16px;">Sinusoidal PE heatmap :: rows=positions (0–63), columns=dimensions (0–63), colour=value</p>
+          <canvas height="120" id="peCanvas" style="width:100%;border-radius:4px;" width="640"></canvas>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(240,244,255,0.3);margin-top:12px;">Each row is added to the corresponding token's embedding. High-freq dims encode fine position differences; low-freq dims encode coarse position.</p>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-label">Sinusoidal vs Learned vs RoPE</div>
+          <p>Modern LLMs have moved beyond fixed sinusoidal PE. <strong>Learned positional embeddings</strong> (GPT-2, BERT) train a lookup table per position :: simpler but can't extrapolate beyond training length. <strong>Rotary Positional Encoding (RoPE)</strong> (Llama, GPT-NeoX) encodes relative positions by rotating Q and K vectors :: enabling better length extrapolation and is now the dominant approach.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEED FORWARD -->
+    <section class="section reveal" id="ff">
+      <span class="section-number">2.1.5</span>
+      <h2>Feed-Forward Layers</h2>
+      <p class="section-intro">After attention aggregates information across positions, a position-wise Feed-Forward Network (FFN) applies a non-linear transformation independently to each token. This is where the model "thinks" about the aggregated context.</p>
+
+      <div class="subsection">
+        <p>The FFN is a two-layer MLP: expand to 4× the model dimension, apply a non-linearity (ReLU or GELU), then project back down. Critically, it is applied identically and independently at each token position :: no cross-position interaction occurs here.</p>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header"><h4>Feed-Forward Network (per token)</h4><span class="diagram-badge">POSITION-WISE</span></div>
+          <div class="diagram-body">
+            <svg style="width:100%;max-width:620px;" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
+              <defs><marker id="ar6" markerHeight="7" markerWidth="7" orient="auto" refX="5" refY="3"><path d="M0,0 L0,6 L7,3z" fill="rgba(240,244,255,0.3)"></path></marker></defs>
+              <!-- Input -->
+              <rect fill="rgba(14,165,160,0.15)" height="40" rx="4" stroke="rgba(14,165,160,0.35)" stroke-width="1.5" width="80" x="10" y="80"></rect>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="50" y="97">Input</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="50" y="113">d_model=512</text>
+              <line marker-end="url(#ar6)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="90" x2="130" y1="100" y2="100"></line>
+
+              <!-- Linear 1 -->
+              <rect fill="rgba(37,99,235,0.15)" height="90" rx="4" stroke="rgba(37,99,235,0.35)" stroke-width="1.5" width="110" x="130" y="55"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="185" y="86">Linear</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="185" y="102">W₁ ∈ ℝ^d×4d</text>
+              <text fill="rgba(240,244,255,0.35)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="185" y="118">expand to 2048</text>
+              <line marker-end="url(#ar6)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="240" x2="280" y1="100" y2="100"></line>
+
+              <!-- GELU -->
+              <rect fill="rgba(124,58,237,0.2)" height="60" rx="4" stroke="rgba(124,58,237,0.4)" stroke-width="1.5" width="90" x="280" y="70"></rect>
+              <text fill="#c4b5fd" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="325" y="97">GELU</text>
+              <text fill="rgba(240,244,255,0.35)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="325" y="115">activation</text>
+              <line marker-end="url(#ar6)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="370" x2="410" y1="100" y2="100"></line>
+
+              <!-- Linear 2 -->
+              <rect fill="rgba(37,99,235,0.15)" height="90" rx="4" stroke="rgba(37,99,235,0.35)" stroke-width="1.5" width="110" x="410" y="55"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="465" y="86">Linear</text>
+              <text fill="rgba(240,244,255,0.4)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="465" y="102">W₂ ∈ ℝ^4d×d</text>
+              <text fill="rgba(240,244,255,0.35)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="465" y="118">back to 512</text>
+              <line marker-end="url(#ar6)" stroke="rgba(240,244,255,0.25)" stroke-width="1.5" x1="520" x2="560" y1="100" y2="100"></line>
+
+              <!-- Output -->
+              <rect fill="rgba(240,244,255,0.06)" height="40" rx="4" stroke="rgba(240,244,255,0.2)" stroke-width="1.5" width="50" x="560" y="80"></rect>
+              <text fill="rgba(240,244,255,0.85)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="585" y="104">Out</text>
+
+              <!-- Formula -->
+              <text fill="rgba(240,244,255,0.6)" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="310" y="178">FFN(x) = GELU(xW₁ + b₁)W₂ + b₂</text>
+              <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="310" y="196">Applied at EACH token position independently. d_ffn = 4 × d_model typically.</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">The Role of the FFN</div>
+          <p>Interpretability research (e.g. Geva et al. 2021) suggests FFN layers act as key-value memories :: the first layer detects patterns (keys) and the second outputs associated information (values). Up to 70% of an LLM's factual knowledge may be stored in its FFN weights, not its attention matrices.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESIDUAL + LAYERNORM -->
+    <section class="section reveal" id="residual">
+      <span class="section-number">2.1.6</span>
+      <h2>Residual Connections &amp; Layer Normalization</h2>
+      <p class="section-intro">Two training stability techniques that are invisible in diagrams but essential in practice :: without them, deep Transformers (96+ layers in GPT-4) are untrainable.</p>
+
+      <div class="subsection">
+        <div class="comp-grid">
+          <div class="comp-card">
+            <div class="comp-card-head" style="background:rgba(232,67,10,0.25);">
+              <h4>Residual Connections</h4>
+            </div>
+            <div class="comp-card-body">
+              <p>Each sub-layer's output is added to its input: <strong>output = x + Sublayer(x)</strong>. The gradient flows directly through the addition :: bypassing the sub-layer entirely if needed. This prevents vanishing gradients in very deep networks.</p>
+              <div class="comp-formula">x_out = LayerNorm(x + Attention(x))<br/>x_out = LayerNorm(x + FFN(x))</div>
+            </div>
+          </div>
+          <div class="comp-card">
+            <div class="comp-card-head" style="background:rgba(14,165,160,0.25);">
+              <h4>Layer Normalization</h4>
+            </div>
+            <div class="comp-card-body">
+              <p>Normalises activations across the feature dimension (not batch dimension) to zero mean and unit variance. Stabilises training and reduces sensitivity to learning rate. Applied before (Pre-LN) or after (Post-LN) each sub-layer.</p>
+              <div class="comp-formula">LayerNorm(x) = γ · (x − μ)/σ + β<br/>γ, β: learned scale and shift<br/>Pre-LN (GPT-2+) is more stable</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="diagram-wrap">
+          <div class="diagram-header"><h4>One Complete Transformer Block (Pre-LN)</h4><span class="diagram-badge">FULL BLOCK</span></div>
+          <div class="diagram-body">
+            <svg style="width:100%;max-width:520px;" viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="ar7" markerHeight="7" markerWidth="7" orient="auto" refX="5" refY="3"><path d="M0,0 L0,6 L7,3z" fill="rgba(240,244,255,0.4)"></path></marker>
+              </defs>
+              <!-- Input x -->
+              <rect fill="rgba(14,165,160,0.15)" height="34" rx="4" stroke="rgba(14,165,160,0.35)" stroke-width="1.5" width="130" x="190" y="330"></rect>
+              <text fill="#5eead4" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="255" y="352">Input x</text>
+              <line marker-end="url(#ar7)" stroke="rgba(240,244,255,0.3)" stroke-width="1.5" x1="255" x2="255" y1="330" y2="308"></line>
+
+              <!-- LayerNorm 1 -->
+              <rect fill="rgba(240,244,255,0.06)" height="34" rx="4" stroke="rgba(240,244,255,0.18)" stroke-width="1" width="130" x="190" y="274"></rect>
+              <text fill="rgba(240,244,255,0.6)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="255" y="296">LayerNorm</text>
+              <line marker-end="url(#ar7)" stroke="rgba(240,244,255,0.3)" stroke-width="1.5" x1="255" x2="255" y1="274" y2="252"></line>
+
+              <!-- MHA -->
+              <rect fill="rgba(37,99,235,0.2)" height="40" rx="5" stroke="rgba(37,99,235,0.45)" stroke-width="1.5" width="190" x="160" y="212"></rect>
+              <text fill="#93c5fd" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="255" y="237">Multi-Head Attention</text>
+              <line marker-end="url(#ar7)" stroke="rgba(240,244,255,0.3)" stroke-width="1.5" x1="255" x2="255" y1="212" y2="192"></line>
+
+              <!-- Add & residual 1 -->
+              <rect fill="rgba(232,67,10,0.12)" height="30" rx="4" stroke="rgba(232,67,10,0.3)" stroke-width="1" width="130" x="190" y="162"></rect>
+              <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="255" y="182">Add (x + Attn)</text>
+              <line marker-end="url(#ar7)" stroke="rgba(240,244,255,0.3)" stroke-width="1.5" x1="255" x2="255" y1="162" y2="142"></line>
+
+              <!-- Residual skip 1 -->
+              <path d="M 172 330 L 152 330 L 152 177 L 172 177" fill="none" stroke="rgba(232,67,10,0.3)" stroke-dasharray="4,3" stroke-width="1.5"></path>
+              <text fill="rgba(232,67,10,0.5)" font-family="'JetBrains Mono'" font-size="9" text-anchor="middle" transform="rotate(-90,140,255)" x="140" y="255">Residual</text>
+
+              <!-- LayerNorm 2 -->
+              <rect fill="rgba(240,244,255,0.06)" height="30" rx="4" stroke="rgba(240,244,255,0.18)" stroke-width="1" width="130" x="190" y="112"></rect>
+              <text fill="rgba(240,244,255,0.6)" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="255" y="132">LayerNorm</text>
+              <line marker-end="url(#ar7)" stroke="rgba(240,244,255,0.3)" stroke-width="1.5" x1="255" x2="255" y1="112" y2="92"></line>
+
+              <!-- FFN -->
+              <rect fill="rgba(124,58,237,0.2)" height="40" rx="5" stroke="rgba(124,58,237,0.45)" stroke-width="1.5" width="190" x="160" y="52"></rect>
+              <text fill="#c4b5fd" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle" x="255" y="77">Feed-Forward Network</text>
+              <line marker-end="url(#ar7)" stroke="rgba(240,244,255,0.3)" stroke-width="1.5" x1="255" x2="255" y1="52" y2="32"></line>
+
+              <!-- Add & residual 2 -->
+              <rect fill="rgba(232,67,10,0.12)" height="24" rx="4" stroke="rgba(232,67,10,0.3)" stroke-width="1" width="130" x="190" y="8"></rect>
+              <text fill="#fb923c" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle" x="255" y="24">Add (x + FFN)</text>
+
+              <!-- Residual skip 2 -->
+              <path d="M 358 162 L 376 162 L 376 20 L 358 20" fill="none" stroke="rgba(232,67,10,0.3)" stroke-dasharray="4,3" stroke-width="1.5"></path>
+              <text fill="rgba(232,67,10,0.5)" font-family="'JetBrains Mono'" font-size="9" text-anchor="middle" transform="rotate(90,388,92)" x="388" y="92">Residual</text>
+
+              <!-- Output label -->
+              <text fill="rgba(240,244,255,0.3)" font-family="'JetBrains Mono'" font-size="10" text-anchor="middle" x="255" y="4">→ Output (feeds next block)</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDS-ON: PYTORCH -->
+    <section class="section reveal" id="handson">
+      <span class="section-number">2.1.7</span>
+      <h2>Hands-on: Mini Attention in PyTorch</h2>
+      <p class="section-intro">Build a complete, production-quality scaled dot-product attention and multi-head attention from scratch in PyTorch. Then assemble a full Transformer block and run a forward pass.</p>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">1</span>Scaled Dot-Product Attention</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">attention.py</span>
+            </div>
+            <span class="code-lang">PYTORCH</span>
+          </div>
+          <pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.nn.functional <span class="kw">as</span> F
+<span class="kw">import</span> math
+
+<span class="kw">def</span> <span class="fn">scaled_dot_product_attention</span>(
+    q: torch.<span class="cls">Tensor</span>,   <span class="cmt"># [batch, heads, seq, d_k]</span>
+    k: torch.<span class="cls">Tensor</span>,   <span class="cmt"># [batch, heads, seq, d_k]</span>
+    v: torch.<span class="cls">Tensor</span>,   <span class="cmt"># [batch, heads, seq, d_v]</span>
+    mask: torch.<span class="cls">Tensor</span> = <span class="cls">None</span>,  <span class="cmt"># [batch, 1, seq, seq] boolean</span>
+    dropout: float = <span class="num">0.0</span>,
+) -&gt; tuple[torch.<span class="cls">Tensor</span>, torch.<span class="cls">Tensor</span>]:
+    <span class="str">"""
+    Compute Attention(Q,K,V) = softmax(QKᵀ / √dₖ) · V
+    Returns: (output [batch,heads,seq,d_v], weights [batch,heads,seq,seq])
+    """</span>
+    <span class="var">d_k</span> = q.<span class="fn">size</span>(-<span class="num">1</span>)
+
+    <span class="cmt"># Step 1: Compute raw attention scores QKᵀ</span>
+    <span class="var">scores</span> = torch.<span class="fn">matmul</span>(q, k.<span class="fn">transpose</span>(-<span class="num">2</span>, -<span class="num">1</span>))  <span class="cmt"># [B, H, Seq, Seq]</span>
+
+    <span class="cmt"># Step 2: Scale by 1/√dₖ to stabilize gradients</span>
+    <span class="var">scores</span> = <span class="var">scores</span> / math.<span class="fn">sqrt</span>(<span class="var">d_k</span>)
+
+    <span class="cmt"># Step 3: Apply mask (causal or padding)</span>
+    <span class="kw">if</span> mask <span class="kw">is not</span> <span class="cls">None</span>:
+        <span class="cmt"># -1e9 → effectively -∞ before softmax → 0 after</span>
+        <span class="var">scores</span> = <span class="var">scores</span>.<span class="fn">masked_fill</span>(mask == <span class="num">0</span>, -<span class="num">1e9</span>)
+
+    <span class="cmt"># Step 4: Softmax over the key dimension</span>
+    <span class="var">weights</span> = F.<span class="fn">softmax</span>(<span class="var">scores</span>, dim=-<span class="num">1</span>)  <span class="cmt"># [B, H, Seq, Seq]</span>
+
+    <span class="cmt"># Step 5: Optional dropout on attention weights</span>
+    <span class="kw">if</span> dropout &gt; <span class="num">0.0</span>:
+        <span class="var">weights</span> = F.<span class="fn">dropout</span>(<span class="var">weights</span>, p=dropout, training=<span class="cls">True</span>)
+
+    <span class="cmt"># Step 6: Weighted sum of values</span>
+    <span class="var">output</span> = torch.<span class="fn">matmul</span>(<span class="var">weights</span>, v)  <span class="cmt"># [B, H, Seq, d_v]</span>
+
+    <span class="kw">return</span> <span class="var">output</span>, <span class="var">weights</span>
+
+
+<span class="cmt"># ── Quick test ──</span>
+<span class="var">B</span>, <span class="var">H</span>, <span class="var">S</span>, <span class="var">D</span> = <span class="num">2</span>, <span class="num">4</span>, <span class="num">8</span>, <span class="num">64</span>   <span class="cmt"># batch, heads, seq_len, head_dim</span>
+<span class="var">q</span> = torch.<span class="fn">randn</span>(<span class="var">B</span>, <span class="var">H</span>, <span class="var">S</span>, <span class="var">D</span>)
+<span class="var">k</span> = torch.<span class="fn">randn</span>(<span class="var">B</span>, <span class="var">H</span>, <span class="var">S</span>, <span class="var">D</span>)
+<span class="var">v</span> = torch.<span class="fn">randn</span>(<span class="var">B</span>, <span class="var">H</span>, <span class="var">S</span>, <span class="var">D</span>)
+
+<span class="cmt"># Causal mask :: lower triangular (decoder-style)</span>
+<span class="var">causal_mask</span> = torch.<span class="fn">tril</span>(torch.<span class="fn">ones</span>(<span class="var">S</span>, <span class="var">S</span>)).<span class="fn">bool</span>().<span class="fn">unsqueeze</span>(<span class="num">0</span>).<span class="fn">unsqueeze</span>(<span class="num">0</span>)
+
+<span class="var">out</span>, <span class="var">attn_weights</span> = <span class="fn">scaled_dot_product_attention</span>(<span class="var">q</span>, <span class="var">k</span>, <span class="var">v</span>, mask=<span class="var">causal_mask</span>)
+<span class="fn">print</span>(<span class="str">f"Output shape:  {out.shape}"</span>)          <span class="cmt"># → torch.Size([2, 4, 8, 64])</span>
+<span class="fn">print</span>(<span class="str">f"Weights shape: {attn_weights.shape}"</span>)  <span class="cmt"># → torch.Size([2, 4, 8, 8])</span>
+<span class="fn">print</span>(<span class="str">f"Weights sum:   {attn_weights[0,0,0].sum():.4f}"</span>)  <span class="cmt"># → 1.0000 (softmax)</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">2</span>Multi-Head Attention Module</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">multi_head_attention.py</span>
+            </div>
+            <span class="code-lang">PYTORCH</span>
+          </div>
+          <pre><code><span class="kw">class</span> <span class="cls">MultiHeadAttention</span>(nn.<span class="cls">Module</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model: int, n_heads: int, dropout: float = <span class="num">0.1</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="fn">assert</span> d_model % n_heads == <span class="num">0</span>, <span class="str">"d_model must be divisible by n_heads"</span>
+
+        self.<span class="var">d_model</span>  = d_model
+        self.<span class="var">n_heads</span>  = n_heads
+        self.<span class="var">d_k</span>      = d_model // n_heads  <span class="cmt"># head dimension</span>
+        self.<span class="var">dropout</span>  = dropout
+
+        <span class="cmt"># Projection matrices (W_q, W_k, W_v fused for efficiency)</span>
+        self.<span class="var">W_qkv</span> = nn.<span class="cls">Linear</span>(d_model, <span class="num">3</span> * d_model, bias=<span class="cls">False</span>)
+        self.<span class="var">W_o</span>   = nn.<span class="cls">Linear</span>(d_model, d_model, bias=<span class="cls">False</span>)
+
+        <span class="cmt"># Initialise with small weights (stabilises training)</span>
+        nn.init.<span class="fn">xavier_uniform_</span>(self.<span class="var">W_qkv</span>.weight)
+        nn.init.<span class="fn">xavier_uniform_</span>(self.<span class="var">W_o</span>.weight)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(
+        self,
+        x: torch.<span class="cls">Tensor</span>,              <span class="cmt"># [batch, seq, d_model]</span>
+        mask: torch.<span class="cls">Tensor</span> = <span class="cls">None</span>,   <span class="cmt"># [batch, 1, seq, seq]</span>
+        return_weights: bool = <span class="cls">False</span>,
+    ) -&gt; torch.<span class="cls">Tensor</span>:
+        <span class="var">B</span>, <span class="var">S</span>, _ = x.<span class="fn">shape</span>
+
+        <span class="cmt"># 1. Project input to Q, K, V (all at once, then split)</span>
+        <span class="var">qkv</span> = self.<span class="var">W_qkv</span>(x)                    <span class="cmt"># [B, S, 3·d_model]</span>
+        <span class="var">q</span>, <span class="var">k</span>, <span class="var">v</span> = qkv.<span class="fn">split</span>(self.<span class="var">d_model</span>, dim=-<span class="num">1</span>)  <span class="cmt"># each [B, S, d_model]</span>
+
+        <span class="cmt"># 2. Reshape to [B, H, S, d_k] for parallel head computation</span>
+        <span class="kw">def</span> <span class="fn">reshape_heads</span>(t):
+            <span class="kw">return</span> t.<span class="fn">view</span>(<span class="var">B</span>, <span class="var">S</span>, self.<span class="var">n_heads</span>, self.<span class="var">d_k</span>).<span class="fn">transpose</span>(<span class="num">1</span>, <span class="num">2</span>)
+
+        <span class="var">q</span>, <span class="var">k</span>, <span class="var">v</span> = <span class="fn">reshape_heads</span>(<span class="var">q</span>), <span class="fn">reshape_heads</span>(<span class="var">k</span>), <span class="fn">reshape_heads</span>(<span class="var">v</span>)
+
+        <span class="cmt"># 3. Scaled dot-product attention (all heads in parallel)</span>
+        <span class="var">attn_out</span>, <span class="var">weights</span> = <span class="fn">scaled_dot_product_attention</span>(
+            <span class="var">q</span>, <span class="var">k</span>, <span class="var">v</span>, mask=mask, dropout=self.<span class="var">dropout</span> <span class="kw">if</span> self.<span class="fn">training</span> <span class="kw">else</span> <span class="num">0.0</span>
+        )   <span class="cmt"># attn_out: [B, H, S, d_k]</span>
+
+        <span class="cmt"># 4. Concatenate heads and project</span>
+        <span class="var">attn_out</span> = attn_out.<span class="fn">transpose</span>(<span class="num">1</span>, <span class="num">2</span>).<span class="fn">contiguous</span>().<span class="fn">view</span>(<span class="var">B</span>, <span class="var">S</span>, self.<span class="var">d_model</span>)
+        <span class="var">output</span>   = self.<span class="var">W_o</span>(<span class="var">attn_out</span>)  <span class="cmt"># [B, S, d_model]</span>
+
+        <span class="kw">return</span> (<span class="var">output</span>, <span class="var">weights</span>) <span class="kw">if</span> return_weights <span class="kw">else</span> <span class="var">output</span>
+
+    <span class="kw">def</span> <span class="fn">extra_repr</span>(self) -&gt; str:
+        <span class="kw">return</span> <span class="str">f"d_model={self.d_model}, n_heads={self.n_heads}, d_k={self.d_k}"</span></code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3><span class="anchor-icon">3</span>Complete Transformer Block</h3>
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="code-dots"><div class="code-dot red"></div><div class="code-dot yellow"></div><div class="code-dot green"></div></div>
+              <span class="code-filename">transformer_block.py</span>
+            </div>
+            <span class="code-lang">PYTORCH</span>
+          </div>
+          <pre><code><span class="kw">class</span> <span class="cls">TransformerBlock</span>(nn.<span class="cls">Module</span>):
+    <span class="str">"""One decoder-style Transformer block (Pre-LayerNorm)."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model: int, n_heads: int, d_ff: int, dropout: float = <span class="num">0.1</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.<span class="var">norm1</span>   = nn.<span class="cls">LayerNorm</span>(d_model)
+        self.<span class="var">attn</span>    = <span class="cls">MultiHeadAttention</span>(d_model, n_heads, dropout)
+        self.<span class="var">norm2</span>   = nn.<span class="cls">LayerNorm</span>(d_model)
+        self.<span class="var">ff</span>      = nn.<span class="cls">Sequential</span>(
+            nn.<span class="cls">Linear</span>(d_model, d_ff),
+            nn.<span class="cls">GELU</span>(),
+            nn.<span class="cls">Dropout</span>(dropout),
+            nn.<span class="cls">Linear</span>(d_ff, d_model),
+            nn.<span class="cls">Dropout</span>(dropout),
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x: torch.<span class="cls">Tensor</span>, mask: torch.<span class="cls">Tensor</span> = <span class="cls">None</span>) -&gt; torch.<span class="cls">Tensor</span>:
+        <span class="cmt"># Pre-LN: normalise BEFORE each sub-layer (more stable than post-LN)</span>
+        x = x + self.<span class="var">attn</span>(self.<span class="var">norm1</span>(x), mask=mask)  <span class="cmt"># residual + attention</span>
+        x = x + self.<span class="var">ff</span>(self.<span class="var">norm2</span>(x))               <span class="cmt"># residual + FFN</span>
+        <span class="kw">return</span> x
+
+
+<span class="kw">class</span> <span class="cls">MiniGPT</span>(nn.<span class="cls">Module</span>):
+    <span class="str">"""Tiny GPT-style decoder-only Transformer."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(
+        self,
+        vocab_size: int = <span class="num">50257</span>,
+        d_model: int    = <span class="num">256</span>,
+        n_heads: int    = <span class="num">8</span>,
+        n_layers: int   = <span class="num">6</span>,
+        max_seq: int    = <span class="num">512</span>,
+        dropout: float  = <span class="num">0.1</span>,
+    ):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.<span class="var">token_emb</span> = nn.<span class="cls">Embedding</span>(vocab_size, d_model)
+        self.<span class="var">pos_emb</span>   = nn.<span class="cls">Embedding</span>(max_seq, d_model)   <span class="cmt"># learned PE</span>
+        self.<span class="var">drop</span>      = nn.<span class="cls">Dropout</span>(dropout)
+        self.<span class="var">blocks</span>    = nn.<span class="cls">ModuleList</span>([
+            <span class="cls">TransformerBlock</span>(d_model, n_heads, d_ff=d_model * <span class="num">4</span>, dropout=dropout)
+            <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_layers)
+        ])
+        self.<span class="var">norm</span>      = nn.<span class="cls">LayerNorm</span>(d_model)
+        self.<span class="var">lm_head</span>  = nn.<span class="cls">Linear</span>(d_model, vocab_size, bias=<span class="cls">False</span>)
+
+        <span class="cmt"># Weight tying: share token embedding and lm_head weights (saves params)</span>
+        self.<span class="var">lm_head</span>.weight = self.<span class="var">token_emb</span>.weight
+
+        <span class="cmt"># Count parameters</span>
+        total = <span class="fn">sum</span>(p.<span class="fn">numel</span>() <span class="kw">for</span> p <span class="kw">in</span> self.<span class="fn">parameters</span>())
+        <span class="fn">print</span>(<span class="str">f"MiniGPT initialised: {total/1e6:.1f}M parameters"</span>)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, idx: torch.<span class="cls">Tensor</span>) -&gt; torch.<span class="cls">Tensor</span>:
+        <span class="var">B</span>, <span class="var">S</span> = idx.<span class="fn">shape</span>
+        <span class="var">pos</span>  = torch.<span class="fn">arange</span>(<span class="num">0</span>, <span class="var">S</span>, device=idx.device).<span class="fn">unsqueeze</span>(<span class="num">0</span>)
+
+        <span class="cmt"># Token + positional embeddings</span>
+        x = self.<span class="var">drop</span>(self.<span class="var">token_emb</span>(idx) + self.<span class="var">pos_emb</span>(pos))
+
+        <span class="cmt"># Causal mask: token i can only see tokens 0…i</span>
+        <span class="var">mask</span> = torch.<span class="fn">tril</span>(torch.<span class="fn">ones</span>(<span class="var">S</span>, <span class="var">S</span>, device=idx.device)).<span class="fn">bool</span>()
+
+        <span class="kw">for</span> block <span class="kw">in</span> self.<span class="var">blocks</span>:
+            x = block(x, mask=mask.<span class="fn">unsqueeze</span>(<span class="num">0</span>).<span class="fn">unsqueeze</span>(<span class="num">0</span>))
+
+        x      = self.<span class="var">norm</span>(x)
+        logits = self.<span class="var">lm_head</span>(x)  <span class="cmt"># [B, S, vocab_size]</span>
+        <span class="kw">return</span> logits
+
+
+<span class="cmt"># ── Instantiate and run a forward pass ──</span>
+<span class="var">model</span> = <span class="cls">MiniGPT</span>(d_model=<span class="num">256</span>, n_heads=<span class="num">8</span>, n_layers=<span class="num">6</span>)
+<span class="cmt"># → "MiniGPT initialised: 21.3M parameters"</span>
+
+<span class="var">dummy_input</span> = torch.<span class="fn">randint</span>(<span class="num">0</span>, <span class="num">50257</span>, (<span class="num">2</span>, <span class="num">64</span>))  <span class="cmt"># batch=2, seq_len=64</span>
+<span class="var">logits</span>      = <span class="var">model</span>(<span class="var">dummy_input</span>)
+
+<span class="fn">print</span>(<span class="str">f"Input shape:   {dummy_input.shape}"</span>)  <span class="cmt"># [2, 64]</span>
+<span class="fn">print</span>(<span class="str">f"Logits shape:  {logits.shape}"</span>)       <span class="cmt"># [2, 64, 50257]</span>
+<span class="fn">print</span>(<span class="str">f"Next token probs (argmax): {logits[:, -1, :].argmax(dim=-1)}"</span>)</code></pre>
+        </div>
+      </div>
+
+      <!-- LIVE DEMO -->
+      <div class="subsection">
+        <h3><span class="anchor-icon">⚡</span>Live Demo :: Explain Any Transformer Concept</h3>
+        <p>Ask the AI to clarify any aspect of the Transformer architecture you found confusing. It will answer as a precise ML instructor.</p>
+
+        <div class="demo-box">
+          <h4>Transformer Architecture Q&amp;A</h4>
+          <p class="demo-desc">Ask any question about the Transformer: attention math, layer shapes, implementation details, comparison with alternatives, or why certain design choices were made.</p>
+
+          <label class="demo-label">Your question</label>
+          <textarea class="demo-input" id="qaInput" placeholder="e.g. Why do we scale by √dₖ? What happens without it?" rows="3">Why do we use Layer Normalization instead of Batch Normalization in Transformers? What would go wrong with BatchNorm here?</textarea>
+
+          <button class="demo-btn" id="qaBtn" onclick="askQuestion()">
+            <span id="qaBtnTxt">▶</span> Ask Question
+          </button>
+
+          <span class="result-label" id="qaLabel" style="display:none;">ANSWER</span>
+          <div class="result-text" id="qaResult" style="display:none;font-family:'Cabinet Grotesk',sans-serif;font-size:14.5px;line-height:1.75;"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a class="btn-nav" href="ai-nlp-llm-section1-3.html">← 1.3 What is an LLM?</a>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">Section 2.1 complete</div>
+    <a class="btn-nav primary" href="#">→ 2.2 BERT, GPT &amp; Beyond</a>
+  </div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-2.html">Ai Nlp Llm Section1 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1-3.html">Ai Nlp Llm Section1 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section1.html">Ai Nlp Llm Section1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-1.html">Ai Nlp Llm Section2 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-2.html">Ai Nlp Llm Section2 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section2-3-4.html">Ai Nlp Llm Section2 3 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-1.html">Ai Nlp Llm Section3 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-2.html">Ai Nlp Llm Section3 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/llm-presentation/ai-nlp-llm-section3-3.html">Ai Nlp Llm Section3 3</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs for Builing Data Products. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+<script>
+// ── PROGRESS ──
+const fill = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  fill.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+});
+
+// ── REVEAL ──
+document.querySelectorAll('.reveal').forEach(el =>
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) el.classList.add('visible'); }, { threshold: 0.06, rootMargin: '0px 0px -50px 0px' }).observe(el)
+);
+
+// ── ACTIVE NAV ──
+document.querySelectorAll('section[id]').forEach(s =>
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-link[href="#${s.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  }, { threshold: 0.3 }).observe(s)
+);
+
+// ── ARCH TABS ──
+function switchArch(tab) {
+  ['full','enc','dec'].forEach(t => {
+    document.getElementById('arch-'+t).classList.toggle('active', t === tab);
+  });
+  document.querySelectorAll('.arch-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', ['full','enc','dec'][i] === tab);
+  });
+}
+
+// ── POSITIONAL ENCODING HEATMAP ──
+(function() {
+  const canvas = document.getElementById('peCanvas');
+  const ctx = canvas.getContext('2d');
+  const rows = 64, cols = 64;
+  const cellW = canvas.width / cols, cellH = canvas.height / rows;
+
+  for (let pos = 0; pos < rows; pos++) {
+    for (let i = 0; i < cols; i++) {
+      const val = i % 2 === 0
+        ? Math.sin(pos / Math.pow(10000, (2 * i) / 128))
+        : Math.cos(pos / Math.pow(10000, (2 * (i-1)) / 128));
+      // Map [-1,1] → colour
+      const t = (val + 1) / 2;
+      const r = Math.round(14 + t * (94 - 14));
+      const g = Math.round(165 + t * (100 - 165));
+      const b = Math.round(160 + t * (10 - 160));
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(i * cellW, pos * cellH, cellW, cellH);
+    }
+  }
+})();
+
+// ── INTERACTIVE ATTENTION ──
+const WORDS = ['The', 'animal', 'didn\'t', 'cross', 'the', 'street', 'because', 'it', 'was', 'tired'];
+
+// Synthetic attention matrices per head [query][key]
+const HEADS = [
+  // Head 0: syntactic :: "it" attends strongly to "animal"
+  WORDS.map((_, qi) => WORDS.map((__, ki) => {
+    if (qi === 7) return ki === 1 ? 0.62 : ki === 5 ? 0.18 : ki === 7 ? 0.1 : 0.01;
+    if (qi === 5) return ki === 3 ? 0.5 : ki === 4 ? 0.3 : ki === 5 ? 0.12 : 0.01;
+    const d = Math.abs(qi - ki);
+    return d === 0 ? 0.45 : d === 1 ? 0.28 : d === 2 ? 0.14 : Math.max(0, 0.05 - d * 0.01);
+  })),
+  // Head 1: semantic :: attends to contextually related words
+  WORDS.map((_, qi) => WORDS.map((__, ki) => {
+    const semantic = [[0,1],[1,7],[3,5],[7,1],[7,9],[5,3]];
+    const bonus = semantic.some(([q,k]) => q === qi && k === ki) ? 0.45 : 0;
+    const d = Math.abs(qi - ki);
+    return bonus + Math.max(0, 0.12 - d * 0.01);
+  })),
+  // Head 2: positional :: attend to nearby positions
+  WORDS.map((_, qi) => WORDS.map((__, ki) => {
+    const d = Math.abs(qi - ki);
+    return d === 0 ? 0.4 : d === 1 ? 0.32 : d === 2 ? 0.18 : d === 3 ? 0.07 : 0.01;
+  })),
+];
+
+// Normalise rows
+HEADS.forEach(head => head.forEach(row => {
+  const s = row.reduce((a,b) => a+b, 0);
+  row.forEach((_, i) => row[i] /= s);
+}));
+
+let currentHead = 0, selectedWord = -1;
+
+function renderAttnWords() {
+  const container = document.getElementById('attnWords');
+  container.innerHTML = WORDS.map((w, i) =>
+    `<div class="attn-word${i === selectedWord ? ' query' : ''}" onclick="selectWord(${i})">${w}</div>`
+  ).join('');
+}
+
+function renderAttnGrid() {
+  if (selectedWord === -1) return;
+  const weights = HEADS[currentHead][selectedWord];
+  const grid = document.getElementById('attnGrid');
+  const colors = ['#93c5fd','#5eead4','#c4b5fd','#fcd34d','#fb923c'];
+
+  grid.innerHTML = WORDS.map((w, ki) => {
+    const wt = weights[ki];
+    const pct = (wt * 100).toFixed(1);
+    const barW = Math.round(wt * 100);
+    const col = colors[ki % colors.length];
+    return `<div class="attn-row">
+      <span class="attn-row-label">${w}</span>
+      <div class="attn-cell" style="flex:1;justify-content:flex-start;background:rgba(240,244,255,0.04);border-radius:3px;overflow:hidden;padding:0;">
+        <div style="width:${barW}%;height:100%;background:${col};border-radius:3px;transition:width 0.4s ease;min-height:28px;"></div>
+      </div>
+      <span class="attn-prob" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(240,244,255,0.4);min-width:46px;text-align:right;">${pct}%</span>
+    </div>`;
+  }).join('');
+
+  const headLabels = ['Syntactic', 'Semantic', 'Positional'];
+  document.getElementById('attnHint').textContent =
+    `Head ${currentHead + 1} (${headLabels[currentHead]}): "${WORDS[selectedWord]}" attends most strongly to "${WORDS[weights.indexOf(Math.max(...weights))]}"`;
+}
+
+function selectWord(i) {
+  selectedWord = i;
+  renderAttnWords();
+  renderAttnGrid();
+}
+
+function setHead(i, btn) {
+  currentHead = i;
+  document.querySelectorAll('.attn-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAttnGrid();
+}
+
+renderAttnWords();
+
+// ── LIVE Q&A ──
+async function askQuestion() {
+  const q = document.getElementById('qaInput').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('qaBtn');
+  const result = document.getElementById('qaResult');
+  const label = document.getElementById('qaLabel');
+
+  btn.disabled = true;
+  document.getElementById('qaBtnTxt').textContent = '⏳';
+  label.style.display = 'block';
+  result.style.display = 'block';
+  result.classList.add('loading');
+  result.textContent = '';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: `You are a precise ML instructor teaching the Transformer architecture. Answer concisely but completely. Use specific numbers and formulas where relevant. Focus on the question asked :: no preamble. Use plain text (no markdown).`,
+        messages: [{ role: 'user', content: q }]
+      })
+    });
+    const data = await resp.json();
+    result.classList.remove('loading');
+    result.textContent = data.content?.[0]?.text || 'Error';
+  } catch(e) {
+    result.classList.remove('loading');
+    result.textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  document.getElementById('qaBtnTxt').textContent = '▶';
+}
+</script>
+
+
+</body></html>
