@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Causal Inference for Business, Economics &amp; Policy | Dhingra</title>
+
+  <!-- Meta Description -->
+  <meta content="A comprehensive research report on causal inference for enterprise decision-making. Covers DecisionOS, Double Machine Learning with Reverse Cross-Fitting, the VOLT metric, causal pricing strategy, and interference in social networks." name="description"/>
+
+  <!-- Keywords -->
+  <meta content="causal inference, business analytics, econometrics, DecisionOS, double machine learning, DML, VOLT metric, causal pricing, network interference, synthetic control, GeoLift, EconML, DoWhy, policy evaluation, prescriptive analytics, uplift modeling, heterogeneous treatment effects" name="keywords"/>
+
+  <!-- Canonical -->
+  <link href="https://dhingra.website/causal-inference/business-economics" rel="canonical"/>
+
+  <!-- Open Graph -->
+  <meta content="article" property="og:type"/>
+  <meta content="Causal Inference for Business, Economics &amp; Policy" property="og:title"/>
+  <meta content="From DecisionOS and Reverse Cross-Fitting to the VOLT metric, causal pricing, and network interference — a practitioner's guide to evidence-based enterprise decision architecture." property="og:description"/>
+  <meta content="https://dhingra.website/causal-inference/business-economics" property="og:url"/>
+  <meta content="Dhingra" property="og:site_name"/>
+  <meta content="en_US" property="og:locale"/>
+  <meta content="Dhingra" property="article:author"/>
+  <meta content="Causal Inference" property="article:section"/>
+  <meta content="Causal Inference, DecisionOS, Double Machine Learning, Econometrics, Policy Evaluation" property="article:tag"/>
+
+  <!-- Twitter Card -->
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Causal Inference for Business, Economics &amp; Policy" name="twitter:title"/>
+  <meta content="A practitioner's guide: DecisionOS, Reverse Cross-Fitting DML, the VOLT metric, causal pricing, and network interference." name="twitter:description"/>
+  <meta content="@dhingra" name="twitter:site"/>
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Causal Inference for Business, Economics, and Policy",
+    "description": "A comprehensive enterprise research report covering DecisionOS, Double Machine Learning with Reverse Cross-Fitting for time series, the VOLT metric for AI learning measurement, causal pricing strategy, and interference in social networks and marketing.",
+    "url": "https://dhingra.website/causal-inference/business-economics",
+    "author": {
+      "@type": "Person",
+      "name": "Dhingra",
+      "url": "https://dhingra.website"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Dhingra",
+      "url": "https://dhingra.website"
+    },
+    "about": [
+      { "@type": "Thing", "name": "Causal Inference" },
+      { "@type": "Thing", "name": "DecisionOS" },
+      { "@type": "Thing", "name": "Double Machine Learning" },
+      { "@type": "Thing", "name": "Prescriptive Analytics" },
+      { "@type": "Thing", "name": "Network Interference" }
+    ],
+    "keywords": "causal inference, DecisionOS, double machine learning, VOLT metric, causal pricing, network interference, synthetic control, prescriptive analytics",
+    "inLanguage": "en-US",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://dhingra.website/causal-inference/business-economics"
+    }
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=DM+Mono:wght@400;500&amp;family=Epilogue:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --ink: #0f0e0d;
+      --paper: #f5f2eb;
+      --cream: #ede9de;
+      --rust: #b84c2b;
+      --rust-light: #e8967a;
+      --gold: #c9a84c;
+      --slate: #3d4a5c;
+      --slate-light: #8392a5;
+      --rule: #d4cfc2;
+      --code-bg: #1a1a2e;
+      --code-text: #a8d8ea;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --mono: 'DM Mono', 'Courier New', monospace;
+      --sans: 'Epilogue', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; font-size: 17px; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────────── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 56px;
+    }
+    .site-logo {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-decoration: none;
+    }
+    .site-nav {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .site-nav a {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--slate-light);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .site-nav a:hover { color: var(--paper); }
+
+    /* ── HERO ───────────────────────────────────────────────────── */
+    .hero {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 7rem 2.5rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 60% 50% at 80% 30%, rgba(201,168,76,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 10% 80%, rgba(184,76,43,0.07) 0%, transparent 70%);
+    }
+    .hero-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      line-height: 1.15;
+      margin-bottom: 1.8rem;
+      font-weight: 400;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--rust-light);
+    }
+    .hero-abstract {
+      font-size: 1.05rem;
+      color: #b8b0a4;
+      max-width: 640px;
+      line-height: 1.8;
+      margin-bottom: 3rem;
+    }
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--slate-light);
+      letter-spacing: 0.05em;
+      border-radius: 2px;
+    }
+
+    /* ── TOC ────────────────────────────────────────────────────── */
+    .toc-band {
+      background: var(--cream);
+      border-top: 1px solid var(--rule);
+      border-bottom: 3px solid var(--rust);
+      padding: 2.5rem 2.5rem;
+    }
+    .toc-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    .toc-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--rust);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding-top: 0.2rem;
+      white-space: nowrap;
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .toc-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+    .toc-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--rust);
+      min-width: 1.4rem;
+      flex-shrink: 0;
+    }
+    .toc-list a {
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--slate);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .toc-list a:hover {
+      color: var(--rust);
+      border-color: var(--rust);
+    }
+
+    /* ── MAIN ───────────────────────────────────────────────────── */
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 5rem 2.5rem 6rem;
+    }
+
+    /* ── SECTIONS ───────────────────────────────────────────────── */
+    .report-section {
+      margin-bottom: 5rem;
+      padding-bottom: 5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .report-section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 2.2rem;
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--rust);
+      letter-spacing: 0.1em;
+      padding-top: 0.55rem;
+      min-width: 2.5rem;
+      flex-shrink: 0;
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    h3 {
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--slate);
+      margin: 2.5rem 0 1rem;
+    }
+
+    h4 {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin: 2rem 0 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+      font-size: 0.97rem;
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    /* ── EXECUTIVE SUMMARY BOX ───────────────────────────────────── */
+    .exec-summary {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 2rem 2.2rem;
+      margin-bottom: 2.5rem;
+      border-left: 3px solid var(--rust);
+    }
+    .exec-summary-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+    .exec-summary p {
+      font-size: 0.9rem;
+      color: #c4bdb5;
+      line-height: 1.8;
+      margin-bottom: 0.9rem;
+    }
+    .exec-summary p:last-child { margin-bottom: 0; }
+
+    /* ── TABLES ─────────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 2rem 0;
+      border: 1px solid var(--rule);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      min-width: 500px;
+    }
+    thead tr {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    thead th {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--rule);
+    }
+    tbody tr:nth-child(even) { background: var(--cream); }
+    tbody tr:hover { background: #e8e2d4; }
+    td {
+      padding: 0.65rem 1rem;
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    td:first-child {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--rust);
+      white-space: nowrap;
+    }
+    .table-note {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--slate-light);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    /* ── CODE BLOCKS ────────────────────────────────────────────── */
+    .code-block {
+      background: var(--code-bg);
+      border-left: 3px solid var(--gold);
+      padding: 1.5rem 1.6rem;
+      overflow-x: auto;
+      margin: 1.75rem 0;
+      position: relative;
+    }
+    .code-lang {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    pre {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      color: var(--code-text);
+      white-space: pre;
+    }
+    code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: rgba(201,168,76,0.12);
+      color: var(--rust);
+      padding: 0.1em 0.35em;
+      border-radius: 2px;
+    }
+
+    /* ── CHECKLIST ──────────────────────────────────────────────── */
+    .checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin: 1.25rem 0;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.92rem;
+      padding: 0.5rem 0.75rem;
+      border-left: 2px solid transparent;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .checklist li:hover {
+      border-left-color: var(--rust);
+      background: var(--cream);
+    }
+    .checklist li::before {
+      content: '◇';
+      color: var(--rust);
+      font-size: 0.7rem;
+      flex-shrink: 0;
+      margin-top: 0.2rem;
+    }
+
+    /* ── CALLOUT ────────────────────────────────────────────────── */
+    .callout {
+      border: 1px solid var(--gold);
+      background: rgba(201,168,76,0.06);
+      padding: 1.4rem 1.6rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .callout::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -0.6rem;
+      left: 1rem;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--paper);
+      padding: 0 0.4rem;
+      color: var(--gold);
+    }
+    .callout p { margin-bottom: 0; font-size: 0.9rem; }
+
+    /* ── FORMULA ────────────────────────────────────────────────── */
+    .formula-block {
+      background: var(--cream);
+      border: 1px solid var(--rule);
+      padding: 1.2rem 1.6rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    .formula {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: var(--slate);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── METHOD CARDS ───────────────────────────────────────────── */
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .method-card {
+      background: var(--cream);
+      border-top: 2px solid var(--rust);
+      padding: 1rem 1.1rem;
+      transition: transform 0.2s;
+    }
+    .method-card:hover { transform: translateY(-2px); }
+    .method-card-name {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--rust);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .method-card-desc {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--slate);
+    }
+
+    /* ── PHASE TIMELINE ─────────────────────────────────────────── */
+    .phase-list {
+      position: relative;
+      padding-left: 2.5rem;
+      margin: 1.5rem 0;
+    }
+    .phase-list::before {
+      content: '';
+      position: absolute;
+      left: 0.6rem;
+      top: 0.5rem;
+      bottom: 0.5rem;
+      width: 1px;
+      background: var(--rule);
+    }
+    .phase-item {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+    .phase-item::before {
+      content: '';
+      position: absolute;
+      left: -2.5rem;
+      top: 0.35rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--paper);
+      border: 2px solid var(--rust);
+    }
+    .phase-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--rust);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .phase-item p {
+      font-size: 0.88rem;
+      margin: 0;
+    }
+
+    /* ── VOLT COMPONENT TABLE ───────────────────────────────────── */
+    .volt-bar-row td:last-child { padding: 0.65rem 1rem; }
+    .volt-bar {
+      height: 6px;
+      background: var(--rust);
+      border-radius: 2px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+
+    /* ── SOURCES ────────────────────────────────────────────────── */
+    .sources-section {
+      background: var(--cream);
+      border-top: 3px solid var(--ink);
+      padding: 3rem 2.5rem;
+    }
+    .sources-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .sources-inner h2 {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 1.5rem;
+    }
+    .sources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 0.75rem;
+    }
+    .source-item {
+      font-size: 0.78rem;
+      line-height: 1.5;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .source-item a {
+      color: var(--slate);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .source-item a:hover { color: var(--rust); }
+    .source-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--rust);
+      margin-right: 0.4rem;
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      color: var(--slate-light);
+      text-align: center;
+      padding: 2rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+    }
+    footer a { color: var(--gold); text-decoration: none; }
+
+    /* ── SCROLL ANIMATIONS ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .report-section {
+      animation: fadeUp 0.5s ease both;
+    }
+    .report-section:nth-child(1) { animation-delay: 0.05s; }
+    .report-section:nth-child(2) { animation-delay: 0.1s; }
+    .report-section:nth-child(3) { animation-delay: 0.15s; }
+    .report-section:nth-child(4) { animation-delay: 0.2s; }
+    .report-section:nth-child(5) { animation-delay: 0.25s; }
+    .report-section:nth-child(6) { animation-delay: 0.3s; }
+
+    @media (max-width: 640px) {
+      .site-nav { display: none; }
+      main { padding: 3rem 1.25rem 4rem; }
+      .toc-inner { grid-template-columns: 1fr; gap: 0.75rem; }
+      .hero { padding: 4rem 1.25rem 3rem; }
+      .section-header { flex-direction: column; gap: 0.25rem; }
+      .section-num { padding-top: 0; }
+      .sources-section { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────────────── -->
+<header class="site-header" role="banner">
+  <a class="site-logo" href="https://dhingra.website">dhingra.website</a>
+  <nav aria-label="Site navigation">
+    <ul class="site-nav">
+      <li><a href="#decision-os">DecisionOS</a></li>
+      <li><a href="#dml">DML / RCF</a></li>
+      <li><a href="#volt">VOLT</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#interference">Interference</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ── HERO ────────────────────────────────────────────────────────── -->
+<section aria-label="Article header" class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Research Report</div>
+    <h1>Causal Inference for<br/><em>Business, Economics</em><br/>&amp; Policy</h1>
+    <p class="hero-abstract">
+      From DecisionOS and Reverse Cross-Fitting to the VOLT metric, causal pricing strategy,
+      and network interference — a practitioner's guide to evidence-based enterprise
+      decision architecture.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">DecisionOS</span>
+      <span class="tag">Double Machine Learning</span>
+      <span class="tag">VOLT Metric</span>
+      <span class="tag">Causal Pricing</span>
+      <span class="tag">Network Interference</span>
+      <span class="tag">Synthetic Controls</span>
+      <span class="tag">HTE / CATE</span>
+      <span class="tag">Prescriptive Analytics</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── TABLE OF CONTENTS ────────────────────────────────────────────── -->
+<nav aria-label="Table of contents" class="toc-band">
+  <div class="toc-inner">
+    <span class="toc-label">Contents</span>
+    <ol class="toc-list">
+      <li><span class="toc-num">01</span><a href="#decision-os">DecisionOS — Beyond Dashboards</a></li>
+      <li><span class="toc-num">02</span><a href="#dml">Double Machine Learning with Reverse Cross-Fitting</a></li>
+      <li><span class="toc-num">03</span><a href="#volt">The VOLT Metric</a></li>
+      <li><span class="toc-num">04</span><a href="#pricing">Causal Pricing Strategy</a></li>
+      <li><span class="toc-num">05</span><a href="#interference">Interference in Social Networks</a></li>
+      <li><span class="toc-num">06</span><a href="#operating-model">Enterprise Operating Model</a></li>
+    </ol>
+  </div>
+</nav>
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────────────────── -->
+<main>
+
+  <!-- ─── SECTION 1: DecisionOS ─────────────────────────────────────── -->
+  <article class="report-section" id="decision-os">
+    <header class="section-header">
+      <span class="section-num">01</span>
+      <h2>DecisionOS &amp; the Move Beyond Dashboards</h2>
+    </header>
+
+    <div class="exec-summary">
+      <div class="exec-summary-label">Executive Summary</div>
+      <p>A <strong>BI dashboard</strong> answers "what happened?" A <strong>DecisionOS</strong> answers "what should we do, under which constraints, with what evidence, through which workflow, and how will we know whether it worked?" That distinction is increasingly visible in both research and enterprise products.</p>
+      <p>Enterprises are moving from descriptive analytics toward operational decisioning because dashboards are good at summarizing states but far weaker at encoding interventions, constraints, workflows, and accountability. The label <strong>DecisionOS</strong> is productized by causaLens, but similar operating primitives are visible across Palantir Ontology, Pega Customer Decision Hub, SAS Intelligent Decisioning, Taktile, and warehouse-native experimentation platforms such as Statsig and Eppo.</p>
+    </div>
+
+    <h3>Architecture Comparison</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>BI-Centric Stack</th>
+            <th>DecisionOS-Centric Stack</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Primary question</td><td>What happened?</td><td>What should we do next?</td></tr>
+          <tr><td>Core artifact</td><td>Dashboard / report</td><td>Decision service / policy engine</td></tr>
+          <tr><td>Data pattern</td><td>Curated facts, aggregates</td><td>Facts + exposures + actions + outcomes</td></tr>
+          <tr><td>Timing</td><td>Batch or near-real-time</td><td>Real-time, event-driven, and batch backfill</td></tr>
+          <tr><td>Intelligence layer</td><td>Descriptive / predictive</td><td>Prescriptive / causal / optimization</td></tr>
+          <tr><td>Workflow</td><td>Human reads and acts manually</td><td>Human-in-the-loop or automated execution</td></tr>
+          <tr><td>Governance</td><td>Metrics definitions, access control</td><td>Access + lineage + policy versioning + audit trail</td></tr>
+          <tr><td>Measurement</td><td>KPI tracking</td><td>Decision-level lift, regret, compliance, ROI</td></tr>
+          <tr><td>Failure mode</td><td>Insight without action</td><td>Action without sufficient identification</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Vendor Landscape</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Representative Vendors / OSS</th>
+            <th>What They Contribute</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Decision platforms</td><td>Palantir, SAS, Pega, Taktile, causaLens</td><td>Workflow, rules, actions, approvals, real-time decisions</td></tr>
+          <tr><td>Warehouse-native measurement</td><td>Eppo, Statsig</td><td>Experimentation, metric computation, auditability</td></tr>
+          <tr><td>Governance &amp; semantic</td><td>Databricks, Snowflake, Palantir</td><td>Lineage, access control, tags, semantic models</td></tr>
+          <tr><td>OSS causal toolkit</td><td>DoWhy, EconML, GRF, DoubleML, GeoLift</td><td>Identification, HTE, DML, IV, synthetic controls</td></tr>
+          <tr><td>Feature &amp; serving layer</td><td>Feast</td><td>Offline/online features, low-latency serving, RBAC</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Implementation Checklist</h3>
+    <ul class="checklist">
+      <li>Define the decision unit, action set, and counterfactual baseline before adding ML.</li>
+      <li>Instrument every decision with assignment, recommendation, acceptance, override, execution, and downstream outcome.</li>
+      <li>Use a governed state layer with lineage, RBAC, and tags before deploying automated actions.</li>
+      <li>Separate identification from estimation; use effect-estimation tools only after the causal question is explicit.</li>
+      <li>Keep a human approval path and signoff protocol for high-stakes domains.</li>
+      <li>Report ROI at the decision-family level, not the notebook or model level.</li>
+    </ul>
+
+    <div class="callout" data-label="Key ROI Metrics">
+      <p>Recommended board-level metrics: <strong>decision latency</strong>, percentage of decisions executed through the governed layer, intervention-to-outcome attribution coverage, incremental lift versus business-as-usual, manual-review rate, exception or override rate, and realized economic value per decision family.</p>
+    </div>
+  </article>
+
+  <!-- ─── SECTION 2: DML ─────────────────────────────────────────────── -->
+  <article class="report-section" id="dml">
+    <header class="section-header">
+      <span class="section-num">02</span>
+      <h2>Double Machine Learning with Reverse Cross-Fitting</h2>
+    </header>
+
+    <div class="exec-summary">
+      <div class="exec-summary-label">Executive Summary</div>
+      <p>Double Machine Learning works by combining an identifiable causal target with <strong>orthogonal scores</strong> and <strong>sample splitting</strong>, so nuisance-model errors affect the final causal estimate only in second order. The challenge in policy and macro applications is that standard i.i.d. cross-fitting does not respect serial dependence.</p>
+      <p><strong>Reverse Cross-Fitting</strong> addresses that problem by adapting the fold structure to time series: contiguous blocks, nuisance models trained away from the evaluation block, and orthogonal scores computed on held-out periods.</p>
+    </div>
+
+    <h3>Core Formulation</h3>
+    <p>A useful practical formulation is the <strong>partially linear local-projection model</strong>:</p>
+    <div class="formula-block">
+      <div class="formula">Y<sub>t+h</sub> = θ<sub>h</sub>D<sub>t</sub> + g<sub>h</sub>(X<sub>t</sub>) + u<sub>t+h</sub></div>
+      <div class="formula" style="margin-top:0.4rem">D<sub>t</sub> = m<sub>h</sub>(X<sub>t</sub>) + v<sub>t</sub></div>
+    </div>
+    <p>Where <code>D<sub>t</sub></code> is the policy/treatment variable, <code>X<sub>t</sub></code> is a high-dimensional control set, and <code>θ<sub>h</sub></code> is the horizon-h causal effect of interest.</p>
+
+    <h3>Six Implementation Steps</h3>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-label">Step 1</div>
+        <p>Specify the treatment timing and the effect horizon grid <code>h = 0, …, H</code>.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Step 2</div>
+        <p>Build a high-dimensional control matrix <code>X<sub>t</sub></code> from lags, macro factors, seasonality, and policy-state variables.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Step 3</div>
+        <p>Split the series into <strong>contiguous blocks</strong>, not random folds, and add <strong>gap buffers</strong> around each validation block.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Step 4</div>
+        <p>For each horizon h, fit nuisance models on blocks outside the target block and its buffer.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Step 5</div>
+        <p>Predict the target block, residualize <code>Y<sub>t+h</sub></code> and <code>D<sub>t</sub></code>, estimate <code>θ<sub>h</sub></code> from orthogonal scores.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Step 6</div>
+        <p>Aggregate across blocks and compute uncertainty with HAC or block-bootstrap procedures.</p>
+      </div>
+    </div>
+
+    <h4>Python Implementation (Illustrative)</h4>
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+      <pre>def blocked_folds(T, n_blocks=5, gap=5):
+    idx = np.arange(T)
+    block_sizes = np.full(n_blocks, T // n_blocks)
+    block_sizes[: T % n_blocks] += 1
+    starts = np.cumsum(np.r_[0, block_sizes[:-1]])
+    folds = []
+    for s, b in zip(starts, block_sizes):
+        test  = idx[s:s+b]
+        left  = max(0, s - gap)
+        right = min(T, s + b + gap)
+        train = np.r_[idx[:left], idx[right:]]
+        folds.append((train, test))
+    return folds</pre>
+    </div>
+
+    <h3>Diagnostic Table</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Diagnostic</th>
+            <th>Why It Matters</th>
+            <th>Warning Sign</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Fold-wise nuisance performance</td><td>Detects unstable first-stage learning</td><td>One or two folds dominate predictive performance</td></tr>
+          <tr><td>Residual ACF / Ljung–Box</td><td>Checks whether orthogonalization removed predictable structure</td><td>Strong autocorrelation remains in score residuals</td></tr>
+          <tr><td>Gap-size sensitivity</td><td>Tests temporal leakage and dependence robustness</td><td>Large sign or magnitude flips across buffer sizes</td></tr>
+          <tr><td>Horizon attrition</td><td>Ensures h-step estimates aren't based on too little data</td><td>Wide intervals and sharp variance explosion at long horizons</td></tr>
+          <tr><td>Placebo timing test</td><td>Screens for spurious policy timing</td><td>Significant pre-effects when none are plausible</td></tr>
+          <tr><td>Overlap / residual treatment variance</td><td>Ensures usable signal in D<sub>t</sub> − m<sub>t</sub></td><td>Residual treatment nearly constant or degenerate</td></tr>
+        </tbody>
+      </table>
+      <div class="table-note">* Practical synthesis of the Reverse Cross-Fitting proposal and standard DML implementation concerns.</div>
+    </div>
+  </article>
+
+  <!-- ─── SECTION 3: VOLT ────────────────────────────────────────────── -->
+  <article class="report-section" id="volt">
+    <header class="section-header">
+      <span class="section-num">03</span>
+      <h2>The VOLT Metric</h2>
+    </header>
+
+    <div class="exec-summary">
+      <div class="exec-summary-label">Executive Summary</div>
+      <p>Most organizations still evaluate AI through activity metrics — seats purchased, prompts generated, copilots launched. Those are <em>adoption</em> metrics, not <em>learning</em> metrics. The <strong>VOLT metric</strong> — Value of Organizational Learning Technologies — measures whether AI and learning systems actually accelerate business maturity.</p>
+    </div>
+
+    <h3>Formal Definition</h3>
+    <p>A <strong>weighted geometric index</strong> so that organizations cannot offset one critical weakness with a strong subscore:</p>
+    <div class="formula-block">
+      <div class="formula">VOLT<sub>u,t</sub> = 100 × ∏<sub>j∈{P,C,E,Q,G}</sub> (ε + z<sub>j,u,t</sub>)<sup>w<sub>j</sub></sup></div>
+      <div style="margin-top:0.6rem;font-family:var(--mono);font-size:0.75rem;color:var(--slate-light)">where ∑<sub>j</sub> w<sub>j</sub> = 1 and ε ≈ 0.05 (floor to avoid zeroing)</div>
+    </div>
+
+    <h3>The Five Components</h3>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-card-name">P — Proficiency Compression</div>
+        <div class="method-card-desc">How much AI reduces time-to-proficiency for new analysts, agents, underwriters, or case workers.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-name">C — Cycle-Time Compression</div>
+        <div class="method-card-desc">Median hours from signal detection to executed decision in the governed workflow.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-name">E — Experimentation Throughput</div>
+        <div class="method-card-desc">Validated experiments per quarter — accumulation rate of causal evidence.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-name">Q — Decision-Quality Lift</div>
+        <div class="method-card-desc">Incremental KPI gain after causal adjustment for confounding and selection.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-name">G — Governance &amp; Reuse</div>
+        <div class="method-card-desc">Share of workflows versioned, approved, audited, and reusable across teams.</div>
+      </div>
+    </div>
+
+    <h3>Sample Dashboard (Illustrative)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Operational Proxy</th>
+            <th>Baseline</th>
+            <th>Current</th>
+            <th>Benchmark %ile</th>
+            <th>Weight</th>
+          </tr>
+        </thead>
+        <tbody class="volt-bar-row">
+          <tr>
+            <td>P — Proficiency</td>
+            <td>Median days for new analyst to reach target quality</td>
+            <td>42 days</td>
+            <td>27 days</td>
+            <td>78th</td>
+            <td>0.20</td>
+          </tr>
+          <tr>
+            <td>C — Cycle-time</td>
+            <td>Median hours from signal to executed decision</td>
+            <td>19.0 hrs</td>
+            <td>10.5 hrs</td>
+            <td>72nd</td>
+            <td>0.20</td>
+          </tr>
+          <tr>
+            <td>E — Experimentation</td>
+            <td>Validated experiments per quarter</td>
+            <td>6</td>
+            <td>14</td>
+            <td>81st</td>
+            <td>0.20</td>
+          </tr>
+          <tr>
+            <td>Q — Decision quality</td>
+            <td>Incremental KPI gain after causal adjustment</td>
+            <td>0.0%</td>
+            <td>3.8%</td>
+            <td>69th</td>
+            <td>0.25</td>
+          </tr>
+          <tr>
+            <td>G — Governance</td>
+            <td>Share of workflows versioned, approved, reusable</td>
+            <td>22%</td>
+            <td>61%</td>
+            <td>75th</td>
+            <td>0.15</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-note">* Values are illustrative. The dashboard format aligns AI-learning measurement with decision-system maturity.</div>
+    </div>
+
+    <h3>Implementation Checklist</h3>
+    <ul class="checklist">
+      <li>Establish the unit of analysis first: team, workflow, or decision family.</li>
+      <li>Use matched controls or staggered adoption wherever possible.</li>
+      <li>Keep raw activity metrics separate from VOLT components.</li>
+      <li>Audit the governance component manually at first; automate later.</li>
+      <li>Recalibrate weights semiannually with a cross-functional governance board.</li>
+      <li>Publish both score movement and economic interpretation.</li>
+    </ul>
+  </article>
+
+  <!-- ─── SECTION 4: Pricing ────────────────────────────────────────── -->
+  <article class="report-section" id="pricing">
+    <header class="section-header">
+      <span class="section-num">04</span>
+      <h2>Causal Pricing Strategy</h2>
+    </header>
+
+    <div class="exec-summary">
+      <div class="exec-summary-label">Executive Summary</div>
+      <p>The pricing problem is not "find one elasticity." It is "find the right price region for the right unit under substitution, competition, timing, interference, and operational constraints." Firms want the <strong>elasticity Goldilocks Zone</strong> — prices high enough to expand contribution, low enough to avoid destroying demand — without exhaustive A/B tests on every segment and price point.</p>
+    </div>
+
+    <h3>Method Comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Best Use Case</th>
+            <th>Core Assumption</th>
+            <th>Main Strength</th>
+            <th>Main Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Structural demand model</td>
+            <td>Portfolio-wide counterfactual pricing &amp; substitution</td>
+            <td>Demand model correctly captures consumer choice</td>
+            <td>Rich counterfactuals and substitution matrices</td>
+            <td>Misspecification can look precise but be wrong</td>
+          </tr>
+          <tr>
+            <td>Synthetic control / GeoLift</td>
+            <td>Geo or region price/promo rollouts</td>
+            <td>Untreated donors can reproduce counterfactual trend</td>
+            <td>Strong for aggregate policy-style rollout questions</td>
+            <td>Poor donor fit and low power</td>
+          </tr>
+          <tr>
+            <td>Uplift / CATE modeling</td>
+            <td>Segment-level sensitivity and price targeting</td>
+            <td>Unconfoundedness or randomized assignment</td>
+            <td>Heterogeneity and targeting</td>
+            <td>Learns local effects, not full equilibrium</td>
+          </tr>
+          <tr>
+            <td>Instrumental variables</td>
+            <td>Observational pricing with endogenous price changes</td>
+            <td>Exclusion and relevance of instrument</td>
+            <td>Handles endogenous pricing cleanly</td>
+            <td>Weak or invalid IVs</td>
+          </tr>
+          <tr>
+            <td>Hybrid experiment design</td>
+            <td>"Anchor" limited experiments to model-based system</td>
+            <td>Test cells are credible and portable</td>
+            <td>Best practical compromise</td>
+            <td>Can still miss spillovers or equilibrium response</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>The Goldilocks Zone — Three Objects to Estimate</h3>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-card-name">1. Global Demand Surface</div>
+        <div class="method-card-desc">Use a structural model so you understand substitution and market-level counterfactuals at scale.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-name">2. Local Marginal Responsiveness</div>
+        <div class="method-card-desc">Use HTE methods (causal forests, DML-style estimators) to find where price changes matter most.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-name">3. Experimental Calibration</div>
+        <div class="method-card-desc">Use experiments or credible quasi-experiments to calibrate both objects against real variation.</div>
+      </div>
+    </div>
+
+    <div class="callout" data-label="Airbnb Pricing Warning">
+      <p>The Airbnb pricing meta-experiment found that at least ~20% of the naïve total-effect estimate in a seller-side price intervention was attributable to <strong>interference bias</strong> that cluster randomization eliminated. Ignoring marketplace spillovers can materially bias estimated lift even in sophisticated pricing programs.</p>
+    </div>
+
+    <h3>Practical Roadmap</h3>
+    <ul class="checklist">
+      <li>Start with one decision unit: product, merchant, route, or city.</li>
+      <li>Log prices, offers, exposures, competitor state, and downstream outcomes.</li>
+      <li>Fit a structural baseline for substitution-aware counterfactuals.</li>
+      <li>Estimate local heterogeneity with a causal forest or DML-style learner.</li>
+      <li>Identify at least one credible IV or one experimental anchor.</li>
+      <li>Use geo or cluster designs where marketplace spillovers are plausible.</li>
+      <li>Update the pricing policy only when model and experimental evidence align.</li>
+    </ul>
+  </article>
+
+  <!-- ─── SECTION 5: Interference ──────────────────────────────────── -->
+  <article class="report-section" id="interference">
+    <header class="section-header">
+      <span class="section-num">05</span>
+      <h2>Interference in Social Networks &amp; Marketing</h2>
+    </header>
+
+    <div class="exec-summary">
+      <div class="exec-summary-label">Executive Summary</div>
+      <p>Under interference, the causal estimand itself changes. You no longer have one treatment effect; you have <strong>direct effects</strong>, <strong>peer effects</strong>, and <strong>total effects</strong>, and the design that is optimal for one may be poor for another. The modern literature treats interference as a joint design-and-analysis problem, not an afterthought.</p>
+      <p>Recent large-scale applications at LinkedIn and Airbnb show that ignoring spillovers can materially bias estimated lift.</p>
+    </div>
+
+    <h3>Design Methods Comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Method Family</th>
+            <th>Typical Estimand</th>
+            <th>Best When</th>
+            <th>Key Assumption</th>
+            <th>Main Tradeoff</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Individual Bernoulli</td>
+            <td>Direct effect / naïve TATE</td>
+            <td>Spillovers are tiny or graph sparse</td>
+            <td>Interference minimal or balanced</td>
+            <td>Easiest, but biased if spillovers matter</td>
+          </tr>
+          <tr>
+            <td>Graph / cluster randomization</td>
+            <td>Total effect under spillovers</td>
+            <td>Strong within-cluster, weak cross-cluster ties</td>
+            <td>Cluster design contains most spillovers</td>
+            <td>Lower bias, higher variance</td>
+          </tr>
+          <tr>
+            <td>Exposure mapping + HT</td>
+            <td>Direct and spillover effects by exposure state</td>
+            <td>Exposure states can be computed</td>
+            <td>Correct exposure mapping and inclusion probabilities</td>
+            <td>Flexible, but variance can be large</td>
+          </tr>
+          <tr>
+            <td>Graph-based clustering optimization</td>
+            <td>Total effect with design tuning</td>
+            <td>Graph observed; clustering can be engineered</td>
+            <td>Worst-case spillover magnitude bounded</td>
+            <td>Design optimization is nontrivial</td>
+          </tr>
+          <tr>
+            <td>Randomization tests</td>
+            <td>Null testing for spillovers</td>
+            <td>Strong modeling assumptions undesirable</td>
+            <td>Randomization known; null sharpened conditionally</td>
+            <td>Robust testing, not always rich estimation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Implementation Checklist</h3>
+    <ul class="checklist">
+      <li>Draw the interaction graph or an explicit proxy graph before randomization.</li>
+      <li>Choose the estimand first: direct, peer, or total effect.</li>
+      <li>If spillovers are strong, prefer graph-cluster or cluster-randomized designs.</li>
+      <li>Measure cluster quality and cross-cluster connectedness before launch.</li>
+      <li>Use randomization tests or exposure-based estimators when the null is non-sharp.</li>
+      <li>Report bias risk qualitatively even when point estimates look clean.</li>
+    </ul>
+
+    <div class="callout" data-label="Policy Implication">
+      <p>If user influence or market interaction is even moderately plausible, the default should not be "run a standard user-level randomized test." The default should be: <strong>state the spillover pathway, decide the estimand, and justify the design</strong>. This matters in public policy as much as in marketing — vaccination, information campaigns, subsidy take-up, marketplace rules, and network-product launches all live in interference-rich environments.</p>
+    </div>
+  </article>
+
+  <!-- ─── SECTION 6: Operating Model ──────────────────────────────── -->
+  <article class="report-section" id="operating-model">
+    <header class="section-header">
+      <span class="section-num">06</span>
+      <h2>Enterprise Operating Model</h2>
+    </header>
+
+    <p>The five topics fit naturally into one operating model. <strong>DecisionOS</strong> is the enterprise control layer. <strong>Reverse Cross-Fitting</strong> is a rigorous analytic pattern for dynamic policy impact estimation inside that layer. <strong>VOLT</strong> is the management KPI for whether the organization is actually learning faster. <strong>Causal pricing</strong> is one high-value commercial use case. <strong>Interference methods</strong> are the correction you need whenever your market or product is inherently networked.</p>
+
+    <p>These are not separate methods — they are adjacent pieces of the same decision architecture.</p>
+
+    <h3>High-Confidence Rollout Path</h3>
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="phase-label">Phase One</div>
+        <p>Instrument decisions, assignments, and outcomes in a governed data plane with lineage and access controls.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Phase Two</div>
+        <p>Operationalize one decision family using rules, causal estimation, and workflow approvals rather than adding another dashboard.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Phase Three</div>
+        <p>Add warehouse-native experimentation and quasi-experimental measurement for closed-loop lift.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Phase Four</div>
+        <p>Introduce specialized estimators: blocked DML for dynamic time-series effects, structural-plus-experimental pricing, and graph-aware designs for interference.</p>
+      </div>
+      <div class="phase-item">
+        <div class="phase-label">Phase Five</div>
+        <p>Manage the transformation with VOLT so organizational learning is measured as rigorously as model performance.</p>
+      </div>
+    </div>
+
+    <h3>Open Questions &amp; Limitations</h3>
+    <ul class="checklist">
+      <li><strong>DecisionOS</strong> is still more of a converging enterprise pattern than a settled academic category; the functional comparison is deliberately architectural, not taxonomic.</li>
+      <li><strong>Reverse Cross-Fitting</strong> is operationally promising but still software-light; many teams will need custom blocked-splitting code and dependence-aware inference.</li>
+      <li><strong>VOLT</strong> is a proposal, not an industry standard; treat it as a measurement design to be piloted, falsified, and recalibrated rather than as a finished benchmark.</li>
+    </ul>
+
+    <div class="callout" data-label="Biggest Practical Challenge">
+      <p>The biggest unresolved question across all five topics is not statistical — it is <strong>organizational</strong>: whether firms can align causal identification, decision rights, instrumentation, and governance tightly enough that better models become better decisions rather than just more sophisticated analytics. The platforms and methods now exist; the harder competitive advantage is building the institutional loop that connects them.</p>
+    </div>
+  </article>
+
+</main>
+
+<!-- ── SOURCES ───────────────────────────────────────────────────────── -->
+<section class="sources-section">
+  <div class="sources-inner">
+    <h2>Primary Sources &amp; References</h2>
+    <div class="sources-grid">
+      <div class="source-item"><span class="source-num">[1]</span><a href="https://link.springer.com/article/10.1007/s10257-024-00688-w" rel="noopener" target="_blank">Prescriptive analytics systems revised — Springer</a></div>
+      <div class="source-item"><span class="source-num">[2]</span><a href="https://arxiv.org/pdf/2603.10999" rel="noopener" target="_blank">Double Machine Learning for Time Series (Reverse Cross-Fitting) — arXiv</a></div>
+      <div class="source-item"><span class="source-num">[3]</span><a href="https://www.sciencedirect.com/science/article/pii/S0378720624000934" rel="noopener" target="_blank">Organizational decision making and analytics — ScienceDirect</a></div>
+      <div class="source-item"><span class="source-num">[4]</span><a href="https://sites.google.com/view/philhaile/home/publications" rel="noopener" target="_blank">Berry &amp; Haile — Foundations of Demand Estimation</a></div>
+      <div class="source-item"><span class="source-num">[5]</span><a href="https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2023.1128649/full" rel="noopener" target="_blank">Network experiment designs for causal effects under interference — Frontiers</a></div>
+      <div class="source-item"><span class="source-num">[6]</span><a href="https://causalai.causalens.com/decision-os/" rel="noopener" target="_blank">decisionOS — causaLens</a></div>
+      <div class="source-item"><span class="source-num">[7]</span><a href="https://www.palantir.com/docs/foundry/ontology/overview" rel="noopener" target="_blank">Palantir Ontology — Overview</a></div>
+      <div class="source-item"><span class="source-num">[8]</span><a href="https://docs.databricks.com/aws/en/data-governance/unity-catalog/" rel="noopener" target="_blank">Unity Catalog — Databricks</a></div>
+      <div class="source-item"><span class="source-num">[9]</span><a href="https://www.sas.com/en_us/software/intelligent-decisioning.html" rel="noopener" target="_blank">Intelligent Decisioning — SAS</a></div>
+      <div class="source-item"><span class="source-num">[10]</span><a href="https://www.pega.com/products/decision-hub" rel="noopener" target="_blank">Pega Customer Decision Hub</a></div>
+      <div class="source-item"><span class="source-num">[11]</span><a href="https://docs.statsig.com/statsig-warehouse-native/introduction" rel="noopener" target="_blank">Statsig Warehouse Native — Documentation</a></div>
+      <div class="source-item"><span class="source-num">[12]</span><a href="https://www.pywhy.org/dowhy/main/index.html" rel="noopener" target="_blank">DoWhy — PyWhy Documentation</a></div>
+      <div class="source-item"><span class="source-num">[13]</span><a href="https://grf-labs.github.io/grf/reference/causal_forest.html" rel="noopener" target="_blank">Causal Forest — GRF Documentation</a></div>
+      <div class="source-item"><span class="source-num">[14]</span><a href="https://facebookincubator.github.io/GeoLift/docs/Methodology/" rel="noopener" target="_blank">GeoLift Methodology — Meta</a></div>
+      <div class="source-item"><span class="source-num">[15]</span><a href="https://arxiv.org/abs/2503.23524" rel="noopener" target="_blank">Reinterpreting demand estimation — arXiv</a></div>
+      <div class="source-item"><span class="source-num">[16]</span><a href="https://arxiv.org/abs/1811.04170" rel="noopener" target="_blank">The Augmented Synthetic Control Method — arXiv</a></div>
+      <div class="source-item"><span class="source-num">[17]</span><a href="https://arxiv.org/abs/2403.16673" rel="noopener" target="_blank">Quasi-randomization tests for network interference — arXiv</a></div>
+      <div class="source-item"><span class="source-num">[18]</span><a href="https://arxiv.org/pdf/2310.14983" rel="noopener" target="_blank">Causal clustering theory — arXiv</a></div>
+      <div class="source-item"><span class="source-num">[19]</span><a href="https://business.columbia.edu/sites/default/files-efs/citation_file_upload/holtz-et-al-2024-reducing-interference-bias-in-online-marketplace-experiments-using-cluster-randomization-evidence-from%20%282%29.pdf" rel="noopener" target="_blank">Reducing Interference Bias in Marketplace Experiments — Airbnb / Columbia</a></div>
+      <div class="source-item"><span class="source-num">[20]</span><a href="https://faculty.washington.edu/msaveski/assets/publications/2017_detecting_network_effects/paper.pdf" rel="noopener" target="_blank">Detecting Network Effects: Randomizing Over Randomized Experiments — LinkedIn</a></div>
+      <div class="source-item"><span class="source-num">[21]</span><a href="https://projecteuclid.org/journals/annals-of-applied-statistics/volume-19/issue-1/Heterogeneous-treatment-and-spillover-effects-under-clustered-network-interference/10.1214/24-AOAS1913.full" rel="noopener" target="_blank">Heterogeneous treatment and spillover effects under clustered network interference — AoAS</a></div>
+      <div class="source-item"><span class="source-num">[22]</span><a href="https://docs.feast.dev/" rel="noopener" target="_blank">Feast — Open Source Feature Store Documentation</a></div>
+      <div class="source-item"><span class="source-num">[23]</span><a href="https://www.nber.org/papers/w27704" rel="noopener" target="_blank">Nonparametric Identification of Differentiated Products Demand — NBER</a></div>
+      <div class="source-item"><span class="source-num">[24]</span><a href="https://causalai.causalens.com/decisionops/" rel="noopener" target="_blank">decisionOps — causaLens</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────── -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build Reusable Not Oneoff Signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/causal-inference-business-economics.html">Causal Inference Business Economics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/causal-inference-healthcare-personalized-medicine.html">Causal Inference Healthcare Personalized Medicine</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo Turn Data Into Products Not Just Pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/chocolate-bar-of-data.html">Chocolate Bar Of Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio Turn Legacy Systems Into Data Product Engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close Loop With Business Feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo Design Products Thatleanr And Compound Value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto Data Products Are New Microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data Products Learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct Or Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define Start With Decisions Not Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2E Lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment Framework For Data Product Consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes And Lesssons Learnt In Building Ai Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track Value Not Just Performance</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+
+
+</body></html>

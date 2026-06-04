@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Causal Inference in Healthcare &amp; Personalized Medicine | Dhingra</title>
+
+  <!-- Meta Description -->
+  <meta content="A comprehensive research report on causal inference in healthcare and personalized medicine. Covers target trial emulation with EHRs, digital twins for precision oncology, causal AI in epidemiology, individualized treatment effects, and wearables for chronic-condition flare prediction." name="description"/>
+
+  <!-- Keywords -->
+  <meta content="causal inference healthcare, target trial emulation, EHR causal inference, digital twins oncology, personalized medicine, individualized treatment effects, ITE, CATE, causal AI epidemiology, wearables flare prediction, Bradford Hill, DAG, g-methods, inverse probability weighting, marginal structural models, rare diseases, precision oncology, N-of-1 trials, real-world evidence" name="keywords"/>
+
+  <!-- Canonical -->
+  <link href="https://dhingra.website/causal-inference/healthcare-personalized-medicine" rel="canonical"/>
+
+  <!-- Open Graph -->
+  <meta content="article" property="og:type"/>
+  <meta content="Causal Inference in Healthcare &amp; Personalized Medicine" property="og:title"/>
+  <meta content="Five active research frontiers: target trial emulation with EHRs for rare diseases, digital twins for precision oncology, causal AI in epidemiology, individualized treatment effects, and wearables as causal flare triggers." property="og:description"/>
+  <meta content="https://dhingra.website/causal-inference/healthcare-personalized-medicine" property="og:url"/>
+  <meta content="Dhingra" property="og:site_name"/>
+  <meta content="en_US" property="og:locale"/>
+  <meta content="Dhingra" property="article:author"/>
+  <meta content="Causal Inference" property="article:section"/>
+  <meta content="Causal Inference, Healthcare, Personalized Medicine, Target Trial Emulation, Digital Twins, EHR" property="article:tag"/>
+
+  <!-- Twitter Card -->
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Causal Inference in Healthcare &amp; Personalized Medicine" name="twitter:title"/>
+  <meta content="Five frontiers: target trial emulation, oncology digital twins, causal epidemiology AI, individualized treatment effects, and wearable flare triggers." name="twitter:description"/>
+  <meta content="@dhingra" name="twitter:site"/>
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Causal Inference in Healthcare and Personalized Medicine",
+    "description": "A comprehensive research report reviewing five active frontiers in causal inference for healthcare: target trial emulation with EHRs for rare diseases, multiscale digital twins for precision oncology, causal AI in epidemiology, predicting individualized treatment effects, and wearables as causal flare triggers for chronic conditions.",
+    "url": "https://dhingra.website/causal-inference/healthcare-personalized-medicine",
+    "author": {
+      "@type": "Person",
+      "name": "Dhingra",
+      "url": "https://dhingra.website"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Dhingra",
+      "url": "https://dhingra.website"
+    },
+    "about": [
+      { "@type": "MedicalCondition", "name": "Rare Diseases" },
+      { "@type": "Thing", "name": "Target Trial Emulation" },
+      { "@type": "Thing", "name": "Digital Twins in Medicine" },
+      { "@type": "Thing", "name": "Individualized Treatment Effects" },
+      { "@type": "Thing", "name": "Wearable Health Monitoring" },
+      { "@type": "Thing", "name": "Precision Oncology" }
+    ],
+    "keywords": "causal inference, healthcare, personalized medicine, target trial emulation, EHR, digital twins, oncology, epidemiology, ITE, CATE, wearables, flare prediction, g-methods, marginal structural models",
+    "inLanguage": "en-US",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://dhingra.website/causal-inference/healthcare-personalized-medicine"
+    }
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&amp;family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg: #f8f7f4;
+      --surface: #ffffff;
+      --border: #e2ddd5;
+      --ink: #1a1a1a;
+      --ink-soft: #4a4a4a;
+      --ink-muted: #888580;
+      --teal: #0d7377;
+      --teal-light: #14a085;
+      --teal-pale: #e8f5f4;
+      --teal-border: #b2dbd9;
+      --amber: #c4852a;
+      --amber-pale: #fdf5e8;
+      --red: #c0392b;
+      --red-pale: #fdf0ef;
+      --violet: #6c3483;
+      --violet-pale: #f5eef8;
+      --sage: #2e7d52;
+      --sage-pale: #eaf4ef;
+      --serif: 'Playfair Display', Georgia, serif;
+      --body: 'Source Serif 4', Georgia, serif;
+      --mono: 'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 17px; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────────── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 58px;
+    }
+    .site-logo {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--teal);
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .site-nav { display: flex; gap: 0.25rem; list-style: none; }
+    .site-nav a {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      padding: 0.3rem 0.65rem;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .site-nav a:hover { background: var(--teal-pale); color: var(--teal); }
+
+    /* ── HERO ───────────────────────────────────────────────────── */
+    .hero {
+      background: var(--teal);
+      color: #fff;
+      padding: 6rem 2.5rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      left: -60px;
+      bottom: -100px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 820px; margin: 0 auto; position: relative; }
+    .hero-kicker {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-kicker span { display: inline-block; width: 28px; height: 1px; background: rgba(255,255,255,0.4); }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+      font-weight: 400;
+      line-height: 1.18;
+      margin-bottom: 1.6rem;
+    }
+    .hero h1 em { font-style: italic; color: rgba(255,255,255,0.75); }
+    .hero-lead {
+      font-family: var(--body);
+      font-size: 1rem;
+      color: rgba(255,255,255,0.78);
+      max-width: 620px;
+      line-height: 1.85;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+    }
+    .hero-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .pill {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 0.28rem 0.7rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.85);
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── FRONTIERS STRIP ────────────────────────────────────────── */
+    .frontiers {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2.5rem;
+      overflow-x: auto;
+    }
+    .frontiers-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+    }
+    .frontier-item {
+      flex: 1;
+      min-width: 140px;
+      padding: 1.1rem 1rem;
+      border-right: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+      display: block;
+    }
+    .frontier-item:last-child { border-right: none; }
+    .frontier-item:hover { background: var(--teal-pale); }
+    .frontier-num {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--teal);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+    .frontier-name {
+      font-family: var(--body);
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      line-height: 1.35;
+      font-weight: 400;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────────────────── */
+    .page-body {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 5rem 2.5rem 6rem;
+    }
+
+    /* ── SECTIONS ───────────────────────────────────────────────── */
+    .section {
+      margin-bottom: 5.5rem;
+      scroll-margin-top: 80px;
+    }
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 3px;
+    }
+    .badge-teal   { background: var(--teal-pale); color: var(--teal); }
+    .badge-amber  { background: var(--amber-pale); color: var(--amber); }
+    .badge-violet { background: var(--violet-pale); color: var(--violet); }
+    .badge-sage   { background: var(--sage-pale); color: var(--sage); }
+    .badge-red    { background: var(--red-pale); color: var(--red); }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+    .section-rule {
+      width: 40px;
+      height: 2px;
+      margin-bottom: 2rem;
+    }
+    .rule-teal   { background: var(--teal); }
+    .rule-amber  { background: var(--amber); }
+    .rule-violet { background: var(--violet); }
+    .rule-sage   { background: var(--sage); }
+    .rule-red    { background: var(--red); }
+
+    h3 {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 2.5rem 0 0.9rem;
+    }
+    h4 {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin: 2rem 0 0.7rem;
+    }
+    p {
+      font-size: 0.96rem;
+      margin-bottom: 1.2rem;
+      color: var(--ink-soft);
+    }
+    strong { color: var(--ink); font-weight: 600; }
+
+    /* ── SUMMARY CARDS ──────────────────────────────────────────── */
+    .summary-card {
+      border-left: 3px solid;
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 2.2rem;
+      background: var(--surface);
+    }
+    .summary-card.teal   { border-color: var(--teal); }
+    .summary-card.amber  { border-color: var(--amber); }
+    .summary-card.violet { border-color: var(--violet); }
+    .summary-card.sage   { border-color: var(--sage); }
+    .summary-card.red    { border-color: var(--red); }
+    .summary-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 0.7rem;
+    }
+    .label-teal   { color: var(--teal); }
+    .label-amber  { color: var(--amber); }
+    .label-violet { color: var(--violet); }
+    .label-sage   { color: var(--sage); }
+    .label-red    { color: var(--red); }
+    .summary-card p {
+      font-size: 0.88rem;
+      line-height: 1.75;
+      margin-bottom: 0.8rem;
+    }
+    .summary-card p:last-child { margin-bottom: 0; }
+
+    /* ── INSIGHT BOX ────────────────────────────────────────────── */
+    .insight {
+      padding: 1.25rem 1.4rem;
+      margin: 1.75rem 0;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .insight-teal   { background: var(--teal-pale); color: var(--teal); border: 1px solid var(--teal-border); }
+    .insight-amber  { background: var(--amber-pale); color: #7a4f10; border: 1px solid #e8d5b0; }
+    .insight-violet { background: var(--violet-pale); color: var(--violet); border: 1px solid #d7b8e8; }
+    .insight strong { color: inherit; }
+
+    /* ── TABLES ─────────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.75rem 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      min-width: 480px;
+      background: var(--surface);
+    }
+    thead tr { background: var(--ink); }
+    thead th {
+      padding: 0.8rem 1rem;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--bg); }
+    tbody tr:hover { background: var(--teal-pale); }
+    td {
+      padding: 0.7rem 1rem;
+      vertical-align: top;
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+    td:first-child {
+      font-weight: 600;
+      color: var(--ink);
+      font-size: 0.78rem;
+    }
+    .table-caption {
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      color: var(--ink-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    /* ── CHECKLIST ──────────────────────────────────────────────── */
+    .checklist { list-style: none; margin: 1.2rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      font-size: 0.9rem;
+      padding: 0.55rem 0.8rem;
+      border-radius: 3px;
+      transition: background 0.15s;
+      color: var(--ink-soft);
+    }
+    .checklist li:hover { background: var(--surface); }
+    .check-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      color: white;
+    }
+    .icon-teal   { background: var(--teal); }
+    .icon-amber  { background: var(--amber); }
+    .icon-violet { background: var(--violet); }
+    .icon-sage   { background: var(--sage); }
+    .icon-red    { background: var(--red); }
+
+    /* ── METHOD CARDS ───────────────────────────────────────────── */
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .method-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1rem 1.1rem;
+      border-radius: 4px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .method-card:hover { border-color: var(--teal-border); transform: translateY(-2px); }
+    .method-card-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .method-card-title {
+      font-family: var(--body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+    .method-card-desc { font-size: 0.76rem; line-height: 1.5; color: var(--ink-soft); }
+
+    /* ── DATASET GRID ───────────────────────────────────────────── */
+    .dataset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+    .dataset-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.9rem 1rem;
+      transition: border-color 0.15s;
+    }
+    .dataset-card:hover { border-color: var(--teal); }
+    .dataset-name {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--teal);
+      margin-bottom: 0.3rem;
+    }
+    .dataset-fit {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+    .dataset-desc { font-size: 0.73rem; color: var(--ink-muted); line-height: 1.45; }
+    .access-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 2px;
+      margin-top: 0.4rem;
+      letter-spacing: 0.04em;
+    }
+    .access-open    { background: var(--sage-pale); color: var(--sage); }
+    .access-cred    { background: var(--amber-pale); color: var(--amber); }
+    .access-apply   { background: var(--violet-pale); color: var(--violet); }
+    .access-mixed   { background: #f0f0f0; color: #555; }
+
+    /* ── EVAL METRICS ───────────────────────────────────────────── */
+    .metric-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.84rem;
+    }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-name {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--teal);
+      min-width: 120px;
+      font-weight: 500;
+    }
+    .metric-desc { color: var(--ink-soft); line-height: 1.45; }
+
+    /* ── PHASE STEPS ────────────────────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 0.85rem; margin: 1.5rem 0; }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.9rem 1rem;
+    }
+    .step-num {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: white;
+      background: var(--teal);
+      min-width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .step-body { flex: 1; }
+    .step-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+    .step-desc { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.5; margin: 0; }
+
+    /* ── BIAS ALERT ─────────────────────────────────────────────── */
+    .bias-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 0.65rem;
+      margin: 1.25rem 0;
+    }
+    .bias-item {
+      background: var(--red-pale);
+      border: 1px solid #f5c6c2;
+      border-radius: 3px;
+      padding: 0.65rem 0.8rem;
+    }
+    .bias-name {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--red);
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+    .bias-desc { font-size: 0.74rem; color: #7a2a22; line-height: 1.4; }
+
+    /* ── DIVIDER ────────────────────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 5.5rem;
+    }
+
+    /* ── SOURCES ────────────────────────────────────────────────── */
+    .sources-section {
+      background: var(--ink);
+      padding: 4rem 2.5rem;
+    }
+    .sources-inner { max-width: 820px; margin: 0 auto; }
+    .sources-inner h2 {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 2rem;
+    }
+    .sources-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 0;
+    }
+    .source-entry {
+      display: flex;
+      gap: 0.6rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      align-items: flex-start;
+    }
+    .src-num {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--teal-light);
+      min-width: 1.8rem;
+      flex-shrink: 0;
+      padding-top: 0.1rem;
+    }
+    .source-entry a {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      line-height: 1.45;
+      transition: color 0.15s;
+    }
+    .source-entry a:hover { color: var(--teal-light); }
+
+    /* ── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      background: #0a0a0a;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      padding: 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.07em;
+    }
+    footer a { color: var(--teal-light); text-decoration: none; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .section { animation: rise 0.45s ease both; }
+    .section:nth-child(1) { animation-delay: 0.05s; }
+    .section:nth-child(2) { animation-delay: 0.1s; }
+    .section:nth-child(3) { animation-delay: 0.15s; }
+    .section:nth-child(4) { animation-delay: 0.2s; }
+    .section:nth-child(5) { animation-delay: 0.25s; }
+    .section:nth-child(6) { animation-delay: 0.3s; }
+    .section:nth-child(7) { animation-delay: 0.35s; }
+
+    @media (max-width: 640px) {
+      .site-nav { display: none; }
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      .page-body { padding: 3rem 1.25rem 4rem; }
+      .frontiers-inner { gap: 0; }
+      .frontier-item { min-width: 110px; padding: 0.9rem 0.7rem; }
+      .sources-section { padding: 2.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SITE HEADER ──────────────────────────────────────────────────── -->
+<header class="site-header">
+  <a class="site-logo" href="https://dhingra.website">dhingra.website</a>
+  <nav aria-label="Page sections">
+    <ul class="site-nav">
+      <li><a href="#tte">TTE</a></li>
+      <li><a href="#twins">Digital Twins</a></li>
+      <li><a href="#epi">Causal AI</a></li>
+      <li><a href="#ite">ITE</a></li>
+      <li><a href="#wearables">Wearables</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ── HERO ────────────────────────────────────────────────────────── -->
+<section aria-label="Article header" class="hero">
+  <div class="hero-inner">
+    <div class="hero-kicker"><span></span>Research Report · Healthcare &amp; Medicine</div>
+    <h1>Causal Inference in<br/>Healthcare &amp;<br/><em>Personalized Medicine</em></h1>
+    <p class="hero-lead">Five active research frontiers — from target trial emulation with EHRs to digital twins for precision oncology, causal AI in epidemiology, individualized treatment effects, and wearable sensors as causal flare triggers.</p>
+    <div class="hero-pills">
+      <span class="pill">Target Trial Emulation</span>
+      <span class="pill">Digital Twins</span>
+      <span class="pill">Precision Oncology</span>
+      <span class="pill">ITE / CATE</span>
+      <span class="pill">Causal AI Epidemiology</span>
+      <span class="pill">Wearables &amp; Flare Triggers</span>
+      <span class="pill">G-Methods</span>
+      <span class="pill">Rare Diseases</span>
+      <span class="pill">Real-World Evidence</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── FRONTIERS STRIP ──────────────────────────────────────────────── -->
+<nav aria-label="Jump to section" class="frontiers">
+  <div class="frontiers-inner">
+    <a class="frontier-item" href="#tte">
+      <span class="frontier-num">01</span>
+      <span class="frontier-name">Target Trial Emulation &amp; EHRs</span>
+    </a>
+    <a class="frontier-item" href="#twins">
+      <span class="frontier-num">02</span>
+      <span class="frontier-name">Multiscale Digital Twins</span>
+    </a>
+    <a class="frontier-item" href="#epi">
+      <span class="frontier-num">03</span>
+      <span class="frontier-name">Causal AI in Epidemiology</span>
+    </a>
+    <a class="frontier-item" href="#ite">
+      <span class="frontier-num">04</span>
+      <span class="frontier-name">Individualized Treatment Effects</span>
+    </a>
+    <a class="frontier-item" href="#wearables">
+      <span class="frontier-num">05</span>
+      <span class="frontier-name">Wearables &amp; Flare Triggers</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ── PAGE BODY ────────────────────────────────────────────────────── -->
+<main class="page-body">
+
+  <!-- ─── COMPARATIVE LANDSCAPE ───────────────────────────────────── -->
+  <section class="section" id="landscape">
+    <div class="section-badge badge-teal">Comparative Landscape</div>
+    <h2>Five Frontiers, One Design Principle</h2>
+    <div class="section-rule rule-teal"></div>
+
+    <p>Across all five topics, the strongest recurring finding is that <strong>causal validity is limited less by model capacity than by study design, measurement quality, time-zero alignment, treatment definition, and domain knowledge</strong>. The common design constraints — consistency, exchangeability, positivity, measurement validity, transportability, and transparent reporting — apply in every frontier.</p>
+
+    <h3>Methods Overview</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Topic</th>
+            <th>Primary Estimand</th>
+            <th>Best Use Case</th>
+            <th>Typical Failure Mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Target Trial Emulation</td>
+            <td>ITT or per-protocol effect under hypothetical trial</td>
+            <td>Comparative effectiveness when RCTs are infeasible</td>
+            <td>Misaligned time zero, immortal time bias, eligibility misclassification</td>
+          </tr>
+          <tr>
+            <td>Oncology Digital Twins</td>
+            <td>Patient-specific trajectory under alternative interventions</td>
+            <td>Dynamic treatment planning &amp; virtual therapy simulation</td>
+            <td>Poor validation, weak biological identifiability, data sparsity</td>
+          </tr>
+          <tr>
+            <td>Causal AI in Epidemiology</td>
+            <td>Structural graph, causal mechanism, or intervention effect</td>
+            <td>Hypothesis generation, DAG refinement, surveillance modeling</td>
+            <td>Hidden confounding, faithfulness violations, poor real-world transport</td>
+          </tr>
+          <tr>
+            <td>ITE Estimation</td>
+            <td>CATE or individualized treatment effect</td>
+            <td>Treatment personalization and policy targeting</td>
+            <td>Counterfactual evaluation gap, overfitting, positivity violations</td>
+          </tr>
+          <tr>
+            <td>Wearables &amp; Flare Triggers</td>
+            <td>Effect of time-varying exposure on imminent flare</td>
+            <td>High-frequency monitoring and trigger identification</td>
+            <td>Reverse causation, irregular sampling, behavior-sensor feedback loops</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Key Evaluation Metrics by Context</h3>
+    <div class="metric-row" style="border-top:1px solid var(--border)">
+      <span class="metric-name">TTE</span>
+      <span class="metric-desc">Covariate balance, positivity diagnostics, protocol fidelity, negative controls, benchmarking to RCTs or replicated trials</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">Digital Twins</span>
+      <span class="metric-desc">Verification, validation, uncertainty quantification (VVUQ), calibration to longitudinal trajectories, scenario robustness</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">Causal Discovery</span>
+      <span class="metric-desc">Edge precision/recall, structural Hamming distance, expert concordance, intervention consistency</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">ITE Models</span>
+      <span class="metric-desc">PEHE or proxy PEHE, C-for-benefit, calibration-for-benefit, Qini/AUUC, policy value/regret, external validation</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">Wearable Flare</span>
+      <span class="metric-desc">AUROC/AUPRC, F1, early-warning lead time, per-patient calibration, alarm burden</span>
+    </div>
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ─── SECTION 1: TTE ───────────────────────────────────────────── -->
+  <section class="section" id="tte">
+    <div class="section-badge badge-teal">Frontier 01</div>
+    <h2>Target Trial Emulation with EHRs for Rare Diseases</h2>
+    <div class="section-rule rule-teal"></div>
+
+    <div class="summary-card teal">
+      <div class="summary-label label-teal">Executive Summary</div>
+      <p>Target trial emulation is the clearest causal framework for using EHRs, claims, and registries to approximate the answer a randomized pragmatic trial would have produced. In rare diseases, it is particularly valuable because randomization is often infeasible, but observational data are intrinsically fragile: cases are sparse, coding is noisy, specialist care is fragmented, and clinically important confounders are often missing.</p>
+      <p>The rare-disease version of TTE succeeds less through "big data" than through <strong>small-but-high-quality longitudinal cohorts with explicit protocol emulation and linkage</strong> to registries, claims, laboratory systems, or manual abstraction.</p>
+    </div>
+
+    <h3>Seven Protocol Components</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Eligibility Criteria</div><p class="step-desc">Define which patients could have been randomized; replicate trial inclusion/exclusion criteria in computable phenotypes.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Treatment Strategies</div><p class="step-desc">Specify the interventions being compared — ideally active-comparator new-user designs to reduce confounding by indication.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Treatment Assignment</div><p class="step-desc">Determine how patients were assigned to strategies; use clone-censor-weighting for grace-period or dynamic-rule initiation.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Time Zero Alignment</div><p class="step-desc">Strictly align eligibility, treatment assignment, and start of follow-up to avoid immortal time bias — the most common "self-inflicted injury."</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Outcomes &amp; Follow-up</div><p class="step-desc">Pre-specify primary and secondary outcomes; handle loss to follow-up with appropriate censoring and weighting.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Causal Contrast</div><p class="step-desc">Explicitly state the estimand: intention-to-treat, per-protocol, or on-treatment effect under a specific intervention.</p></div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Statistical Analysis</div><p class="step-desc">Choose g-methods (IPW, g-formula, MSMs), doubly robust estimators, or targeted learning; pre-register sensitivity analyses.</p></div></div>
+    </div>
+
+    <h3>Key Bias Threats in Rare Diseases</h3>
+    <div class="bias-grid">
+      <div class="bias-item"><div class="bias-name">Immortal Time Bias</div><div class="bias-desc">Time before treatment start mistakenly classified as exposed person-time.</div></div>
+      <div class="bias-item"><div class="bias-name">Confounding by Severity</div><div class="bias-desc">Sicker patients selectively receive treatment or are treated at specialized centers.</div></div>
+      <div class="bias-item"><div class="bias-name">Delayed Diagnosis</div><div class="bias-desc">Long diagnostic odysseys misalign true disease onset with observed eligibility date.</div></div>
+      <div class="bias-item"><div class="bias-name">Left Truncation</div><div class="bias-desc">Patients who died or recovered before EHR capture are systematically excluded.</div></div>
+      <div class="bias-item"><div class="bias-name">Phenotype Misclassification</div><div class="bias-desc">ICD codes for rare conditions have high false-positive rates without chart validation.</div></div>
+      <div class="bias-item"><div class="bias-name">Positivity Violations</div><div class="bias-desc">One therapy may dominate narrow subgroups, making counterfactuals extrapolative.</div></div>
+    </div>
+
+    <div class="insight insight-teal">
+      <strong>Regulatory context:</strong> FDA and EMA both explicitly support increasing use of real-world data including EHRs and registries. FDA's 2025 rare-disease evidence principles reflect a more flexible evidence posture, but do not relax the need for data relevance, reliability, and interpretable estimands.
+    </div>
+
+    <h3>Open Opportunities</h3>
+    <ul class="checklist">
+      <li><div class="check-icon icon-teal">✓</div>Federated rare-disease TTE on standardized OMOP/PCORnet models while retaining local governance — single institutions usually lack enough cases for credible positivity.</li>
+      <li><div class="check-icon icon-teal">✓</div>Probabilistic phenotyping and human-in-the-loop chart review for validated rare-disease computable phenotypes.</li>
+      <li><div class="check-icon icon-teal">✓</div>Better small-sample diagnostics, Bayesian borrowing under explicit causal assumptions, and principled combinations of mechanistic natural-history models with observational emulation.</li>
+    </ul>
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ─── SECTION 2: Digital Twins ────────────────────────────────── -->
+  <section class="section" id="twins">
+    <div class="section-badge badge-amber">Frontier 02</div>
+    <h2>Multiscale Digital Twins for Precision Oncology</h2>
+    <div class="section-rule rule-amber"></div>
+
+    <div class="summary-card amber">
+      <div class="summary-label label-amber">Executive Summary</div>
+      <p>The oncology digital-twin literature contains two partially connected traditions: <strong>multiscale computational oncology</strong> (mechanistic/hybrid models across molecular → tissue scales) and the broader <strong>medical digital twin</strong> movement emphasizing dynamic patient-specific updating and decision support.</p>
+      <p>A clinically meaningful oncology twin cannot be only a high-performing predictive model — it must respond correctly to <strong>interventions</strong>. Explicit structural causal model integration remains an open research frontier rather than settled practice.</p>
+    </div>
+
+    <h3>Twin Modeling Families</h3>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--amber)">Mechanistic</div>
+        <div class="method-card-title">ODE / PDE Tumor Growth</div>
+        <div class="method-card-desc">Differential equation models of tumor kinetics; biology-based; can be calibrated to patient imaging.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--amber)">Agent-Based</div>
+        <div class="method-card-title">Tumor Microenvironment</div>
+        <div class="method-card-desc">Individual cell-agent rules; conduit between cellular signaling and tissue-level twins.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--amber)">Multiscale</div>
+        <div class="method-card-title">Systems Biology Hybrid</div>
+        <div class="method-card-desc">Spans molecular → cellular → tissue → organ; requires data assimilation for patient-specific calibration.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--amber)">Surrogate ML</div>
+        <div class="method-card-title">Reduced-Order Models</div>
+        <div class="method-card-desc">Emulate expensive mechanistic simulations; fast inference for clinical decision loops.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--amber)">Causal SCM Layer</div>
+        <div class="method-card-title">Emerging Causal Twins</div>
+        <div class="method-card-desc">Explicit intervention nodes and counterfactual queries layered on mechanistic simulation — still an open research frontier.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--amber)">Imaging-Informed</div>
+        <div class="method-card-title">MRI-Based Calibration</div>
+        <div class="method-card-desc">Inverse problems calibrated to serial MRI; proven in TNBC neoadjuvant schedule optimization (2022/2025).</div>
+      </div>
+    </div>
+
+    <h3>VVUQ — Non-Negotiable Validation Framework</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num" style="background:var(--amber)">V</div><div class="step-body"><div class="step-title">Verification</div><p class="step-desc">Confirm the computational model solves the mathematical equations correctly — code accuracy, convergence, numerical precision.</p></div></div>
+      <div class="step"><div class="step-num" style="background:var(--amber)">V</div><div class="step-body"><div class="step-title">Validation</div><p class="step-desc">Confirm the model represents the real biological/clinical system — longitudinal trajectory calibration, held-out patient cohorts.</p></div></div>
+      <div class="step"><div class="step-num" style="background:var(--amber)">U</div><div class="step-body"><div class="step-title">Uncertainty Quantification</div><p class="step-desc">Characterize and propagate parameter uncertainty through predictions; report prediction intervals, not just point estimates.</p></div></div>
+      <div class="step"><div class="step-num" style="background:var(--amber)">Q</div><div class="step-body"><div class="step-title">Scenario Robustness</div><p class="step-desc">Test twin behavior under edge-case interventions; confirm intervention-response is biologically plausible and stable.</p></div></div>
+    </div>
+
+    <h3>Oncology Data Resources</h3>
+    <div class="dataset-grid">
+      <div class="dataset-card"><div class="dataset-name">GDC / TCGA</div><div class="dataset-fit">Cancer Genomics</div><div class="dataset-desc">Standardized clinical and genomic cancer data; open and controlled tiers.</div><span class="access-badge access-mixed">Open + Controlled</span></div>
+      <div class="dataset-card"><div class="dataset-name">cBioPortal</div><div class="dataset-fit">Exploratory Oncology</div><div class="dataset-desc">Curated, downloadable large-scale cancer genomics studies.</div><span class="access-badge access-open">Public</span></div>
+      <div class="dataset-card"><div class="dataset-name">TCIA</div><div class="dataset-fit">Imaging-Driven Twins</div><div class="dataset-desc">Deidentified cancer imaging collections for multiscale oncology modeling.</div><span class="access-badge access-open">Public</span></div>
+      <div class="dataset-card"><div class="dataset-name">CPTAC / PDC</div><div class="dataset-fit">Proteogenomics</div><div class="dataset-desc">Harmonized proteomic and linked genomic cancer data.</div><span class="access-badge access-mixed">Mixed / Some Protected</span></div>
+    </div>
+
+    <div class="insight insight-amber">
+      <strong>Key research opportunity:</strong> Connect multiscale mechanistic models to explicit causal semantics — clear intervention nodes, mediator structure, and counterfactual queries — not just forward simulation. Combine with ITE estimators so the twin represents both mechanistic disease evolution and empirical treatment heterogeneity.
+    </div>
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ─── SECTION 3: Epidemiology ─────────────────────────────────── -->
+  <section class="section" id="epi">
+    <div class="section-badge badge-violet">Frontier 03</div>
+    <h2>Causal AI in Epidemiology</h2>
+    <div class="section-rule rule-violet"></div>
+
+    <div class="summary-card violet">
+      <div class="summary-label label-violet">Executive Summary</div>
+      <p>The current frontier in epidemiology is not a replacement of causal thinking by machine learning, but a <strong>synthesis of them</strong>. Hill's 1965 viewpoints remain influential as an interpretive framework, but modern epidemiology stresses they are neither an algorithm nor a substitute for design, identification, and bias analysis.</p>
+      <p>The most credible contemporary position: use formal causal models and estimands to structure the question, use evidence synthesis and expert DAG construction to encode prior knowledge, and use automated discovery to surface plausible structures and contradictions — not to produce autonomous causal truth.</p>
+    </div>
+
+    <h3>Automated Causal Discovery Algorithm Families</h3>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--violet)">Constraint-Based</div>
+        <div class="method-card-title">PC / FCI-Type</div>
+        <div class="method-card-desc">Tests conditional independencies to infer skeleton and orientation. FCI handles latent confounders.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--violet)">Score-Based</div>
+        <div class="method-card-title">GES / NOTEARS</div>
+        <div class="method-card-desc">Optimize a global score over graph structures; continuous optimization variants enable gradient-based search.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--violet)">Functional Causal</div>
+        <div class="method-card-title">LiNGAM Families</div>
+        <div class="method-card-desc">Exploit non-Gaussianity or other distribution-specific features to identify full causal direction.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--violet)">Time-Series</div>
+        <div class="method-card-title">PCMCI-Style</div>
+        <div class="method-card-desc">Exploit temporal ordering; handle contemporaneous and lagged causal links in longitudinal data.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--violet)">Expert-Augmented</div>
+        <div class="method-card-title">ESC-DAGs</div>
+        <div class="method-card-desc">Evidence-synthesis protocol: systematic review drives DAG construction; integrates data-driven and domain knowledge.</div>
+      </div>
+    </div>
+
+    <h3>Recommended Workflow</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num" style="background:var(--violet)">1</div><div class="step-body"><div class="step-title">Domain Question &amp; Estimand</div><p class="step-desc">State the research question and causal estimand precisely before touching data.</p></div></div>
+      <div class="step"><div class="step-num" style="background:var(--violet)">2</div><div class="step-body"><div class="step-title">Literature- &amp; Expert-Informed DAG</div><p class="step-desc">Build a preliminary DAG from subject-matter knowledge; optionally use ESC-DAG evidence-synthesis protocol.</p></div></div>
+      <div class="step"><div class="step-num" style="background:var(--violet)">3</div><div class="step-body"><div class="step-title">Automated Discovery as Complement</div><p class="step-desc">Run discovery algorithms to surface plausible structures; never treat output as ground truth.</p></div></div>
+      <div class="step"><div class="step-num" style="background:var(--violet)">4</div><div class="step-body"><div class="step-title">Adjudication &amp; Sensitivity Analysis</div><p class="step-desc">Any disagreement between expert graph and discovered graph becomes a target for analysis or additional data collection.</p></div></div>
+      <div class="step"><div class="step-num" style="background:var(--violet)">5</div><div class="step-body"><div class="step-title">Transparent Reporting</div><p class="step-desc">Report the causal model, assumptions, robustness analyses, and reproducibility materials.</p></div></div>
+    </div>
+
+    <div class="insight insight-violet">
+      <strong>Key limitation:</strong> The AJE commentary notes a reproducibility problem in causal discovery, especially when algorithms are benchmarked primarily on simulations that do not resemble real epidemiologic systems. Discovery should be paired with robustness analysis, triangulation, and expert review.
+    </div>
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ─── SECTION 4: ITE ───────────────────────────────────────────── -->
+  <section class="section" id="ite">
+    <div class="section-badge badge-sage">Frontier 04</div>
+    <h2>Predicting Individualized Treatment Effects</h2>
+    <div class="section-rule rule-sage"></div>
+
+    <div class="summary-card sage">
+      <div class="summary-label label-sage">Executive Summary</div>
+      <p>The move from average treatment effects (ATE) to individualized treatment effects (ITE) is one of the clearest methodological bridges between causal inference and personalized medicine. Treatments are approved on average, but patients differ in baseline risk, treatment responsiveness, toxicity susceptibility, and adherence context.</p>
+      <p>The field is mature enough to move beyond average treatment effects, but <strong>not mature enough to treat individual effect predictions as routine clinical truth</strong>. Recent reviews emphasize that many current models are insufficiently validated for routine clinical deployment.</p>
+    </div>
+
+    <h3>Method Families</h3>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--sage)">Meta-Learners</div>
+        <div class="method-card-title">S / T / X Learners</div>
+        <div class="method-card-desc">Reduce CATE estimation to regression sub-problems; differ in how they use treated/control data.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--sage)">Tree Ensemble</div>
+        <div class="method-card-title">Causal Forests</div>
+        <div class="method-card-desc">Most frequently applied ML algorithm in recent healthcare HTE literature; adaptive weighting for local heterogeneity.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--sage)">Bayesian</div>
+        <div class="method-card-title">BCF / Bayesian Methods</div>
+        <div class="method-card-desc">Bayesian Causal Forests; principled uncertainty quantification; regularization priors on heterogeneity.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--sage)">Deep Learning</div>
+        <div class="method-card-title">Representation Learning</div>
+        <div class="method-card-desc">Balance treated/control in latent space (e.g. Shalit et al. 2017); generalization bounds on counterfactual prediction.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--sage)">Doubly Robust</div>
+        <div class="method-card-title">DR / TMLE Learners</div>
+        <div class="method-card-desc">Combine treatment and outcome models; doubly robust to misspecification; targeted inference for CATE.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-card-label" style="color:var(--sage)">Time-Series</div>
+        <div class="method-card-title">Dynamic ITE Models</div>
+        <div class="method-card-desc">For longitudinal EHR data; still sparse, lacks standardized metrics; major methodological gap identified in 2026 JAMIA review.</div>
+      </div>
+    </div>
+
+    <h3>Evaluation Metrics That Actually Matter</h3>
+    <p>Outcome prediction quality is <em>not</em> the same as treatment-effect prediction quality. The counterfactual is unobserved for any one patient.</p>
+    <div class="metric-row" style="border-top:1px solid var(--border)">
+      <span class="metric-name" style="color:var(--sage)">C-for-Benefit</span>
+      <span class="metric-desc">Discrimination analog for benefit prediction — does the model rank patients correctly by likely benefit?</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name" style="color:var(--sage)">Calibration-for-Benefit</span>
+      <span class="metric-desc">Do predicted effect sizes match observed group-level differences in benefit?</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name" style="color:var(--sage)">Qini / AUUC</span>
+      <span class="metric-desc">Uplift curve metrics for ranking patients by expected benefit; policy-relevant.</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name" style="color:var(--sage)">Policy Value / Regret</span>
+      <span class="metric-desc">Expected outcome under model-guided vs. alternative treatment policy; decision-theoretic evaluation.</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name" style="color:var(--sage)">PEHE / Proxy PEHE</span>
+      <span class="metric-desc">Precision in estimating heterogeneous effects; typically requires simulated or semi-synthetic data.</span>
+    </div>
+
+    <h3>Key Datasets for ITE Benchmarking</h3>
+    <div class="dataset-grid">
+      <div class="dataset-card"><div class="dataset-name">MIMIC-IV</div><div class="dataset-fit">ICU ITE &amp; TTE Methods</div><div class="dataset-desc">Rich deidentified critical-care EHR with training and DUA requirements.</div><span class="access-badge access-cred">Credentialed</span></div>
+      <div class="dataset-card"><div class="dataset-name">eICU-CRD</div><div class="dataset-fit">Multicenter Benchmarking</div><div class="dataset-desc">Multi-hospital ICU data useful for transportability and external validation.</div><span class="access-badge access-cred">Credentialed</span></div>
+      <div class="dataset-card"><div class="dataset-name">N3C Enclave</div><div class="dataset-fit">National-Scale EHR TTE</div><div class="dataset-desc">Secure enclave with governed access and tiered permissions.</div><span class="access-badge access-apply">Registered + DUR</span></div>
+      <div class="dataset-card"><div class="dataset-name">All of Us</div><div class="dataset-fit">Multimodal Causal Studies</div><div class="dataset-desc">Surveys, EHR, physical measures, genomics, and wearables; &gt;59K Fitbit participants.</div><span class="access-badge access-apply">Registered Workspace</span></div>
+      <div class="dataset-card"><div class="dataset-name">BioLINCC / CSDR</div><div class="dataset-fit">ITE Benchmarking</div><div class="dataset-desc">Patient-level clinical trial data for external validation; high-validity anchors.</div><span class="access-badge access-apply">Proposal-Based</span></div>
+      <div class="dataset-card"><div class="dataset-name">OHDSI OMOP CDM</div><div class="dataset-fit">Reproducible Pipelines</div><div class="dataset-desc">Standardizes observational data structure across sites; open standard.</div><span class="access-badge access-open">Open Standard</span></div>
+    </div>
+
+    <div class="insight insight-teal">
+      <strong>Best practice — Triangulation:</strong> Derive heterogeneity patterns in an RCT if possible → transport or recalibrate in observational data → externally validate in another cohort. Rather than estimating heterogeneity from vaguely defined observational comparisons, <strong>define a target trial first</strong> and then estimate treatment heterogeneity within that emulation.
+    </div>
+  </section>
+
+  <hr class="section-divider"/>
+
+  <!-- ─── SECTION 5: Wearables ─────────────────────────────────────── -->
+  <section class="section" id="wearables">
+    <div class="section-badge badge-red">Frontier 05</div>
+    <h2>Wearables &amp; Causal Triggers of Chronic-Condition Flare-Ups</h2>
+    <div class="section-rule rule-red"></div>
+
+    <div class="summary-card red">
+      <div class="summary-label label-red">Executive Summary</div>
+      <p>Wearables make causal research attractive because they provide dense, temporally ordered, real-world measurements of physiology and behavior. The strongest recent evidence: in IBD, physiological signals changed up to <strong>7 weeks before</strong> inflammatory and symptomatic flares; in RA, wearable-derived measures altered up to <strong>4 weeks before</strong> flares.</p>
+      <p>These are strong demonstrations of pre-flare physiology, but they stop short of proving that the measured variables are <strong>causal drivers</strong> rather than early markers or mediators. A causal trigger is something whose modification would change flare risk.</p>
+    </div>
+
+    <h3>The Critical Distinction</h3>
+    <div class="method-grid">
+      <div class="method-card" style="border-top:2px solid var(--red)">
+        <div class="method-card-label" style="color:var(--red)">What Current Studies Show</div>
+        <div class="method-card-title">Preclinical State Change</div>
+        <div class="method-card-desc">Physiological markers (HRV, resting HR, activity, oxygenation) change before flare onset — high-quality temporal prediction.</div>
+      </div>
+      <div class="method-card" style="border-top:2px solid var(--sage)">
+        <div class="method-card-label" style="color:var(--sage)">What the Field Still Needs</div>
+        <div class="method-card-title">Causal Trigger Identification</div>
+        <div class="method-card-desc">Combine wearable prediction with causal time-series designs and micro-randomized or N-of-1 interventions to test modifiability.</div>
+      </div>
+    </div>
+
+    <h3>Rigorous Study Design Checklist</h3>
+    <ul class="checklist">
+      <li><div class="check-icon icon-red">1</div>Define the event precisely: symptomatic flare, inflammatory flare, relapse, exacerbation, or clinically validated symptom worsening.</li>
+      <li><div class="check-icon icon-red">2</div>Separate candidate triggers (sleep disruption, medication change, infection, inactivity) from downstream physiological signatures (HRV decline, elevated resting HR).</li>
+      <li><div class="check-icon icon-red">3</div>Use self-controlled designs: N-of-1 observational counterfactual frameworks, case-crossover for transient triggers, dynamic MSMs for time-varying confounding.</li>
+      <li><div class="check-icon icon-red">4</div>Report <strong>lead time</strong> and <strong>alarm burden</strong>, not only AUROC — clinicians need to know whether there's enough time to intervene and whether alerts are tolerably specific.</li>
+      <li><div class="check-icon icon-red">5</div>Evaluate temporal performance: F1 at 7, 14, 21, and 28 days before flare, as in the 2025 RA flare study.</li>
+      <li><div class="check-icon icon-red">6</div>Address wearable feature drift and consumer-device updates that can undermine transportability across cohorts and calendar time.</li>
+    </ul>
+
+    <h3>Wearable &amp; Sensor Data Resources</h3>
+    <div class="dataset-grid">
+      <div class="dataset-card"><div class="dataset-name">All of Us</div><div class="dataset-fit">Multimodal: Wearables + EHR + Genomics</div><div class="dataset-desc">&gt;59,000 Fitbit participants; integrates surveys, physical measures, and genomics.</div><span class="access-badge access-apply">Registered Workspace</span></div>
+      <div class="dataset-card"><div class="dataset-name">UK Biobank Accelerometry</div><div class="dataset-fit">Population-Scale Sensors</div><div class="dataset-desc">Large accelerometer resource with linked phenotypes and longitudinal follow-up.</div><span class="access-badge access-apply">Application Required</span></div>
+      <div class="dataset-card"><div class="dataset-name">RADAR-base</div><div class="dataset-fit">Chronic-Disease Remote Monitoring</div><div class="dataset-desc">Built explicitly for remote assessment of disease and relapses; open-source platform.</div><span class="access-badge access-mixed">Study-Specific</span></div>
+      <div class="dataset-card"><div class="dataset-name">mPower</div><div class="dataset-fit">N-of-1 Digital Phenotyping</div><div class="dataset-desc">Public researcher portal for coded Parkinson-related mobile sensor data.</div><span class="access-badge access-apply">Synapse / Qualified Sharing</span></div>
+    </div>
+
+    <div class="insight insight-amber">
+      <strong>Most exciting research opportunity:</strong> Move from passive flare forecasting to <strong>causal trigger testing</strong> — micro-randomized trials of modifiable exposures, adaptive N-of-1 designs, or just-in-time interventions driven by digital twins or ITE models. Fuse wearables with EHRs to link physiological triggers to medications, labs, imaging, and clinician-validated outcomes.
+    </div>
+
+    <h3>Ethical &amp; Governance Considerations</h3>
+    <ul class="checklist">
+      <li><div class="check-icon icon-red">!</div>Continuous flare prediction from dense daily-life data raises strong privacy and autonomy issues — explicit consent for secondary inference is essential.</li>
+      <li><div class="check-icon icon-red">!</div>Alert fatigue and behavioral pressure are real clinical risks; transparent handling of false positives must be designed into the system.</li>
+      <li><div class="check-icon icon-red">!</div>Clear boundaries around employer, insurer, or platform access to flare-risk signals must be established in governance frameworks.</li>
+      <li><div class="check-icon icon-red">!</div>FDA's AI-enabled device guidance is relevant whenever wearable analytics influence diagnosis or treatment management.</li>
+    </ul>
+  </section>
+
+  <!-- ─── OPEN QUESTIONS ───────────────────────────────────────────── -->
+  <section class="section" id="open-questions">
+    <div class="section-badge badge-teal">Cross-Cutting</div>
+    <h2>Open Questions &amp; Maturity Assessment</h2>
+    <div class="section-rule rule-teal"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Frontier</th>
+            <th>Methodological Maturity</th>
+            <th>Key Gap</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Target Trial Emulation</td>
+            <td>High — clear methodological core, standardized terminology</td>
+            <td>Federated rare-disease TTE; small-sample diagnostics; Bayesian borrowing</td>
+          </tr>
+          <tr>
+            <td>ITE Estimation</td>
+            <td>High — diverse methods; growing clinical literature</td>
+            <td>Dynamic time-series ITE; joint efficacy + toxicity modeling; real-world covariate shift</td>
+          </tr>
+          <tr>
+            <td>Causal AI in Epidemiology</td>
+            <td>Medium — discovery methods exist; real-world validation lacking</td>
+            <td>Hill-plus-DAG-plus-discovery integration; multimodal epidemiologic panels</td>
+          </tr>
+          <tr>
+            <td>Digital Twins (Oncology)</td>
+            <td>Medium — multiscale models mature; explicit SCM layer emerging</td>
+            <td>Causal semantics integration; VVUQ standards; trial-style benchmarking of twin-guided decisions</td>
+          </tr>
+          <tr>
+            <td>Wearable Flare Triggers</td>
+            <td>Lower — strong prediction evidence; causal claims still limited</td>
+            <td>Causal trigger testing via micro-randomized trials; wearable + EHR data fusion</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Several important recent contributions in these areas are reviews, perspectives, or tool papers rather than definitive comparative clinical validations. Many translational claims should still be treated as <strong>promising but provisional</strong>.</p>
+  </section>
+
+</main>
+
+<!-- ── SOURCES ───────────────────────────────────────────────────────── -->
+<section aria-label="References" class="sources-section">
+  <div class="sources-inner">
+    <h2>Primary Sources &amp; References</h2>
+    <div class="sources-list">
+      <div class="source-entry"><span class="src-num">[1]</span><a href="https://academic.oup.com/aje/article-abstract/183/8/758/1739860" rel="noopener" target="_blank">Hernán &amp; Robins — Target Trial Emulation. American Journal of Epidemiology, 2016</a></div>
+      <div class="source-entry"><span class="src-num">[2]</span><a href="https://www.thelancet.com/journals/lanchi/article/PIIS2352-4642(25)00131-2/fulltext" rel="noopener" target="_blank">Pediatric &amp; Rare-Disease TTE. Lancet Child &amp; Adolescent Health, 2025</a></div>
+      <div class="source-entry"><span class="src-num">[3]</span><a href="https://www.nature.com/articles/s41591-021-01558-5" rel="noopener" target="_blank">Hernandez-Boussard et al. — Predictive Oncology Digital Twins. Nature Medicine, 2021</a></div>
+      <div class="source-entry"><span class="src-num">[4]</span><a href="https://journals.sagepub.com/doi/pdf/10.1177/0141076814562718" rel="noopener" target="_blank">Hill — The Environment and Disease: Association or Causation? JRSM, 1965</a></div>
+      <div class="source-entry"><span class="src-num">[5]</span><a href="https://www.nature.com/articles/s41591-024-02902-1" rel="noopener" target="_blank">Causal Machine Learning for Predicting Treatment Outcomes. Nature Medicine, 2024</a></div>
+      <div class="source-entry"><span class="src-num">[6]</span><a href="https://www.sciencedirect.com/science/article/pii/S0016508525000137" rel="noopener" target="_blank">IBD Forecast Study — Wearable Pre-Flare Physiology. Gastroenterology, 2025</a></div>
+      <div class="source-entry"><span class="src-num">[7]</span><a href="https://miguelhernan.org/whatifbook" rel="noopener" target="_blank">Hernán &amp; Robins — What If (Causal Inference Book)</a></div>
+      <div class="source-entry"><span class="src-num">[8]</span><a href="https://www.sciencedirect.com/science/article/pii/S0895435616301366" rel="noopener" target="_blank">Randomized Trials — Journal of Clinical Epidemiology, 2016 (TTE bias reference)</a></div>
+      <div class="source-entry"><span class="src-num">[9]</span><a href="https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2024.1473125/full" rel="noopener" target="_blank">Multiscale Oncology Digital Twins Review. Frontiers in Physiology, 2024</a></div>
+      <div class="source-entry"><span class="src-num">[10]</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4841209/" rel="noopener" target="_blank">Spirtes &amp; Zhang — Causal Discovery Methods. PMC, 2016</a></div>
+      <div class="source-entry"><span class="src-num">[11]</span><a href="https://www.nature.com/articles/s41746-024-01402-3" rel="noopener" target="_blank">Causal Digital Twins. npj Digital Medicine, 2024</a></div>
+      <div class="source-entry"><span class="src-num">[12]</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6087468/" rel="noopener" target="_blank">N-of-1 Counterfactual Framework for Self-Tracked Time Series. PMC, 2018</a></div>
+      <div class="source-entry"><span class="src-num">[13]</span><a href="https://physionet.org/content/mimiciv/view-required-training/3.1/" rel="noopener" target="_blank">MIMIC-IV — PhysioNet</a></div>
+      <div class="source-entry"><span class="src-num">[14]</span><a href="https://eicu.mit.edu/gettingstarted/access/" rel="noopener" target="_blank">eICU Collaborative Research Database — MIT</a></div>
+      <div class="source-entry"><span class="src-num">[15]</span><a href="https://ncats.nih.gov/research/research-activities/n3c/data-overview/access" rel="noopener" target="_blank">N3C Data Enclave — NCATS / NIH</a></div>
+      <div class="source-entry"><span class="src-num">[16]</span><a href="https://allofus.nih.gov/" rel="noopener" target="_blank">All of Us Research Program — NIH</a></div>
+      <div class="source-entry"><span class="src-num">[17]</span><a href="https://ohdsi.github.io/CommonDataModel/" rel="noopener" target="_blank">OHDSI OMOP Common Data Model</a></div>
+      <div class="source-entry"><span class="src-num">[18]</span><a href="https://pcornet.org/data/" rel="noopener" target="_blank">PCORnet — Patient-Centered Clinical Research Network</a></div>
+      <div class="source-entry"><span class="src-num">[19]</span><a href="https://trinetx.com/data-sets-analytics/" rel="noopener" target="_blank">TriNetX — Real-World Data Network</a></div>
+      <div class="source-entry"><span class="src-num">[20]</span><a href="https://portal.gdc.cancer.gov/" rel="noopener" target="_blank">GDC / TCGA — NCI Genomic Data Commons</a></div>
+      <div class="source-entry"><span class="src-num">[21]</span><a href="https://www.cbioportal.org/" rel="noopener" target="_blank">cBioPortal for Cancer Genomics</a></div>
+      <div class="source-entry"><span class="src-num">[22]</span><a href="https://www.cancerimagingarchive.net/" rel="noopener" target="_blank">The Cancer Imaging Archive (TCIA)</a></div>
+      <div class="source-entry"><span class="src-num">[23]</span><a href="https://gdc.cancer.gov/about-gdc/contributed-genomic-data-cancer-research/clinical-proteomic-tumor-analysis-consortium-cptac" rel="noopener" target="_blank">CPTAC / PDC — Proteogenomic Cancer Data</a></div>
+      <div class="source-entry"><span class="src-num">[24]</span><a href="https://www.ukbiobank.ac.uk/use-our-data/apply-for-access/" rel="noopener" target="_blank">UK Biobank — Accelerometry &amp; Phenotypes</a></div>
+      <div class="source-entry"><span class="src-num">[25]</span><a href="https://radar-base.org/" rel="noopener" target="_blank">RADAR-base — Remote Assessment Platform</a></div>
+      <div class="source-entry"><span class="src-num">[26]</span><a href="https://www.synapse.org/mpower" rel="noopener" target="_blank">mPower — Parkinson mHealth Study (Synapse)</a></div>
+      <div class="source-entry"><span class="src-num">[27]</span><a href="https://biolincc.nhlbi.nih.gov/home/" rel="noopener" target="_blank">BioLINCC — NHLBI Biologic Specimen and Data Repository</a></div>
+      <div class="source-entry"><span class="src-num">[28]</span><a href="https://www.nature.com/articles/s41746-026-02563-z" rel="noopener" target="_blank">Operational EHR-TTE Framework. npj Digital Medicine, 2026</a></div>
+      <div class="source-entry"><span class="src-num">[29]</span><a href="https://www.nature.com/articles/s41746-025-01447-y" rel="noopener" target="_blank">VVUQ for Medical Digital Twins. npj Digital Medicine, 2025</a></div>
+      <div class="source-entry"><span class="src-num">[30]</span><a href="https://academic.oup.com/aje/article/193/10/1341/7686097" rel="noopener" target="_blank">Synergy of Causal Discovery and Epidemiology. American Journal of Epidemiology, 2024</a></div>
+      <div class="source-entry"><span class="src-num">[31]</span><a href="https://link.springer.com/article/10.1186/s12874-023-01974-w" rel="noopener" target="_blank">Evaluation Metrics for ITE / HTE Models. BMC Medical Research Methodology, 2023</a></div>
+      <div class="source-entry"><span class="src-num">[32]</span><a href="https://www.nature.com/articles/s41598-025-29748-y" rel="noopener" target="_blank">Wearable Flare Prediction in Rheumatoid Arthritis. Scientific Reports, 2025</a></div>
+      <div class="source-entry"><span class="src-num">[33]</span><a href="https://aacrjournals.org/cancerres/article/82/18/3394/709036/MRI-Based-Digital-Models-Forecast-Patient-Specific" rel="noopener" target="_blank">MRI-Based Digital Models for TNBC Response Forecasting. Cancer Research, 2022</a></div>
+      <div class="source-entry"><span class="src-num">[34]</span><a href="https://proceedings.mlr.press/v70/shalit17a.html" rel="noopener" target="_blank">Shalit, Johansson, Sontag — Estimating ITE with Representation Learning. ICML, 2017</a></div>
+      <div class="source-entry"><span class="src-num">[35]</span><a href="https://academic.oup.com/jamia/article-abstract/33/1/234/8043066" rel="noopener" target="_blank">Time-Series ITE from EHRs — JAMIA Review, 2026</a></div>
+      <div class="source-entry"><span class="src-num">[36]</span><a href="https://academic.oup.com/ije/article/49/1/322/5536330" rel="noopener" target="_blank">Building DAGs with Domain Experts. International Journal of Epidemiology, 2020</a></div>
+      <div class="source-entry"><span class="src-num">[37]</span><a href="https://www.fda.gov/science-research/science-and-research-special-topics/real-world-evidence" rel="noopener" target="_blank">FDA — Real-World Evidence Framework</a></div>
+      <div class="source-entry"><span class="src-num">[38]</span><a href="https://pubmed.ncbi.nlm.nih.gov/37097356/" rel="noopener" target="_blank">RCT-DUPLICATE Initiative. PubMed, 2023</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────── -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build Reusable Not Oneoff Signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/causal-inference-business-economics.html">Causal Inference Business Economics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/causal-inference-healthcare-personalized-medicine.html">Causal Inference Healthcare Personalized Medicine</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo Turn Data Into Products Not Just Pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/chocolate-bar-of-data.html">Chocolate Bar Of Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio Turn Legacy Systems Into Data Product Engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close Loop With Business Feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo Design Products Thatleanr And Compound Value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto Data Products Are New Microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data Products Learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct Or Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define Start With Decisions Not Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2E Lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment Framework For Data Product Consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes And Lesssons Learnt In Building Ai Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track Value Not Just Performance</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+
+
+</body></html>
