@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+<!-- ============== PRIMARY SEO META ============== -->
+<title>Encrypted Data Analytics: A 2026 Field Guide to Privacy-Enhancing Technologies | Prashant Dhingra</title>
+<meta content="A 2026 field guide to encrypted data analytics: how homomorphic encryption, MPC, trusted execution environments, searchable encryption, OPE/ORE, functional encryption, and differential privacy let you compute on sensitive data — with threat models, a technique catalog, a comparative tradeoff table, vendor landscape, and a stage-gate deployment checklist." name="description"/>
+<meta content="encrypted data analytics, privacy enhancing technologies, PETs, homomorphic encryption, fully homomorphic encryption, FHE, partial homomorphic encryption, Paillier, secure multi-party computation, MPC, trusted execution environment, TEE, confidential computing, searchable encryption, queryable encryption, MongoDB Queryable Encryption, order-preserving encryption, OPE, ORE, functional encryption, differential privacy, private set intersection, private join and compute, OpenFHE, SEAL, MP-SPDZ, SecretFlow, Concrete ML, Prio, DAP, NIST PEC, GDPR pseudonymisation, encrypted analytics 2026" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/>
+<link href="https://prashant.dhingra.website/encrypted-data-analytics" rel="canonical"/>
+
+<!-- ============== OPEN GRAPH / SOCIAL ============== -->
+<meta content="article" property="og:type"/>
+<meta content="Encrypted Data Analytics: A 2026 Field Guide to Privacy-Enhancing Technologies" property="og:title"/>
+<meta content="HE, MPC, TEEs, searchable encryption, OPE/ORE, functional encryption, and DP compared for computing on sensitive data — threat models, a technique catalog, tradeoffs, vendors, and a deployment checklist." property="og:description"/>
+<meta content="https://prashant.dhingra.website/encrypted-data-analytics" property="og:url"/>
+<meta content="prashant.dhingra.website" property="og:site_name"/>
+<meta content="en_US" property="og:locale"/>
+<meta content="Prashant Dhingra" property="article:author"/>
+<meta content="2026-06-04" property="article:published_time"/>
+<meta content="2026-06-04" property="article:modified_time"/>
+<meta content="Data &amp; Privacy Engineering" property="article:section"/>
+<meta content="Privacy Enhancing Technologies" property="article:tag"/>
+<meta content="Encrypted Analytics" property="article:tag"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Encrypted Data Analytics: A 2026 Field Guide to PETs" name="twitter:title"/>
+<meta content="A threat-model-first tour of the technologies that let you analyze data you can't see." name="twitter:description"/>
+
+<!-- ============== GENERATIVE ENGINE OPTIMIZATION (GEO) STRUCTURED DATA ============== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Encrypted Data Analytics: A 2026 Field Guide to Privacy-Enhancing Technologies",
+  "description": "A 2026 field guide to encrypted data analytics covering homomorphic encryption, MPC, trusted execution environments, searchable encryption, OPE/ORE, functional encryption, and differential privacy.",
+  "author": {"@type": "Person", "name": "Prashant Dhingra", "url": "https://prashant.dhingra.website"},
+  "publisher": {"@type": "Person", "name": "Prashant Dhingra", "url": "https://prashant.dhingra.website"},
+  "datePublished": "2026-06-04",
+  "dateModified": "2026-06-04",
+  "inLanguage": "en",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://prashant.dhingra.website/encrypted-data-analytics"},
+  "about": [
+    {"@type": "Thing", "name": "Privacy-Enhancing Technologies"},
+    {"@type": "Thing", "name": "Homomorphic Encryption"},
+    {"@type": "Thing", "name": "Secure Multi-Party Computation"},
+    {"@type": "Thing", "name": "Trusted Execution Environment"},
+    {"@type": "Thing", "name": "Searchable Encryption"},
+    {"@type": "Thing", "name": "Differential Privacy"}
+  ],
+  "keywords": "encrypted data analytics, PETs, FHE, MPC, TEE, searchable encryption, OPE, ORE, functional encryption, differential privacy"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What is encrypted data analytics?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Encrypted data analytics is an umbrella for privacy-enhancing technologies that let an analyst, cloud service, or counterparties compute over sensitive data while reducing or eliminating ordinary plaintext exposure during processing. It includes homomorphic encryption, secure multi-party computation, structured/searchable encryption, private set operations, functional encryption, and — in industry practice — trusted execution environments and confidential computing. Plain encryption at rest or in transit alone does not qualify, because the analytic engine still processes plaintext in normal memory."}},
+    {"@type": "Question", "name": "Which privacy-enhancing technology should I choose for analytics?",
+      "acceptedAnswer": {"@type": "Answer", "text": "The choice is threat-model-first, not feature-first. Use trusted execution environments for broad, low-latency analytics when you trust a hardware root of trust; MPC when multiple organizations must jointly analyze without a trusted operator; FHE when one owner outsources computation and the server must be cryptographically untrusted; searchable or queryable encryption for equality and range lookups; OPE/ORE for fast range search when order leakage is acceptable; functional encryption for narrow delegated functions; and differential privacy on top whenever aggregate outputs leave the trusted boundary. A good rule is: use the weakest tool that still closes the threat you actually care about."}},
+    {"@type": "Question", "name": "Does encrypted data analytics make data exempt from GDPR or HIPAA?",
+      "acceptedAnswer": {"@type": "Answer", "text": "No. Under GDPR, pseudonymisation is still processing of personal data, not automatic anonymization, and PETs are complementary safeguards, not a silver bullet. Article 25 requires data protection by design, and Article 32 cites pseudonymisation and encryption as example measures. U.S. regimes (HIPAA, FTC, GLBA Safeguards Rule) are risk-based. Encrypted analytics helps with risk reduction, breach resilience, and cross-organization sharing, but does not eliminate obligations around purpose limitation, transparency, data-subject rights, or output governance."}},
+    {"@type": "Question", "name": "Is fully homomorphic encryption practical for analytics in 2026?",
+      "acceptedAnswer": {"@type": "Answer", "text": "FHE is most mature today for selected aggregation, vector operations, similarity search, low-depth arithmetic, and ML inference rather than general-purpose OLAP. General SQL engines, broad joins, and large-model training over FHE remain mostly research or prototype territory. Bootstrapping is still a dominant bottleneck, and the best current use cases are single-owner outsourced computation and hybrid pipelines where FHE protects only the most sensitive steps."}},
+    {"@type": "Question", "name": "What is the risk with searchable and order-preserving encryption?",
+      "acceptedAnswer": {"@type": "Answer", "text": "They trade leakage for speed. Efficient searchable encryption is defined in terms of allowed leakage — search pattern, access pattern, frequency, result size, or index structure — which leakage-abuse attacks can exploit. OPE/ORE explicitly reveal order, which can enable powerful inference attacks given auxiliary distribution data. Both can be the right answer for equality/range/search workloads, but only when the leakage profile is explicitly documented, accepted, and bounded by access controls."}}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://prashant.dhingra.website"},
+    {"@type": "ListItem", "position": 2, "name": "Tutorials", "item": "https://prashant.dhingra.website/tutorials"},
+    {"@type": "ListItem", "position": 3, "name": "Encrypted Data Analytics", "item": "https://prashant.dhingra.website/encrypted-data-analytics"}
+  ]
+}
+</script>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&amp;family=Spline+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --ink:#e9ecf1;
+  --ink-dim:#9aa1b0;
+  --ink-faint:#646b7d;
+  --bg:#0a0b10;
+  --bg-2:#0e1016;
+  --panel:#12141d;
+  --panel-2:#181b26;
+  --line:#262a39;
+  --line-soft:#1b1e2a;
+  /* 8-technique spectrum: warm (reduced exposure) -> cool (strict opacity) */
+  --c-phe:#ff8a5c; --c-fhe:#ff6f59; --c-mpc:#ec6f9c; --c-tee:#a98bff;
+  --c-se:#6f8cf0;  --c-ore:#46c8b0; --c-fe:#7fce7a;  --c-dp:#d2cf57;
+  --accent:#ff7d5c; --accent-2:#ff9d6b;
+  --cyan:#46c8b0;
+  --glow:rgba(255,125,92,.13);
+  --disp:"Bricolage Grotesque",system-ui,sans-serif;
+  --sans:"Spline Sans",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --maxw:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:17px;line-height:1.72;letter-spacing:.005em;overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(900px 520px at 80% -8%,var(--glow),transparent 60%),
+    radial-gradient(680px 560px at 2% 14%,rgba(70,200,176,.06),transparent 55%),
+    radial-gradient(560px 460px at 55% 112%,rgba(169,139,255,.05),transparent 60%);}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.wrap{position:relative;z-index:2;max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+#progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--c-phe),var(--c-mpc),var(--c-se),var(--c-ore),var(--c-dp));box-shadow:0 0 12px var(--glow)}
+
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(11px);
+  background:rgba(10,11,16,.74);border-bottom:1px solid var(--line-soft)}
+.topbar .row{display:flex;align-items:center;justify-content:space-between;height:58px}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:13px;letter-spacing:.02em;color:var(--ink);text-decoration:none}
+.brand .dot{width:11px;height:11px;border-radius:3px;background:linear-gradient(135deg,var(--c-phe),var(--c-mpc) 40%,var(--c-se) 70%,var(--c-ore));animation:pulse 3.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+.brand b{font-weight:600}.brand span{color:var(--ink-faint)}
+.topnav{display:flex;gap:22px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.topnav a{color:var(--ink-dim);text-decoration:none;transition:color .2s}
+.topnav a:hover{color:var(--accent)}
+@media(max-width:860px){.topnav{display:none}}
+
+.hero{padding:70px 0 30px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:24px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--accent);opacity:.6}
+h1{font-family:var(--disp);font-weight:700;font-size:clamp(2.6rem,6.4vw,5rem);line-height:.98;letter-spacing:-.02em;color:#f4f6fa;max-width:16ch}
+h1 .grad{background:linear-gradient(100deg,var(--c-phe),var(--c-mpc) 45%,var(--c-se) 72%,var(--c-ore));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.standfirst{font-size:1.22rem;line-height:1.55;color:var(--ink-dim);max-width:62ch;margin-top:26px}
+.standfirst b{color:var(--ink);font-weight:600}
+.byline{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin-top:32px;font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+.byline .who{display:flex;align-items:center;gap:10px;color:var(--ink)}
+.avatar{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:14px;color:var(--bg);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.byline .sep{width:4px;height:4px;border-radius:50%;background:var(--ink-faint)}
+.byline a{color:var(--accent);text-decoration:none}.byline a:hover{text-decoration:underline}
+
+/* spectrum strip */
+.spectrum{margin:42px 0 8px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:22px 22px 18px}
+.spectrum .axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-faint);text-transform:uppercase;margin-bottom:14px}
+.spectrum .bar{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.seg{border-radius:7px;padding:11px 8px 12px;text-align:center;background:var(--panel-2);border-top:3px solid;transition:transform .25s}
+.seg:hover{transform:translateY(-3px)}
+.seg .ab{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.02em}
+.seg .ds{font-size:10.5px;color:var(--ink-faint);margin-top:3px;line-height:1.25;font-family:var(--mono)}
+@media(max-width:680px){.spectrum .bar{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:420px){.spectrum .bar{grid-template-columns:repeat(2,1fr)}}
+
+/* layout */
+.layout{display:grid;grid-template-columns:226px 1fr;gap:56px;padding:34px 0 90px;align-items:start}
+@media(max-width:940px){.layout{grid-template-columns:1fr;gap:0}}
+.toc{position:sticky;top:80px}
+@media(max-width:940px){.toc{display:none}}
+.toc h4{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:15px}
+.toc ol{list-style:none;counter-reset:t;border-left:1px solid var(--line)}
+.toc li{counter-increment:t}
+.toc a{display:block;padding:7px 0 7px 18px;margin-left:-1px;border-left:2px solid transparent;font-size:13.5px;color:var(--ink-dim);text-decoration:none;line-height:1.35;transition:all .2s}
+.toc a::before{content:counter(t,decimal-leading-zero);font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-right:9px}
+.toc a:hover{color:var(--ink)}
+.toc a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc a.active::before{color:var(--accent)}
+
+article{max-width:734px}
+article section{margin-bottom:30px;scroll-margin-top:78px}
+h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.85rem,3.7vw,2.6rem);line-height:1.05;letter-spacing:-.018em;color:#f4f6fa;margin:50px 0 10px;padding-top:30px;position:relative}
+h2 .n{position:absolute;top:0;left:0;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:500;text-transform:uppercase}
+h2:first-of-type{margin-top:0}
+h3{font-family:var(--disp);font-weight:600;font-size:1.34rem;color:var(--ink);margin:34px 0 10px;letter-spacing:-.01em}
+h4.sub{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:28px 0 12px}
+p{margin:0 0 18px}article p{color:#c7cdd8}
+strong{color:#f1f3f7;font-weight:600}em{color:var(--ink)}
+.lead{font-size:1.16rem;color:var(--ink-dim);line-height:1.6}
+
+ul.bul{list-style:none;margin:6px 0 20px}
+ul.bul li{position:relative;padding-left:25px;margin-bottom:11px;color:#c7cdd8}
+ul.bul li::before{content:"";position:absolute;left:3px;top:11px;width:8px;height:8px;border:1.5px solid var(--accent);border-radius:2px}
+
+/* answer box */
+.tldr{background:linear-gradient(160deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:6px 0 36px;position:relative;overflow:hidden}
+.tldr::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--c-phe),var(--c-mpc),var(--c-se),var(--c-ore))}
+.tldr .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:9px}
+.tldr .lbl svg{width:15px;height:15px}
+.tldr ul{list-style:none}
+.tldr li{position:relative;padding-left:22px;margin-bottom:10px;font-size:15.5px;color:#d3d8e2;line-height:1.55}
+.tldr li:last-child{margin-bottom:0}
+.tldr li::before{content:"→";position:absolute;left:0;top:0;color:var(--accent);font-family:var(--mono)}
+.tldr li b{color:#fff}
+
+.def{border:1px solid var(--line);border-radius:12px;background:var(--bg-2);padding:22px 24px;margin:24px 0}
+.def .term{font-family:var(--disp);font-weight:600;font-size:1.2rem;color:var(--accent);margin-bottom:6px}
+.def p{margin:0;color:#c7cdd8;font-size:15.5px}
+
+/* technique catalog */
+.catalog{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:26px 0}
+@media(max-width:640px){.catalog{grid-template-columns:1fr}}
+.tech{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:20px;position:relative;overflow:hidden;transition:transform .3s,border-color .3s}
+.tech::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tc)}
+.tech:hover{transform:translateY(-3px);border-color:var(--tc)}
+.tech .top{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.tech .ix{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--tc)}
+.tech .nm{font-family:var(--disp);font-weight:700;font-size:1.12rem;color:#f4f6fa;line-height:1.1}
+.tech .role{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px}
+.tech .field{font-size:13.5px;color:#c7cdd8;margin-bottom:8px;line-height:1.5}
+.tech .field b{color:var(--ink);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;display:block;color:var(--tc);margin-bottom:2px;opacity:.9}
+.tech .tools{margin-top:11px;padding-top:11px;border-top:1px solid var(--line-soft);font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);line-height:1.5}
+
+/* tables */
+.tablewrap{margin:26px 0;border:1px solid var(--line);border-radius:13px;overflow:auto;background:var(--panel)}
+table.cmp{border-collapse:collapse;width:100%;min-width:860px;font-size:13px}
+table.cmp th,table.cmp td{text-align:left;padding:12px 13px;vertical-align:top;border-bottom:1px solid var(--line-soft)}
+table.cmp thead th{position:sticky;top:0;background:var(--panel-2);color:var(--accent);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--line)}
+table.cmp thead th.dim{color:var(--ink-faint)}
+table.cmp tbody th{font-family:var(--sans);font-weight:700;color:#f1f3f7;font-size:13.5px;background:var(--bg-2);white-space:nowrap;border-left:3px solid var(--tc,transparent)}
+table.cmp td{color:var(--ink-dim);line-height:1.5}
+table.cmp tr:last-child td,table.cmp tr:last-child th{border-bottom:none}
+table.cmp tbody tr:hover td,table.cmp tbody tr:hover th{background:var(--panel-2)}
+.scrollhint{font-family:var(--mono);font-size:11px;color:var(--ink-faint);text-align:center;margin-top:-14px;margin-bottom:26px}
+@media(min-width:880px){.scrollhint{display:none}}
+
+/* stage gate table (lighter) */
+table.gate{border-collapse:collapse;width:100%;min-width:720px;font-size:13px}
+table.gate th,table.gate td{text-align:left;padding:12px 14px;vertical-align:top;border-bottom:1px solid var(--line-soft)}
+table.gate thead th{background:var(--panel-2);color:var(--cyan);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--line)}
+table.gate tbody th{font-family:var(--disp);font-weight:600;color:#f1f3f7;font-size:14px;background:var(--bg-2);white-space:nowrap}
+table.gate td{color:var(--ink-dim);line-height:1.5}
+table.gate tr:last-child td,table.gate tr:last-child th{border-bottom:none}
+
+/* callout */
+.callout{border:1px solid var(--accent);border-radius:14px;background:linear-gradient(150deg,rgba(255,125,92,.1),rgba(255,125,92,.02));padding:24px 26px;margin:30px 0}
+.callout .tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+  background:rgba(255,125,92,.13);border:1px solid rgba(255,125,92,.3);padding:4px 10px;border-radius:20px;margin-bottom:14px}
+.callout .tag .blink{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s infinite}
+.callout h3{margin-top:0}.callout ul.bul li::before{border-color:var(--accent)}
+
+.note{border-left:3px solid var(--c-dp);background:rgba(210,207,87,.06);border-radius:0 10px 10px 0;padding:18px 22px;margin:24px 0}
+.note .h{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-dp);margin-bottom:8px}
+.note p{margin:0;color:#dad7c2;font-size:15px}
+
+/* hybrid flow */
+.hybrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:26px 0}
+@media(max-width:680px){.hybrid{grid-template-columns:repeat(2,1fr)}}
+.hy{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:14px 12px;text-align:center;border-top:3px solid var(--hc);transition:transform .25s}
+.hy:hover{transform:translateY(-3px)}
+.hy .l{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--hc);margin-bottom:5px}
+.hy .d{font-size:11.5px;color:var(--ink-dim);line-height:1.35}
+
+/* vendor groups */
+.vendors{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+@media(max-width:640px){.vendors{grid-template-columns:1fr}}
+.vg{border:1px solid var(--line);border-radius:12px;background:var(--bg-2);padding:18px 20px}
+.vg .h{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+.vg p{font-size:14px;color:var(--ink-dim);margin:0;line-height:1.55}
+.vg p b{color:var(--ink)}
+
+.checklist{list-style:none;counter-reset:c;margin:20px 0}
+.checklist li{counter-increment:c;position:relative;padding:14px 16px 14px 54px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:var(--bg-2);color:#c7cdd8;font-size:15px;line-height:1.5;transition:all .25s}
+.checklist li:hover{border-color:var(--accent);background:var(--panel)}
+.checklist li::before{content:counter(c);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:8px;background:rgba(255,125,92,.12);border:1px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:600}
+
+.faq details{border:1px solid var(--line);border-radius:11px;background:var(--bg-2);margin-bottom:11px;overflow:hidden;transition:border-color .25s}
+.faq details[open]{border-color:var(--accent)}
+.faq summary{padding:18px 22px;cursor:pointer;font-family:var(--disp);font-weight:600;color:#f4f6fa;font-size:1.1rem;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .pl{font-family:var(--mono);color:var(--accent);font-size:20px;transition:transform .3s;flex:0 0 auto}
+.faq details[open] summary .pl{transform:rotate(45deg)}
+.faq .ans{padding:0 22px 20px;color:var(--ink-dim);font-size:15px;line-height:1.62}
+
+.sources .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.sources a{display:block;padding:11px 14px;border:1px solid var(--line);border-radius:9px;background:var(--bg-2);color:var(--ink-dim);text-decoration:none;font-size:12px;font-family:var(--mono);transition:all .2s;word-break:break-word;line-height:1.4}
+.sources a:hover{border-color:var(--accent);color:var(--accent)}
+.sources a b{display:block;color:var(--ink);font-family:var(--sans);font-size:13px;font-weight:600;margin-bottom:3px}
+
+footer{border-top:1px solid var(--line-soft);padding:44px 0 60px;margin-top:30px}
+.fauthor{display:flex;align-items:center;gap:15px;margin-bottom:24px}
+.fauthor .avatar{width:46px;height:46px;font-size:18px}
+.fauthor .meta b{display:block;color:#f4f6fa;font-size:16px;font-family:var(--disp);font-weight:700}
+.fauthor .meta span{color:var(--ink-faint);font-size:12.5px;font-family:var(--mono)}
+.fnote{font-size:13px;color:var(--ink-faint);line-height:1.65;max-width:64ch}
+.flinks{display:flex;flex-wrap:wrap;gap:22px;margin-top:20px;font-family:var(--mono);font-size:12px}
+.flinks a{color:var(--ink-dim);text-decoration:none}.flinks a:hover{color:var(--accent)}
+
+::selection{background:rgba(255,125,92,.26);color:#fff}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<header class="topbar">
+  <div class="wrap row">
+    <a class="brand" href="https://prashant.dhingra.website"><span class="dot"></span><b>prashant.dhingra</b><span>.website</span></a>
+    <nav class="topnav">
+      <a href="#scope">Scope</a>
+      <a href="#threats">Threats</a>
+      <a href="#catalog">Catalog</a>
+      <a href="#tradeoffs">Tradeoffs</a>
+      <a href="#deployments">Deployments</a>
+      <a href="#selection">Choose</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero wrap">
+  <div class="eyebrow">Field Guide · Data &amp; Privacy Engineering · Updated June 2026</div>
+  <h1>Analytics on data you <span class="grad">can't see</span></h1>
+  <p class="standfirst"><b>Encrypted data analytics</b> is an umbrella for the privacy-enhancing technologies that let you compute, search, join, and model over sensitive data while reducing or eliminating ordinary plaintext exposure during processing. No single technique wins. This guide catalogs eight of them, maps each to a threat model, and shows how to choose — and combine — them.</p>
+  <div class="byline">
+    <span class="who"><span class="avatar">PD</span> By Prashant Dhingra</span>
+    <span class="sep"></span><span>~26 min read</span>
+    <span class="sep"></span><span>8 techniques cataloged</span>
+    <span class="sep"></span><a href="#sources">Primary sources ↓</a>
+  </div>
+
+  <div class="spectrum">
+    <div class="axis"><span>← reduced plaintext exposure</span><span>strict cryptographic opacity →</span></div>
+    <div class="bar">
+      <div class="seg" style="border-color:var(--c-tee)"><div class="ab" style="color:var(--c-tee)">TEE</div><div class="ds">attested hardware</div></div>
+      <div class="seg" style="border-color:var(--c-ore)"><div class="ab" style="color:var(--c-ore)">OPE/ORE</div><div class="ds">order revealed</div></div>
+      <div class="seg" style="border-color:var(--c-se)"><div class="ab" style="color:var(--c-se)">Search.</div><div class="ds">bounded leakage</div></div>
+      <div class="seg" style="border-color:var(--c-dp)"><div class="ab" style="color:var(--c-dp)">DP</div><div class="ds">output control</div></div>
+      <div class="seg" style="border-color:var(--c-fe)"><div class="ab" style="color:var(--c-fe)">FE</div><div class="ds">f(x) only</div></div>
+      <div class="seg" style="border-color:var(--c-mpc)"><div class="ab" style="color:var(--c-mpc)">MPC</div><div class="ds">split trust</div></div>
+      <div class="seg" style="border-color:var(--c-phe)"><div class="ab" style="color:var(--c-phe)">PHE</div><div class="ds">narrow arith.</div></div>
+      <div class="seg" style="border-color:var(--c-fhe)"><div class="ab" style="color:var(--c-fhe)">FHE</div><div class="ds">ciphertext math</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap layout">
+  <aside class="toc">
+    <h4>Contents</h4>
+    <ol>
+      <li><a href="#scope">Definitions &amp; scope</a></li>
+      <li><a href="#threats">Threat models &amp; law</a></li>
+      <li><a href="#catalog">Technique catalog</a></li>
+      <li><a href="#tradeoffs">Comparative tradeoffs</a></li>
+      <li><a href="#hybrid">Hybrid architectures</a></li>
+      <li><a href="#deployments">Deployments &amp; vendors</a></li>
+      <li><a href="#new2026">2026 signals</a></li>
+      <li><a href="#selection">Selection &amp; checklist</a></li>
+      <li><a href="#benchmarks">Benchmark metrics</a></li>
+      <li><a href="#open">Open questions</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ol>
+  </aside>
+
+  <article>
+    <!-- ANSWER BOX -->
+    <div class="tldr">
+      <div class="lbl">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        Key takeaways
+      </div>
+      <ul>
+        <li><b>"Encrypted analytics" is not binary.</b> Systems differ in what they protect against (cloud operators, collaborators, DBAs, output inference, side channels, collusion) and in what they can compute.</li>
+        <li>The choice is <b>threat-model-first, not feature-first</b> — pick the weakest tool that still closes the threat you actually care about.</li>
+        <li><b>TEEs</b> give the broadest functionality at near-native speed; <b>MPC</b> suits multi-party analytics; <b>FHE</b> removes the most server trust; <b>searchable/OPE</b> trade leakage for query speed; <b>FE</b> is narrow; <b>DP</b> guards the outputs.</li>
+        <li>The dominant 2026 production pattern is <b>hybridization</b> — confidential computing for general execution, cryptographic sub-protocols for the sensitive steps, searchable encryption for queryability, and DP for release.</li>
+        <li>PETs are <b>complementary safeguards, not compliance exemptions</b> — pseudonymised data is still personal data under GDPR.</li>
+      </ul>
+    </div>
+
+    <!-- 1 SCOPE -->
+    <section id="scope">
+      <h2><span class="n">01 — Scope</span>Definitions and scope</h2>
+      <p class="lead">In the strict cryptographic sense, encrypted analytics covers homomorphic encryption, MPC, structured/searchable encryption, private set operations, and functional encryption. In industry practice the umbrella also includes trusted execution environments and confidential computing.</p>
+      <div class="def">
+        <div class="term">Encrypted data analytics</div>
+        <p>Any architecture that allows useful analytics, search, joining, or ML over sensitive data while preventing the processing environment from having ordinary, unrestricted plaintext visibility — via computation on ciphertext or secret shares, queries over protected indexes, hardware-attested execution, or DP-controlled output release.</p>
+      </div>
+      <p>A useful distinction is between <strong>strict cryptographic opacity</strong> and <strong>reduced plaintext exposure</strong>. FHE, MPC, PIR/PSI, and most functional-encryption constructions aim for the former. TEEs aim for the latter: data becomes plaintext <em>inside</em> an attested enclave or confidential VM, but the operator, hypervisor, and surrounding platform are meant to stay outside the trust boundary. Crucially, <strong>ordinary encryption at rest or in transit alone does not qualify</strong> — the analytic engine still processes plaintext in its normal memory.</p>
+      <p>NIST's Privacy-Enhancing Cryptography project gives a stable foundation: MPC lets distrustful parties compute on private inputs; FHE evaluates functions on ciphertexts; PIR retrieves an item without revealing the query; structured encryption enables private queries over encrypted data structures; and functional encryption is listed among related tools. The "analytics" in scope is broad — aggregation, ML inference and (where feasible) training, SQL-like filtering and selected joins, search over encrypted data, and cross-party linkage such as private join and compute.</p>
+    </section>
+
+    <!-- 2 THREATS -->
+    <section id="threats">
+      <h2><span class="n">02 — Threats &amp; Law</span>Threat models and regulatory constraints</h2>
+      <p>The first question is <strong>who is the adversary</strong>. Common models include an honest-but-curious cloud provider; a malicious operator or hypervisor; colluding input parties in an MPC workflow; a database administrator who can dump storage and logs; a side-channel attacker observing memory, page faults, or microarchitectural effects; and an analyst who sees only aggregate outputs but attempts membership or reconstruction attacks. Different PETs address very different subsets of that list.</p>
+      <ul class="bul">
+        <li><strong>Cryptographic techniques</strong> rest on lattice or number-theoretic hardness and on how much leakage the scheme permits by design.</li>
+        <li><strong>MPC</strong> hinges on the corruption model and collusion threshold — passive vs malicious, honest- vs dishonest-majority, and behavior under abort.</li>
+        <li><strong>TEEs</strong> have a narrower, operational model: only an attested workload may access keys or plaintext — so hardware/firmware bugs, side channels, or vendor supply-chain trust fall outside it.</li>
+      </ul>
+      <p>Regulation is nuanced. Under GDPR, <strong>pseudonymisation is still processing of personal data</strong>, not automatic anonymization; Article 25 requires data protection by design and default, and Article 32 cites pseudonymisation and encryption as example measures. The ICO's PET guidance is explicit that PETs support data minimisation and security but are <strong>not a silver bullet</strong>, and still require lawful, fair, transparent processing plus a case-by-case DPIA. U.S. sectoral regimes echo this: HIPAA points to NIST controls, the FTC stresses understanding data flows and avoiding deceptive privacy claims, and the GLBA Safeguards Rule is explicitly risk-based.</p>
+      <div class="note">
+        <div class="h">The recurring lesson</div>
+        <p>Encrypted analytics helps with risk reduction, processor minimization, breach resilience, and cross-organizational sharing — but it usually does not eliminate obligations around purpose limitation, transparency, data-subject rights, retention, or transfers, especially when a controller can still decrypt outputs or relink results to individuals.</p>
+      </div>
+    </section>
+
+    <!-- 3 CATALOG -->
+    <section id="catalog">
+      <h2><span class="n">03 — Catalog</span>The technique catalog</h2>
+      <p>Eight families, each strongest at a different job. The colored spine on each card matches the spectrum strip at the top of the page.</p>
+      <div class="catalog">
+        <div class="tech" style="--tc:var(--c-phe)">
+          <div class="top"><span class="ix">01</span><span class="nm">Partial HE (PHE)</span></div>
+          <div class="role">additive homomorphism · low functionality</div>
+          <div class="field"><b>Computes</b>Counts, sums, weighted sums, private billing, secure aggregation — often embedded inside larger protocols.</div>
+          <div class="field"><b>Caveat</b>No arbitrary comparisons, joins, or general SQL without combining with other primitives.</div>
+          <div class="tools">python-paillier · LightPHE</div>
+        </div>
+        <div class="tech" style="--tc:var(--c-fhe)">
+          <div class="top"><span class="ix">02</span><span class="nm">Fully HE (FHE)</span></div>
+          <div class="role">ciphertext computation · strongest server-trust reduction</div>
+          <div class="field"><b>Computes</b>Aggregation, vector ops, similarity search, low-depth arithmetic, selected ML inference; multiparty variants extend toward collaboration.</div>
+          <div class="field"><b>Caveat</b>Slow; bootstrapping bottleneck; general SQL, joins, and training remain mostly research/prototype.</div>
+          <div class="tools">OpenFHE · SEAL · HElib · Lattigo · TFHE-rs · Concrete ML</div>
+        </div>
+        <div class="tech" style="--tc:var(--c-mpc)">
+          <div class="top"><span class="ix">03</span><span class="nm">Secure MPC</span></div>
+          <div class="role">distributed trust · multi-party</div>
+          <div class="field"><b>Computes</b>Aggregations, histograms, PSI, private joins, overlap-and-sum, federated analytics, partitioned ML training/inference.</div>
+          <div class="field"><b>Caveat</b>Network- and round-bound; complex to operate; security collapses if too many parties collude.</div>
+          <div class="tools">MP-SPDZ · MPyC · MOTION · EMP · ABY3 · SecretFlow</div>
+        </div>
+        <div class="tech" style="--tc:var(--c-tee)">
+          <div class="top"><span class="ix">04</span><span class="nm">TEE / Confidential computing</span></div>
+          <div class="role">attested hardware · broadest functionality</div>
+          <div class="field"><b>Computes</b>SQL, joins, arbitrary code, conventional databases, ML training/inference — often near-native speed (DuckDB-SGX2: &lt;2× on TPC-H SF30).</div>
+          <div class="field"><b>Caveat</b>Larger TCB; side channels (SGX.Fail, SEV-SNP "Fabricked" 2026); needs patch discipline + attestation-bound keys.</div>
+          <div class="tools">SGX · Nitro Enclaves · SEV-SNP · TDX · Confidential Space · Gramine</div>
+        </div>
+        <div class="tech" style="--tc:var(--c-se)">
+          <div class="top"><span class="ix">05</span><span class="nm">Searchable encryption</span></div>
+          <div class="role">encrypted indexes · queryable</div>
+          <div class="field"><b>Computes</b>Equality search, keyword/document retrieval, selected range/prefix/suffix queries over protected indexes.</div>
+          <div class="field"><b>Caveat</b>Leaks some of: search/access pattern, frequency, result size, structure — exploitable by leakage-abuse attacks.</div>
+          <div class="tools">MongoDB Queryable Encryption · OpenSSE · CipherSweet · Cosmian Findex · CipherStash</div>
+        </div>
+        <div class="tech" style="--tc:var(--c-ore)">
+          <div class="top"><span class="ix">06</span><span class="nm">OPE / ORE</span></div>
+          <div class="role">order-revealing · range-native</div>
+          <div class="field"><b>Computes</b>Sorting, range filters, thresholding, ORDER BY-like semantics — very fast, easy to index.</div>
+          <div class="field"><b>Caveat</b>Reveals order by design; inference attacks can recover substantial plaintext given auxiliary data.</div>
+          <div class="tools">CipherStash ore.rs · Block-ORE constructions</div>
+        </div>
+        <div class="tech" style="--tc:var(--c-fe)">
+          <div class="top"><span class="ix">07</span><span class="nm">Functional encryption</span></div>
+          <div class="role">keys bound to functions · f(x) only</div>
+          <div class="field"><b>Computes</b>Inner products, selected linear/quadratic functions, some scoring and ML components; analysts learn f(x), nothing more.</div>
+          <div class="field"><b>Caveat</b>Narrow functionality, thin tooling, demanding key authority — promising but low-maturity for enterprise.</div>
+          <div class="tools">Fentec libraries · research prototypes</div>
+        </div>
+        <div class="tech" style="--tc:var(--c-dp)">
+          <div class="top"><span class="ix">08</span><span class="nm">DP + encrypted execution</span></div>
+          <div class="role">output control · pairs with any PET</div>
+          <div class="field"><b>Computes</b>Not a compute method — it bounds what the released statistics or model can reveal about any individual. Pairs with secure aggregation.</div>
+          <div class="field"><b>Caveat</b>Hard parts are privacy accounting, contribution bounding, sampling assumptions, and utility loss.</div>
+          <div class="tools">OpenDP · Google secure aggregation · AWS Clean Rooms DP · Prio/DAP</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 TRADEOFFS -->
+    <section id="tradeoffs">
+      <h2><span class="n">04 — Tradeoffs</span>Comparative tradeoffs</h2>
+      <p>A <strong>qualitative synthesis</strong>, not a literal benchmark. "Security level" means how much trust is removed from the execution environment <em>when the stated assumptions hold</em>.</p>
+      <div class="tablewrap">
+        <table class="cmp">
+          <thead><tr><th class="dim">Technique</th><th>Security level</th><th>Supported analytics</th><th>Performance</th><th>Best fit</th><th>Primary caveat</th></tr></thead>
+          <tbody>
+            <tr><th style="--tc:var(--c-phe)">Partial HE</th><td>High for narrow arithmetic</td><td>Counts, sums, weighted sums, aggregation</td><td>High (no bootstrapping)</td><td>Simple outsourced arithmetic</td><td>Functionality too narrow for rich queries</td></tr>
+            <tr><th style="--tc:var(--c-fhe)">Full HE</th><td>Very high trust reduction</td><td>Aggregation, vector ops, similarity, ML inference</td><td>Low–medium; often slowest</td><td>Single-owner outsourced compute</td><td>Ciphertext blow-up, slow bootstrapping, limited SQL/training</td></tr>
+            <tr><th style="--tc:var(--c-mpc)">MPC</th><td>Very high within collusion thresholds</td><td>Aggregation, joins, PSI/PJC, partitioned ML</td><td>Medium; network/round-bound</td><td>Cross-org collaboration, no trusted hardware</td><td>Operational complexity &amp; collusion assumptions</td></tr>
+            <tr><th style="--tc:var(--c-tee)">TEE / confidential computing</th><td>High if HW/firmware/attestation hold</td><td>Broadest: SQL, joins, arbitrary code, ML</td><td>High; often closest to native</td><td>Lift-and-shift confidential analytics</td><td>Side channels, larger TCB, HW vulnerabilities</td></tr>
+            <tr><th style="--tc:var(--c-se)">Searchable encryption</th><td>Medium–high, leakage-prone</td><td>Equality, keyword, some range/prefix/suffix</td><td>High</td><td>Queryable encrypted databases</td><td>Search/access/frequency leakage</td></tr>
+            <tr><th style="--tc:var(--c-ore)">OPE / ORE</th><td>Low–medium (order leaks)</td><td>Sorting, range filters, thresholding</td><td>Very high</td><td>Fast range search when leakage acceptable</td><td>Inference attacks recover plaintext structure</td></tr>
+            <tr><th style="--tc:var(--c-fe)">Functional encryption</th><td>High for supported functions</td><td>Inner products, selected linear/quadratic</td><td>Medium for narrow tasks</td><td>Fine-grained delegated analytics</td><td>Narrow functionality, low ecosystem maturity</td></tr>
+            <tr><th style="--tc:var(--c-dp)">DP + encrypted execution</th><td>High vs output inference</td><td>Aggregates, telemetry, federated learning</td><td>High for DP step</td><td>Safe result release after protected compute</td><td>Utility/privacy tradeoff &amp; budget accounting</td></tr>
+            <tr><th style="--tc:var(--accent)">Hybrid</th><td>Potentially strongest overall</td><td>Broadest practical coverage</td><td>Medium–high if well partitioned</td><td>Real-world enterprise deployments</td><td>Compositional proofs &amp; operating complexity</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="scrollhint">← swipe the table to see all columns →</p>
+    </section>
+
+    <!-- 5 HYBRID -->
+    <section id="hybrid">
+      <h2><span class="n">05 — Hybrid</span>Hybrid architectures</h2>
+      <p>Hybrids are increasingly the production default because they align technique to task. SecretFlow abstracts MPC, HE, and TEE into one framework; Duality's AWS work uses Nitro Enclaves alongside prior FHE, federated learning, and DP; Decentriq combines Azure confidential computing with other privacy technologies including DP. A well-partitioned stack looks like this:</p>
+      <div class="hybrid">
+        <div class="hy" style="--hc:var(--c-se)"><div class="l">Searchable</div><div class="d">narrow lookup</div></div>
+        <div class="hy" style="--hc:var(--c-tee)"><div class="l">TEE</div><div class="d">general SQL / serving</div></div>
+        <div class="hy" style="--hc:var(--c-mpc)"><div class="l">MPC</div><div class="d">cross-party joins</div></div>
+        <div class="hy" style="--hc:var(--c-fhe)"><div class="l">FHE/PHE</div><div class="d">sensitive arithmetic</div></div>
+        <div class="hy" style="--hc:var(--c-dp)"><div class="l">DP</div><div class="d">anything released</div></div>
+      </div>
+      <p>The value is straightforward: this often beats any single primitive on the joint objective of security, functionality, and cost. The downside is equally straightforward — <strong>security proofs become compositional rather than monolithic</strong>, and operational complexity rises sharply because each layer adds new assumptions, observability needs, and failure modes.</p>
+    </section>
+
+    <!-- 6 DEPLOYMENTS -->
+    <section id="deployments">
+      <h2><span class="n">06 — Deployments</span>Deployments and vendor landscape</h2>
+      <p>The clearest production maturity today is in confidential-computing and clean-room deployments — broad-functionality encrypted analytics is, in practice, currently led by <strong>TEE-centric and hybrid</strong> architectures.</p>
+      <div class="vendors">
+        <div class="vg">
+          <div class="h">Confidential computing &amp; clean rooms</div>
+          <p><b>Google Confidential Space</b> (and Google Ads confidential matching), <b>Azure Confidential Computing</b> with <b>Decentriq</b> clean rooms, and <b>AWS Nitro Enclaves</b> with <b>Duality</b> (including cross-border cancer research).</p>
+        </div>
+        <div class="vg">
+          <div class="h">Pure cryptography (FHE/MPC)</div>
+          <p><b>IBM HElayers</b> (an Intesa Sanpaolo digital-transaction deployment), <b>Duality</b> for healthcare/finance/government, <b>Zama</b> (TFHE-rs, Concrete, Concrete ML), and <b>Inpher</b> for MPC/HE/federated learning.</p>
+        </div>
+        <div class="vg">
+          <div class="h">Queryable encrypted databases</div>
+          <p><b>MongoDB Queryable Encryption</b> — the most prominent mainstream example — plus <b>CipherSweet</b>, <b>OpenSSE</b>, <b>Cosmian Findex</b>, and <b>CipherStash</b> for application-level searchable encryption.</p>
+        </div>
+        <div class="vg">
+          <div class="h">Private aggregation &amp; telemetry</div>
+          <p><b>Prio</b> and descendants: Mozilla's Prio-based <b>DAP</b> in Firefox and <b>Divvi Up</b> (Prio3), plus Google federated learning with secure aggregation and <b>AWS Clean Rooms Differential Privacy</b>.</p>
+        </div>
+      </div>
+      <p>On the cryptography side the market is real but more selective. MongoDB Queryable Encryption is the clearest queryable-database example: equality and range queries are production-supported, while prefix/suffix/substring remain public preview in 8.2 (GA targeted for 2026) — and MongoDB documents the real costs of queryability: extra storage, query-performance impact, and reduced observability because encrypted collections redact some logs.</p>
+    </section>
+
+    <!-- 7 2026 -->
+    <section id="new2026">
+      <h2><span class="n">07 — Signals</span>2026 signals</h2>
+      <div class="callout">
+        <span class="tag"><span class="blink"></span>Recently updated</span>
+        <h3>What's moving right now</h3>
+        <ul class="bul">
+          <li><strong>Confidential computing went to the GPU.</strong> NVIDIA Confidential Computing across Hopper and Blackwell GPUs (encrypted VRAM, attestable alongside a CPU TEE) makes TEE-based private AI inference and training practical — a major boost for the broad-functionality end of this spectrum.</li>
+          <li><strong>TEE risk kept evolving.</strong> The 2024 SGX.Fail systematization and the 2026 "Fabricked" SEV-SNP result (arbitrary read/write and forged attestation under a routing-misconfiguration attack, acknowledged by an AMD bulletin) confirm that TEE security must be revisited as hardware, attestation, and patch guidance change.</li>
+          <li><strong>FHE commercialized and accelerated.</strong> Zama became the first FHE unicorn (2025) and targets 500–1,000 TPS via GPU; the FHE Benchmarking Suite matured into a standard way to compare latency, throughput, memory, storage blow-up, communication, and accuracy loss.</li>
+          <li><strong>Queryable encryption broadened.</strong> MongoDB QE added production range queries and moved prefix/suffix/substring into public preview (8.2), with GA expected in 2026 — narrowing the gap between "encrypted at rest" and "queryable in use."</li>
+          <li><strong>Private telemetry scaled.</strong> Prio/DAP deployments (Firefox, Divvi Up) show encrypted analytics is not only about databases and model serving, but also safe measurement at population scale.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8 SELECTION -->
+    <section id="selection">
+      <h2><span class="n">08 — Choose</span>Selection criteria &amp; deployment checklist</h2>
+      <p>The first decision criterion is not vendor or algorithm — it's the <strong>trust boundary you are trying to move</strong>. The second is <strong>workload shape</strong>. A concise decision rule: <em>use the weakest tool that still closes the threat you actually care about</em>, and combine two or more rather than forcing one primitive to do everything.</p>
+      <ul class="bul">
+        <li>Distrust the cloud operator but trust a hardware root and need rich existing software → <span style="color:var(--c-tee);font-weight:600">TEEs</span>.</li>
+        <li>Multiple organizations, no single operator may see data → <span style="color:var(--c-mpc);font-weight:600">MPC / PJC</span>.</li>
+        <li>One owner outsourcing computation, server fully untrusted → <span style="color:var(--c-fhe);font-weight:600">FHE / PHE</span>.</li>
+        <li>Mostly equality/range retrieval in a database → <span style="color:var(--c-se);font-weight:600">searchable / queryable encryption</span>.</li>
+        <li>Sensitive <em>outputs</em>, not just inputs → add <span style="color:var(--c-dp);font-weight:600">differential privacy</span>.</li>
+      </ul>
+      <h4 class="sub">Stage-gate deployment checklist</h4>
+      <div class="tablewrap">
+        <table class="gate">
+          <thead><tr><th>Stage</th><th>What to do</th><th>Pass condition</th></tr></thead>
+          <tbody>
+            <tr><th>Problem framing</th><td>Classify data, outputs, parties, and exact operators</td><td>You know if it's aggregation, search, join, inference, or training</td></tr>
+            <tr><th>Threat model</th><td>Write down adversaries, collusion assumptions, unacceptable leakages</td><td>Named threat model approved by security/legal</td></tr>
+            <tr><th>Technique shortlist</th><td>Map workload to 2–3 candidate architectures</td><td>≥1 cryptographic and ≥1 operationally efficient option considered</td></tr>
+            <tr><th>Key &amp; identity design</th><td>Define key custody, attestation flow, or share-holder governance</td><td>Keys/shares are never ad hoc</td></tr>
+            <tr><th>Prototype</th><td>Benchmark on representative data at realistic security levels</td><td>Meets p95 latency, throughput, and cost guardrails</td></tr>
+            <tr><th>Leakage review</th><td>Document observable metadata, patterns, or outputs</td><td>Explicit acceptance or rejection of the leakage profile</td></tr>
+            <tr><th>Release controls</th><td>Add DP, quotas, or query governance if results leave the boundary</td><td>Output policy defined and testable</td></tr>
+            <tr><th>Red-team &amp; compliance</th><td>Test side channels, patching, logging, legal claims</td><td>Findings resolved before rollout</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="scrollhint">← swipe the table →</p>
+    </section>
+
+    <!-- 9 BENCHMARKS -->
+    <section id="benchmarks">
+      <h2><span class="n">09 — Metrics</span>What to actually measure</h2>
+      <p>The benchmark program should be explicit. The FHE Benchmarking Suite is a good model, centering <strong>latency, throughput, memory, storage expansion, communication complexity, and quality loss</strong>. Extend it per technique:</p>
+      <ul class="bul">
+        <li><strong>TEE-based SQL</strong> — attestation time, EPC/enclave-paging behavior, cache-miss amplification, observable overhead under realistic OLAP.</li>
+        <li><strong>Searchable encryption</strong> — index size, query selectivity, token-generation cost, and a documented leakage profile.</li>
+        <li><strong>DP-based releases</strong> — epsilon, delta, contribution bounding, privacy-budget burn rate, and utility loss.</li>
+      </ul>
+      <p>A good cross-technique suite includes at least five workload families: aggregations on wide tables; private join / PSI-plus-sum on skewed identifiers; search with equality and range predicates; SQL analytics on a TPC-H-like subset with one or two joins; and ML with one classical and one compact neural model. For each, measure p50/p95 latency, throughput, ciphertext/share expansion, network bytes, RAM/VRAM, accuracy degradation, deployment time, and operator effort. <strong>If a solution needs hidden parameter tuning or hand-crafted circuits your own engineers can't maintain, treat that as a first-class cost signal, not a footnote.</strong></p>
+    </section>
+
+    <!-- 10 OPEN -->
+    <section id="open">
+      <h2><span class="n">10 — Limits</span>Open questions and limitations</h2>
+      <p>Several parts of this field move quickly enough that any static guide has limits. <strong>General-purpose FHE for SQL and large-model training</strong> is improving, but the most credible evidence still points to selective inference and narrow analytics rather than drop-in encrypted datastores. <strong>Searchable-encryption leakage</strong> remains an open design fault line — "acceptable leakage" is highly context-specific and still being quantified, and this is where vendor positioning and academic caution most often diverge. <strong>TEE risk is not stable</strong>, as recent SGX and SEV-SNP results show. And <strong>functional encryption</strong> remains under-evidenced in production relative to the rest of the field, which argues for targeted pilots rather than broad enterprise commitments unless the function family is unusually well matched.</p>
+    </section>
+
+    <!-- 11 FAQ -->
+    <section id="faq">
+      <h2><span class="n">11 — FAQ</span>Frequently asked questions</h2>
+      <div class="faq">
+        <details open="">
+          <summary>What is encrypted data analytics? <span class="pl">+</span></summary>
+          <div class="ans">An umbrella for privacy-enhancing technologies that let you compute over sensitive data while reducing or eliminating ordinary plaintext exposure during processing — homomorphic encryption, MPC, searchable/structured encryption, private set operations, functional encryption, and (in practice) trusted execution environments. Plain encryption at rest or in transit does not qualify, because the analytic engine still processes plaintext in normal memory.</div>
+        </details>
+        <details>
+          <summary>Which PET should I choose for analytics? <span class="pl">+</span></summary>
+          <div class="ans">It's threat-model-first. TEEs for broad, low-latency analytics when you trust a hardware root; MPC when multiple organizations must analyze jointly without a trusted operator; FHE when one owner outsources and the server must be cryptographically untrusted; searchable/queryable encryption for equality and range lookups; OPE/ORE for fast range search when order leakage is acceptable; functional encryption for narrow delegated functions; and DP on top whenever aggregate outputs leave the trusted boundary. Use the weakest tool that still closes the threat you care about.</div>
+        </details>
+        <details>
+          <summary>Does encrypted analytics make data exempt from GDPR or HIPAA? <span class="pl">+</span></summary>
+          <div class="ans">No. Pseudonymisation is still processing of personal data under GDPR, and PETs are complementary safeguards, not a silver bullet. Article 25 requires data protection by design; Article 32 cites pseudonymisation and encryption as example measures. HIPAA, the FTC, and the GLBA Safeguards Rule are risk-based. Encrypted analytics aids risk reduction and sharing but doesn't remove obligations around purpose limitation, transparency, data-subject rights, or output governance.</div>
+        </details>
+        <details>
+          <summary>Is FHE practical for analytics in 2026? <span class="pl">+</span></summary>
+          <div class="ans">It's most mature for selected aggregation, vector ops, similarity search, low-depth arithmetic, and ML inference — not general OLAP. Broad SQL, joins, and large-model training over FHE remain mostly research or prototype. Bootstrapping is still a dominant bottleneck, so the best uses are single-owner outsourced computation and hybrid pipelines where FHE protects only the most sensitive steps.</div>
+        </details>
+        <details>
+          <summary>What's the risk with searchable and order-preserving encryption? <span class="pl">+</span></summary>
+          <div class="ans">They trade leakage for speed. Efficient searchable encryption is defined in terms of allowed leakage — search/access pattern, frequency, result size, structure — which leakage-abuse attacks can exploit. OPE/ORE explicitly reveal order, enabling inference attacks given auxiliary distribution data. Both can be right for equality/range/search, but only when the leakage profile is documented, accepted, and bounded by access controls.</div>
+        </details>
+        <details>
+          <summary>What is the most common production pattern? <span class="pl">+</span></summary>
+          <div class="ans">Hybridization: a confidential-computing layer for general execution, cryptographic sub-protocols (MPC/FHE) for the most sensitive steps, searchable encryption for narrow queryability, and differential privacy for result release. Frameworks and products reflecting this include SecretFlow, Duality on AWS Nitro Enclaves, Decentriq on Azure, MongoDB Queryable Encryption, AWS Clean Rooms DP, and Prio/DAP systems.</div>
+        </details>
+      </div>
+    </section>
+
+    <!-- SOURCES -->
+    <section id="sources">
+      <h2><span class="n">12 — Sources</span>Primary sources</h2>
+      <p>Synthesized from standards bodies, regulators, vendor documentation, peer-reviewed research, and 2024–2026 systems work.</p>
+      <div class="sources">
+        <div class="grid">
+          <a href="https://csrc.nist.gov/Projects/pec" rel="noopener" target="_blank"><b>NIST</b>Privacy-Enhancing Cryptography</a>
+          <a href="https://csrc.nist.gov/Projects/pec/pec-tools" rel="noopener" target="_blank"><b>NIST</b>PEC tools (MPC, FHE, PIR, structured enc.)</a>
+          <a href="https://csrc.nist.gov/Projects/pec/fhe" rel="noopener" target="_blank"><b>NIST</b>FHE definition</a>
+          <a href="https://arxiv.org/abs/2405.11988" rel="noopener" target="_blank"><b>DuckDB-SGX2</b>Encrypted OLAP in enclaves</a>
+          <a href="https://secretflow.readthedocs.io/en/stable/index.html" rel="noopener" target="_blank"><b>SecretFlow</b>MPC + HE + TEE framework</a>
+          <a href="https://github.com/data61/python-paillier" rel="noopener" target="_blank"><b>python-paillier</b>Partial HE</a>
+          <a href="https://github.com/fhe-benchmarking/fhe-benchmarking.github.io" rel="noopener" target="_blank"><b>FHE Benchmarking Suite</b>Metrics &amp; methodology</a>
+          <a href="https://ibm.github.io/helayers/" rel="noopener" target="_blank"><b>IBM HElayers</b>FHE services</a>
+          <a href="https://github.com/data61/MP-SPDZ" rel="noopener" target="_blank"><b>MP-SPDZ</b>MPC framework</a>
+          <a href="https://github.com/Google/private-join-and-compute" rel="noopener" target="_blank"><b>Google</b>Private Join and Compute</a>
+          <a href="https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html" rel="noopener" target="_blank"><b>AWS</b>Nitro Enclaves</a>
+          <a href="https://learn.microsoft.com/en-us/azure/confidential-computing/overview" rel="noopener" target="_blank"><b>Azure</b>Confidential Computing overview</a>
+          <a href="https://docs.cloud.google.com/confidential-computing/confidential-space/docs/confidential-space-overview" rel="noopener" target="_blank"><b>Google</b>Confidential Space</a>
+          <a href="https://oaklandsok.github.io/papers/schaik2024.pdf" rel="noopener" target="_blank"><b>SGX.Fail (2024)</b>SGX attack systematization</a>
+          <a href="https://www.mongodb.com/docs/manual/core/queryable-encryption/" rel="noopener" target="_blank"><b>MongoDB</b>Queryable Encryption</a>
+          <a href="https://eprint.iacr.org/2024/1558" rel="noopener" target="_blank"><b>IACR 2024/1558</b>Structured-encryption leakage</a>
+          <a href="https://crypto.stanford.edu/ore/" rel="noopener" target="_blank"><b>Stanford</b>Order-revealing encryption</a>
+          <a href="https://cs.brown.edu/people/seny/pubs/edb.pdf" rel="noopener" target="_blank"><b>Brown</b>Inference attacks on encrypted DBs</a>
+          <a href="https://research.ibm.com/projects/functional-encryption" rel="noopener" target="_blank"><b>IBM</b>Functional encryption</a>
+          <a href="https://github.com/opendp/opendp" rel="noopener" target="_blank"><b>OpenDP</b>Differential privacy</a>
+          <a href="https://research.google/blog/distributed-differential-privacy-for-federated-learning/" rel="noopener" target="_blank"><b>Google</b>Distributed DP for federated learning</a>
+          <a href="https://blog.mozilla.org/en/firefox/partnership-ohttp-prio/" rel="noopener" target="_blank"><b>Mozilla</b>Prio / DAP in Firefox</a>
+          <a href="https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng" rel="noopener" target="_blank"><b>EUR-Lex</b>GDPR (Articles 25 &amp; 32)</a>
+          <a href="https://ico.org.uk/media2/migrated/4021464/chapter-5-anonymisation-pets.pdf" rel="noopener" target="_blank"><b>ICO</b>Anonymisation &amp; PETs guidance</a>
+          <a href="https://www.hhs.gov/hipaa/for-professionals/security/guidance/index.html" rel="noopener" target="_blank"><b>HHS</b>HIPAA security guidance</a>
+        </div>
+      </div>
+    </section>
+
+  </article>
+</div>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+const prog=document.getElementById('progress');
+addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  prog.style.width=((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';
+},{passive:true});
+
+const tocLinks=[...document.querySelectorAll('.toc a')];
+const map={};
+tocLinks.forEach(a=>{map[a.getAttribute('href').slice(1)]=a;});
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      tocLinks.forEach(l=>l.classList.remove('active'));
+      const a=map[e.target.id]; if(a)a.classList.add('active');
+    }
+  });
+},{rootMargin:'-18% 0px -72% 0px'});
+document.querySelectorAll('article section[id]').forEach(s=>obs.observe(s));
+</script>
+
+
+</body></html>
