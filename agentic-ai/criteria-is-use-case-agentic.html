@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Interactive Guide to Agentic AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: A thematic, single-page scrolling application that guides the user from foundational concepts to a central interactive evaluation tool. The flow is designed for progressive learning: 1. Introduction, 2. Core Pillars (interactive cards), 3. Agentic Loop (visual diagram), 4. The Interactive Evaluator (the main tool with sliders and a radar chart), 5. Tangible Case Studies (buttons that preset the evaluator), 6. Comparative Analysis (tabs), and 7. Strategic Implications (expandable cards). This structure breaks down a complex report into digestible, engaging modules, prioritizing user exploration and understanding over a rigid, linear presentation. -->
+    <!-- Visualization & Content Choices: The core of the report, the evaluation matrix, is transformed into an interactive evaluator. Goal: Allow exploration of the framework. Method: Sliders for each of the 5 dimensions update a Chart.js radar chart in real-time. Justification: A radar chart is the ideal visualization for a multi-dimensional "fingerprint," making the abstract framework tangible and easy to grasp. Case studies are presented as buttons that configure this evaluator, providing concrete examples. Other sections use simple, effective interactions like clickable cards and tabs to maintain engagement without overwhelming the user. All visualizations are built with Chart.js (Canvas) or pure HTML/CSS/JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #1f2937;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
+        .pillar-card, .case-study-btn, .tab-btn, .accordion-button {
+            transition: all 0.3s ease;
+        }
+        .loop-step {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .loop-step.active {
+            background-color: #4f46e5;
+            color: white;
+            transform: scale(1.05);
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
+            margin-top: -8px;
+        }
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">Agentic AI Explorer</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent" href="#intro">Introduction</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent" href="#pillars">Pillars</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent" href="#evaluator">Evaluator</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent" href="#comparisons">Comparisons</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent" href="#implications">Implications</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="py-20 md:py-28 bg-white" id="intro">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">Deconstructing Agentic AI</h2>
+                <p class="mt-6 max-w-3xl mx-auto text-lg text-gray-600">Move beyond the hype. This interactive guide provides a structured framework to evaluate and understand any "agentic" AI system. Explore the core principles, experiment with our interactive evaluator, and see how real-world use cases measure up on the spectrum of autonomy.</p>
+                <a class="mt-8 inline-block bg-indigo-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition-colors" href="#evaluator">Launch the Evaluator</a>
+            </div>
+        </section>
+
+        <section class="py-20 md:py-24" id="pillars">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl font-bold text-gray-900">The Four Pillars of Agency</h3>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Modern agentic systems are defined by four essential characteristics. Click on each pillar to learn more about the foundational concepts that enable AI to act with purpose and autonomy.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" id="pillars-grid">
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-20 md:py-24 bg-white" id="loop">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl font-bold text-gray-900">The Agentic Loop</h3>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Agentic behavior is not a single action but a continuous, iterative cycle. This loop is the engine that drives autonomous, goal-oriented behavior. Click each step to understand its role in the process.</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-8">
+                    <div class="loop-step p-4 rounded-full bg-gray-200 text-gray-700 font-semibold" id="loop-step-perception">Perception</div>
+                    <div class="text-2xl text-indigo-500 font-sans">→</div>
+                    <div class="loop-step p-4 rounded-full bg-gray-200 text-gray-700 font-semibold" id="loop-step-reasoning">Reasoning</div>
+                    <div class="text-2xl text-indigo-500 font-sans">→</div>
+                    <div class="loop-step p-4 rounded-full bg-gray-200 text-gray-700 font-semibold" id="loop-step-planning">Planning</div>
+                    <div class="text-2xl text-indigo-500 font-sans">→</div>
+                    <div class="loop-step p-4 rounded-full bg-gray-200 text-gray-700 font-semibold" id="loop-step-action">Action</div>
+                    <div class="text-2xl text-indigo-500 font-sans">→</div>
+                    <div class="loop-step p-4 rounded-full bg-gray-200 text-gray-700 font-semibold" id="loop-step-learning">Learning</div>
+                </div>
+                <div class="mt-8 p-6 bg-indigo-50 rounded-lg text-center max-w-3xl mx-auto min-h-[100px]" id="loop-description">
+                    <p class="text-indigo-800"></p>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="py-20 md:py-28" id="evaluator">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold text-gray-900">The Agentic AI Evaluator</h3>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">Use this tool to classify any AI use case. Adjust the sliders for each of the five dimensions to see the system's "agentic fingerprint" update in real-time. Or, explore our pre-loaded case studies to see the framework in action.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="space-y-6" id="sliders-container"></div>
+                    </div>
+                    <div class="lg:sticky top-24">
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold text-center mb-2">Agentic Fingerprint</h4>
+                            <div class="chart-container">
+                                <canvas id="agenticChart"></canvas>
+                            </div>
+                            <div class="mt-4 text-center p-4 bg-gray-100 rounded-lg" id="classification-output">
+                                <h5 class="text-lg font-semibold text-indigo-700" id="classification-title"></h5>
+                                <p class="text-gray-600 mt-1" id="classification-description"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mt-16">
+                    <h4 class="text-2xl font-bold text-center text-gray-900 mb-6">Explore Case Studies</h4>
+                    <div class="flex flex-wrap justify-center gap-4" id="case-studies-container">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 md:py-24 bg-white" id="comparisons">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                     <h3 class="text-3xl md:text-4xl font-bold text-gray-900">How Agentic AI Differs</h3>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Agentic AI is often confused with other AI paradigms. This section provides clear, side-by-side comparisons to distinguish it from its precursors and look-alikes.</p>
+                </div>
+                <div class="flex justify-center mb-8">
+                    <div class="flex space-x-2 p-1 bg-gray-200 rounded-lg" id="tabs-container">
+                    </div>
+                </div>
+                <div class="max-w-4xl mx-auto" id="comparison-content">
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 md:py-24" id="implications">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold text-gray-900">Strategic Implications</h3>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Accurately classifying an AI system isn't just academic—it's a strategic necessity. Understanding a system's level of agency has profound implications for risk, cost, and enterprise readiness.</p>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-4" id="accordion-container">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    <script>
+        const appData = {
+            pillars: [
+                { title: 'Goal-Orientation', icon: '🎯', description: "An agentic system's behavior is fundamentally driven by the pursuit of a specific objective; it is not merely a passive tool that responds to inputs. The system must have a purpose that guides its actions." },
+                { title: 'Autonomy', icon: '⚙️', description: 'The capacity to operate, make decisions, and execute tasks with limited or no direct human intervention over extended periods. It implies the system has control over its own internal state and actions.' },
+                { title: 'Adaptability & Learning', icon: '🧠', description: 'The ability to adjust plans and strategies in response to new information, unexpected obstacles, or feedback. The agent\'s behavior evolves, making it more effective as it gains experience.' },
+                { title: 'Proactivity & Interaction', icon: '⚡️', description: 'The ability to perceive its environment by collecting data and then acting upon that environment to make progress toward its goal. This involves taking initiative rather than waiting for commands.' }
+            ],
+            loopSteps: {
+                perception: 'The agent gathers information from its environment, such as user interactions, databases, documents, and real-time data streams from APIs.',
+                reasoning: 'The agent\'s "brain"—typically an LLM—processes data to understand context, identify patterns, and formulate potential strategies to achieve its goal.',
+                planning: 'The agent takes a high-level goal and breaks it down into a concrete plan of smaller, executable sub-tasks. This is fundamental to tackling complex problems.',
+                action: 'The agent executes its plan by interacting with other systems, typically via "tool calling" to invoke external functions or APIs.',
+                learning: 'After acting, the agent observes the outcome, evaluates its success, and uses this feedback to refine its internal models and future strategies, closing the loop.'
+            },
+            framework: {
+                dimensions: [
+                    { id: 'autonomy', label: 'Autonomy & Human Oversight' },
+                    { id: 'complexity', label: 'Goal & Task Complexity' },
+                    { id: 'reasoning', label: 'Planning & Reasoning' },
+                    { id: 'learning', label: 'Learning & Adaptability' },
+                    { id: 'interaction', label: 'Environmental Interaction & Tool Use' }
+                ],
+                levels: [
+                    { title: 'Level 0: Non-Agentic', description: 'System is human-driven or follows hard-coded rules.' },
+                    { title: 'Level 1: Task Automation', description: 'Executes a single, predefined task upon explicit user command.' },
+                    { title: 'Level 2: Co-Pilot', description: 'Executes a multi-step plan but requires human approval at key checkpoints.' },
+                    { title: 'Level 3: Specialized Agent', description: 'Executes multi-step tasks end-to-end within a defined domain under human supervision.' },
+                    { title: 'Level 4: Autonomous System', description: 'Operates independently for extended periods, handling failures without human oversight.' }
+                ],
+                descriptions: {
+                    autonomy: [
+                        'Human performs all tasks.', 'AI executes a single task on command.', 'AI requires human approval at key checkpoints.', 'AI works end-to-end; human can intervene.', 'AI operates independently without oversight.'
+                    ],
+                    complexity: [
+                        'Performs a function, no goal.', 'Completes one discrete, well-defined action.', 'Follows a predefined, sequential chain of tasks.', 'Resolves a multi-step problem with dynamic logic.', 'Pursues a high-level, abstract strategic objective.'
+                    ],
+                    reasoning: [
+                        'Follows hard-coded if-then rules.', 'Directly translates a prompt into an action.', 'Breaks a task into a few linear steps.', 'Generates a dynamic plan and adapts to obstacles.', 'Reasons about its own reasoning and self-corrects.'
+                    ],
+                    learning: [
+                        'Performance is fixed and does not change.', 'Does not learn from actions within a session.', 'Adapts based on short-term memory in one session.', 'Improves over time based on explicit feedback.', 'Proactively seeks new information to self-improve.'
+                    ],
+                    interaction: [
+                        'A closed system with no external interaction.', 'Can use one specific tool for its task.', 'Can use multiple tools in a fixed sequence.', 'Dynamically selects the best tool for a sub-task.', 'Can create its own tools or collaborate with other agents.'
+                    ]
+                }
+            },
+            caseStudies: [
+                { id: 'sdr', name: 'Autonomous Sales Rep', fingerprint: [3, 3, 3, 2, 3] },
+                { id: 'supplychain', name: 'Supply Chain Manager', fingerprint: [4, 4, 4, 4, 4] },
+                { id: 'dev', name: 'Software Debugging Co-Pilot', fingerprint: [2, 3, 3, 2, 3] },
+                { id: 'reset', name: 'Reset Evaluator', fingerprint: [0, 0, 0, 0, 0] }
+            ],
+            comparisons: {
+                generative: {
+                    title: 'vs. Generative AI',
+                    content: `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2">Generative AI</h4>
+                                <p class="text-gray-600">A foundational technology focused on <strong class="text-indigo-600">creating new content</strong> (text, images, code) based on a prompt. It's a powerful content engine.</p>
+                                <ul class="mt-4 space-y-2 text-sm">
+                                    <li><strong>Function:</strong> Content Creation</li>
+                                    <li><strong>Example:</strong> Asking an LLM to write an email draft.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 p-6 rounded-lg border border-indigo-200">
+                                <h4 class="font-bold text-lg mb-2">Agentic AI</h4>
+                                <p class="text-gray-700">An application architecture that <strong class="text-indigo-600">uses a generative AI to reason, plan, and act</strong> to achieve a goal. It's a system that *does* things.</p>
+                                <ul class="mt-4 space-y-2 text-sm">
+                                    <li><strong>Function:</strong> Goal-Oriented Action</li>
+                                    <li><strong>Example:</strong> An AI that not only writes an email but also sends it, schedules follow-ups, and updates the CRM.</li>
+                                </ul>
+                            </div>
+                        </div>`
+                },
+                reactive: {
+                    title: 'vs. Reactive Automation',
+                    content: `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2">Reactive / Rule-Based AI</h4>
+                                <p class="text-gray-600">Operates on a fixed set of predefined <strong class="text-indigo-600">if-then rules</strong>. It responds to specific triggers with pre-programmed actions. Its behavior is predictable but rigid.</p>
+                                <ul class="mt-4 space-y-2 text-sm">
+                                    <li><strong>Logic:</strong> Predefined Scripts</li>
+                                    <li><strong>Example:</strong> A traditional RPA bot that processes invoices based on a fixed template.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 p-6 rounded-lg border border-indigo-200">
+                                <h4 class="font-bold text-lg mb-2">Agentic AI</h4>
+                                <p class="text-gray-700">Is <strong class="text-indigo-600">proactive and goal-oriented</strong>. It formulates and executes a plan to achieve a desired future state, adapting its strategy when faced with unexpected outcomes.</p>
+                                <ul class="mt-4 space-y-2 text-sm">
+                                    <li><strong>Logic:</strong> Dynamic Planning & Reasoning</li>
+                                    <li><strong>Example:</strong> An AI that manages inventory by predicting demand and adapting to shipping delays.</li>
+                                </ul>
+                            </div>
+                        </div>`
+                }
+            },
+            implications: [
+                { title: 'Risk Management & Governance', content: 'The level of agency directly correlates with risk. A Level 4 system making financial decisions requires far more robust governance, security, and human oversight protocols than a Level 1 tool. Accurate classification is the first step in applying the right level of control.' },
+                { title: 'Cost & Resource Allocation', content: 'The complexity, cost, and development time increase exponentially with each level. A Level 2 Co-Pilot might be a single-team project, while a Level 4 Autonomous System is a major, multi-year engineering initiative. The framework helps in realistic project scoping and budgeting.' },
+                { title: 'Setting Realistic Expectations', content: 'The framework provides a precise vocabulary to describe what a product can and cannot do. This prevents the "AI hype" gap, helping sales teams set proper customer expectations and leadership make sound investment decisions based on a system\'s true maturity.' },
+                { title: 'Assessing Enterprise Readiness', content: 'Deploying a highly autonomous agent requires more than just technology. It demands a foundation of clean data, secure APIs for tool integration, and a corporate culture that understands how to collaborate with and govern intelligent systems. The framework can be a mirror to assess organizational preparedness.' }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pillarsGrid = document.getElementById('pillars-grid');
+            appData.pillars.forEach(pillar => {
+                const card = document.createElement('div');
+                card.className = 'pillar-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 cursor-pointer';
+                card.innerHTML = `
+                    <div class="text-4xl mb-4">${pillar.icon}</div>
+                    <h4 class="font-bold text-xl mb-2">${pillar.title}</h4>
+                    <p class="text-gray-600">${pillar.description}</p>
+                `;
+                pillarsGrid.appendChild(card);
+            });
+
+            const loopSteps = document.querySelectorAll('.loop-step');
+            const loopDescriptionEl = document.querySelector('#loop-description p');
+            loopSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    loopSteps.forEach(s => s.classList.remove('active'));
+                    step.classList.add('active');
+                    const stepId = step.id.replace('loop-step-', '');
+                    loopDescriptionEl.textContent = appData.loopSteps[stepId];
+                });
+            });
+            document.getElementById('loop-step-perception').click();
+
+            const slidersContainer = document.getElementById('sliders-container');
+            appData.framework.dimensions.forEach((dim, index) => {
+                const sliderEl = document.createElement('div');
+                sliderEl.innerHTML = `
+                    <label for="${dim.id}-slider" class="block text-md font-medium text-gray-700">${dim.label}</label>
+                    <input type="range" id="${dim.id}-slider" name="${dim.id}" min="0" max="4" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
+                    <div id="${dim.id}-desc" class="text-sm text-gray-500 mt-1"></div>
+                `;
+                slidersContainer.appendChild(sliderEl);
+            });
+
+            const caseStudiesContainer = document.getElementById('case-studies-container');
+            appData.caseStudies.forEach(cs => {
+                const button = document.createElement('button');
+                button.id = `cs-${cs.id}`;
+                button.className = 'case-study-btn bg-white text-indigo-600 font-semibold px-6 py-2 rounded-full shadow-sm border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300';
+                button.textContent = cs.name;
+                caseStudiesContainer.appendChild(button);
+            });
+
+            const tabsContainer = document.getElementById('tabs-container');
+            Object.keys(appData.comparisons).forEach((key, index) => {
+                const tab = document.createElement('button');
+                tab.dataset.tab = key;
+                tab.className = `tab-btn px-4 py-2 text-sm font-medium rounded-md ${index === 0 ? 'bg-white shadow' : 'text-gray-600'}`;
+                tab.textContent = appData.comparisons[key].title;
+                tabsContainer.appendChild(tab);
+            });
+
+            const comparisonContent = document.getElementById('comparison-content');
+            function updateComparisonTab(tabKey) {
+                comparisonContent.innerHTML = appData.comparisons[tabKey].content;
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.toggle('bg-white', btn.dataset.tab === tabKey);
+                    btn.classList.toggle('shadow', btn.dataset.tab === tabKey);
+                    btn.classList.toggle('text-gray-600', btn.dataset.tab !== tabKey);
+                });
+            }
+            tabsContainer.addEventListener('click', e => {
+                if (e.target.matches('.tab-btn')) {
+                    updateComparisonTab(e.target.dataset.tab);
+                }
+            });
+            updateComparisonTab('generative');
+
+            const accordionContainer = document.getElementById('accordion-container');
+            appData.implications.forEach((item, index) => {
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'bg-white rounded-lg shadow-sm';
+                accordionItem.innerHTML = `
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-4 font-semibold hover:bg-gray-50">
+                        <span>${item.title}</span>
+                        <span class="transform transition-transform duration-300 text-indigo-500 text-xl">+</span>
+                    </button>
+                    <div class="accordion-content overflow-hidden max-h-0 transition-all duration-500 ease-in-out">
+                        <p class="p-4 pt-0 text-gray-600">${item.content}</p>
+                    </div>
+                `;
+                accordionContainer.appendChild(accordionItem);
+            });
+
+            accordionContainer.addEventListener('click', e => {
+                const button = e.target.closest('.accordion-button');
+                if (button) {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('span:last-child');
+                    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+
+                    document.querySelectorAll('.accordion-content').forEach(c => {
+                        c.style.maxHeight = '0px';
+                        c.previousElementSibling.querySelector('span:last-child').textContent = '+';
+                    });
+                    
+                    if (!isOpen) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.textContent = '-';
+                    }
+                }
+            });
+
+            const ctx = document.getElementById('agenticChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: appData.framework.dimensions.map(d => d.label.split(' & ')),
+                    datasets: [{
+                        label: 'Agentic Capability',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(79, 70, 229, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#374151'
+                            },
+                            ticks: {
+                                backdropColor: 'rgba(255, 255, 255, 0.75)',
+                                stepSize: 1,
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            min: 0,
+                            max: 4
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            function updateFramework() {
+                const values = appData.framework.dimensions.map(dim => {
+                    const slider = document.getElementById(`${dim.id}-slider`);
+                    return parseInt(slider.value);
+                });
+
+                chart.data.datasets[0].data = values;
+                chart.update();
+
+                appData.framework.dimensions.forEach((dim, index) => {
+                    const level = values[index];
+                    const descEl = document.getElementById(`${dim.id}-desc`);
+                    descEl.textContent = `Level ${level}: ${appData.framework.descriptions[dim.id][level]}`;
+                });
+                
+                const averageLevel = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+                const classification = appData.framework.levels[averageLevel];
+                document.getElementById('classification-title').textContent = classification.title;
+                document.getElementById('classification-description').textContent = classification.description;
+            }
+            
+            slidersContainer.addEventListener('input', updateFramework);
+
+            caseStudiesContainer.addEventListener('click', e => {
+                const button = e.target.closest('.case-study-btn');
+                if (button) {
+                    const csId = button.id.replace('cs-', '');
+                    const caseStudy = appData.caseStudies.find(cs => cs.id === csId);
+                    if (caseStudy) {
+                        appData.framework.dimensions.forEach((dim, index) => {
+                            document.getElementById(`${dim.id}-slider`).value = caseStudy.fingerprint[index];
+                        });
+                        updateFramework();
+                    }
+                }
+            });
+            
+            updateFramework();
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</body></html>

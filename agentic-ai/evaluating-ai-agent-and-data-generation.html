@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Internal State: Evaluating &amp; Governing Agentic AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: "Soothing Neutrals & Tech Slate" -->
+    <!-- Application Structure Plan: The application is structured into five thematic, single-page sections accessible via a sticky top navigation. This non-linear design replaces the report's linear format to improve usability. The user can jump directly to "Introduction," "How Agents Work," "Evaluation," "Risks & Governance," or "The Future." This structure was chosen because the source report is dense and academic; a thematic, interactive approach allows users to explore concepts in any order and at their own pace. Key interactions include clickable diagrams for architecture, expandable cards for design patterns, and an interactive chart for exploring evaluation metrics, making complex information digestible and engaging. -->
+    <!-- Visualization & Content Choices: 
+        - Agentic Architecture: Goal: Organize/Inform. Method: Interactive diagram (HTML/CSS/JS). Interaction: Clicking a component reveals its description. Justification: Visually breaks down a complex system into understandable parts.
+        - Design Patterns: Goal: Compare/Organize. Method: Interactive cards (HTML/CSS/JS). Interaction: Clicking a card expands it to show details. Justification: More engaging than a static table, allows progressive disclosure of information.
+        - Evaluation Metrics: Goal: Compare/Explore. Method: Bar Chart (Chart.js) linked to a dynamic text area. Interaction: Clicking a bar on the chart filters the detailed metric descriptions shown below. Justification: Provides a high-level visual comparison of evaluation categories and allows users to drill down into specific areas of interest.
+        - Risk Matrix: Goal: Organize/Inform. Method: Interactive grid (HTML/CSS/JS). Interaction: Clicking a risk category reveals detailed information in a separate panel. Justification: Converts a dense table into an explorable interface, making it easier to find and focus on specific threats.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .interactive-diagram-node {
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .interactive-diagram-node.selected {
+            background-color: #e0e7ff;
+            border-color: #3b82f6;
+        }
+        .risk-card.selected {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-slate-700">Agentic AI Governance</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 border-b-2 border-transparent" href="#introduction">Introduction</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 border-b-2 border-transparent" href="#how-it-works">How Agents Work</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 border-b-2 border-transparent" href="#evaluation">Evaluation</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 border-b-2 border-transparent" href="#risks">Risks &amp; Governance</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 border-b-2 border-transparent" href="#future">The Future</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" id="mobile-nav">
+                        <option value="introduction">Introduction</option>
+                        <option value="how-it-works">How Agents Work</option>
+                        <option value="evaluation">Evaluation</option>
+                        <option value="risks">Risks &amp; Governance</option>
+                        <option value="future">The Future</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section class="content-section" id="introduction">
+            <div class="bg-white p-8 rounded-xl shadow-md">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">The Internal State: A Framework for Evaluating and Governing Autonomous LLM-Powered Agents</h2>
+                <p class="text-slate-600 mb-6">This interactive report explores the shift towards agentic AI, systems that can autonomously reason, plan, and act. It deconstructs their architecture, examines how they are evaluated, outlines their inherent risks, and proposes frameworks for their governance. The goal is to move beyond seeing AI as a simple tool and instead understand it as a proactive, goal-driven collaborator that requires a new paradigm of oversight.</p>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="border-l-4 border-blue-500 pl-6">
+                        <h3 class="text-2xl font-semibold text-slate-700 mb-2">Generative AI (Reactive)</h3>
+                        <p class="text-slate-500">Processes a prompt and provides a corresponding output. Its agency is fundamentally reactive and transaction-centered, ending after the response is delivered. Think of it as a powerful but stateless content creator.</p>
+                    </div>
+                    <div class="border-l-4 border-green-500 pl-6">
+                        <h3 class="text-2xl font-semibold text-slate-700 mb-2">Agentic AI (Proactive)</h3>
+                        <p class="text-slate-500">Designed to achieve high-level objectives. It's a stateful, goal-oriented system that can decompose a broad goal into a sequence of actionable sub-tasks and execute them over time, interacting with tools and memory.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="how-it-works">
+            <div class="space-y-12">
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">Core Architectural Components</h3>
+                    <p class="text-slate-600 mb-6">An agent's intelligence comes not from a single model, but from a sophisticated architecture of interconnected components. The LLM acts as the "brain," but requires support systems to overcome its limitations. Click on a component below to learn more about its role in the agentic system.</p>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-center">
+                        <div class="interactive-diagram-node border-2 border-slate-300 p-4 rounded-lg bg-slate-100 hover:bg-slate-200" id="node-llm">LLM (Brain)</div>
+                        <div class="interactive-diagram-node border-2 border-slate-300 p-4 rounded-lg bg-slate-100 hover:bg-slate-200" id="node-memory">Memory System</div>
+                        <div class="interactive-diagram-node border-2 border-slate-300 p-4 rounded-lg bg-slate-100 hover:bg-slate-200" id="node-planning">Planning Module</div>
+                        <div class="interactive-diagram-node border-2 border-slate-300 p-4 rounded-lg bg-slate-100 hover:bg-slate-200" id="node-tools">Tool Integration</div>
+                    </div>
+                    <div class="p-6 bg-blue-50 rounded-lg min-h-[150px]" id="architecture-details">
+                        <p class="text-slate-700">Select a component to see its description.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">Agentic Design Patterns</h3>
+                    <p class="text-slate-600 mb-6">Agentic behavior is enabled by powerful design patterns that structure their operations. These are often combined to create robust and adaptable systems. Click on a pattern to explore its mechanism, use case, and trade-offs.</p>
+                    <div class="grid md:grid-cols-2 gap-6" id="patterns-container">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="evaluation">
+            <div class="bg-white p-8 rounded-xl shadow-md">
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">A Multi-Layered Evaluation Framework</h3>
+                <p class="text-slate-600 mb-6">Traditional LLM benchmarks are insufficient for agents. Evaluation must shift from assessing the final answer to assessing the entire process. This requires a new suite of metrics that can analyze an agent's internal states, such as its plans, reasoning chains, and tool use. Click on a category in the chart below to explore the relevant metrics.</p>
+                <div class="chart-container mb-8">
+                    <canvas id="evaluationChart"></canvas>
+                </div>
+                <div id="metrics-details-container">
+                    <h4 class="text-xl font-semibold text-slate-700 mb-4">Metric Details</h4>
+                    <div class="p-6 bg-slate-50 rounded-lg min-h-[200px] text-slate-600" id="metrics-details">
+                        <p>Select a category from the chart to see detailed metrics and their descriptions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="risks">
+            <div class="bg-white p-8 rounded-xl shadow-md">
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">A Taxonomy of Agentic Risks</h3>
+                <p class="text-slate-600 mb-6">The autonomy of agentic AI introduces a new spectrum of dynamic and emergent threats. Governance must be continuous and embedded within the system's architecture. Click on a risk category to understand the specific threats, their impact, and potential governance controls.</p>
+                <div class="lg:flex lg:space-x-8">
+                    <div class="lg:w-1/3">
+                        <div class="space-y-4" id="risk-cards-container">
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 mt-6 lg:mt-0">
+                        <div class="p-6 bg-red-50 rounded-lg min-h-[300px]" id="risk-details">
+                             <p class="text-slate-700">Select a risk category to see details.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="future">
+             <div class="bg-white p-8 rounded-xl shadow-md space-y-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">Open Research Questions</h3>
+                    <p class="text-slate-600 mb-4">While current systems are impressive, several fundamental questions remain unanswered, particularly concerning long-term stability and control.</p>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600">
+                        <li><b>Managing Emergent Behaviors:</b> How can we model, predict, and control system-level properties that arise from the collective dynamics of multi-agent systems?</li>
+                        <li><b>Long-Term Value Alignment:</b> How do we ensure an agent's goals remain aligned with human values as it continuously learns and potentially modifies itself?</li>
+                        <li><b>Verifiable and Controllable AI:</b> Key priorities include improving robustness, developing reliable self-improvement methods, extending formal verification techniques, and advancing internal state interpretability.</li>
+                    </ul>
+                </div>
+                <hr/>
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">Recommendations for Responsible Deployment</h3>
+                    <p class="text-slate-600 mb-4">Navigating the transition to an agentic future requires proactive and strategic leadership from all stakeholders.</p>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-lg text-slate-700">For Technology Leaders (CAIOs, VPs of Engineering)</h4>
+                            <p class="text-slate-600">Adopt a systems-theoretic perspective, establish a centralized "agentic mesh" strategy to avoid fragmentation, and invest heavily in observability and real-time governance platforms.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-slate-700">For Risk and Compliance Officers</h4>
+                            <p class="text-slate-600">Adapt risk frameworks like NIST for autonomy, develop multi-stakeholder governance processes, and prioritize robust contractual frameworks to manage supply chain liability.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-slate-700">For Policymakers and Regulators</h4>
+                            <p class="text-slate-600">Develop concrete, technically-informed standards, foster international harmonization to prevent regulatory fragmentation, and support foundational research in AI safety and control.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const data = {
+                architecture: {
+                    'node-llm': {
+                        title: 'Large Language Model (LLM)',
+                        description: 'The core "reasoning engine" or "brain" of the agent. It provides foundational capabilities for natural language understanding, reasoning, and decision-making. However, it is slow, stateless, and has knowledge cutoffs, making it insufficient on its own.'
+                    },
+                    'node-memory': {
+                        title: 'Memory System',
+                        description: 'Counteracts the statelessness of LLMs by providing persistent storage. It tracks short-term conversational context and long-term knowledge (e.g., user preferences, past experiences), enabling coherent, long-horizon tasks.'
+                    },
+                    'node-planning': {
+                        title: 'Planning Module',
+                        description: 'Decomposes high-level, ambiguous goals into a structured sequence of smaller, manageable sub-tasks. This allows the agent to formulate a coherent strategy before taking action.'
+                    },
+                    'node-tools': {
+                        title: 'Tool Integration',
+                        description: 'Overcomes the LLM\'s knowledge limitations by connecting it to external tools like APIs, databases, code interpreters, and web search. This grounds the agent\'s reasoning in factual, real-time data and enables it to take action in the world.'
+                    }
+                },
+                patterns: [
+                    {
+                        name: 'Reflection / Self-Correction',
+                        mechanism: 'The agent reviews and critiques its own output in a second step, then refines it.',
+                        useCase: 'Improving the quality, completeness, and accuracy of a single-shot generation (e.g., code, summaries).',
+                        advantages: 'Simple to implement, significantly reduces simple errors and omissions.',
+                        risks: 'Can be superficial; may not catch deep logical flaws; increases latency and cost.'
+                    },
+                    {
+                        name: 'Tool Use',
+                        mechanism: 'The agent is given access to external tools (APIs, databases, code interpreters) via function-calling.',
+                        useCase: 'Grounding responses in real-time or proprietary data; taking actions in external systems.',
+                        advantages: 'Overcomes LLM knowledge cutoffs; enables real-world action; reduces hallucination.',
+                        risks: 'Requires robust "plumbing" (APIs, routing); creates major security risks (tool misuse, privilege compromise).'
+                    },
+                    {
+                        name: 'ReAct (Reason + Act)',
+                        mechanism: 'The agent operates in a tight loop of reasoning about the next step, taking an action (often with a tool), and observing the result to inform the next reasoning step.',
+                        useCase: 'Dynamic, multi-step tasks where the plan must adapt based on intermediate outcomes (e.g., web research, debugging).',
+                        advantages: 'Highly adaptive and flexible; can course-correct in real-time; robust to unexpected inputs.',
+                        risks: 'Prone to loops; requires memory management; errors can compound; difficult to debug.'
+                    },
+                    {
+                        name: 'Multi-Agent System (MAS)',
+                        mechanism: 'Multiple specialized agents collaborate to solve a problem. Patterns include debate, sequential review (e.g., coder -> reviewer), or hierarchical orchestration.',
+                        useCase: 'Decomposing very complex, long-horizon tasks that require diverse skills (e.g., software development, scientific discovery).',
+                        advantages: 'Enables specialization and division of labor; can improve quality through review and debate.',
+                        risks: 'Significant orchestration overhead; introduces communication channel vulnerabilities; risk of cascading failures.'
+                    }
+                ],
+                evaluationMetrics: {
+                    'Planning & Coherence': [
+                        { name: 'Reasoning Coherence', description: 'Assesses if the agent\'s plan follows a logical, step-by-step process. Often evaluated using an LLM-as-a-judge.' },
+                        { name: 'Reasoning Relevancy', description: 'Measures if each step in the plan is directly tied to the user\'s stated objective.' },
+                        { name: 'Formal Verification', description: 'Translates the natural language plan into a formal language (like LTL) to automatically check for logical inconsistencies. For high-stakes applications.' }
+                    ],
+                    'Tool Use & Grounding': [
+                        { name: 'Tool Call Accuracy', description: 'Checks if the agent selected the correct tool and provided accurate, correctly formatted parameters.' },
+                        { name: 'Tool-Calling Efficiency', description: 'Assesses whether tools are used efficiently, measuring redundant calls or excessive frequency.' }
+                    ],
+                    'Self-Correction & Adaptation': [
+                        { name: 'Recovery Metrics', description: 'Quantifies the agent\'s ability to recognize its own errors and successfully correct its course after a "reflection" step.' },
+                        { name: 'Self-Aware Failures', description: 'Tracks when an agent appropriately admits it lacks information instead of hallucinating an answer.' }
+                    ],
+                    'Factuality & Utility': [
+                        { name: 'Faithfulness and Grounding', description: 'Checks if a claim made by the agent can be logically inferred from the specific context it was provided (e.g., from a RAG system).' },
+                        { name: 'Internal State Probing', description: 'Analyzes the LLM\'s hidden layer activations to determine if the model "believes" a statement is true, independent of its final output.' },
+                        { name: 'Utility vs. Truthfulness', description: 'Measures how often an agent chooses to lie or conceal information to achieve a conflicting goal.' }
+                    ]
+                },
+                risks: [
+                    {
+                        category: 'Memory & State',
+                        risk: 'Memory Poisoning',
+                        description: 'An attacker subtly injects false data into the agent\'s memory, causing long-term behavioral drift and flawed decision-making.',
+                        controls: 'Isolate Session Memory, Validate Data Sources, Immutable Logs, Scoped Permissions.'
+                    },
+                    {
+                        category: 'Reasoning & Planning',
+                        risk: 'Goal Manipulation',
+                        description: 'An adversary alters the agent\'s perceived goals or planning logic, hijacking its intent to perform unauthorized or destructive actions.',
+                        controls: 'Behavioral Monitoring, Human-in-the-Loop (HITL) for Goal Changes, Strict Role Definitions.'
+                    },
+                    {
+                        category: 'Tool & Action',
+                        risk: 'Tool Misuse & Privilege Compromise',
+                        description: 'The agent is tricked into using its integrated tools for malicious purposes (e.g., data exfiltration) or its permissions are escalated.',
+                        controls: 'Granular Access Controls (ACLs), Principle of Least Privilege, Tool Use Sanity Checks, API Rate Limiting.'
+                    },
+                    {
+                        category: 'Systemic & Emergent',
+                        risk: 'Cascading Hallucinations / Model Collapse',
+                        description: 'A single hallucinated fact propagates through the system, leading to misinformation. If retrained on this flawed data, it can cause "model collapse," a degenerative feedback loop eroding accuracy.',
+                        controls: 'Retrieval Augmented Generation (RAG), Real-time Fact-Checking, Strict Quality Gating for Retraining Data.'
+                    },
+                    {
+                        category: 'Multi-Agent',
+                        risk: 'Communication Channel Compromise',
+                        description: 'An attacker intercepts and manipulates messages between agents, compromising the integrity and goals of the entire multi-agent system.',
+                        controls: 'Encrypted Communication Channels, Mutual Authentication of Agents, Centralized Message Auditing.'
+                    }
+                ]
+            };
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileNav = document.getElementById('mobile-nav');
+            const sections = document.querySelectorAll('.content-section');
+
+            function navigateTo(hash) {
+                const targetHash = hash.startsWith('#') ? hash : '#' + hash;
+                
+                sections.forEach(section => {
+                    if ('#' + section.id === targetHash) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === targetHash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                if (mobileNav.value !== targetHash.substring(1)) {
+                    mobileNav.value = targetHash.substring(1);
+                }
+                
+                window.location.hash = targetHash;
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navigateTo(e.target.getAttribute('href'));
+                });
+            });
+            
+            mobileNav.addEventListener('change', (e) => {
+                navigateTo(e.target.value);
+            });
+
+            const initialHash = window.location.hash || '#introduction';
+            navigateTo(initialHash);
+
+            const archNodes = document.querySelectorAll('.interactive-diagram-node');
+            const archDetails = document.getElementById('architecture-details');
+            archNodes.forEach(node => {
+                node.addEventListener('click', () => {
+                    archNodes.forEach(n => n.classList.remove('selected'));
+                    node.classList.add('selected');
+                    const details = data.architecture[node.id];
+                    archDetails.innerHTML = `<h4 class="font-semibold text-lg text-blue-800 mb-2">${details.title}</h4><p class="text-blue-900">${details.description}</p>`;
+                });
+            });
+
+            const patternsContainer = document.getElementById('patterns-container');
+            data.patterns.forEach(pattern => {
+                const card = document.createElement('div');
+                card.className = 'card bg-white rounded-lg border border-slate-200 cursor-pointer';
+                card.innerHTML = `
+                    <div class="p-6">
+                        <h4 class="font-semibold text-lg text-slate-700">${pattern.name}</h4>
+                    </div>
+                    <div class="details hidden p-6 border-t border-slate-200 bg-slate-50">
+                        <p class="text-sm text-slate-600 mb-2"><strong>Mechanism:</strong> ${pattern.mechanism}</p>
+                        <p class="text-sm text-slate-600 mb-2"><strong>Use Case:</strong> ${pattern.useCase}</p>
+                        <p class="text-sm text-slate-600 mb-2"><strong>Advantages:</strong> ${pattern.advantages}</p>
+                        <p class="text-sm text-slate-600"><strong>Risks:</strong> ${pattern.risks}</p>
+                    </div>
+                `;
+                patternsContainer.appendChild(card);
+                card.addEventListener('click', () => {
+                    card.querySelector('.details').classList.toggle('hidden');
+                });
+            });
+
+            const riskCardsContainer = document.getElementById('risk-cards-container');
+            const riskDetailsContainer = document.getElementById('risk-details');
+            data.risks.forEach((risk, index) => {
+                const card = document.createElement('div');
+                card.className = 'risk-card card p-4 bg-white rounded-lg border-2 border-slate-200 cursor-pointer';
+                card.innerHTML = `<h4 class="font-semibold text-slate-700">${risk.category}</h4><p class="text-sm text-slate-500">${risk.risk}</p>`;
+                card.dataset.index = index;
+                riskCardsContainer.appendChild(card);
+                
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.risk-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    
+                    const selectedRisk = data.risks[card.dataset.index];
+                    riskDetailsContainer.innerHTML = `
+                        <h4 class="font-bold text-xl text-red-800 mb-2">${selectedRisk.category}: ${selectedRisk.risk}</h4>
+                        <p class="text-red-900/90 mb-4">${selectedRisk.description}</p>
+                        <h5 class="font-semibold text-lg text-red-800 mb-2">Primary Governance Controls</h5>
+                        <p class="text-red-900/90">${selectedRisk.controls}</p>
+                    `;
+                });
+            });
+
+            const ctx = document.getElementById('evaluationChart').getContext('2d');
+            const evaluationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.evaluationMetrics),
+                    datasets: [{
+                        label: 'Metric Category Focus',
+                        data: [3, 2, 2, 3],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.6)',
+                            'rgba(16, 185, 129, 0.6)',
+                            'rgba(249, 115, 22, 0.6)',
+                            'rgba(239, 68, 68, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(249, 115, 22, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Click to see details';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            display: false
+                        }
+                    },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const category = evaluationChart.data.labels[index];
+                            const metrics = data.evaluationMetrics[category];
+                            const metricsDetails = document.getElementById('metrics-details');
+                            
+                            let html = `<h4 class="font-bold text-xl text-slate-800 mb-4">${category}</h4>`;
+                            html += '<ul class="space-y-4">';
+                            metrics.forEach(metric => {
+                                html += `<li class="border-l-4 border-slate-300 pl-4"><strong class="text-slate-700">${metric.name}:</strong> ${metric.description}</li>`;
+                            });
+                            html += '</ul>';
+                            metricsDetails.innerHTML = html;
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

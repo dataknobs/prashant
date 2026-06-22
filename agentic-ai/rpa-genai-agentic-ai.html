@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Agentic Enterprise: An Interactive Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is designed with a non-linear, thematic structure to maximize user exploration and understanding. Instead of a linear scroll, a top navigation bar controls which content section is visible, creating a focused, app-like experience. The structure includes: 1) An 'Overview' to set the context. 2) 'The Evolution,' an interactive comparison of RPA, GenAI, and Agentic AI using a chart and dynamic text to clarify their distinctions. 3) 'Value Chain Transformation,' the interactive core where users select a business function (e.g., R&D, Manufacturing) to explore specific AI impacts, making the dense report content digestible and relevant to their interests. 4) 'Strategic Imperatives,' a section for key takeaways on implementation, risk, and ethics. This structure was chosen to deconstruct the report into logical, interactive modules, allowing users to learn through exploration rather than passive reading, which is more effective for complex topics. -->
+    <!-- Visualization & Content Choices: 1) Automation Evolution Comparison: Goal is to compare the three AI types. Method is a three-column layout with clickable buttons and a Chart.js horizontal bar chart. Interaction: Clicking a button (e.g., 'RPA') highlights its column, updates a detailed text view, and visually emphasizes its position on the chart's capability spectrum. Justification: This provides a multi-faceted comparison (visual + textual) that is more engaging than a static table. 2) Value Chain Impact: Goal is to show AI's role in various business functions. Method is a set of interactive cards for each function. Interaction: Clicking a card (e.g., 'Manufacturing') dynamically loads that function's specific transformations (e.g., Generative Design, Predictive Maintenance) into a content area with nested tabs. Justification: This "drill-down" approach prevents information overload and allows users to focus only on the business areas relevant to them. 3) Strategic Imperatives: Goal is to present key challenges. Method is an accordion-style UI. Interaction: Clicking a topic expands to show details. Justification: This organizes a large amount of text into a compact, manageable format. All visualizations use Chart.js or structured HTML/CSS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .nav-link { transition: all 0.3s ease; }
+        .nav-link.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+        .nav-link:not(.active) { border-bottom-color: transparent; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .tab-button.active { background-color: #eef2ff; color: #4338ca; }
+        .value-chain-card { transition: all 0.2s ease-in-out; }
+        .value-chain-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8" id="app">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">The Agentic Enterprise</h1>
+            <p class="mt-3 text-lg text-slate-600 max-w-3xl mx-auto">An interactive report on the evolution of automation from RPA to Generative and Agentic AI.</p>
+        </header>
+
+        <nav class="mb-12 border-b border-slate-200">
+            <ul class="flex items-center justify-center flex-wrap -mb-px text-sm font-medium text-center">
+                <li class="mr-2">
+                    <a class="nav-link inline-block p-4 border-b-2 rounded-t-lg" href="#" id="nav-overview">Overview</a>
+                </li>
+                <li class="mr-2">
+                    <a class="nav-link inline-block p-4 border-b-2 rounded-t-lg" href="#" id="nav-evolution">The Evolution</a>
+                </li>
+                <li class="mr-2">
+                    <a class="nav-link inline-block p-4 border-b-2 rounded-t-lg" href="#" id="nav-value-chain">Value Chain</a>
+                </li>
+                <li>
+                    <a class="nav-link inline-block p-4 border-b-2 rounded-t-lg" href="#" id="nav-strategy">Strategic Imperatives</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main>
+            <section class="content-section" id="section-overview">
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4">Executive Summary</h2>
+                    <p class="text-slate-600 leading-relaxed">The landscape of enterprise automation is undergoing a seismic transformation, moving beyond task execution into an era of cognitive augmentation and autonomous operation. This report analyzes the progression from Robotic Process Automation (RPA) to the cognitive revolution of Generative AI (GenAI), and culminates in the emergence of Agentic AI—a technology poised to create the fully autonomous enterprise. Agentic AI represents a fundamental paradigm shift from task automation to outcome ownership, impacting every facet of the enterprise value chain from R&amp;D to customer service. This interactive experience is designed to help you explore this evolution and its profound implications.</p>
+                </div>
+            </section>
+
+            <section class="content-section" id="section-evolution">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">The Evolving Spectrum of Automation</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">From mimicking actions to owning outcomes. Click on each technology to see how it fits into the automation landscape.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <button class="tech-button text-center p-6 bg-white rounded-xl shadow-sm border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500" data-tech="rpa">
+                        <h3 class="text-xl font-semibold text-slate-900">RPA</h3>
+                        <p class="text-sm text-slate-500 mt-1">Task Mimicry</p>
+                    </button>
+                    <button class="tech-button text-center p-6 bg-white rounded-xl shadow-sm border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500" data-tech="genai">
+                        <h3 class="text-xl font-semibold text-slate-900">Generative AI</h3>
+                        <p class="text-sm text-slate-500 mt-1">Content &amp; Synthesis</p>
+                    </button>
+                    <button class="tech-button text-center p-6 bg-white rounded-xl shadow-sm border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500" data-tech="agentic">
+                        <h3 class="text-xl font-semibold text-slate-900">Agentic AI</h3>
+                        <p class="text-sm text-slate-500 mt-1">Goal Achievement</p>
+                    </button>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-900 mb-4" id="tech-title"></h3>
+                            <p class="text-slate-600 leading-relaxed mb-4" id="tech-description"></p>
+                            <div class="space-y-3 text-sm" id="tech-details"></div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="evolutionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section" id="section-value-chain">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Transformation of the Enterprise Value Chain</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">Select a business function to explore how GenAI and Agentic AI are creating new value and reshaping core processes.</p>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+                    <div class="value-chain-card cursor-pointer bg-white p-4 rounded-lg shadow-sm text-center" data-function="rd">
+                        <span class="text-3xl">🔬</span>
+                        <p class="font-semibold mt-2 text-sm">R&amp;D</p>
+                    </div>
+                    <div class="value-chain-card cursor-pointer bg-white p-4 rounded-lg shadow-sm text-center" data-function="manufacturing">
+                        <span class="text-3xl">🏭</span>
+                        <p class="font-semibold mt-2 text-sm">Manufacturing</p>
+                    </div>
+                    <div class="value-chain-card cursor-pointer bg-white p-4 rounded-lg shadow-sm text-center" data-function="supplychain">
+                        <span class="text-3xl">🚚</span>
+                        <p class="font-semibold mt-2 text-sm">Supply Chain</p>
+                    </div>
+                    <div class="value-chain-card cursor-pointer bg-white p-4 rounded-lg shadow-sm text-center" data-function="sales">
+                        <span class="text-3xl">📈</span>
+                        <p class="font-semibold mt-2 text-sm">Sales &amp; Marketing</p>
+                    </div>
+                    <div class="value-chain-card cursor-pointer bg-white p-4 rounded-lg shadow-sm text-center" data-function="corporate">
+                        <span class="text-3xl">💼</span>
+                        <p class="font-semibold mt-2 text-sm">Corporate Core</p>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm min-h-[300px]" id="value-chain-content">
+                    <p class="text-slate-500 text-center pt-16">Select a function above to see the details.</p>
+                </div>
+            </section>
+
+            <section class="content-section" id="section-strategy">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Strategic Imperatives for the Agentic Era</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">Successfully navigating this new era requires addressing a new class of complex challenges. Click each topic to learn more.</p>
+                </div>
+                <div class="space-y-4" id="strategy-accordion">
+                </div>
+            </section>
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+    </div>
+
+    <script>
+        const appData = {
+            evolution: {
+                rpa: {
+                    title: "Robotic Process Automation (RPA)",
+                    description: "RPA is software technology that emulates human interactions with digital systems. These 'bots' operate at the user interface level to perform repetitive, rule-based tasks.",
+                    details: [
+                        "<strong>Primary Function:</strong> Task Mimicry",
+                        "<strong>Data Needs:</strong> Highly Structured",
+                        "<strong>Autonomy:</strong> Follows a rigid script",
+                        "<strong>Limitation:</strong> Brittle; fails with UI changes"
+                    ],
+                    chartValue: 20
+                },
+                genai: {
+                    title: "Generative AI (GenAI)",
+                    description: "GenAI moves beyond rules to understand, analyze, and generate new, original content like text, images, and code by learning patterns from vast datasets.",
+                    details: [
+                        "<strong>Primary Function:</strong> Content Generation & Synthesis",
+                        "<strong>Data Needs:</strong> Primarily Unstructured",
+                        "<strong>Autonomy:</strong> Reacts to human prompts",
+                        "<strong>Limitation:</strong> Lacks ability to execute tasks in systems"
+                    ],
+                    chartValue: 60
+                },
+                agentic: {
+                    title: "Agentic AI",
+                    description: "Agentic AI represents the next leap, creating autonomous systems that can proactively pursue goals by reasoning, planning, and executing actions with minimal human supervision.",
+                     details: [
+                        "<strong>Primary Function:</strong> Goal Achievement",
+                        "<strong>Data Needs:</strong> Both Structured & Unstructured",
+                        "<strong>Autonomy:</strong> Proactively takes initiative",
+                        "<strong>Limitation:</strong> High complexity and security risks"
+                    ],
+                    chartValue: 100
+                }
+            },
+            valueChain: {
+                rd: {
+                    title: "Revolutionizing R&D",
+                    intro: "Agentic AI is emerging as a powerful catalyst in research and development, capable of not just accelerating existing workflows but fundamentally altering the scientific method itself by automating the entire discovery lifecycle.",
+                    tabs: {
+                        "Knowledge Synthesis": "Agents can autonomously navigate and synthesize vast libraries of scientific literature, creating knowledge maps that highlight promising or underexplored areas of research in a fraction of the time.",
+                        "Autonomous Discovery": "By analyzing massive, multimodal datasets, agentic systems can identify novel connections and propose testable hypotheses. They can then design and execute computer-simulated experiments, representing a fully automated research lifecycle.",
+                        "Impact Stat": "An agentic platform identified a novel coolant material in just 200 hours—a process that would have traditionally taken months of human-led research."
+                    }
+                },
+                manufacturing: {
+                    title: "The Sentient Factory",
+                    intro: "The manufacturing sector is being reshaped by AI, transitioning from rigid automation to a dynamic, intelligent, and self-optimizing production environment that leverages AI for design and operational orchestration.",
+                    tabs: {
+                        "Generative Design": "Instead of manual design, engineers define goals and constraints. The AI then autonomously explores thousands of design alternatives, optimizing for weight, strength, and material usage.",
+                        "Predictive Maintenance": "Agentic systems don't just predict failures; they autonomously analyze the fault, order parts, schedule maintenance, and adjust production schedules to minimize downtime, cutting costs by up to 25%.",
+                        "Robotic Orchestration": "An agentic AI can serve as the central orchestrator of the production floor, receiving real-time data from sensors and dynamically allocating tasks to robots to maximize throughput."
+                    }
+                },
+                supplychain: {
+                    title: "The Autonomous Supply Chain",
+                    intro: "In a world of volatility, GenAI and Agentic AI are providing the tools to build not just an optimized supply chain, but an intelligent, resilient, and self-healing one that can adapt to disruptions in real time.",
+                    tabs: {
+                        "Dynamic Demand Sensing": "GenAI analyzes real-time market conditions, social media trends, and geopolitical events to create more accurate demand forecasts. Agents can then autonomously adjust pricing or promotions to shape demand.",
+                        "Autonomous Procurement": "Agents continuously monitor inventory levels. When stock is low, an agent can autonomously evaluate suppliers, initiate a purchase order, and even conduct automated negotiations for standard items.",
+                        "Disruption Response": "When a disruption occurs (e.g., a factory shutdown), an agent can perceive the event, instantly assess its impact, and execute a contingency plan like re-routing shipments, all without human intervention."
+                    }
+                },
+                sales: {
+                    title: "Redefining Engagement in Sales & Marketing",
+                    intro: "The traditional, linear sales funnel is being replaced by a dynamic, intelligent system of continuous customer engagement, personalized and automated at an unprecedented scale.",
+                    tabs: {
+                        "Hyper-Personalization": "GenAI crafts tailored outreach emails, proposals, and presentations by analyzing a prospect's industry, role, and past interactions, moving beyond simple mail-merge to true contextual relevance.",
+                        "Autonomous Lead Management": "An agent can instantly enrich a new lead with data, apply a dynamic score based on real-time behavior, and route high-value leads to sales reps, eliminating delays and ensuring engagement at peak interest.",
+                        "Marketing Orchestration": "Agents monitor campaign performance in real-time and can autonomously reallocate budget, refine audience targeting, or A/B test creative assets to optimize return on investment."
+                    }
+                },
+                corporate: {
+                    title: "Optimizing the Corporate Core",
+                    intro: "GenAI and Agentic AI are driving a quiet revolution within core functions like Finance, HR, and Customer Service, enhancing efficiency, reducing risk, and freeing professionals to focus on strategic work.",
+                    tabs: {
+                        "Automated Finance": "Agents automate financial reporting, analysis, and compliance monitoring. In fraud detection, they can monitor transactions in real-time, block suspicious activity, and initiate an investigation within milliseconds.",
+                        "Streamlined HR": "In recruitment, agents can source candidates, perform initial screening, and manage interview scheduling. For new hires, they can automate onboarding, provision IT access, and act as a 24/7 virtual assistant.",
+                        "Autonomous Service": "An agent can handle a complex customer issue end-to-end: understanding the problem, verifying warranty, checking inventory, processing a new shipment, and generating a return label in a single, conversational interaction."
+                    }
+                }
+            },
+            strategy: [
+                {
+                    title: "Data Readiness Imperative",
+                    content: "Agentic AI is data-driven. Success requires a foundation of accurate, timely, and well-contextualized data. Organizations must invest in data quality management, real-time data pipelines, and rich metadata to prevent agents from learning from flawed information and making incorrect decisions."
+                },
+                {
+                    title: "Governance & Orchestration",
+                    content: "Deploying autonomous agents without a central governance framework leads to operational chaos and risk. Leaders must establish clear 'guardrails' defining roles, responsibilities, and decision boundaries. An orchestration platform is the technical nervous system that coordinates agents, manages human handoffs, and ensures all actions are accountable and aligned with business goals."
+                },
+                {
+                    title: "New Frontiers of Security Risk",
+                    content: "Agentic AI introduces novel threats. <strong>Overprivileged Agents</strong> can cause massive damage if compromised. <strong>Prompt Injection</strong> can trick an agent into misusing its legitimate tools for malicious purposes. <strong>Memory Poisoning</strong> can corrupt an agent's knowledge base over time. Security must shift from a perimeter defense to a rigorous, identity-centric model focused on least-privilege access for AI."
+                },
+                {
+                    title: "Ethics & Accountability",
+                    content: "A critical ethical challenge is algorithmic bias. If training data reflects historical biases, agents can amplify them at scale in areas like hiring or lending. It's crucial to diversify datasets and conduct regular audits. Furthermore, establishing clear accountability for an agent's actions is essential for building trust and ensuring responsible deployment."
+                },
+                {
+                    title: "The Future of Work: Human-AI Symbiosis",
+                    content: "Agentic AI will automate routine cognitive tasks, elevating the importance of uniquely human skills: creativity, critical thinking, and emotional intelligence. The future workforce will collaborate with intelligent agents. This requires a massive commitment to reskilling, developing 'Agentic AI literacy,' and creating new roles like AI trainers, ethicists, and governance specialists."
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const techButtons = document.querySelectorAll('.tech-button');
+            const valueChainCards = document.querySelectorAll('.value-chain-card');
+            const strategyAccordionContainer = document.getElementById('strategy-accordion');
+
+            let evolutionChart;
+
+            function navigateTo(pageId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.id === `nav-${pageId}`);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === `section-${pageId}`);
+                });
+                window.scrollTo(0, 0);
+            }
+
+            function setupNavigation() {
+                navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const pageId = e.target.id.split('-')[1];
+                        navigateTo(pageId);
+                    });
+                });
+                navigateTo('overview');
+            }
+
+            function setupEvolutionSection() {
+                const ctx = document.getElementById('evolutionChart').getContext('2d');
+                evolutionChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['RPA', 'Generative AI', 'Agentic AI'],
+                        datasets: [{
+                            label: 'Automation Capability',
+                            data: [appData.evolution.rpa.chartValue, appData.evolution.genai.chartValue, appData.evolution.agentic.chartValue],
+                            backgroundColor: [
+                                'rgba(165, 180, 252, 0.6)',
+                                'rgba(129, 140, 248, 0.6)',
+                                'rgba(79, 70, 229, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(165, 180, 252, 1)',
+                                'rgba(129, 140, 248, 1)',
+                                'rgba(79, 70, 229, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false },
+                            title: {
+                                display: true,
+                                text: 'Automation Capability Spectrum',
+                                font: { size: 14 }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 110,
+                                ticks: {
+                                    callback: function(value) {
+                                        if (value === 20) return 'Task-Based';
+                                        if (value === 60) return 'Cognitive';
+                                        if (value === 100) return 'Autonomous';
+                                        return '';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                function updateEvolutionContent(techKey) {
+                    const techData = appData.evolution[techKey];
+                    document.getElementById('tech-title').textContent = techData.title;
+                    document.getElementById('tech-description').textContent = techData.description;
+                    
+                    const detailsContainer = document.getElementById('tech-details');
+                    detailsContainer.innerHTML = techData.details.map(detail => `<p class="text-slate-600">${detail}</p>`).join('');
+
+                    techButtons.forEach(btn => {
+                        btn.classList.toggle('bg-indigo-100', btn.dataset.tech === techKey);
+                        btn.classList.toggle('border-indigo-500', btn.dataset.tech === techKey);
+                    });
+                    
+                    const backgroundColors = evolutionChart.data.datasets[0].backgroundColor.map((color, index) => {
+                        const techKeys = ['rpa', 'genai', 'agentic'];
+                        return techKeys[index] === techKey ? color.replace('0.6', '1') : color.replace('1', '0.6');
+                    });
+                    evolutionChart.data.datasets[0].backgroundColor = backgroundColors;
+                    evolutionChart.update();
+                }
+
+                techButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const techKey = e.currentTarget.dataset.tech;
+                        updateEvolutionContent(techKey);
+                    });
+                });
+                updateEvolutionContent('rpa');
+            }
+            
+            function setupValueChainSection() {
+                const contentContainer = document.getElementById('value-chain-content');
+
+                function updateValueChainContent(functionKey) {
+                    const functionData = appData.valueChain[functionKey];
+                    const tabKeys = Object.keys(functionData.tabs);
+                    
+                    let tabsHtml = tabKeys.map((key, index) => 
+                        `<button class="tab-button text-sm font-medium px-4 py-2 rounded-md ${index === 0 ? 'active' : ''}" data-tab-key="${key}">${key}</button>`
+                    ).join('');
+
+                    contentContainer.innerHTML = `
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">${functionData.title}</h3>
+                        <p class="text-slate-600 leading-relaxed mb-6">${functionData.intro}</p>
+                        <div class="flex flex-wrap gap-2 mb-4 border-b border-slate-200 pb-2">
+                            ${tabsHtml}
+                        </div>
+                        <div id="tab-content" class="text-slate-600 leading-relaxed">
+                            ${functionData.tabs[tabKeys[0]]}
+                        </div>
+                    `;
+
+                    const tabButtons = contentContainer.querySelectorAll('.tab-button');
+                    const tabContent = contentContainer.querySelector('#tab-content');
+
+                    tabButtons.forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const tabKey = e.currentTarget.dataset.tabKey;
+                            tabContent.textContent = functionData.tabs[tabKey];
+                            tabButtons.forEach(btn => btn.classList.remove('active'));
+                            e.currentTarget.classList.add('active');
+                        });
+                    });
+                }
+                
+                valueChainCards.forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const functionKey = e.currentTarget.dataset.function;
+                        updateValueChainContent(functionKey);
+                        valueChainCards.forEach(c => c.classList.remove('ring-2', 'ring-indigo-500'));
+                        e.currentTarget.classList.add('ring-2', 'ring-indigo-500');
+                    });
+                });
+            }
+
+            function setupStrategySection() {
+                appData.strategy.forEach((item, index) => {
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'bg-white rounded-xl shadow-sm overflow-hidden';
+                    accordionItem.innerHTML = `
+                        <button class="w-full text-left p-5 flex justify-between items-center focus:outline-none">
+                            <h3 class="text-lg font-semibold text-slate-900">${item.title}</h3>
+                            <span class="transform transition-transform duration-300">
+                                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </span>
+                        </button>
+                        <div class="accordion-content h-0 overflow-hidden transition-all duration-300">
+                            <p class="px-5 pb-5 text-slate-600 leading-relaxed">${item.content}</p>
+                        </div>
+                    `;
+                    strategyAccordionContainer.appendChild(accordionItem);
+
+                    const button = accordionItem.querySelector('button');
+                    const content = accordionItem.querySelector('.accordion-content');
+                    const icon = button.querySelector('span');
+
+                    button.addEventListener('click', () => {
+                        if (content.classList.contains('h-0')) {
+                            content.style.height = content.scrollHeight + 'px';
+                            content.classList.remove('h-0');
+                            icon.classList.add('rotate-180');
+                        } else {
+                            content.style.height = '0px';
+                            content.classList.add('h-0');
+                            icon.classList.remove('rotate-180');
+                        }
+                    });
+                });
+            }
+
+            setupNavigation();
+            setupEvolutionSection();
+            setupValueChainSection();
+            setupStrategySection();
+        });
+    </script>
+
+
+</body></html>

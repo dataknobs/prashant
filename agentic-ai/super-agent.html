@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Rise of the SuperAgent: Orchestrating Enterprise AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a guided, exploratory journey, rather than a static report. It starts with a high-level definition (Hero), then allows users to interactively deconstruct the concept's architecture ('What is a SuperAgent?'). It then moves to practical value by showing stakeholder benefits in a clickable format ('New Capabilities'). Finally, it provides a strategic path forward with an interactive roadmap ('Building Your SuperAgent') and a visual workflow ('Orchestration in Action'). This thematic, interactive structure was chosen to make a complex, abstract topic tangible and easy to digest, allowing users to drill into the areas that interest them most, which is more effective for learning than a linear document. -->
+    <!-- Visualization & Content Choices: 
+    1. SuperAgent Architecture: Report info -> Concept of a hierarchical AI system. Goal -> Organize/Inform. Viz -> Interactive diagram (HTML/CSS). Interaction -> Click nodes to reveal descriptions. Justification -> Visually clarifies relationships and hierarchy; interaction encourages exploration. Method -> Vanilla JS, HTML/CSS.
+    2. Stakeholder Benefits: Report info -> List of capabilities for different groups. Goal -> Inform/Compare. Viz -> Icon-driven clickable cards/tabs. Interaction -> Click a card to see specific benefits. Justification -> Segments information for easy consumption based on user role/interest. Method -> Vanilla JS, HTML/CSS.
+    3. Development Roadmap: Report info -> Phased development approach. Goal -> Organize/Change. Viz -> Two-stage process diagram (HTML/CSS). Interaction -> Click items for details. Justification -> Clearly shows the sequential logic of building foundational tools before the orchestrator. Method -> Vanilla JS, HTML/CSS.
+    4. Orchestration Workflow: Report info -> How a SuperAgent integrates tools. Goal -> Inform (Process). Viz -> Flowchart diagram (HTML/CSS). Interaction -> Hover over steps for tooltips. Justification -> Makes the abstract concept of orchestration concrete and understandable through a practical example. Method -> Vanilla JS, HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .active-nav {
+            color: #1e3a8a;
+            border-bottom-color: #1e3a8a;
+        }
+        .inactive-nav {
+            color: #6b7280;
+            border-bottom-color: transparent;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .architecture-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .architecture-node.selected {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(30, 58, 138, 0.4);
+        }
+        .stakeholder-card {
+            transition: all 0.3s ease;
+        }
+        .stakeholder-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .roadmap-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .roadmap-item:hover {
+             background-color: #eef2ff;
+        }
+        .workflow-step {
+            position: relative;
+        }
+        .workflow-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .workflow-step:hover .workflow-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-[#fdfcfb] text-slate-800">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <header class="text-center py-12 md:py-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">The Rise of the <span class="text-blue-800">SuperAgent</span></h1>
+            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An interactive guide to the future of enterprise AI orchestration and the powerful new capabilities it unlocks.</p>
+        </header>
+
+        <nav class="sticky top-0 bg-[#fdfcfb] z-10 mb-8 border-b border-slate-200">
+            <ul class="flex justify-center space-x-4 sm:space-x-8">
+                <li><a class="nav-link text-sm sm:text-base font-medium py-4 px-2 border-b-2 active-nav" href="#introduction">Introduction</a></li>
+                <li><a class="nav-link text-sm sm:text-base font-medium py-4 px-2 border-b-2 inactive-nav" href="#capabilities">Capabilities</a></li>
+                <li><a class="nav-link text-sm sm:text-base font-medium py-4 px-2 border-b-2 inactive-nav" href="#roadmap">Roadmap</a></li>
+                <li><a class="nav-link text-sm sm:text-base font-medium py-4 px-2 border-b-2 inactive-nav" href="#orchestration">Orchestration</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section class="content-section active" id="introduction">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl font-bold text-slate-900">What is a SuperAgent?</h2>
+                     <p class="mt-3 text-slate-600 max-w-4xl mx-auto">A SuperAgent is not a single AI model, but a sophisticated <span class="font-semibold text-blue-800">orchestration layer</span>. It acts as a central conductor, intelligently managing a team of smaller, specialized AI agents and tools. Its primary role is to understand complex, multi-step business goals, break them down into manageable tasks, and delegate those tasks to the best agent or tool for the job, seamlessly integrating their outputs to achieve the final objective.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                    <div class="lg:col-span-2 flex flex-col items-center justify-center space-y-6 p-6" id="architecture-diagram">
+                        <div class="architecture-node selected bg-blue-800 text-white rounded-lg p-4 w-48 text-center shadow-lg" data-target="info-superagent" id="node-superagent">
+                            <h3 class="font-bold">SuperAgent</h3>
+                            <p class="text-xs">Orchestrator</p>
+                        </div>
+                        <div class="w-full flex justify-center items-center">
+                            <div class="h-px bg-slate-300 w-1/4"></div>
+                            <div class="w-0.5 h-8 bg-slate-300"></div>
+                            <div class="h-px bg-slate-300 w-1/4"></div>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <div class="architecture-node bg-indigo-200 text-indigo-900 rounded-lg p-3 w-40 text-center shadow" data-target="info-specialized" id="node-specialized">
+                                <h3 class="font-semibold">Specialized Agents</h3>
+                                <p class="text-xs">Task Experts</p>
+                            </div>
+                            <div class="architecture-node bg-teal-200 text-teal-900 rounded-lg p-3 w-40 text-center shadow" data-target="info-tools" id="node-tools">
+                                <h3 class="font-semibold">AI Tools &amp; Solutions</h3>
+                                <p class="text-xs">Point Functions</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 min-h-[250px]" id="architecture-info">
+                        <div class="info-panel" id="info-superagent">
+                            <h3 class="font-bold text-lg text-blue-800 mb-2">The SuperAgent: Central Conductor</h3>
+                            <p class="text-slate-600 text-sm">The SuperAgent is the brain of the operation. It receives high-level requests, maintains context, plans multi-step actions, and validates the final output. It doesn't perform tasks itself, but knows exactly who to call upon.</p>
+                        </div>
+                         <div class="info-panel hidden" id="info-specialized">
+                            <h3 class="font-bold text-lg text-indigo-800 mb-2">Specialized Agents: The Experts</h3>
+                            <p class="text-slate-600 text-sm">These are smaller AI models trained for specific business functions, like a 'Data Analysis Agent' that understands your company's database schemas, or a 'Customer Communication Agent' that knows your brand's tone of voice. They execute complex, domain-specific tasks.</p>
+                        </div>
+                         <div class="info-panel hidden" id="info-tools">
+                            <h3 class="font-bold text-lg text-teal-800 mb-2">AI Tools: The Point Solutions</h3>
+                            <p class="text-slate-600 text-sm">These are foundational, single-purpose AI services or APIs. Examples include language translation, sentiment analysis, image recognition, or a tool that connects to a specific software like Salesforce. They are the building blocks that Specialized Agents use.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section" id="capabilities">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">New Capabilities for Stakeholders</h2>
+                    <p class="mt-3 text-slate-600 max-w-4xl mx-auto">By orchestrating AI capabilities, a SuperAgent creates entirely new, streamlined experiences for everyone who interacts with the enterprise. It moves beyond simple task automation to proactive, intelligent assistance across the value chain.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="stakeholder-card bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-4">👤</span>
+                            <h3 class="text-xl font-semibold text-slate-900">Employees</h3>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 text-sm list-disc list-inside">
+                            <li><strong>Automated Workflows:</strong> Initiate complex processes like "onboard a new client" with a single command.</li>
+                            <li><strong>Proactive Insights:</strong> Receive summaries of relevant market changes or internal performance without asking.</li>
+                            <li><strong>Hyper-Personalized Tools:</strong> Have an assistant that understands individual roles, projects, and communication styles.</li>
+                        </ul>
+                    </div>
+                    <div class="stakeholder-card bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-4">💻</span>
+                            <h3 class="text-xl font-semibold text-slate-900">Developers</h3>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 text-sm list-disc list-inside">
+                            <li><strong>Agentic Infrastructure:</strong> Build and deploy new specialized agents that plug into the central system.</li>
+                            <li><strong>Automated Code Review:</strong> SuperAgent can orchestrate static analysis, security scans, and style checks.</li>
+                            <li><strong>Intelligent DevOps:</strong> Automate complex deployment pipelines and incident response procedures.</li>
+                        </ul>
+                    </div>
+                    <div class="stakeholder-card bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-4">📦</span>
+                            <h3 class="text-xl font-semibold text-slate-900">Suppliers</h3>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 text-sm list-disc list-inside">
+                            <li><strong>Automated Onboarding:</strong> Streamlined, guided process for becoming a new vendor.</li>
+                            <li><strong>Smart RFP Responses:</strong> The system can pre-fill requests for proposals based on supplier capabilities.</li>
+                            <li><strong>Proactive Demand Forecasting:</strong> Automatically share inventory needs based on internal sales forecasts.</li>
+                        </ul>
+                    </div>
+                    <div class="stakeholder-card bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-4">👥</span>
+                            <h3 class="text-xl font-semibold text-slate-900">Customers</h3>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 text-sm list-disc list-inside">
+                            <li><strong>Seamless Support:</strong> An agent that can access order history, troubleshoot, and process a return in one conversation.</li>
+                            <li><strong>Personalized Journeys:</strong> Proactively receive product recommendations and support relevant to usage patterns.</li>
+                            <li><strong>Complex Query Resolution:</strong> Get answers to multi-faceted questions that previously required multiple support agents.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="roadmap">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">The Path to a SuperAgent</h2>
+                    <p class="mt-3 text-slate-600 max-w-4xl mx-auto">Building a SuperAgent is a strategic journey, not a single project. It starts with creating a strong foundation of modular, reusable AI components (Point Solutions) before developing the sophisticated orchestration layer that ties them all together.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">Phase 1: Develop Foundational Point Solutions</h3>
+                        <p class="text-slate-600 mb-6">First, build a library of independent, high-value AI tools and agents that solve specific business problems. These are the building blocks. Focus on tools that can be exposed via APIs for easy integration later.</p>
+                        <div class="space-y-3">
+                            <div class="roadmap-item p-3 border border-slate-200 rounded-md">
+                                <h4 class="font-semibold text-slate-800">🔌 Data Connectors</h4>
+                                <p class="text-sm text-slate-500">Agents that can reliably authenticate and pull data from key systems (CRM, ERP, databases).</p>
+                            </div>
+                            <div class="roadmap-item p-3 border border-slate-200 rounded-md">
+                                <h4 class="font-semibold text-slate-800">📝 NLP Services</h4>
+                                <p class="text-sm text-slate-500">Core tools for summarization, sentiment analysis, entity extraction, and translation.</p>
+                            </div>
+                            <div class="roadmap-item p-3 border border-slate-200 rounded-md">
+                                <h4 class="font-semibold text-slate-800">🤖 Task Automation Agents</h4>
+                                <p class="text-sm text-slate-500">Specialized agents that can perform discrete actions like 'draft an email', 'create a calendar invite', or 'update a Salesforce record'.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">Phase 2: Build the SuperAgent Orchestrator</h3>
+                        <p class="text-slate-600 mb-6">Once you have a critical mass of point solutions, develop the SuperAgent to integrate them. This layer is responsible for planning, delegating, and synthesizing results from the foundational tools.</p>
+                         <div class="space-y-3">
+                            <div class="roadmap-item p-3 border border-slate-200 rounded-md">
+                                <h4 class="font-semibold text-slate-800">🧠 Intent Recognition &amp; Planning Engine</h4>
+                                <p class="text-sm text-slate-500">The core component that interprets user requests and creates a step-by-step execution plan.</p>
+                            </div>
+                            <div class="roadmap-item p-3 border border-slate-200 rounded-md">
+                                <h4 class="font-semibold text-slate-800">🛠️ Tool &amp; Agent Registry</h4>
+                                <p class="text-sm text-slate-500">A directory that the SuperAgent uses to know which tools are available and what their capabilities are.</p>
+                            </div>
+                            <div class="roadmap-item p-3 border border-slate-200 rounded-md">
+                                <h4 class="font-semibold text-slate-800">🔄 State &amp; Context Management</h4>
+                                <p class="text-sm text-slate-500">A system to track the progress of complex tasks and maintain conversational context over long interactions.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section" id="orchestration">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Orchestration in Action</h2>
+                    <p class="mt-3 text-slate-600 max-w-4xl mx-auto">See how the SuperAgent orchestrates point solutions to fulfill a complex request. This workflow demonstrates the breakdown of a high-level goal into a series of delegated, automated tasks, resulting in a comprehensive final output.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200">
+                    <div class="mb-6">
+                        <p class="text-sm text-slate-500">User Request:</p>
+                        <p class="text-lg font-semibold text-slate-800">"Summarize customer feedback from last quarter for our 'Pro' plan, identify the top 3 complaints, and draft email responses for each."</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="workflow-step flex items-center">
+                            <div class="bg-blue-800 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold flex-shrink-0">1</div>
+                            <div class="ml-4 p-4 border border-slate-200 rounded-lg w-full bg-slate-50">
+                                <h4 class="font-semibold">SuperAgent: Deconstructs Request</h4>
+                                <p class="text-sm text-slate-600">Identifies four sub-tasks: 1. Get data. 2. Filter data. 3. Analyze data. 4. Draft emails.</p>
+                                <div class="workflow-tooltip absolute -top-8 left-16 bg-slate-900 text-white text-xs rounded py-1 px-2 pointer-events-none">Planning Phase</div>
+                            </div>
+                        </div>
+
+                        <div class="ml-5 pl-5 border-l-2 border-slate-300">
+                            <div class="workflow-step flex items-center mt-4">
+                                <div class="bg-indigo-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold flex-shrink-0">2</div>
+                                <div class="ml-4 p-4 border border-slate-200 rounded-lg w-full bg-indigo-50">
+                                    <h4 class="font-semibold">Delegates to Data Agent</h4>
+                                    <p class="text-sm text-slate-600">Task: "Fetch all customer feedback from Q3." Agent uses 'Zendesk Connector' and 'Database Connector' tools.</p>
+                                    <div class="workflow-tooltip absolute -top-8 left-16 bg-slate-900 text-white text-xs rounded py-1 px-2 pointer-events-none">Tool Execution</div>
+                                </div>
+                            </div>
+
+                             <div class="workflow-step flex items-center mt-4">
+                                <div class="bg-teal-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold flex-shrink-0">3</div>
+                                <div class="ml-4 p-4 border border-slate-200 rounded-lg w-full bg-teal-50">
+                                    <h4 class="font-semibold">Delegates to NLP Agent</h4>
+                                    <p class="text-sm text-slate-600">Task: "Filter for 'Pro' plan feedback. Perform sentiment analysis and topic modeling to find top 3 complaints."</p>
+                                     <div class="workflow-tooltip absolute -top-8 left-16 bg-slate-900 text-white text-xs rounded py-1 px-2 pointer-events-none">Analysis</div>
+                                </div>
+                            </div>
+
+                            <div class="workflow-step flex items-center mt-4">
+                                <div class="bg-indigo-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold flex-shrink-0">4</div>
+                                <div class="ml-4 p-4 border border-slate-200 rounded-lg w-full bg-indigo-50">
+                                    <h4 class="font-semibold">Delegates to Communications Agent</h4>
+                                    <p class="text-sm text-slate-600">Task: "Using these 3 complaints, draft empathetic and helpful email templates."</p>
+                                     <div class="workflow-tooltip absolute -top-8 left-16 bg-slate-900 text-white text-xs rounded py-1 px-2 pointer-events-none">Content Generation</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step flex items-center">
+                            <div class="bg-blue-800 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold flex-shrink-0">5</div>
+                            <div class="ml-4 p-4 border border-slate-200 rounded-lg w-full bg-slate-50">
+                                <h4 class="font-semibold">SuperAgent: Synthesizes &amp; Presents</h4>
+                                <p class="text-sm text-slate-600">Combines the analysis summary and the drafted emails into a single, cohesive report for the user.</p>
+                                <div class="workflow-tooltip absolute -top-8 left-16 bg-slate-900 text-white text-xs rounded py-1 px-2 pointer-events-none">Final Output</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    
+                    navLinks.forEach(l => {
+                        l.classList.remove('active-nav');
+                        l.classList.add('inactive-nav');
+                    });
+                    
+                    link.classList.add('active-nav');
+                    link.classList.remove('inactive-nav');
+                    
+                    const targetId = link.getAttribute('href').substring(1);
+                    
+                    contentSections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            const architectureNodes = document.querySelectorAll('.architecture-node');
+            const infoPanels = document.querySelectorAll('.info-panel');
+
+            architectureNodes.forEach(node => {
+                node.addEventListener('click', () => {
+                    const targetId = node.dataset.target;
+
+                    architectureNodes.forEach(n => n.classList.remove('selected'));
+                    node.classList.add('selected');
+
+                    infoPanels.forEach(panel => {
+                        if (panel.id === targetId) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+
+</body></html>

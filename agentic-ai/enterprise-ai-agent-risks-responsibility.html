@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AI Agent Risk &amp; Governance Framework: An Interactive Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Corporate Neutral -->
+    <!-- Application Structure Plan: The SPA is designed as a narrative journey from problem to solution. It begins with a high-level summary, then uses an interactive section to define the core concepts (Types of Risk). It then dives deep into an interactive "Risk Explorer" to detail specific threats. This is followed by a "Legal Minefield" section with clear case studies. The app culminates in a multi-part "Governance Blueprint" that presents actionable solutions, including an interactive maturity model. This structure guides a corporate leader from understanding the strategic problem to a clear, actionable solution set, which is more user-friendly than the report's linear format. -->
+    <!-- Visualization & Content Choices: 
+        - Risk Taxonomy (Part II): Report Info -> Multiple categories of risk. Goal -> Organize/Inform. Viz -> Interactive tabbed component. Interaction -> User clicks tabs (Cybersecurity, Legal, etc.) to view detailed risk cards. Justification -> Breaks the dense risk taxonomy into manageable, user-selected topics, preventing information overload. NO SVG.
+        - Cascading Failure (Sec 2.4): Report Info -> Narrative of how risks interconnect. Goal -> Show a process. Viz -> HTML/CSS flowchart. Interaction -> None. Justification -> Visually demonstrates the complex relationship between different risk domains more effectively than text alone. NO SVG/Mermaid.
+        - Governance Maturity Model (Table in 4.1): Report Info -> A 5-level maturity table. Goal -> Show a process/Organize. Viz -> Interactive clickable step component. Interaction -> Clicking a level updates the detailed descriptions for all four governance pillars. Justification -> Highly interactive and more engaging than a static table, clearly showing the progression of maturity. NO SVG.
+        - Key Mitigation Strategies (Tables): Report Info -> Summarized mitigation actions. Goal -> Inform/Organize. Viz -> Styled HTML cards and lists. Interaction -> None. Justification -> Presents actionable advice in a clear, scannable format. NO SVG.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 400px; }
+        .nav-link { transition: color 0.3s ease, border-bottom-color 0.3s ease; }
+        .nav-link.active { color: #0f766e; border-bottom-color: #0f766e; font-weight: 600; }
+        .tab-button.active { background-color: #0f766e; color: #ffffff; }
+        .tab-button { transition: background-color 0.3s ease, color 0.3s ease; }
+        .maturity-step.active { border-color: #0f766e; background-color: #f0fdfa; }
+        .maturity-step.active .step-circle { background-color: #0f766e; color: white; }
+        .flow-node { border: 2px solid #99f6e4; background-color: #f0fdfa; }
+        .flow-arrow::after { content: '→'; position: absolute; font-size: 1.5rem; color: #5eead4; top: 50%; right: -1.25rem; transform: translateY(-50%); }
+        .flow-arrow-down::after { content: '↓'; position: absolute; font-size: 1.5rem; color: #5eead4; bottom: -1.5rem; left: 50%; transform: translateX(-50%); }
+    </style>
+</head>
+<body>
+
+    <header class="text-center py-10 px-4 bg-white border-b">
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Enterprise AI Agents: Risk &amp; Responsibility</h1>
+        <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An interactive framework for navigating the challenges and threats of deploying autonomous AI in the enterprise.</p>
+    </header>
+
+    <nav class="sticky top-0 bg-white/90 backdrop-blur-md z-50 shadow-sm" id="navbar">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center items-center h-16 space-x-4 md:space-x-8 overflow-x-auto">
+                <a class="nav-link text-slate-600 border-b-2 border-transparent pb-1 whitespace-nowrap" href="#risks">Risk Taxonomy</a>
+                <a class="nav-link text-slate-600 border-b-2 border-transparent pb-1 whitespace-nowrap" href="#legal">Legal Minefield</a>
+                <a class="nav-link text-slate-600 border-b-2 border-transparent pb-1 whitespace-nowrap" href="#blueprint">Governance Blueprint</a>
+                <a class="nav-link text-slate-600 border-b-2 border-transparent pb-1 whitespace-nowrap" href="#solutions">Core Solutions</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section class="py-16 scroll-mt-20" id="risks">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">A Taxonomy of Corporate Risk</h2>
+            <p class="max-w-3xl mx-auto text-slate-600 mb-12 text-center">The deployment of autonomous AI agents introduces a complex web of interconnected risks. Understanding these threats is the first step toward effective governance. Use the tabs below to explore the primary categories of risk, from operational hurdles to critical cybersecurity vulnerabilities.</p>
+            <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg border">
+                <div class="flex flex-wrap border-b border-gray-200" id="risk-tabs-container">
+                    <!-- Tabs will be inserted here by JS -->
+                </div>
+                <div class="p-6 md:p-8" id="risk-tab-content">
+                    <!-- Tab content will be inserted here by JS -->
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-16" id="cascading-failure">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">Interconnected Risk: A Cascading Failure Scenario</h2>
+             <p class="max-w-3xl mx-auto text-slate-600 mb-12 text-center">Risks from AI agents are not isolated. A single failure in one domain can trigger a catastrophic chain reaction across the enterprise. The diagram below illustrates how a seemingly minor data quality issue can escalate into a multi-front legal, ethical, and security crisis.</p>
+             <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
+                <div class="relative flow-node p-4 rounded-lg text-center">
+                    <span class="absolute -top-3 -left-3 bg-teal-600 text-white text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">1</span>
+                    <h4 class="font-bold text-teal-800">Data Quality Failure</h4>
+                    <p class="text-sm text-slate-600">Training data contains historical biases and is poorly governed.</p>
+                    <div class="md:hidden flow-arrow-down mt-4"></div>
+                    <div class="hidden md:block flow-arrow right"></div>
+                </div>
+                <div class="relative flow-node p-4 rounded-lg text-center">
+                    <span class="absolute -top-3 -left-3 bg-teal-600 text-white text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">2</span>
+                    <h4 class="font-bold text-teal-800">Ethical &amp; Legal Failure</h4>
+                    <p class="text-sm text-slate-600">Agent makes discriminatory lending decisions, violating anti-discrimination laws.</p>
+                     <div class="md:hidden flow-arrow-down mt-4"></div>
+                    <div class="hidden md:block flow-arrow right"></div>
+                </div>
+                <div class="relative flow-node p-4 rounded-lg text-center">
+                    <span class="absolute -top-3 -left-3 bg-teal-600 text-white text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">3</span>
+                    <h4 class="font-bold text-teal-800">Security &amp; Privacy Failure</h4>
+                    <p class="text-sm text-slate-600">An attacker uses prompt injection to exfiltrate the poorly-governed data, causing a massive breach.</p>
+                </div>
+             </div>
+        </section>
+
+        <section class="py-16 scroll-mt-20" id="legal">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">Navigating the Legal Minefield</h2>
+            <p class="max-w-3xl mx-auto text-slate-600 mb-12 text-center">Existing legal frameworks are being stress-tested by autonomous agents. Liability, intellectual property, and data privacy are key areas where companies face significant uncertainty and risk. The following case studies highlight how courts and regulators are beginning to address these challenges.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Case Study: Corporate Liability</h3>
+                    <p class="text-slate-600 mb-4">In <strong class="text-slate-900">Air Canada (2024)</strong>, a customer service chatbot provided incorrect information. The tribunal ruled that the company is responsible for all information on its website, whether from a static page or an autonomous agent. The defense "the AI did it" was rejected.</p>
+                    <p class="font-semibold text-teal-700">Key Takeaway: A company is directly accountable for its agent's actions and outputs under the principle of apparent authority.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border">
+                     <h3 class="text-xl font-bold text-slate-800 mb-3">Case Study: Professional Negligence</h3>
+                    <p class="text-slate-600 mb-4">In <strong class="text-slate-900">Morgan &amp; Morgan (2024)</strong>, lawyers faced sanctions for submitting legal filings containing fictitious cases generated by an internal AI tool. This highlights the severe liability risk of using AI outputs in high-stakes professional contexts without rigorous human verification.</p>
+                    <p class="font-semibold text-teal-700">Key Takeaway: Reliance on an agent's output is not a viable defense against professional standards of care.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-16 scroll-mt-20" id="blueprint">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">A Blueprint for Responsible AI Governance</h2>
+             <p class="max-w-3xl mx-auto text-slate-600 mb-12 text-center">A reactive approach to AI risk is insufficient. Leaders must champion a proactive governance framework. The maturity model below provides a structured roadmap for developing this capability. Click on each level to see how key organizational pillars evolve.</p>
+             <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-center items-center md:space-x-4 space-y-4 md:space-y-0 mb-8" id="maturity-steps-container">
+                    <!-- Maturity steps will be inserted here by JS -->
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="maturity-content-container">
+                    <!-- Maturity content cards will be inserted here by JS -->
+                </div>
+             </div>
+        </section>
+
+        <section class="py-16 scroll-mt-20" id="solutions">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">Core Solutions &amp; Mitigation Strategies</h2>
+            <p class="max-w-3xl mx-auto text-slate-600 mb-12 text-center">Effective governance is built on a foundation of concrete technical, procedural, and cultural controls. The following strategies are essential for mitigating the risks identified and building a responsible AI program.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Technical &amp; Security Fortifications</h3>
+                    <ul class="space-y-3 list-disc list-inside text-slate-700">
+                        <li><strong>Input Validation &amp; Output Sanitization:</strong> The primary defense against prompt injection. Use guardrail tools to inspect and constrain all I/O.</li>
+                        <li><strong>Isolation &amp; Least Privilege:</strong> Run agents in sandboxed environments and grant access only to the data and tools absolutely necessary for their function.</li>
+                        <li><strong>Continuous Monitoring &amp; Logging:</strong> Treat agents like production microservices. Log all interactions and decisions to enable real-time anomaly detection.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Auditing, Testing &amp; Validation</h3>
+                    <ul class="space-y-3 list-disc list-inside text-slate-700">
+                        <li><strong>Adversarial &amp; Edge Case Testing:</strong> Go beyond standard benchmarks to test agent robustness against unexpected and malicious inputs.</li>
+                        <li><strong>Algorithmic Bias Audits:</strong> Regularly and rigorously audit systems for disparate impact on demographic groups, going beyond minimal legal requirements.</li>
+                        <li><strong>Component-Level Evaluation:</strong> Monitor the performance of individual agent components (e.g., router, tool selection) not just the final outcome.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border col-span-1 md:col-span-2">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">The Human-in-the-Loop (HITL) Imperative</h3>
+                    <p class="text-slate-600 mb-4">For all high-risk functions, human oversight is a non-negotiable control. It is a critical feature of a mature and risk-aware deployment strategy.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                        <div>
+                            <strong class="text-slate-900">AI-in-the-Loop (Human as Decider):</strong> The AI assists and recommends, but a human makes the final decision. Ideal for the most sensitive tasks.
+                        </div>
+                        <div>
+                            <strong class="text-slate-900">Human-in-the-Loop (Human as Supervisor):</strong> The AI operates autonomously but escalates exceptions, low-confidence decisions, and ambiguous cases to a human for review.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const riskData = {
+                "Cybersecurity": [
+                    { title: "Indirect Prompt Injection", description: "Malicious instructions hidden in external data cause the agent to perform unauthorized actions, like exfiltrating data." },
+                    { title: "Tool Misuse & Goal Manipulation", description: "An attacker tricks the agent into abusing its integrated tools (e.g., sending phishing emails from an internal account)." },
+                    { title: "Credential Leakage & Identity Spoofing", description: "Stolen API keys or service tokens allow an attacker to impersonate the agent and inherit its privileges." },
+                    { title: "Data Overexposure", description: "Agent accesses and shares sensitive data that the human user is not authorized to see, laundering access permissions." }
+                ],
+                "Performance & Ethical": [
+                    { title: "Hallucinations & Factual Inaccuracy", description: "Agent produces outputs that are fluent, confident, but entirely false, leading to legal and reputational damage." },
+                    { title: "Unpredictability & Emergent Behaviors", description: "Complex systems display unforeseen behaviors, making validation difficult and posing risks in mission-critical applications." },
+                    { title: "Objective Misalignment & Goal Drift", description: "An agent's goals shift over time as it learns, becoming misaligned with the original user intent." },
+                    { title: "Destabilizing Feedback Loops", description: "A single erroneous decision is rapidly amplified through a cascade of subsequent automated actions, causing systemic harm." }
+                ],
+                "Legal & Compliance": [
+                    { title: "Corporate Liability", description: "The company is held legally responsible for harms caused by its agent, as seen in the Air Canada case where a chatbot invented a policy." },
+                    { title: "IP Infringement", description: "Agent's output infringes on third-party copyrights because its training data included protected works without permission." },
+                    { title: "Confidentiality Loss", description: "Employees input trade secrets into third-party AI tools, inadvertently waiving trade secret protection." },
+                    { title: "Data Privacy Violations (GDPR/CCPA)", description: "Inability to fulfill user rights like 'right to erasure' or 'right to explanation' due to model limitations." }
+                ],
+                 "Operational": [
+                    { title: "Integration Complexity", description: "Agents must connect to a convoluted web of legacy enterprise systems, requiring significant process re-engineering." },
+                    { title: "Prohibitive Costs", description: "The computational resources needed for 24/7 operation are frequently underestimated, destroying ROI." },
+                    { title: "Talent Gap & 'Agent Ops'", description: "A lack of hybrid talent with expertise in AI, security, and compliance creates a significant operational bottleneck." },
+                    { title: "AI-Induced Cognitive Laziness", description: "Over-reliance on autonomous systems can lead to the atrophy of critical thinking skills among employees." }
+                ]
+            };
+
+            const maturityData = [
+                {
+                    level: 1,
+                    title: 'Ad-Hoc',
+                    pillars: {
+                        'Policy & Principles': 'No formal AI policy. Use is decentralized and unmanaged.',
+                        'Risk & Compliance': 'Risks are unidentified. Compliance is reactive.',
+                        'Technology & Security': 'No specific security controls for AI agents.',
+                        'People & Culture': 'No formal AI-related training or defined roles.'
+                    }
+                },
+                {
+                    level: 2,
+                    title: 'Developing',
+                    pillars: {
+                        'Policy & Principles': 'High-level ethical principles are published but not operationalized.',
+                        'Risk & Compliance': 'Initial risk assessments are conducted for select projects.',
+                        'Technology & Security': 'Basic security measures (e.g., API keys) are in place.',
+                        'People & Culture': 'Awareness of AI risks exists only in technical teams.'
+                    }
+                },
+                {
+                    level: 3,
+                    title: 'Defined',
+                    pillars: {
+                        'Policy & Principles': 'An AI Code of Conduct and Governance Board are formed.',
+                        'Risk & Compliance': 'Regular bias audits and DPIAs are mandatory for high-risk systems.',
+                        'Technology & Security': 'Sandboxing and Role-Based Access Control (RBAC) are implemented.',
+                        'People & Culture': 'Mandatory AI ethics and security training is rolled out.'
+                    }
+                },
+                {
+                    level: 4,
+                    title: 'Managed',
+                    pillars: {
+                        'Policy & Principles': 'Policies are reviewed annually and updated based on internal audits.',
+                        'Risk & Compliance': 'A centralized system for tracking AI risks is integrated with ERM.',
+                        'Technology & Security': 'Continuous monitoring of agent behavior is implemented.',
+                        'People & Culture': 'A dedicated "Agent Ops" team is established.'
+                    }
+                },
+                {
+                    level: 5,
+                    title: 'Optimized',
+                    pillars: {
+                        'Policy & Principles': 'Policies are dynamically updated. The company shapes industry standards.',
+                        'Risk & Compliance': 'Predictive risk modeling is used to anticipate future AI risks.',
+                        'Technology & Security': 'Automated, real-time behavioral monitoring and response is active.',
+                        'People & Culture': 'AI governance is deeply embedded in the corporate culture.'
+                    }
+                }
+            ];
+
+            const setupRiskTabs = () => {
+                const tabsContainer = document.getElementById('risk-tabs-container');
+                const contentContainer = document.getElementById('risk-tab-content');
+                const riskCategories = Object.keys(riskData);
+
+                riskCategories.forEach((category, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = category;
+                    button.className = 'tab-button flex-auto p-4 font-semibold text-slate-600 border-b-2 border-transparent';
+                    if (index === 0) button.classList.add('active');
+                    
+                    button.addEventListener('click', () => {
+                        tabsContainer.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        renderRiskContent(category);
+                    });
+                    tabsContainer.appendChild(button);
+                });
+
+                const renderRiskContent = (category) => {
+                    contentContainer.innerHTML = '';
+                    const grid = document.createElement('div');
+                    grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
+                    riskData[category].forEach(risk => {
+                        const card = document.createElement('div');
+                        card.className = 'bg-slate-50 p-4 rounded-md border';
+                        card.innerHTML = `<h4 class="font-bold text-slate-800">${risk.title}</h4><p class="text-slate-600 text-sm mt-1">${risk.description}</p>`;
+                        grid.appendChild(card);
+                    });
+                    contentContainer.appendChild(grid);
+                };
+                
+                renderRiskContent(riskCategories[0]);
+            };
+
+            const setupMaturityModel = () => {
+                const stepsContainer = document.getElementById('maturity-steps-container');
+                const contentContainer = document.getElementById('maturity-content-container');
+
+                maturityData.forEach((data, index) => {
+                    const step = document.createElement('div');
+                    step.className = 'maturity-step cursor-pointer p-4 border-2 rounded-lg flex items-center space-x-3 w-full md:w-auto flex-1';
+                    step.innerHTML = `<div class="step-circle w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-gray-500">${data.level}</div><span class="font-semibold text-slate-700">${data.title}</span>`;
+                    
+                    if(index === 2) step.classList.add('active');
+
+                    step.addEventListener('click', () => {
+                        stepsContainer.querySelectorAll('.maturity-step').forEach(s => s.classList.remove('active'));
+                        step.classList.add('active');
+                        renderMaturityContent(data.level);
+                    });
+                    stepsContainer.appendChild(step);
+
+                    if (index < maturityData.length - 1) {
+                        const arrow = document.createElement('div');
+                        arrow.className = 'text-gray-300 text-2xl hidden md:block mx-2';
+                        arrow.innerHTML = `&rarr;`;
+                        stepsContainer.appendChild(arrow);
+                    }
+                });
+
+                const renderMaturityContent = (level) => {
+                    contentContainer.innerHTML = '';
+                    const data = maturityData.find(d => d.level === level);
+                    Object.entries(data.pillars).forEach(([pillar, description]) => {
+                         const card = document.createElement('div');
+                         card.className = 'bg-white p-4 rounded-lg border shadow-sm';
+                         card.innerHTML = `<h4 class="font-bold text-teal-800">${pillar}</h4><p class="text-slate-600 text-sm mt-1">${description}</p>`;
+                         contentContainer.appendChild(card);
+                    });
+                };
+
+                renderMaturityContent(3); 
+            };
+            
+            const handleScrollspy = () => {
+                const sections = document.querySelectorAll('section');
+                const navLinks = document.querySelectorAll('.nav-link');
+                const navbarHeight = document.getElementById('navbar').offsetHeight;
+
+                const observer = new IntersectionObserver(entries => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            navLinks.forEach(link => {
+                                link.classList.remove('active');
+                                if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                    link.classList.add('active');
+                                }
+                            });
+                        }
+                    });
+                }, { rootMargin: `-${navbarHeight}px 0px 0px 0px`, threshold: 0.3 });
+
+                sections.forEach(section => observer.observe(section));
+            };
+
+            setupRiskTabs();
+            setupMaturityModel();
+            handleScrollspy();
+        });
+    </script>
+
+
+</body></html>

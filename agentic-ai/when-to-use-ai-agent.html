@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AI Agent Decision Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page, vertical-scrolling experience with a sticky top navigation for easy access to all sections. This structure was chosen to guide the user through a logical decision-making process: 1) A quick introduction. 2) An interactive "Decision Framework" with toggle questions that immediately engage the user. 3) A dynamic "Suitability Score" that provides instant, personalized feedback based on their answers. 4) Supporting "Use Cases" and "Anti-Use Cases" for context. 5) Concluding "Lessons Learned". This flow transforms a static document into a practical, personalized tool, enhancing usability and user comprehension. -->
+    <!-- Visualization & Content Choices: Report Info: "Questions to ask" -> Goal: Guide user decision -> Viz/Presentation: Interactive toggle cards -> Interaction: User toggles Yes/No, which updates a JS state object -> Justification: More engaging than a static list and provides data for a summary score. Report Info: Suitability summary -> Goal: Synthesize & provide feedback -> Viz/Presentation: Donut Chart + dynamic text -> Interaction: Chart and text update in real-time based on toggle changes -> Justification: Provides a clear, quantitative, and personalized takeaway for the user. Library: Chart.js for the canvas-based chart. Report Info: "When to use/not use" -> Goal: Inform & Compare -> Viz/Presentation: Thematically colored cards with icons in a grid layout -> Interaction: Simple hover effects -> Justification: Easy to scan and visually distinguishes between positive and negative factors. All interactions are handled with vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #374151;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+        }
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #2dd4bf;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #2dd4bf;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="text-xl font-bold text-teal-600">AI Agent Guide</div>
+                <div class="hidden md:flex space-x-6 text-sm font-medium">
+                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#framework">Framework</a>
+                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#score">Score</a>
+                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#use-cases">Use Cases</a>
+                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#lessons">Lessons Learned</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section class="text-center mb-16" id="intro">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Should You Use an AI Agent?</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">This interactive guide helps you evaluate the suitability of an AI agent for your specific needs. Answer the questions in the framework below to generate a personalized suitability score and gain clarity on your decision.</p>
+        </section>
+
+        <section class="mb-16" id="framework">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">The Decision Framework</h2>
+            <p class="text-md text-gray-500 text-center mb-10">Answer these key questions before considering an AI agent. Your score will update automatically.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="questions-container">
+            </div>
+        </section>
+
+        <section class="mb-16 bg-white rounded-2xl shadow-lg p-8" id="score">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Your AI Agent Suitability Score</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                <div class="chart-container">
+                    <canvas id="suitabilityChart"></canvas>
+                </div>
+                <div class="text-center md:text-left max-w-md">
+                    <p class="text-6xl font-bold text-gray-700 mb-4" id="score-text">0%</p>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-2" id="score-title">Start the Assessment</h3>
+                    <p class="text-gray-600" id="score-description">Toggle the switches in the framework above to see your score. The more questions you answer with "Yes," the more likely an AI agent is a good fit for your project.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16" id="use-cases">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="bg-teal-50/50 border border-teal-200 rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold text-teal-800 mb-6 text-center">✅ When to Use an AI Agent</h3>
+                    <ul class="space-y-4" id="when-to-use-list">
+                    </ul>
+                </div>
+                <div class="bg-rose-50/50 border border-rose-200 rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold text-rose-800 mb-6 text-center">❌ When Not to Use an AI Agent</h3>
+                    <ul class="space-y-4" id="when-not-to-use-list">
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="lessons">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Key Lessons Learned</h2>
+            <p class="text-md text-gray-500 text-center mb-10">Keep these insights in mind throughout your AI agent implementation journey.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="lessons-learned-container">
+            </div>
+        </section>
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+    
+<!--
+    <footer class="bg-gray-100 mt-16">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-500 text-sm">
+            <p>AI Agent Decision Framework | Interactive Guide</p>
+        </div>
+    </footer>
+-->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const questions = [
+                { id: 'q1', text: 'Is the task well-defined and repetitive?', weight: 15 },
+                { id: 'q2', text: 'Does the task involve complex data analysis or pattern recognition?', weight: 15 },
+                { id: 'q3', text: 'Can the process be broken down into logical steps or rules?', weight: 10 },
+                { id: 'q4', text: 'Do you have access to high-quality, relevant data for training/operation?', weight: 20 },
+                { id: 'q5', text: 'Is the goal to automate a process to increase efficiency or reduce human error?', weight: 15 },
+                { id: 'q6', text: 'Is personalization or dynamic response a key requirement?', weight: 10 },
+                { id: 'q7', text: 'Are the success metrics for the task clear and measurable?', weight: 10 },
+                { id: 'q8', text: 'Is the required level of accuracy achievable by current AI technology?', weight: 5 },
+            ];
+
+            const useCases = [
+                { icon: '🔄', text: 'Repetitive, high-volume tasks like data entry or customer service FAQs.' },
+                { icon: '📊', text: 'Complex data processing and analysis that exceeds human capability.' },
+                { icon: '🤖', text: 'Automating rule-based workflows and business processes.' },
+                { icon: '🎯', text: 'Personalizing user experiences in real-time.' },
+                { icon: '🔍', text: 'Tasks requiring continuous learning and adaptation from new data.' },
+            ];
+
+            const notUseCases = [
+                { icon: '🤔', text: 'Tasks requiring deep emotional intelligence, empathy, or complex ethical judgment.' },
+                { icon: '🎨', text: 'Highly creative or strategic work that requires novel, out-of-the-box thinking.' },
+                { icon: '❓', text: 'Ill-defined problems with constantly changing, unpredictable rules.' },
+                { icon: '🚫', text: 'Situations where 100% accuracy is critical and failure has severe consequences (e.g., life-critical systems).' },
+                { icon: '🔒', text: 'When you lack sufficient or high-quality data to train or guide the agent.' },
+            ];
+            
+            const lessons = [
+                { icon: '🎯', title: 'Start Small', description: 'Begin with a well-defined, low-risk pilot project to prove value.'},
+                { icon: '📈', title: 'Data is King', description: 'The quality and quantity of your data will determine the agent\'s success.'},
+                { icon: '👥', title: 'Human in the Loop', description: 'Design systems with human oversight, especially for critical decisions.'},
+                { icon: '💡', title: 'Iterate & Learn', description: 'AI implementation is not a one-time setup. Plan for continuous monitoring and improvement.'}
+            ];
+
+            const questionsContainer = document.getElementById('questions-container');
+            const whenToUseList = document.getElementById('when-to-use-list');
+            const whenNotToUseList = document.getElementById('when-not-to-use-list');
+            const lessonsLearnedContainer = document.getElementById('lessons-learned-container');
+
+            const state = {
+                answers: {}
+            };
+
+            questions.forEach(q => {
+                state.answers[q.id] = false;
+                const card = `
+                    <div class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                        <p class="font-semibold text-gray-700 mb-4 h-12">${q.text}</p>
+                        <div class="flex items-center justify-center">
+                            <span class="text-sm font-medium text-gray-500 mr-3">No</span>
+                            <label for="${q.id}" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="${q.id}" class="sr-only peer toggle-input" data-question-id="${q.id}">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-teal-300 peer-checked:bg-teal-500"></div>
+                            </label>
+                            <span class="text-sm font-medium text-gray-900 ml-3">Yes</span>
+                        </div>
+                    </div>
+                `;
+                questionsContainer.innerHTML += card;
+            });
+            
+            useCases.forEach(item => {
+                whenToUseList.innerHTML += `
+                    <li class="flex items-start">
+                        <span class="text-xl mr-4">${item.icon}</span>
+                        <span class="text-gray-700">${item.text}</span>
+                    </li>`;
+            });
+
+            notUseCases.forEach(item => {
+                whenNotToUseList.innerHTML += `
+                    <li class="flex items-start">
+                        <span class="text-xl mr-4">${item.icon}</span>
+                        <span class="text-gray-700">${item.text}</span>
+                    </li>`;
+            });
+            
+            lessons.forEach(lesson => {
+                lessonsLearnedContainer.innerHTML += `
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                         <div class="text-4xl mb-3">${lesson.icon}</div>
+                         <h4 class="font-bold text-lg text-gray-800 mb-2">${lesson.title}</h4>
+                         <p class="text-gray-600 text-sm">${lesson.description}</p>
+                    </div>
+                `;
+            });
+
+            const ctx = document.getElementById('suitabilityChart').getContext('2d');
+            const suitabilityChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Suitability', 'Remaining'],
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: ['#14b8a6', '#f0f0f0'],
+                        borderColor: ['#ffffff', '#ffffff'],
+                        borderWidth: 4,
+                        circumference: 180,
+                        rotation: 270,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+
+            const scoreText = document.getElementById('score-text');
+            const scoreTitle = document.getElementById('score-title');
+            const scoreDescription = document.getElementById('score-description');
+
+            function updateScore() {
+                let currentScore = 0;
+                questions.forEach(q => {
+                    if (state.answers[q.id]) {
+                        currentScore += q.weight;
+                    }
+                });
+
+                suitabilityChart.data.datasets[0].data[0] = currentScore;
+                suitabilityChart.data.datasets[0].data[1] = 100 - currentScore;
+                suitabilityChart.update();
+
+                scoreText.textContent = `${currentScore}%`;
+
+                if (currentScore === 0) {
+                     scoreTitle.textContent = 'Start the Assessment';
+                     scoreDescription.textContent = 'Toggle the switches in the framework above to see your score.';
+                     scoreText.style.color = '#4b5563';
+                } else if (currentScore < 40) {
+                    scoreTitle.textContent = 'Consider Carefully';
+                    scoreDescription.textContent = 'An AI agent might not be the best fit. Your use case has several contraindications. Re-evaluate the problem you are trying to solve.';
+                    scoreText.style.color = '#f43f5e';
+                } else if (currentScore < 75) {
+                    scoreTitle.textContent = 'Potentially a Good Fit';
+                    scoreDescription.textContent = 'An AI agent shows promise for your use case. Proceed with a pilot project and careful planning, paying attention to the areas you marked "No".';
+                    scoreText.style.color = '#f59e0b';
+                } else {
+                    scoreTitle.textContent = 'Excellent Candidate';
+                    scoreDescription.textContent = 'Your use case is a strong candidate for an AI agent. You have the key ingredients for a successful implementation.';
+                    scoreText.style.color = '#10b981';
+                }
+            }
+
+            document.querySelectorAll('.toggle-input').forEach(input => {
+                input.addEventListener('change', (event) => {
+                    const questionId = event.target.dataset.questionId;
+                    state.answers[questionId] = event.target.checked;
+                    updateScore();
+                });
+            });
+            
+            updateScore();
+        });
+    </script>
+
+
+</body></html>

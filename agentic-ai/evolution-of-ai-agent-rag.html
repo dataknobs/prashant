@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Evolution of AI Systems: From Prompt to Self-Improvement</title>
+    <meta content="An interactive deep dive into the evolution of AI architectures: from Basic Prompting and Context-aware models to RAG, Agentic workflows, and Self-improving systems. Explore use cases, benefits, and technical trade-offs." name="description"/>
+    <meta content="AI, Artificial Intelligence, RAG, Agentic AI, Prompt Engineering, Large Language Models, LLM, Self-Improving Agents, AI Architecture, Interactive Data Visualization, Tech Trends" name="keywords"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 350px; max-height: 400px; }
+        .transition-opacity { transition: opacity 0.3s ease-in-out; }
+        .step-active { border-bottom: 3px solid #d97706; color: #1c1917; font-weight: 700; }
+        .step-inactive { border-bottom: 3px solid transparent; color: #a8a29e; }
+        .step-inactive:hover { color: #57534e; }
+        /* Custom scrollbar for card content if needed */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f5f5f4; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone) with Subdued Accents (Amber, Teal, Indigo, Rose) -->
+    <!-- Application Structure Plan: 
+         1. Header: Context setting.
+         2. Navigation Timeline: The core interaction. Users click through the evolutionary stages.
+         3. Dynamic Dashboard (Split View):
+            - Left: "Architecture View" - A HTML-based diagram showing how data flows in that stage.
+            - Right: "Capability Profile" - A Radar chart showing the trade-offs (e.g., Speed vs Accuracy).
+         4. Detailed Cards: Three columns for Use Cases, Benefits, and Challenges.
+         5. Comparative Summary: A bubble chart at the bottom to compare all stages on Cost vs. Capability.
+         Rationale: This structure allows the user to focus on one concept at a time (via the timeline) while instantly seeing the "What" (Architecture), "How good" (Radar), and "Why" (Text details). 
+    -->
+    <!-- Visualization & Content Choices:
+         - Radar Chart: Goal: Inform/Compare. Best for showing multi-dimensional attributes (Autonomy, Latency, etc.) of a single selected stage.
+         - Bubble Chart: Goal: Compare. Best for plotting all stages against "Implementation Complexity" vs "Reasoning Capability".
+         - HTML Flow Diagrams: Goal: Inform. Replacing SVG to show system architecture using Flexbox and CSS borders. 
+         - Interaction: Clicking timeline updates all components. Hovering bubbles shows tooltips.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-stone-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-stone-900 tracking-tight">AI Systems Evolution</h1>
+                    <p class="text-sm text-stone-500 mt-1">Interactive analysis of the progression from Basic Prompts to Self-Improving Agents.</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-600">
+                        Interactive Report
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation / Timeline -->
+    <nav class="bg-white shadow-sm pt-2 overflow-x-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between space-x-8 min-w-max" id="timeline-nav">
+                <!-- Navigation items injected by JS -->
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- Intro Context Block -->
+        <section class="mb-10 text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-stone-900 mb-3 transition-opacity" id="stage-title">Select a Stage</h2>
+            <p class="text-lg text-stone-600 leading-relaxed transition-opacity" id="stage-desc">
+                Explore how Artificial Intelligence interaction models have matured over time. Click the tabs above to navigate through the evolution.
+            </p>
+        </section>
+
+        <!-- Top Row: Architecture & Metrics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            
+            <!-- Architecture Visualizer (HTML/CSS) -->
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 flex flex-col">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-stone-800">System Architecture</h3>
+                    <p class="text-xs text-stone-500">Visual representation of data flow and components.</p>
+                </div>
+                <div class="flex-grow flex items-center justify-center bg-stone-50 rounded-lg border border-stone-100 p-4 min-h-[300px] overflow-hidden relative" id="architecture-diagram">
+                    <!-- Dynamic HTML Diagram injected here -->
+                </div>
+            </div>
+
+            <!-- Profile Radar Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 flex flex-col">
+                <div class="mb-4 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-semibold text-stone-800">Capability Profile</h3>
+                        <p class="text-xs text-stone-500">Relative performance across key dimensions (Scale 0-10).</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Row: Deep Dive Cards (Use Cases, Benefits, Challenges) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Use Cases -->
+            <div class="bg-white rounded-xl shadow-sm border-t-4 border-emerald-500 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mr-3 font-bold text-lg">💡</div>
+                    <h3 class="text-lg font-semibold text-stone-800">Core Use Cases</h3>
+                </div>
+                <ul class="space-y-3 text-stone-600 text-sm" id="list-usecases">
+                    <!-- Injected via JS -->
+                </ul>
+            </div>
+
+            <!-- Benefits -->
+            <div class="bg-white rounded-xl shadow-sm border-t-4 border-blue-500 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-bold text-lg">▲</div>
+                    <h3 class="text-lg font-semibold text-stone-800">Key Benefits</h3>
+                </div>
+                <ul class="space-y-3 text-stone-600 text-sm" id="list-benefits">
+                    <!-- Injected via JS -->
+                </ul>
+            </div>
+
+            <!-- Challenges -->
+            <div class="bg-white rounded-xl shadow-sm border-t-4 border-rose-500 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mr-3 font-bold text-lg">!</div>
+                    <h3 class="text-lg font-semibold text-stone-800">Challenges &amp; Risks</h3>
+                </div>
+                <ul class="space-y-3 text-stone-600 text-sm" id="list-challenges">
+                    <!-- Injected via JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Comparative Analysis -->
+        <section class="bg-stone-100 rounded-2xl p-8 border border-stone-200">
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-stone-800">Comparative Landscape</h3>
+                <p class="text-stone-600 text-sm max-w-2xl">
+                    Analyzing the trade-off between implementation complexity and system reasoning capabilities across all evolutionary stages.
+                    Bubble size represents the typical <strong>Cost of Operation</strong>.
+                </p>
+            </div>
+            <div class="chart-container bg-white rounded-xl border border-stone-200 p-4 shadow-sm" style="height: 400px; max-height: 450px;">
+                <canvas id="bubbleChart"></canvas>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+    <!-- LOGIC -->
+    <script>
+        // --- DATA STORE ---
+        // Contains all content and metrics for the application
+        const appData = [
+            {
+                id: "prompt",
+                title: "1. Basic Prompting",
+                shortTitle: "Prompting",
+                desc: "The foundational interaction model where users provide a direct input (zero-shot or few-shot) and the LLM responds based solely on its pre-trained internal weights.",
+                color: "rgb(245, 158, 11)", // Amber
+                metrics: {
+                    autonomy: 1,
+                    complexity: 1,
+                    accuracy: 4,
+                    latency: 9, // Very fast (score is inverse of time? No, let's say score is "Performance" so High Latency score = Fast) -> Let's use specific labels. Let's say 10 = Best. So 10 = Instant.
+                    context: 2
+                },
+                bubble: { x: 1, y: 2, r: 5 }, // x: Complexity, y: Capability, r: Cost
+                diagram: `
+                    <div class="flex items-center space-x-2">
+                        <div class="p-3 bg-stone-200 rounded-lg border border-stone-300 text-xs font-bold">User</div>
+                        <div class="text-stone-400 text-xl">→</div>
+                        <div class="p-4 bg-amber-100 rounded-lg border border-amber-300 shadow-sm text-center w-32">
+                            <div class="font-bold text-amber-800 text-sm">LLM</div>
+                            <div class="text-[10px] text-amber-600 mt-1">Pre-trained Knowledge</div>
+                        </div>
+                        <div class="text-stone-400 text-xl">→</div>
+                        <div class="p-3 bg-stone-200 rounded-lg border border-stone-300 text-xs font-bold">Answer</div>
+                    </div>
+                `,
+                useCases: [
+                    "Creative writing assistance and brainstorming.",
+                    "Basic language translation.",
+                    "Summarizing text pasted directly into the prompt.",
+                    "General knowledge Q&A (non-current events)."
+                ],
+                benefits: [
+                    "Lowest barrier to entry; no infrastructure setup required.",
+                    "Near-instant response times.",
+                    "Extremely low cost per interaction.",
+                    "Great for generic tasks not requiring external data."
+                ],
+                challenges: [
+                    "High risk of hallucinations on factual queries.",
+                    "Knowledge cutoff (frozen training data).",
+                    "Limited context window for input data.",
+                    "Cannot access private or proprietary user data."
+                ]
+            },
+            {
+                id: "context",
+                title: "2. Prompt + Context",
+                shortTitle: "Prompt + Context",
+                desc: "Enhancing the basic prompt by manually pasting relevant text or data into the input window to ground the model's response.",
+                color: "rgb(234, 88, 12)", // Orange
+                metrics: {
+                    autonomy: 2,
+                    complexity: 2,
+                    accuracy: 6,
+                    latency: 8,
+                    context: 5
+                },
+                bubble: { x: 2, y: 3, r: 8 },
+                diagram: `
+                    <div class="flex flex-col space-y-4 w-full max-w-md items-center">
+                        <div class="flex space-x-4 w-full justify-center">
+                            <div class="flex flex-col items-center">
+                                <span class="text-[10px] text-stone-500 mb-1">Manual Input</span>
+                                <div class="p-2 bg-stone-200 rounded border border-stone-300 text-xs w-20 text-center">Query</div>
+                            </div>
+                            <div class="text-stone-300 text-xl self-center">+</div>
+                            <div class="flex flex-col items-center">
+                                <span class="text-[10px] text-stone-500 mb-1">Manual Paste</span>
+                                <div class="p-2 bg-orange-100 rounded border border-orange-200 text-xs w-20 text-center">Context Data</div>
+                            </div>
+                        </div>
+                        <div class="text-stone-400 text-xl">⬇</div>
+                        <div class="p-3 bg-amber-100 rounded-lg border border-amber-300 shadow-sm w-40 text-center">
+                            <div class="font-bold text-amber-800 text-sm">LLM</div>
+                            <div class="text-[10px] text-amber-600">In-Context Learning</div>
+                        </div>
+                        <div class="text-stone-400 text-xl">⬇</div>
+                        <div class="p-2 bg-stone-100 rounded border border-stone-300 text-xs font-bold">Grounded Answer</div>
+                    </div>
+                `,
+                useCases: [
+                    "Summarizing a specific article or email thread.",
+                    "Extracting data from a pasted CSV snippet.",
+                    "Answering questions about a specific policy document.",
+                    "Code debugging by pasting error logs."
+                ],
+                benefits: [
+                    "Significantly reduced hallucinations compared to basic prompts.",
+                    "Ability to work with private data (if manually pasted).",
+                    "No engineering overhead; accessible to non-coders.",
+                    "Simple way to 'teach' the model formatting."
+                ],
+                challenges: [
+                    "Tedious manual effort to gather context.",
+                    "Strictly limited by the model's token limit (context window).",
+                    "Context is lost once the chat session ends.",
+                    "Does not scale to large datasets (e.g., entire wikis)."
+                ]
+            },
+            {
+                id: "rag",
+                title: "3. RAG (Retrieval-Augmented Generation)",
+                shortTitle: "RAG",
+                desc: "An architectural framework that programmatically retrieves relevant documents from an external knowledge base (Vector DB) and injects them into the context before the LLM generates an answer.",
+                color: "rgb(16, 185, 129)", // Emerald
+                metrics: {
+                    autonomy: 3,
+                    complexity: 5,
+                    accuracy: 8,
+                    latency: 7,
+                    context: 9
+                },
+                bubble: { x: 5, y: 6, r: 15 },
+                diagram: `
+                     <div class="grid grid-cols-3 gap-2 w-full max-w-md items-center text-xs">
+                        <div class="col-span-1 flex flex-col items-center">
+                            <div class="p-2 bg-stone-200 border border-stone-300 rounded mb-2">User Query</div>
+                            <div class="text-stone-400">↓</div>
+                            <div class="p-2 bg-emerald-100 border border-emerald-300 rounded text-emerald-800 font-bold">Retriever</div>
+                        </div>
+                        <div class="col-span-1 flex flex-col items-center justify-center">
+                            <div class="text-stone-400 text-2xl">→</div>
+                            <div class="my-1 text-[10px] text-stone-500 text-center">Vector Search</div>
+                            <div class="text-stone-400 text-2xl">←</div>
+                        </div>
+                        <div class="col-span-1 flex flex-col items-center">
+                            <div class="p-2 bg-stone-800 text-stone-100 border border-stone-600 rounded mb-1">Vector DB</div>
+                            <div class="h-8 w-1 bg-stone-300"></div>
+                            <div class="p-1 bg-white border border-stone-200 text-[10px] rounded">Documents</div>
+                        </div>
+                        
+                        <div class="col-span-3 border-t-2 border-dashed border-stone-200 my-2"></div>
+                        
+                        <div class="col-span-3 flex items-center justify-center space-x-2">
+                             <div class="p-2 bg-emerald-50 border border-emerald-200 rounded">Query + Docs</div>
+                             <div class="text-stone-400">→</div>
+                             <div class="p-3 bg-amber-100 border border-amber-300 rounded font-bold text-amber-800">LLM</div>
+                             <div class="text-stone-400">→</div>
+                             <div class="p-2 bg-white border border-stone-300 rounded font-bold">Answer</div>
+                        </div>
+                    </div>
+                `,
+                useCases: [
+                    "Enterprise knowledge management (Search internal Wikis).",
+                    "Customer support chatbots with access to latest manuals.",
+                    "Legal contract analysis across thousands of files.",
+                    "Medical research assistance citing specific papers."
+                ],
+                benefits: [
+                    "Scalable access to vast amounts of private data.",
+                    "Responses include citations/sources for verification.",
+                    "Model stays 'current' without retraining (just update the DB).",
+                    "Reduced hallucination via grounding."
+                ],
+                challenges: [
+                    "Retrieval quality bottleneck (garbage in, garbage out).",
+                    "Complex setup (Chunking, Embedding, Vector DB management).",
+                    "Lost context in multi-turn conversations.",
+                    "Latency increases due to the retrieval step."
+                ]
+            },
+            {
+                id: "agentic",
+                title: "4. Agentic RAG",
+                shortTitle: "Agentic RAG",
+                desc: "Giving the LLM 'agency'—the ability to reason, plan, and use tools. Instead of a linear retrieve-then-generate, the Agent acts as a controller that can search multiple times, use calculators, or run code to answer complex queries.",
+                color: "rgb(59, 130, 246)", // Blue
+                metrics: {
+                    autonomy: 7,
+                    complexity: 8,
+                    accuracy: 9,
+                    latency: 5, // Slower due to multi-step
+                    context: 8
+                },
+                bubble: { x: 8, y: 8, r: 25 },
+                diagram: `
+                    <div class="relative w-full max-w-md p-2">
+                        <div class="absolute inset-0 border-2 border-blue-100 rounded-xl pointer-events-none"></div>
+                        <div class="flex justify-between items-start">
+                            <div class="p-2 bg-stone-200 text-xs rounded border border-stone-300 z-10">Complex Query</div>
+                            <div class="flex flex-col items-center z-10">
+                                <div class="p-3 bg-blue-600 text-white rounded-lg shadow-lg font-bold text-sm mb-2">Agent (Brain)</div>
+                                <div class="text-[10px] text-blue-600">Planning & Reasoning</div>
+                            </div>
+                            <div class="w-16"></div> 
+                        </div>
+                        
+                        <div class="flex justify-center my-2 text-stone-300">⬇ ⬆ (Loop)</div>
+                        
+                        <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
+                            <div class="p-2 bg-white border-2 border-blue-200 rounded text-blue-800">
+                                <strong>Tool A</strong><br>Web Search
+                            </div>
+                            <div class="p-2 bg-white border-2 border-blue-200 rounded text-blue-800">
+                                <strong>Tool B</strong><br>Vector DB
+                            </div>
+                            <div class="p-2 bg-white border-2 border-blue-200 rounded text-blue-800">
+                                <strong>Tool C</strong><br>Code Exec
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex justify-center">
+                            <div class="p-2 bg-stone-100 border border-stone-300 rounded text-xs w-full text-center">Final Synthesized Answer</div>
+                        </div>
+                    </div>
+                `,
+                useCases: [
+                    "Complex research tasks ('Find X, compare with Y, and plot Z').",
+                    "Data analysis agents that write and execute Python code.",
+                    "Autonomous travel planning (booking flights and hotels).",
+                    "Multi-hop reasoning questions."
+                ],
+                benefits: [
+                    "Can handle ambiguous or multi-step requests.",
+                    "Self-correction (if a search fails, it tries a different query).",
+                    "Uses specific tools for math/logic (overcoming LLM weakness).",
+                    "High accuracy for complex tasks."
+                ],
+                challenges: [
+                    "High latency (multiple LLM calls per request).",
+                    "High cost per transaction.",
+                    "Looping issues (agent gets stuck trying to solve).",
+                    "Complex debugging and observability."
+                ]
+            },
+            {
+                id: "self_improving",
+                title: "5. Self-improving Agents",
+                shortTitle: "Self-improving",
+                desc: "The cutting edge: Agents that persist memory and learn from interactions. They analyze user feedback or success metrics to update their own prompts, memory, or tool selection strategies, getting better over time without code changes.",
+                color: "rgb(139, 92, 246)", // Violet
+                metrics: {
+                    autonomy: 10,
+                    complexity: 10,
+                    accuracy: 9.5,
+                    latency: 4, // Variable
+                    context: 10
+                },
+                bubble: { x: 10, y: 10, r: 35 },
+                diagram: `
+                    <div class="flex items-center justify-center w-full h-full relative p-2">
+                        <!-- Central Agent -->
+                        <div class="z-10 p-4 bg-violet-600 text-white rounded-full shadow-lg text-center w-24 h-24 flex flex-col justify-center items-center border-4 border-violet-200">
+                            <span class="font-bold text-xs">Agent</span>
+                            <span class="text-[9px] opacity-90">v2.0</span>
+                        </div>
+                        
+                        <!-- Orbiting Elements -->
+                        <div class="absolute top-0 right-10 p-2 bg-white border border-stone-200 shadow-sm rounded text-[10px] w-20 text-center">
+                            Action
+                        </div>
+                        <div class="absolute bottom-0 right-10 p-2 bg-white border border-stone-200 shadow-sm rounded text-[10px] w-20 text-center">
+                            Feedback
+                        </div>
+                        <div class="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-violet-50 border border-violet-200 text-violet-800 rounded text-[10px] w-24 text-center">
+                            <strong>Long-term Memory</strong><br>(Experience)
+                        </div>
+                        
+                        <!-- Arrows representing the loop -->
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 0;">
+                             <path d="M 180 60 Q 220 60 220 100" fill="none" stroke="#ddd" stroke-dasharray="4"/>
+                             <path d="M 220 150 Q 220 190 180 190" fill="none" stroke="#ddd" stroke-dasharray="4"/>
+                             <path d="M 140 190 Q 80 190 80 125" fill="none" stroke="#8b5cf6" stroke-width="2"/> <!-- Learning Path -->
+                        </svg>
+                        
+                        <div class="absolute bottom-2 left-10 text-[9px] font-bold text-violet-600 bg-white px-1">Refinement Loop</div>
+                    </div>
+                `,
+                useCases: [
+                    "Personal assistants that learn user preferences over months.",
+                    "Coding agents that fix their own bugs and remember the fix.",
+                    "Gaming NPCs that adapt to player strategy.",
+                    "Enterprise workflow automation that optimizes itself."
+                ],
+                benefits: [
+                    "Performance improves with usage (Inverse degradation).",
+                    "Hyper-personalization.",
+                    "Reduced need for manual prompt engineering updates.",
+                    "Autonomous adaptation to new data environments."
+                ],
+                challenges: [
+                    "Safety risks (agent learning bad behaviors).",
+                    "Drift (diverging from original purpose).",
+                    "Extremely complex state management.",
+                    "Ethical concerns regarding autonomy."
+                ]
+            }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let currentStateIndex = 0;
+        let radarChart = null;
+        let bubbleChart = null;
+
+        // --- DOM ELEMENTS ---
+        const timelineNav = document.getElementById('timeline-nav');
+        const stageTitle = document.getElementById('stage-title');
+        const stageDesc = document.getElementById('stage-desc');
+        const archDiagram = document.getElementById('architecture-diagram');
+        const listUseCases = document.getElementById('list-usecases');
+        const listBenefits = document.getElementById('list-benefits');
+        const listChallenges = document.getElementById('list-challenges');
+
+        // --- INITIALIZATION ---
+        function init() {
+            buildNavigation();
+            initCharts();
+            renderStage(0);
+        }
+
+        // --- FUNCTIONS ---
+
+        function buildNavigation() {
+            appData.forEach((stage, index) => {
+                const btn = document.createElement('button');
+                btn.className = `pb-4 px-2 text-sm font-medium transition-colors duration-200 focus:outline-none whitespace-nowrap ${index === 0 ? 'step-active' : 'step-inactive'}`;
+                btn.innerText = stage.shortTitle;
+                btn.onclick = () => renderStage(index);
+                btn.id = `nav-btn-${index}`;
+                timelineNav.appendChild(btn);
+            });
+        }
+
+        function updateNavStyles(activeIndex) {
+            appData.forEach((_, index) => {
+                const btn = document.getElementById(`nav-btn-${index}`);
+                if (index === activeIndex) {
+                    btn.className = 'pb-4 px-2 text-sm font-medium transition-colors duration-200 focus:outline-none whitespace-nowrap step-active';
+                } else {
+                    btn.className = 'pb-4 px-2 text-sm font-medium transition-colors duration-200 focus:outline-none whitespace-nowrap step-inactive';
+                }
+            });
+        }
+
+        function renderStage(index) {
+            currentStateIndex = index;
+            const data = appData[index];
+
+            // 1. Update Navigation Visuals
+            updateNavStyles(index);
+
+            // 2. Update Text Content with Fade
+            stageTitle.style.opacity = 0;
+            stageDesc.style.opacity = 0;
+            
+            setTimeout(() => {
+                stageTitle.innerText = data.title;
+                stageDesc.innerText = data.desc;
+                stageTitle.style.opacity = 1;
+                stageDesc.style.opacity = 1;
+            }, 150);
+
+            // 3. Update Architecture Diagram (HTML Injection)
+            archDiagram.innerHTML = data.diagram;
+
+            // 4. Update Lists
+            updateList(listUseCases, data.useCases);
+            updateList(listBenefits, data.benefits);
+            updateList(listChallenges, data.challenges);
+
+            // 5. Update Radar Chart
+            updateRadarChart(data);
+        }
+
+        function updateList(element, items) {
+            element.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "flex items-start";
+                li.innerHTML = `<span class="mr-2 mt-1.5 h-1.5 w-1.5 bg-stone-400 rounded-full flex-shrink-0"></span><span>${item}</span>`;
+                element.appendChild(li);
+            });
+        }
+
+        // --- CHART CONFIGURATION ---
+
+        function initCharts() {
+            // Radar Chart Init
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Autonomy', 'Complexity', 'Accuracy', 'Context Awareness', 'Speed (Inv. Latency)'],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: {
+                                font: { size: 12, family: "'Inter', sans-serif" },
+                                color: '#4b5563'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            ticks: { display: false, stepSize: 2 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1c1917',
+                            bodyColor: '#44403c',
+                            borderColor: '#e5e5e5',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+
+            // Bubble Chart Init
+            const bubbleCtx = document.getElementById('bubbleChart').getContext('2d');
+            
+            // Prepare datasets for all stages for the bubble chart
+            const bubbleDatasets = appData.map(stage => ({
+                label: stage.shortTitle,
+                data: [{
+                    x: stage.bubble.x,
+                    y: stage.bubble.y,
+                    r: stage.bubble.r
+                }],
+                backgroundColor: stage.color.replace('rgb', 'rgba').replace(')', ', 0.7)'),
+                borderColor: stage.color,
+                borderWidth: 1
+            }));
+
+            bubbleChart = new Chart(bubbleCtx, {
+                type: 'bubble',
+                data: { datasets: bubbleDatasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Implementation Complexity (Low → High)' },
+                            min: 0, max: 12,
+                            grid: { color: '#f3f4f6' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Reasoning Capability (Low → High)' },
+                            min: 0, max: 12,
+                            grid: { color: '#f3f4f6' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const raw = context.raw;
+                                    return `${context.dataset.label}: Cost Factor ~${raw.r}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRadarChart(data) {
+            if (!radarChart) return;
+            
+            const newData = [
+                data.metrics.autonomy,
+                data.metrics.complexity,
+                data.metrics.accuracy,
+                data.metrics.context,
+                data.metrics.latency
+            ];
+
+            // If dataset exists, update it, otherwise create it
+            if (radarChart.data.datasets.length > 0) {
+                radarChart.data.datasets[0].data = newData;
+                radarChart.data.datasets[0].label = data.shortTitle;
+                radarChart.data.datasets[0].backgroundColor = data.color.replace('rgb', 'rgba').replace(')', ', 0.2)');
+                radarChart.data.datasets[0].borderColor = data.color;
+                radarChart.data.datasets[0].pointBackgroundColor = data.color;
+            } else {
+                radarChart.data.datasets.push({
+                    label: data.shortTitle,
+                    data: newData,
+                    backgroundColor: data.color.replace('rgb', 'rgba').replace(')', ', 0.2)'),
+                    borderColor: data.color,
+                    pointBackgroundColor: data.color,
+                    borderWidth: 2,
+                    pointRadius: 4
+                });
+            }
+            radarChart.update();
+        }
+
+        // Start App
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+
+</body></html>
