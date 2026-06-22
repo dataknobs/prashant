@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Guide to Data Product Experimentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Stone, Gray, and Orange -->
+    <!-- Application Structure Plan: The SPA is designed with a fixed sidebar navigation on larger screens (transforming to a top bar on mobile) and a main content area. This structure was chosen over a linear document to provide users with constant, easy access to all key sections (Overview, Framework, Pillars, Case Study, Metrics, Best Practices). This non-linear navigation encourages exploration and allows users to jump to the most relevant information for them. The flow is logical: starting broad (Overview), explaining the process (Framework), detailing the core components (Pillars), demonstrating with a hands-on example (Interactive Case Study), defining terms (Metrics), and concluding with actionable advice (Best Practices). This architecture prioritizes user control and comprehension. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Experimentation Lifecycle -> Goal: Organize/Inform -> Viz: Interactive Flow Diagram -> Interaction: Hover to see details on each step -> Justification: Visually represents a complex process in a digestible way without scrolling. -> Library/Method: HTML/Tailwind CSS.
+        - Report Info: A/B Test Results -> Goal: Compare/Show Change -> Viz: Bar Chart -> Interaction: Buttons to toggle between 'Control' and 'Variant' datasets, which dynamically updates the chart. -> Justification: Makes the impact of an experiment tangible and immediately understandable. -> Library/Method: Chart.js with dynamic data updates.
+        - Report Info: Key Concepts (Data Signal vs. UI) -> Goal: Inform/Compare -> Viz: Side-by-side content cards -> Interaction: N/A, focus on clarity. -> Justification: Clearly separates and defines the two fundamental pillars of experimentation. -> Library/Method: HTML/Tailwind CSS.
+        - Report Info: Definitions -> Goal: Inform -> Viz: Grid of cards -> Interaction: Subtle hover effects for feedback -> Justification: An easily scannable glossary of important terms. -> Library/Method: HTML/Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 45vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #f97316; /* orange-500 */
+            color: white;
+            transform: translateX(4px);
+        }
+        .framework-step {
+            transition: all 0.3s ease-in-out;
+        }
+        .framework-step:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <aside class="w-full md:w-64 bg-white md:border-r border-stone-200 p-4 md:fixed md:h-full">
+            <h1 class="text-xl font-bold text-orange-600 border-b border-stone-200 pb-4">Data Experimentation</h1>
+            <nav class="mt-6">
+                <ul class="space-y-2">
+                    <li><a class="nav-link active block font-medium p-3 rounded-lg hover:bg-stone-200" href="#overview">Overview</a></li>
+                    <li><a class="nav-link block font-medium p-3 rounded-lg hover:bg-stone-200" href="#framework">Experimentation Framework</a></li>
+                    <li><a class="nav-link block font-medium p-3 rounded-lg hover:bg-stone-200" href="#pillars">Two Pillars</a></li>
+                    <li><a class="nav-link block font-medium p-3 rounded-lg hover:bg-stone-200" href="#case-study">Interactive Case Study</a></li>
+                    <li><a class="nav-link block font-medium p-3 rounded-lg hover:bg-stone-200" href="#metrics">Key Metrics</a></li>
+                    <li><a class="nav-link block font-medium p-3 rounded-lg hover:bg-stone-200" href="#practices">Best Practices</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="flex-1 md:ml-64 p-6 md:p-10">
+            <section class="mb-16 min-h-screen flex flex-col justify-center" id="overview">
+                <h2 class="text-4xl font-bold text-stone-900 mb-4">Mastering Data Product Experimentation</h2>
+                <p class="text-lg text-stone-600 max-w-3xl">
+                    Explore this interactive guide to data product experimentation. It simplifies the key concepts behind designing, executing, and interpreting experiments for product enhancement. Learn to balance data insights with user experience, mastering A/B testing and other methods for impactful product improvements. Navigate to discover the framework, examine a case study, and uncover best practices.
+                </p>
+                 <div class="mt-8 text-2xl animate-bounce">↓</div>
+            </section>
+
+            <section class="mb-16" id="framework">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">The Experimentation Framework</h2>
+                <p class="text-md text-stone-600 mb-8 max-w-3xl">
+                    A structured process defines successful experiments. This lifecycle guarantees tests are well-planned, trackable, and generate useful findings. Progressing sequentially, from crafting a hypothesis to informed decisions based on data, each stage builds on the one before. Learn more about each step's role by hovering over the details below.
+                </p>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+                    <div class="framework-step bg-white p-6 rounded-xl shadow-md flex-1">
+                        <div class="text-3xl mb-2">1</div>
+                        <h3 class="font-semibold">Hypothesis</h3>
+                        <p class="text-sm text-stone-500 hidden md:block">Formulate a clear, testable question.</p>
+                    </div>
+                    <div class="text-2xl text-stone-300 font-light mx-2 hidden md:block">→</div>
+                    <div class="framework-step bg-white p-6 rounded-xl shadow-md flex-1">
+                        <div class="text-3xl mb-2">2</div>
+                        <h3 class="font-semibold">Design</h3>
+                        <p class="text-sm text-stone-500 hidden md:block">Define variants, target audience, and key metrics.</p>
+                    </div>
+                    <div class="text-2xl text-stone-300 font-light mx-2 hidden md:block">→</div>
+                     <div class="framework-step bg-white p-6 rounded-xl shadow-md flex-1">
+                        <div class="text-3xl mb-2">3</div>
+                        <h3 class="font-semibold">Implement</h3>
+                        <p class="text-sm text-stone-500 hidden md:block">Develop and deploy the experimental variants.</p>
+                    </div>
+                    <div class="text-2xl text-stone-300 font-light mx-2 hidden md:block">→</div>
+                     <div class="framework-step bg-white p-6 rounded-xl shadow-md flex-1">
+                        <div class="text-3xl mb-2">4</div>
+                        <h3 class="font-semibold">Analyze</h3>
+                        <p class="text-sm text-stone-500 hidden md:block">Collect data and evaluate statistical significance.</p>
+                    </div>
+                     <div class="text-2xl text-stone-300 font-light mx-2 hidden md:block">→</div>
+                     <div class="framework-step bg-white p-6 rounded-xl shadow-md flex-1">
+                        <div class="text-3xl mb-2">5</div>
+                        <h3 class="font-semibold">Decide</h3>
+                        <p class="text-sm text-stone-500 hidden md:block">Launch, iterate, or discard based on results.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16" id="pillars">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">The Two Pillars of Experimentation</h2>
+                 <p class="text-md text-stone-600 mb-8 max-w-3xl">
+                    Data product experiments hinge on two pillars: the Data Signal and the User Interface. Altering one frequently impacts the other. Success lies in balancing high-quality data with a clear, intuitive, and engaging presentation. Testing changes across both is crucial for product evolution.
+                </p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-semibold mb-3">📡 Data Signal</h3>
+                        <p class="text-stone-600">
+                            Here's a concise rewrite of the provided line, aiming for a similar length and meaning:
+
+This involves the core components: data, algorithms, and models. Testing these includes new recommendation methods, data sources, or scoring adjustments. The focus is to enhance information accuracy, relevance, and originality for the user, regardless of the UI.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-semibold mb-3">🎨 User Interface (UI)</h3>
+                        <p class="text-stone-600">
+                            Here's a rewritten version of the line, similar in length and meaning:
+
+User interfaces display data. UI testing explores presentation: layout, visuals, and interactive features. This includes trying new button colors, chart types, or streamlined layouts. The aim is improved understanding, engagement, and guiding users towards specific actions, regardless of the data itself.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16" id="case-study">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Interactive Case Study: A/B Test</h2>
+                <p class="text-md text-stone-600 mb-8 max-w-3xl">
+                    Consider this practical scenario: A team believes a card-based UI for "Recommended Articles" will boost engagement versus the existing list view. This experiment tests a UI redesign. Toggle the buttons below to compare the original design's (Control) performance metrics against the new design (Variant) and assess the impact.
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="flex justify-center gap-4 mb-6">
+                        <button class="bg-orange-500 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition-transform transform hover:scale-105" id="controlBtn">
+                            Control Group
+                        </button>
+                        <button class="bg-stone-500 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-opacity-50 transition-transform transform hover:scale-105" id="variantBtn">
+                            Variant Group
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="abTestChart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-16" id="metrics">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Key Metrics to Track</h2>
+                <p class="text-md text-stone-600 mb-8 max-w-3xl">
+                    Selecting effective metrics is crucial for assessing an experiment's impact. These choices must align with your hypothesis's goals. While some metrics apply broadly, others are tailored to the product's purpose. Below are key, frequently-used metrics in data product experimentation.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow transition hover:shadow-lg">
+                        <h3 class="font-semibold text-lg">Click-Through Rate (CTR)</h3>
+                        <p class="text-stone-600 mt-1">Here are a few options, all similar in length and meaning:
+
+*   **Click-through rate: Clicks on a link or item, divided by total views.**
+*   **The proportion of viewers who click a specific link or item.**
+*   **Click rate: The ratio of clicks to views for a given link or item.**
+*   **Link/item click percentage: Clicks divided by the total number of views.**</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow transition hover:shadow-lg">
+                        <h3 class="font-semibold text-lg">Conversion Rate</h3>
+                        <p class="text-stone-600 mt-1">Here are a few options, all similar in length:
+
+*   The conversion rate for key user actions (signup, purchase, etc.).
+*   The proportion of users finishing a target action (sign-up, buy, etc.).
+*   Rate of users achieving a goal (signup, purchase, or download).
+*   User success rate for a specific action (sign up, buy, download).</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow transition hover:shadow-lg">
+                        <h3 class="font-semibold text-lg">User Engagement</h3>
+                        <p class="text-stone-600 mt-1">Here are a few options, all similar in length and capturing the essence of the original:
+
+*   A versatile measure encompassing time, scrolling, and session engagement.
+*   This metric can incorporate page time, scroll behavior, and session activity.
+*   It's a comprehensive measure including page time, scroll, and session events.
+*   A holistic metric: page time, scroll depth, and session interaction count.
+*   This wide-ranging metric covers time on-page, scrolling, and user engagement.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow transition hover:shadow-lg">
+                        <h3 class="font-semibold text-lg">Retention Rate</h3>
+                        <p class="text-stone-600 mt-1">Here are a few options, all similar in length:
+
+*   **Product user retention rate over time.**
+*   **Recurring user rate after a defined duration.**
+*   **Percentage of users revisiting the product.**
+*   **User return rate within a set timeframe.**
+*   **Product's user reactivation percentage.**</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow transition hover:shadow-lg">
+                        <h3 class="font-semibold text-lg">Task Success Rate</h3>
+                        <p class="text-stone-600 mt-1">Here are a few options, all similar in length and capturing the core meaning:
+
+*   **Task success rate: users completing a specific action (e.g., info search).**
+*   **Users' task completion percentage: achieving a set goal (e.g., find info).**
+*   **Percentage of users succeeding at a set task (e.g., information retrieval).**
+*   **Successful task completion rate for users (e.g., finding information).**</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow transition hover:shadow-lg">
+                        <h3 class="font-semibold text-lg">Data Quality Score</h3>
+                        <p class="text-stone-600 mt-1">A key internal metric for assessing data signals, evaluating their accuracy, completeness, and relevance.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="practices">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Best Practices</h2>
+                <p class="text-md text-stone-600 mb-8 max-w-3xl">
+                    For successful, dependable experimentation, follow these key best practices. They safeguard test accuracy, avoid common errors, and promote data-informed decisions.
+                </p>
+                <ul class="list-none space-y-4">
+                    <li class="bg-white p-5 rounded-lg shadow-sm flex items-start">
+                        <span class="text-orange-500 font-bold text-xl mr-4">✔</span>
+                        <div>
+                            <h4 class="font-semibold">Start with a Clear Hypothesis</h4>
+                            <p class="text-stone-600">Here are a few options, all keeping a similar size and conveying the same core idea:
+
+*   **Always test with a clear hypothesis: "If X, then Y, due to Z."**
+
+*   **Focus testing: Ask "If we adjust X, will Y result, supported by Z?"**
+
+*   **Test with purpose: Form a hypothesis: "X change leads to Y, explained by Z."**
+
+*   **Define your test: "Changing X should cause Y, because of Z."**</p>
+                        </div>
+                    </li>
+                    <li class="bg-white p-5 rounded-lg shadow-sm flex items-start">
+                        <span class="text-orange-500 font-bold text-xl mr-4">✔</span>
+                        <div>
+                            <h4 class="font-semibold">Test One Thing at a Time</h4>
+                            <p class="text-stone-600">Here are a few options, all similar in length and focusing on clarity:
+
+*   **Separate variables to link metric shifts directly to your edits.**
+*   **Track variables distinctly to see how your changes impact metrics.**
+*   **Segment variables so you can connect metric changes to your work.**
+*   **Distinctly define variables to directly correlate modifications and metrics.**</p>
+                        </div>
+                    </li>
+                     <li class="bg-white p-5 rounded-lg shadow-sm flex items-start">
+                        <span class="text-orange-500 font-bold text-xl mr-4">✔</span>
+                        <div>
+                            <h4 class="font-semibold">Run Tests Long Enough</h4>
+                            <p class="text-stone-600">Gather sufficient data for statistically sound results, considering user behavior differences (weekdays vs. weekends).</p>
+                        </div>
+                    </li>
+                    <li class="bg-white p-5 rounded-lg shadow-sm flex items-start">
+                        <span class="text-orange-500 font-bold text-xl mr-4">✔</span>
+                        <div>
+                            <h4 class="font-semibold">Segment Your Results</h4>
+                            <p class="text-stone-600">Examine user group reactions (e.g., new/returning, mobile/desktop) to the update.</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Portfolio Website</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer></main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const controlData = {
+                label: 'Control Group (List View)',
+                data: [12, 45, 1.8],
+                backgroundColor: 'rgba(249, 115, 22, 0.6)',
+                borderColor: 'rgba(249, 115, 22, 1)',
+                borderWidth: 1
+            };
+
+            const variantData = {
+                label: 'Variant Group (Card View)',
+                data: [18, 65, 3.2],
+                backgroundColor: 'rgba(120, 113, 108, 0.6)',
+                borderColor: 'rgba(120, 113, 108, 1)',
+                borderWidth: 1
+            };
+
+            const chartLabels = ['Click-Through Rate (%)', 'User Engagement (Interactions/Session)', 'Time on Page (Minutes)'];
+
+            const ctx = document.getElementById('abTestChart').getContext('2d');
+            const abTestChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [controlData]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Value'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'A/B Test Results: Control vs. Variant',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x;
+                                        if (context.label.includes('%')) {
+                                            label += '%';
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const controlBtn = document.getElementById('controlBtn');
+            const variantBtn = document.getElementById('variantBtn');
+            
+            controlBtn.addEventListener('click', () => {
+                abTestChart.data.datasets = [controlData];
+                abTestChart.update();
+                controlBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+                controlBtn.classList.remove('bg-stone-500', 'hover:bg-stone-600');
+                variantBtn.classList.add('bg-stone-500', 'hover:bg-stone-600');
+                variantBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+            });
+
+            variantBtn.addEventListener('click', () => {
+                abTestChart.data.datasets = [variantData];
+                abTestChart.update();
+                variantBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+                variantBtn.classList.remove('bg-stone-500', 'hover:bg-stone-600');
+                controlBtn.classList.add('bg-stone-500', 'hover:bg-stone-600');
+                controlBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+            });
+            
+            const sections = document.querySelectorAll('main section');
+            const navLinks = document.querySelectorAll('nav a.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: '-30% 0px -70% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    document.querySelector(targetId).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+
+
+</body></html>
