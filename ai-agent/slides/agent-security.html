@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Security: Prompt Injection, MCP Risks, and Defense-in-Depth for AI Agents</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;family=Red+Hat+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --bg:#14161A;
+  --bg2:#1C1F24;
+  --panel:#20242A;
+  --ink:#E8E9EA;
+  --ink-soft:#7C828A;
+  --line:#33383F;
+  --line-strong:#454C55;
+  --red:#A6192E;
+  --red-tint:#332025;
+  --amber:#D4A017;
+  --amber-tint:#332C18;
+  --green:#3F8F5F;
+  --green-tint:#1C2C22;
+  --font-display:'Bebas Neue', sans-serif;
+  --font-body:'Libre Baskerville', serif;
+  --font-mono:'Red Hat Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.72;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;filter:grayscale(4%);}
+a{color:var(--red);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);letter-spacing:.02em;font-weight:400;}
+
+/* ── redaction-bar divider (signature motif) ──────────────────────── */
+.redact{height:44px;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;}
+.redact .bar{height:9px;background:#0A0A0A;border-radius:1px;}
+.redact .stamp{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--red);border:1px solid var(--red);padding:2px 8px;margin:0 8px;text-transform:uppercase;}
+
+/* ── dossier frame (signature motif) ──────────────────────────────── */
+.dossier-frame{position:relative;background:var(--panel);border:1px solid var(--line-strong);padding:18px 20px 14px;}
+.stamp-tag{position:absolute;top:14px;right:16px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);border:1px solid var(--red);padding:2px 8px;transform:rotate(4deg);}
+.frame-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;}
+.frame-label b{color:var(--amber);}
+.dossier-frame img{border:1px solid var(--line);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(20,22,26,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+.brand::before{content:"◈";color:var(--red);}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--red);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--red);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--red);display:inline-block;}
+.hero-title{font-size:clamp(2.6rem,6.4vw,4.6rem);line-height:1;margin-bottom:22px;font-weight:400;text-transform:uppercase;letter-spacing:.02em;}
+.hero-title em{font-style:normal;color:var(--red);}
+.hero-sub{font-size:1.14rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;font-family:var(--font-body);}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--red);color:#fff;border-color:var(--red);}
+.btn-solid:hover{background:#7E1421;}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--bg2);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--panel);border:1px solid var(--line-strong);border-left:4px solid var(--red);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.02rem;color:#D6D9DC;}
+.quick-answer strong{color:var(--ink);}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:56px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:12px;}
+.section-title{font-size:clamp(1.9rem,3.6vw,2.6rem);margin-bottom:14px;font-weight:400;text-transform:uppercase;}
+.section-lede{color:var(--ink-soft);font-size:1.02rem;}
+
+/* ── brief rows ───────────────────────────────────────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:44px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.brief-title{font-size:2rem;margin-bottom:14px;font-weight:400;text-transform:uppercase;}
+.brief-text p{font-size:.98rem;color:#CDD1D4;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.93rem;color:var(--ink-soft);}
+.brief-list li::before{content:"■";position:absolute;left:0;color:var(--red);font-size:.6rem;top:6px;}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── stats grid ───────────────────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.stat-card{background:var(--panel);padding:22px 18px;text-align:center;}
+.stat-card .v{font-family:var(--font-display);font-size:2.4rem;color:var(--red);line-height:1;}
+.stat-card .l{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-top:8px;}
+@media (max-width:820px){.stat-grid{grid-template-columns:1fr 1fr;}}
+
+/* ── layer grid ───────────────────────────────────────────────────── */
+.layer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.layer-card{background:var(--panel);padding:24px 22px;}
+.layer-card .k{font-family:var(--font-mono);font-size:10.5px;color:var(--amber);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+.layer-card h5{font-family:var(--font-display);font-size:1.3rem;margin-bottom:8px;font-weight:400;text-transform:uppercase;}
+.layer-card p{font-size:.87rem;color:var(--ink-soft);}
+@media (max-width:760px){.layer-grid{grid-template-columns:1fr;}}
+
+/* ── table ────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--panel);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem;}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);background:var(--bg2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:600;color:var(--red);font-size:.85rem;}
+tr:last-child td{border-bottom:none;}
+.tagpill{font-family:var(--font-mono);font-size:10.5px;padding:3px 9px;border-radius:2px;}
+.tagpill.good{background:var(--green-tint);color:var(--green);}
+.tagpill.warn{background:var(--amber-tint);color:var(--amber);}
+.tagpill.bad{background:var(--red-tint);color:var(--red);}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.25rem;color:var(--ink);padding:20px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:400;text-transform:uppercase;letter-spacing:.01em;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--red);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.96rem;max-width:820px;font-family:var(--font-body);}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--bg2);padding:64px 0;border-top:1px solid var(--line-strong);}
+.cta-band p{color:var(--ink-soft);max-width:580px;margin-bottom:26px;font-size:1rem;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.88rem;color:var(--ink-soft);}
+.cta-list li::before{content:"✓ ";color:var(--green);}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line-strong);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="#top">AGENT SECURITY</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#scale">Scale</a></li>
+      <li><a href="#defense">Defense</a></li>
+      <li><a href="#guardrails">Guardrails</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Risk &amp; Governance</span>
+    <h1 class="hero-title">The exploit is<br/>written in <em>plain English</em>.</h1>
+    <p class="hero-sub">An agent can be compromised through the content it's designed to process — a sentence buried in a webpage, a document, or an email, with no malware and no stolen credentials involved. The security posture that protected a chatbot does not protect an agent that can reason, act, and touch real systems.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#scale">See how big the problem is →</a>
+      <a class="btn btn-ghost" href="#defense">Jump to defense-in-depth</a>
+    </div>
+    <div class="dossier-frame reveal">
+      <span class="stamp-tag">restricted</span>
+      <span class="frame-label">SLIDE <b>01</b> — AGENT SECURITY</span>
+      <img alt="Cover slide: Agent Security" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Agent security</strong> is the discipline of defending AI agents against a threat model traditional application security wasn't built for: attacks that exploit a model's inherent trust of the text it reads, rather than a code vulnerability or a stolen credential. The leading threat is <strong>prompt injection</strong> — malicious instructions planted inside a webpage, document, or tool result that an agent then executes with the same authority it uses for legitimate tasks. Model-level defenses help but are not sufficient on their own; a regulator will not accept "the model was instructed not to" as evidence of access control. Real protection requires <strong>defense-in-depth</strong>: architectural isolation, scoped permissions, input/output guardrails, and human approval for anything irreversible, layered so that no single failure compromises the whole system.</p>
+  </div>
+</div>
+
+<div class="redact">
+  <div class="bar" style="width:30px;"></div><div class="bar" style="width:14px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:18px;"></div><div class="bar" style="width:34px;"></div>
+</div>
+
+<!-- ═══ SLIDE 2 — A DIFFERENT THREAT MODEL ══════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media dossier-frame">
+      <span class="stamp-tag">threat model</span>
+      <span class="frame-label">SLIDE <b>02</b> — WHY AGENTS NEED A DIFFERENT THREAT MODEL</span>
+      <img alt="Why AI agents require a different security threat model than traditional applications" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Not malware. Not stolen credentials.</span>
+      <h3 class="brief-title">The exploit hides inside normal content</h3>
+      <p>Security teams spent years learning to think in network perimeters, credential theft, and malware signatures. Agents introduce a threat model where the exploit is a carefully worded sentence — detecting it is a fundamentally different skill from detecting a SQL injection attempt or a malicious binary.</p>
+      <p>An agent that can reason, take action, and reach enterprise systems is not a chatbot, and the controls that protected a chatbot don't protect it. One survey found 82% of executives believed existing policy already protected them from unauthorized agent actions, while a separate survey of the same population found 88% had experienced a confirmed or suspected agent security incident. That gap between confidence and reality is where the current crisis lives.</p>
+    </div>
+  </div>
+</div>
+
+<div class="redact">
+  <div class="bar" style="width:20px;"></div><div class="bar" style="width:38px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:26px;"></div><div class="bar" style="width:12px;"></div>
+</div>
+
+<!-- ═══ SLIDE 3 — PROMPT INJECTION FUNDAMENTALS ═════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media dossier-frame">
+      <span class="stamp-tag">LLM01</span>
+      <span class="frame-label">SLIDE <b>03</b> — PROMPT INJECTION FUNDAMENTALS</span>
+      <img alt="How prompt injection works: direct and indirect attack vectors" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-3.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-3.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-3.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-3.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Everything is tokens</span>
+      <h3 class="brief-title">Why models can't tell instruction from data</h3>
+      <p>Prompt injection exploits a structural weakness: the system prompt, the user's message, retrieved documents, and tool outputs all occupy the same context window as undifferentiated tokens. An attacker who inserts text anywhere in that window can potentially override the operator's instructions.</p>
+      <p><strong>Direct injection</strong> comes straight from the user, typing a request crafted to override stated constraints. <strong>Indirect injection</strong> is more dangerous for agents specifically: the malicious instruction is planted in a webpage, a document, or an email the agent reads as part of its task, and it executes that instruction with the same authority as the user's original request. If an attacker reaches an agent's long-term memory, the injected instruction can influence every future interaction, not just the current one.</p>
+    </div>
+  </div>
+</div>
+
+<div class="redact">
+  <div class="bar" style="width:34px;"></div><div class="bar" style="width:16px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:22px;"></div><div class="bar" style="width:30px;"></div>
+</div>
+
+<!-- ═══ SLIDE 4 — THE SCALE OF THE PROBLEM ══════════════════════════ -->
+<section id="scale">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The numbers, plainly</span>
+      <h2 class="section-title">This is not a theoretical risk</h2>
+      <p class="section-lede">Prompt injection has moved from a research curiosity to OWASP's top-ranked vulnerability for LLM applications, three years running.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media dossier-frame">
+        <span class="stamp-tag">brief</span>
+        <span class="frame-label">SLIDE <b>04</b> — THE SCALE OF THE PROBLEM</span>
+        <img alt="Statistics on the scale of prompt injection and agent security incidents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-4.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-4.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-4.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-4.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Detection tools are losing ground</span>
+        <h3 class="brief-title">A fast-growing, poorly-detected threat</h3>
+        <p>Reported incidents keep climbing while detection accuracy lags badly behind: current tools catch only a minority of sophisticated injection attempts, and five carefully crafted poisoned documents have been shown to manipulate retrieval-augmented agents in the large majority of trials.</p>
+      </div>
+    </div>
+    <div class="stat-grid reveal">
+      <div class="stat-card"><div class="v">73%+</div><div class="l">Of production AI deployments show injection exposure</div></div>
+      <div class="stat-card"><div class="v">340%</div><div class="l">Year-over-year surge in injection attacks (OWASP)</div></div>
+      <div class="stat-card"><div class="v">23%</div><div class="l">Of sophisticated attempts caught by current detection tools</div></div>
+      <div class="stat-card"><div class="v">48%</div><div class="l">Of co-running agents affected once one is compromised</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="redact">
+  <div class="bar" style="width:16px;"></div><div class="bar" style="width:28px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:36px;"></div><div class="bar" style="width:14px;"></div>
+</div>
+
+<!-- ═══ SLIDE 5 — MCP & SUPPLY CHAIN RISKS ══════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media dossier-frame">
+      <span class="stamp-tag">supply chain</span>
+      <span class="frame-label">SLIDE <b>05</b> — MCP &amp; SUPPLY CHAIN RISK</span>
+      <img alt="MCP tool poisoning and AI supply chain risks" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">When the damage isn't just words</span>
+      <h3 class="brief-title">Injection that reaches a tool becomes an action</h3>
+      <p>When an agent is connected to tools, an injected instruction stops being confined to response text — it extends to the tool's side effects: a database write, an API call, a file system operation. Attack techniques specific to this layer include tool poisoning (a malicious or compromised tool description) and credential theft via tool output.</p>
+      <p>Supply-chain risk compounds this: a backdoored package used as the language-model gateway for several major agent frameworks was live on a public package registry for a few hours in early 2026, pulled in by tens of thousands of downloads before it was caught — a reminder that an agent's security surface includes every dependency in its tool chain, not just its own code.</p>
+    </div>
+  </div>
+</div>
+
+<div class="redact">
+  <div class="bar" style="width:24px;"></div><div class="bar" style="width:18px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:32px;"></div><div class="bar" style="width:20px;"></div>
+</div>
+
+<!-- ═══ SLIDE 6 — MULTI-AGENT PROPAGATION ═══════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media dossier-frame">
+      <span class="stamp-tag">propagation</span>
+      <span class="frame-label">SLIDE <b>06</b> — MULTI-AGENT PROPAGATION &amp; MEMORY POISONING</span>
+      <img alt="How prompt injection propagates across multi-agent systems and persists via memory poisoning" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">One compromised agent, many casualties</span>
+      <h3 class="brief-title">Guardrails don't survive the handoff</h3>
+      <p>In a multi-agent system, one agent's output routinely becomes another's input — which means a successful injection at one layer can propagate to every layer downstream. Security testing has found a single injection incident spreading to roughly half of co-running agents in some multi-agent deployments.</p>
+      <p>Long conversations compound the risk further: prompt guardrails measurably degrade as context grows, since cumulative context can gradually shift a model's effective constraint boundary. And if an injected instruction reaches persistent memory, it converts the agent into a standing threat — influencing every future session, not just the one where it was planted.</p>
+    </div>
+  </div>
+</div>
+
+<div class="redact">
+  <div class="bar" style="width:30px;"></div><div class="bar" style="width:22px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:16px;"></div><div class="bar" style="width:34px;"></div>
+</div>
+
+<!-- ═══ SLIDE 7 — DEFENSE IN DEPTH ═══════════════════════════════════ -->
+<section id="defense">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The only defense that holds up</span>
+      <h2 class="section-title">Model-level defenses are a layer, not a solution</h2>
+      <p class="section-lede">A regulator will not accept "the model was instructed not to" as evidence of access control — architecture has to carry the weight that instructions alone can't.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media dossier-frame">
+        <span class="stamp-tag">architecture</span>
+        <span class="frame-label">SLIDE <b>07</b> — DEFENSE-IN-DEPTH ARCHITECTURE</span>
+        <img alt="Defense-in-depth architecture layering model-level and architectural controls" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-7.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-7.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-7.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-7.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Assume any single layer can fail</span>
+        <h3 class="brief-title">Raise the cost of attack at every layer</h3>
+        <p>Safety training reduces the success rate of common injection patterns and is a meaningful additional layer — but it isn't a substitute for architectural controls, and it cannot bear the full weight of enterprise security on its own. A defense-in-depth posture pairs model-level resistance with structural controls, and is designed on the assumption that any one layer, including the model itself, can fail.</p>
+      </div>
+    </div>
+    <div class="layer-grid reveal">
+      <div class="layer-card"><div class="k">Layer 1</div><h5>Model-Level</h5><p>Safety training that raises the cost of common injection patterns — necessary, not sufficient on its own.</p></div>
+      <div class="layer-card"><div class="k">Layer 2</div><h5>Gateway / Guardrail</h5><p>Input and output scanning enforced at the infrastructure layer, before requests reach the model or responses reach a tool.</p></div>
+      <div class="layer-card"><div class="k">Layer 3</div><h5>Execution Boundary</h5><p>Structural isolation and least-privilege scoping so a compromised reasoning step can't take an unauthorized action.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="redact">
+  <div class="bar" style="width:22px;"></div><div class="bar" style="width:30px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:14px;"></div><div class="bar" style="width:26px;"></div>
+</div>
+
+<!-- ═══ SLIDE 8 — PRACTICAL GUARDRAILS ═══════════════════════════════ -->
+<section id="guardrails">
+  <div class="wrap">
+    <div class="brief-row reveal">
+      <div class="brief-media dossier-frame">
+        <span class="stamp-tag">guardrails</span>
+        <span class="frame-label">SLIDE <b>08</b> — PRACTICAL GUARDRAILS</span>
+        <img alt="Practical input, output, and goal-alignment guardrails for AI agents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-8.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-8.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-8.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-8.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Concrete controls, not just policy</span>
+        <h3 class="brief-title">What a working guardrail stack actually does</h3>
+        <ul class="brief-list">
+          <li><strong>Input scanning</strong> — content scanning on retrieved documents before processing, and a blocklist of known malicious sources</li>
+          <li><strong>Output guardrails</strong> — the last line of defense before a response reaches a user or a downstream tool call</li>
+          <li><strong>Goal-alignment checks</strong> — does this output still align with the agent's original sanctioned objective, catching goal drift before an irreversible action is taken</li>
+          <li><strong>Tool-call allow-lists</strong> — validate every proposed tool invocation against a pre-approved action list before it executes</li>
+          <li><strong>Incremental scope consent</strong> — the current MCP specification lets a client request only the minimum access needed per operation, rather than a broad standing grant</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="redact">
+  <div class="bar" style="width:36px;"></div><div class="bar" style="width:16px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:20px;"></div><div class="bar" style="width:28px;"></div>
+</div>
+
+<!-- ═══ SLIDE 9 — LEAST PRIVILEGE & HUMAN-IN-THE-LOOP ═══════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media dossier-frame">
+      <span class="stamp-tag">access control</span>
+      <span class="frame-label">SLIDE <b>09</b> — LEAST PRIVILEGE &amp; HUMAN-IN-THE-LOOP</span>
+      <img alt="Least privilege access and human-in-the-loop approval for high-risk agent actions" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-9.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-9.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-9.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-9.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The permission the agent never had can't be abused</span>
+      <h3 class="brief-title">Isolation at the execution boundary</h3>
+      <p>The most reliable defense against prompt injection isn't a smarter prompt — it's structural isolation at the point where reasoning turns into action. An agent scoped to only the tools and data it strictly needs for its task limits the blast radius of any single compromised step, regardless of how convincing the injected instruction was.</p>
+      <p>For anything irreversible — a payment, a deletion, an external message, a production deployment — route the action through explicit human approval rather than autonomous execution. This isn't a failure of trust in the agent; it's the same principle that governs privileged access for human operators, applied consistently to a system that can now act on its own.</p>
+    </div>
+  </div>
+</div>
+
+<div class="redact">
+  <div class="bar" style="width:18px;"></div><div class="bar" style="width:32px;"></div>
+  <span class="stamp">restricted</span>
+  <div class="bar" style="width:24px;"></div><div class="bar" style="width:14px;"></div>
+</div>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media dossier-frame">
+      <span class="stamp-tag">final brief</span>
+      <span class="frame-label">SLIDE <b>10</b> — ARCHITECTURE, NOT AN AFTERTHOUGHT</span>
+      <img alt="Summary: treat agent security as a first-order architectural concern" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide700/agent-security-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The line between breach reports and everyone else</span>
+      <h3 class="brief-title">Build it in before agents touch real money and real records</h3>
+      <p>As agents move from proof-of-concept into infrastructure touching real money, real medical data, and real legal records, the organizations that treat prompt injection as a first-order architectural concern — not something bolted on after a chatbot demo — are the ones that don't end up in the next breach report.</p>
+      <p>No single control is sufficient alone: model-level training, gateway guardrails, scoped permissions, and human approval for irreversible actions each close a different gap. Layered together, and designed on the assumption that any one of them can fail, they're what turns "the model was instructed not to" into an actual access-control system a regulator — and an attacker — would recognize as one.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent security FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What is prompt injection?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Prompt injection is an attack where malicious instructions are embedded in content an AI model or agent processes — a message, a webpage, a document, a tool result — exploiting the fact that the model can't reliably distinguish operator instructions from data it's reading. The agent then executes the injected instruction with the same authority as a legitimate request.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between direct and indirect prompt injection?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Direct injection comes from the user typing a request crafted to override the system's stated constraints. Indirect injection is planted in content the agent reads as part of its task — a retrieved webpage, an email, a document — and is generally more dangerous for agents because it doesn't require the attacker to interact with the agent directly at all.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Can model-level safety training solve prompt injection on its own?<span class="plus">+</span></button>
+        <div class="faq-a"><p>No. Safety training measurably reduces the success rate of common injection patterns and is a valuable additional layer, but it isn't a substitute for architectural controls. A defense-in-depth posture assumes any single layer, including the model, can fail — which is why scoped permissions, gateway guardrails, and human approval for high-risk actions still matter even with a well-trained model underneath.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why is MCP a distinct security risk for agents?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Because when an injected instruction reaches a connected tool, the damage stops being confined to response text and extends to the tool's real side effects — a database write, an API call, a file operation. MCP-specific risks include tool poisoning through malicious tool descriptions and credential theft via tool output, which is why the current MCP specification introduces incremental scope consent to limit access to the minimum needed per operation.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Can prompt injection spread across a multi-agent system?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Yes. When one agent's output becomes another agent's input, a successful injection at one layer can propagate through every subsequent layer. Security testing has found a single injection incident affecting roughly half of co-running agents in some multi-agent deployments, which is why isolation between agents matters as much as isolation within a single agent.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the single most effective practical control against agent security risk?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Least-privilege scoping combined with human approval for irreversible actions. Limiting an agent to only the tools and data its task strictly requires shrinks the blast radius of any single compromised step, and routing payments, deletions, or external messages through explicit human confirmation prevents an injected instruction from ever reaching real-world consequence on its own.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to harden your agent's security posture?</h2>
+    <p>Layer model-level defenses with gateway guardrails, scope every tool to least privilege, and route irreversible actions through human approval — before an incident forces the question.</p>
+    <ul class="cta-list">
+      <li>A defense-in-depth architecture checklist for agent deployments</li>
+      <li>A tool-call allow-list template with incremental scope consent</li>
+      <li>A red-team test plan for direct and indirect prompt injection</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#guardrails">Revisit practical guardrails →</a>
+      <a class="btn btn-ghost" href="#defense">Back to defense-in-depth</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','scale','defense','guardrails','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

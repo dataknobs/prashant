@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Human in the Loop: Approval Gates, Escalation Tiers, and Safe Autonomy for AI Agents</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&amp;family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;family=Chivo+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --paper:#F5F6F4;
+  --paper2:#E8EAE5;
+  --card:#FFFFFF;
+  --ink:#1A1F1C;
+  --ink-soft:#5B655D;
+  --line:#D3D8CE;
+  --line-strong:#AEB8A5;
+  --green:#2E8B57;
+  --green-tint:#DCEEE1;
+  --amber:#D6900E;
+  --amber-tint:#F5E4C2;
+  --red:#C1392B;
+  --red-tint:#F1D9D5;
+  --slate:#37414A;
+  --font-display:'Archivo', sans-serif;
+  --font-body:'Public Sans', sans-serif;
+  --font-mono:'Chivo Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.68;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;}
+a{color:var(--green);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);font-weight:800;}
+
+/* ── traffic-signal divider (signature motif) ─────────────────────── */
+.signal{height:44px;position:relative;display:flex;align-items:center;justify-content:center;gap:8px;}
+.signal::before,.signal::after{content:"";flex:1;border-top:1px solid var(--line-strong);}
+.signal .lights{display:flex;gap:6px;padding:0 14px;}
+.signal .dot{width:9px;height:9px;border-radius:50%;}
+
+/* ── checkpoint frame (signature motif) ───────────────────────────── */
+.gate-frame{position:relative;background:var(--card);border:1px solid var(--line-strong);padding:18px 20px 14px;box-shadow:0 8px 20px -14px rgba(26,31,28,0.3);}
+.gate-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-bottom:10px;}
+.gate-badge.auto{background:var(--green-tint);color:var(--green);}
+.gate-badge.review{background:var(--amber-tint);color:#8A5F0E;}
+.gate-badge.escalate{background:var(--red-tint);color:var(--red);}
+.gate-badge.info{background:var(--paper2);color:var(--ink-soft);}
+.frame-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;}
+.frame-label b{color:var(--slate);}
+.gate-frame img{border:1px solid var(--line);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(245,246,244,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+.brand::before{content:"⛊";color:var(--green);}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--green);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--green);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--green);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--green);display:inline-block;}
+.hero-title{font-size:clamp(2.4rem,6vw,4.2rem);line-height:1.05;margin-bottom:22px;font-weight:800;}
+.hero-title em{font-style:normal;color:var(--green);}
+.hero-sub{font-size:1.14rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.btn-solid:hover{background:var(--slate);}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--paper2);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--card);border:1px solid var(--line-strong);border-left:4px solid var(--green);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.02rem;}
+.quick-answer strong{color:var(--ink);}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:56px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-bottom:12px;}
+.section-title{font-size:clamp(1.75rem,3.2vw,2.35rem);margin-bottom:14px;font-weight:800;}
+.section-lede{color:var(--ink-soft);font-size:1.02rem;}
+
+/* ── brief rows ───────────────────────────────────────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:44px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.brief-title{font-size:1.7rem;margin-bottom:14px;font-weight:800;}
+.brief-text p{font-size:.98rem;color:#2A302B;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.93rem;color:var(--ink-soft);}
+.brief-list li::before{content:"▸";position:absolute;left:0;color:var(--green);}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── tier grid ────────────────────────────────────────────────────── */
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.tier-card{background:var(--card);padding:24px 22px;}
+.tier-card .t{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:2px;display:inline-block;margin-bottom:10px;}
+.tier-card.t1 .t{background:var(--green-tint);color:var(--green);}
+.tier-card.t2 .t{background:var(--amber-tint);color:#8A5F0E;}
+.tier-card.t3 .t{background:var(--red-tint);color:var(--red);}
+.tier-card h4{font-size:1.15rem;margin-bottom:8px;font-weight:800;}
+.tier-card p{font-size:.87rem;color:var(--ink-soft);}
+@media (max-width:760px){.tier-grid{grid-template-columns:1fr;}}
+
+/* ── risk grid ────────────────────────────────────────────────────── */
+.risk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.risk-card{background:var(--card);padding:20px 18px;}
+.risk-card .n{font-family:var(--font-mono);font-size:10.5px;color:var(--slate);margin-bottom:8px;}
+.risk-card h5{font-family:var(--font-display);font-size:1rem;margin-bottom:8px;font-weight:700;}
+.risk-card p{font-size:.83rem;color:var(--ink-soft);}
+@media (max-width:820px){.risk-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:520px){.risk-grid{grid-template-columns:1fr;}}
+
+/* ── table ────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--card);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.92rem;}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:700;color:var(--slate);font-size:.85rem;}
+tr:last-child td{border-bottom:none;}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.05rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:700;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--green);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.96rem;max-width:820px;}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--slate);color:var(--paper);padding:64px 0;}
+.cta-band .section-kicker{color:#9FCBB0;}
+.cta-band h2{color:var(--paper);}
+.cta-band p{color:#C7CFC9;max-width:560px;margin-bottom:26px;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.88rem;color:#C7CFC9;}
+.cta-list li::before{content:"✓ ";color:var(--green);}
+.cta-band .btn-solid{background:var(--green);border-color:var(--green);}
+.cta-band .btn-solid:hover{background:#256F45;}
+.cta-band .btn-ghost{border-color:#4A5560;color:var(--paper);}
+.cta-band .btn-ghost:hover{background:#2C353D;}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="#top">HUMAN IN THE LOOP</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#patterns">Patterns</a></li>
+      <li><a href="#tiers">Escalation Tiers</a></li>
+      <li><a href="#pitfalls">Pitfalls</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Safe Autonomy</span>
+    <h1 class="hero-title">Not less autonomy.<br/><em>Better</em> handoffs.</h1>
+    <p class="hero-sub">Human-in-the-loop isn't a safety blanket bolted onto the end of a workflow — it's the design layer that decides exactly when an agent should keep going and when it should stop and ask. Teams have invested heavily in evals, tracing, and prompting. Almost nobody engineers this layer on purpose, and it's one of the practical reasons agent projects stall at the pilot stage.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#patterns">See the three approval patterns →</a>
+      <a class="btn btn-ghost" href="#tiers">Jump to escalation tiers</a>
+    </div>
+    <div class="gate-frame reveal">
+      <span class="gate-badge info">overview</span>
+      <span class="frame-label">SLIDE <b>01</b> — HUMAN IN THE LOOP</span>
+      <img alt="Cover slide: Human in the Loop for AI Agents" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide1000/human-in-the-loop-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide1000/human-in-the-loop-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Human-in-the-loop (HITL)</strong> is a design pattern where an AI agent works autonomously through most of a task but pauses, escalates, or requests confirmation at defined decision points, rather than running fully unsupervised or requiring approval for everything. It works through three approval patterns — <strong>pre-action</strong> (approve before anything external happens), <strong>post-action</strong> (review after execution), and <strong>confidence-based</strong> (escalate only when uncertainty or risk crosses a threshold) — layered with a risk classification that reserves mandatory human approval for actions where a mistake would actually cost more than the automation saves. The industry isn't moving toward full unsupervised autonomy; it's moving toward <strong>selective autonomy</strong> — agents that handle the repeatable, high-context work reliably, and reliably surface the moments where human judgment still matters.</p>
+  </div>
+</div>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 2 — THREE MODES / OVERSIGHT MODELS ════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media gate-frame">
+      <span class="gate-badge info">definitions</span>
+      <span class="frame-label">SLIDE <b>02</b> — IN-THE-LOOP, ON-THE-LOOP, IN-COMMAND</span>
+      <img alt="Three human oversight models: in-the-loop, on-the-loop, in-command" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Three oversight models, often in the same workflow</span>
+      <h3 class="brief-title">Oversight is a property of the decision, not a global setting</h3>
+      <p>Picture an airline rebooking agent that reroutes most disrupted passengers automatically. It hits a first-class passenger on an international itinerary with a loyalty-tier override and a fare class requiring manual reissuance — recognizes the policy boundary, pauses, and routes an approval request to a senior agent. That's <strong>human-in-the-loop</strong>.</p>
+      <p>Meanwhile a supervisor watches the overall rebooking flow for anomalies — unusually high costs, a pattern of picking expensive alternatives — without reviewing every individual case. That's <strong>human-on-the-loop</strong>. A senior operator who can override the whole system's policy is <strong>human-in-command</strong>. All three routinely coexist in one system; the level applied to any given decision is determined dynamically by its risk, context, and policy — not fixed for the whole agent.</p>
+    </div>
+  </div>
+</div>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 3 — THE MISSING LAYER ═══════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media gate-frame">
+      <span class="gate-badge info">the gap</span>
+      <span class="frame-label">SLIDE <b>03</b> — THE LAYER MOST TEAMS SKIP</span>
+      <img alt="Human-in-the-loop as the missing layer in the production agent stack" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-3.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-3.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-3.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-3.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Not a capability problem</span>
+      <h3 class="brief-title">Well-evaluated agents still stall without this</h3>
+      <p>Evaluation harnesses, tracing, and prompt engineering are all reasonably well covered in a modern agent stack. The layer that decides when an agent should stop and ask a person is, for most teams, not — and that omission isn't cosmetic. It's one of the practical reasons agent projects work fine in a demo and never make it past the pilot.</p>
+      <p>A lot of teams implement approval as a vague safety blanket: one manual review step tacked onto the end of a workflow, labeled governance, and then wonder why users abandon the feature. A better pattern reviews the specific decision that needs judgment, not the entire run.</p>
+    </div>
+  </div>
+</div>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 4 — THREE APPROVAL PATTERNS ═══════════════════════════ -->
+<section id="patterns">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The core mechanics</span>
+      <h2 class="section-title">Three approval patterns cover almost every case</h2>
+      <p class="section-lede">Each answers a different question about timing: before the action, after it, or only when something crosses a threshold.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media gate-frame">
+        <span class="gate-badge info">mechanics</span>
+        <span class="frame-label">SLIDE <b>04</b> — PRE-ACTION, POST-ACTION, CONFIDENCE-BASED</span>
+        <img alt="Three approval patterns: pre-action, post-action, and confidence-based" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-4.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-4.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-4.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-4.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Match the pattern to the cost of being wrong</span>
+        <h3 class="brief-title">Approve before, review after, or escalate on trigger</h3>
+        <p><strong>Pre-action</strong> holds the agent's proposed action for approval before anything external happens — right for irreversible or high-blast-radius actions. <strong>Post-action</strong> lets the agent execute and surfaces the result for review afterward — right when speed matters more than a pre-check and mistakes are cheaply reversible. <strong>Confidence-based</strong> runs the agent normally until it hits genuine uncertainty, a policy boundary, or missing information, then routes only that moment to a human — the pattern that scales best once volume grows past what constant pre-approval can sustain.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 5 — FOUR-TIER RISK CLASSIFICATION ══════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media gate-frame">
+      <span class="gate-badge info">classification</span>
+      <span class="frame-label">SLIDE <b>05</b> — CLASSIFY BY RISK, NOT CONFIDENCE ALONE</span>
+      <img alt="Four-tier risk classification for agent actions" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The cost of a mistake, not the model's own certainty</span>
+      <h3 class="brief-title">Reserve mandatory approval for where it earns its cost</h3>
+      <p>Classifying actions by their actual risk — rather than by how confident the model claims to be — reserves mandatory human approval for the cases where the cost of a mistake genuinely exceeds the value the automation provides. A read-only lookup and an irreversible external transaction shouldn't sit behind the same gate.</p>
+    </div>
+  </div>
+</div>
+
+<div class="risk-grid reveal" style="max-width:1056px;margin:0 32px;">
+  <div class="risk-card"><div class="n">TIER A</div><h5>Read-only</h5><p>No side effects; automate freely with basic logging only.</p></div>
+  <div class="risk-card"><div class="n">TIER B</div><h5>Reversible</h5><p>Can be undone cheaply; post-action review is usually sufficient.</p></div>
+  <div class="risk-card"><div class="n">TIER C</div><h5>External</h5><p>Affects a system or person outside the org; pre-action review recommended.</p></div>
+  <div class="risk-card"><div class="n">TIER D</div><h5>High-risk / irreversible</h5><p>Cannot be undone; mandatory human approval before execution, no exceptions.</p></div>
+</div>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 6 — CONFIDENCE-CALIBRATION PROBLEM ═════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media gate-frame">
+      <span class="gate-badge escalate">calibration risk</span>
+      <span class="frame-label">SLIDE <b>06</b> — WHY VERBAL CONFIDENCE ISN'T ENOUGH</span>
+      <img alt="Why an agent's stated confidence is not a reliable escalation signal" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The math that justifies mandatory gates</span>
+      <h3 class="brief-title">Miscalibration compounds across a chain</h3>
+      <p>An agent stating "90% confident" is not the same thing as being right 90% of the time — verbal confidence alone is not a safe signal to escalate on. The problem compounds badly across multi-step agent chains: if each step in a three-step chain is miscalibrated by around fifteen percentage points, a claimed ninety percent per-step confidence can imply the probability all three steps were actually correct is closer to forty percent.</p>
+      <p>That's the quantitative case for hard gates on consequential actions — not a soft best-practice suggestion, but a direct consequence of how confidence errors stack across a chain of dependent decisions.</p>
+    </div>
+  </div>
+</div>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 7 — ESCALATION SLA TIERS ═══════════════════════════════ -->
+<section id="tiers">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Turning a threshold into a workflow</span>
+      <h2 class="section-title">Three escalation tiers, each with its own SLA</h2>
+      <p class="section-lede">Without defined response times, approval queues grow unbounded and agents stall waiting on a human who never knew they were being waited on.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media gate-frame">
+        <span class="gate-badge info">SLA design</span>
+        <span class="frame-label">SLIDE <b>07</b> — ESCALATION TIERS AND SERVICE LEVELS</span>
+        <img alt="Three escalation tiers with defined SLAs and reviewer authority" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-7.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-7.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-7.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-7.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Allocate reviewer capacity proportionally</span>
+        <h3 class="brief-title">Not every escalation deserves the same urgency</h3>
+        <p>Tiered SLAs let the business point its scarcest resource — senior reviewer attention — at what actually needs it fastest, while routine reviews still get handled within a bounded window instead of drifting indefinitely.</p>
+      </div>
+    </div>
+    <div class="tier-grid reveal">
+      <div class="tier-card t1"><span class="t">Tier 1 · Standard</span><h4>4-hour SLA</h4><p>Confidence 0.6–0.8, moderate risk. Reviewed by a team member. Most actions in this tier are approved unchanged — the value is the human check, not deep analysis.</p></div>
+      <div class="tier-card t2"><span class="t">Tier 2 · Elevated</span><h4>1-hour SLA</h4><p>Confidence below 0.6, or high blast radius. Reviewed by a team lead, who may request more context or modify the proposed action before approving.</p></div>
+      <div class="tier-card t3"><span class="t">Tier 3 · Executive</span><h4>15-minute SLA</h4><p>Compliance exposure, legal risk, or critical infrastructure. Reviewed by a designated authority, typically with an automatic page or alert.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 8 — ASYNC-FIRST DESIGN ═════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media gate-frame">
+      <span class="gate-badge info">infrastructure</span>
+      <span class="frame-label">SLIDE <b>08</b> — ASYNC-FIRST BY DEFAULT</span>
+      <img alt="Async-first infrastructure design for human approval gates" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Real infrastructure doesn't wait politely</span>
+      <h3 class="brief-title">Synchronous approval collides with real systems</h3>
+      <p>Holding a live connection open while a human decides sounds simple, but it collides with gateway timeouts, token expiry, and stale cursors the moment a review takes longer than a few seconds — which, for anything requiring real judgment, it usually does.</p>
+      <p>The pattern that survives real infrastructure is durable, state-managed interruption: the agent's work-in-progress state is persisted with an idempotency key, the approval request is queued, and execution resumes cleanly whenever the human responds — in five minutes or five hours. Roughly two-thirds of production agents already tolerate minute-plus latency on a given step, which is exactly the room async-first design needs to work.</p>
+    </div>
+  </div>
+</div>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 9 — COMMON FAILURE PATTERNS ════════════════════════════ -->
+<section id="pitfalls">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">What kills a HITL program</span>
+      <h2 class="section-title">Three patterns derail oversight more than any technical issue</h2>
+      <p class="section-lede">None of these are infrastructure problems. All three are design and calibration problems that show up only after real usage begins.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media gate-frame">
+        <span class="gate-badge review">common pitfalls</span>
+        <span class="frame-label">SLIDE <b>09</b> — WHY HITL PROGRAMS FAIL</span>
+        <img alt="Common failure patterns that derail human-in-the-loop programs" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-9.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Watch the queue, not just the model</span>
+        <h3 class="brief-title">The queue tells you what the model can't</h3>
+        <ul class="brief-list">
+          <li><strong>Notification fatigue</strong> — too many low-value approvals train reviewers to rubber-stamp, which defeats the entire point of the gate</li>
+          <li><strong>Feedback that doesn't feed back</strong> — approval and rejection signals that never change future agent behavior waste every correction a human makes</li>
+          <li><strong>Static gates</strong> — launch conservative, but review the queue weekly; loosen a gate only once an action has accumulated a real track record of clean executions, not on a fixed schedule</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="signal"><span class="lights"><span class="dot" style="background:var(--green);"></span><span class="dot" style="background:var(--amber);"></span><span class="dot" style="background:var(--red);"></span></span></div>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media gate-frame">
+      <span class="gate-badge info">scaling</span>
+      <span class="frame-label">SLIDE <b>10</b> — OVERSIGHT THAT SCALES WITH THE FLEET</span>
+      <img alt="Summary: scaling human oversight to thousands of agents through versioned policy" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide1000/human-in-the-loop-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide600/human-in-the-loop-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide700/human-in-the-loop-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide900/human-in-the-loop-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/human-in-the-loop/images/Slide1000/human-in-the-loop-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">From 10 agents to 10,000</span>
+      <h3 class="brief-title">Version the policy the same way you version the code</h3>
+      <p>The scaling question isn't hypothetical for long: how do you maintain real oversight once an organization is running thousands of agents at once, not a handful? The answer that holds up is treating approval rules, escalation semantics, and reviewer assignments as versioned artifacts — testable in staging, replayable against historical traces, deployable with rollback, just like application code.</p>
+      <p>Designed well, human-in-the-loop is what lets agents handle the large majority of repeatable, high-context work on their own, while a human keeps deliberate, engineered control over the smaller share of decisions that actually define the business. That trade — not full autonomy, not full manual review — is the whole point.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Human-in-the-loop FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between human-in-the-loop and human-on-the-loop?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Human-in-the-loop means a specific decision pauses and routes to a person for approval before it proceeds. Human-on-the-loop means a person monitors the overall system for anomalies without reviewing every individual decision. Both models can coexist in the same workflow, with the level applied determined dynamically by the risk of each decision.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What are the three main HITL approval patterns?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Pre-action (the agent's proposed action is held for approval before anything external happens), post-action (the agent executes and the result is reviewed afterward), and confidence-based (the agent runs normally until it hits a defined uncertainty or risk threshold, then escalates only that moment).</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why isn't an agent's stated confidence a reliable trigger for escalation?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Because verbal confidence is often poorly calibrated, and the error compounds across multi-step chains — a claimed 90% per-step confidence across three dependent steps, each miscalibrated by around 15 percentage points, can imply a true probability of all three being correct closer to 40%. Risk-based hard gates, not confidence thresholds alone, are the more reliable control.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How should escalation SLAs be structured?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Typically in tiers matched to urgency and authority: a standard tier for moderate-risk, moderate-confidence actions with a several-hour response window, an elevated tier for low-confidence or high-blast-radius actions with a roughly one-hour window reviewed by a team lead, and an executive tier for compliance, legal, or critical-infrastructure exposure with a near-immediate response window and an automatic alert.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why does synchronous approval break in production?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Because holding a live connection open while waiting for a human decision collides with gateway timeouts, token expiry, and stale cursors once a review takes more than a few seconds — which real judgment calls usually do. Async-first design persists the agent's state with an idempotency key and resumes execution cleanly whenever the human responds, rather than keeping a fragile connection alive.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What causes a human-in-the-loop program to fail after launch?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Most commonly notification fatigue from too many low-value approval requests, which trains reviewers to rubber-stamp instead of actually evaluating; approval and rejection decisions that never feed back into improving agent behavior; and gates that stay static instead of loosening only once an action has built a genuine track record of clean executions.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to design your agent's approval gates?</h2>
+    <p>Classify actions by risk, not confidence alone, set escalation SLAs before a queue ever backs up, and design for async from day one.</p>
+    <ul class="cta-list">
+      <li>A four-tier risk classification worksheet for your agent's action set</li>
+      <li>An escalation-tier SLA template with sample response windows</li>
+      <li>An async-approval architecture pattern with idempotency handling</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#tiers">Revisit escalation tiers →</a>
+      <a class="btn btn-ghost" href="#pitfalls">Back to common pitfalls</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','patterns','tiers','pitfalls','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

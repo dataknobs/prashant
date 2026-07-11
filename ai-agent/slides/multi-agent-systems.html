@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Multi-Agent Systems: Orchestration Patterns for AI Agent Teams</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&amp;family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --paper:#EEF0F2;
+  --paper2:#E2E6EA;
+  --card:#FAFBFC;
+  --ink:#1B2226;
+  --ink-soft:#5C6870;
+  --line:#C7CFD5;
+  --line-strong:#A9B4BC;
+  --indigo:#3B4E8C;
+  --indigo-tint:#DFE4F0;
+  --teal:#1F8A82;
+  --teal-tint:#DCEDEA;
+  --magenta:#A63D6B;
+  --magenta-tint:#F1DEE7;
+  --font-display:'Sora', sans-serif;
+  --font-body:'Source Serif 4', serif;
+  --font-mono:'DM Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:18px;line-height:1.68;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;}
+a{color:var(--indigo);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);}
+
+/* ── node-mesh divider (signature motif) ─────────────────────────── */
+.mesh{height:52px;position:relative;display:flex;align-items:center;justify-content:center;}
+
+/* ── node frame (signature motif) ─────────────────────────────────── */
+.node-frame{position:relative;background:var(--card);border:1px solid var(--line-strong);padding:18px 20px 14px;}
+.node-badge{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.node-badge .dot{width:10px;height:10px;border-radius:50%;background:var(--indigo);position:relative;}
+.node-badge .dot::after{content:"";position:absolute;left:12px;top:50%;width:16px;height:1px;background:var(--line-strong);}
+.frame-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);}
+.frame-label b{color:var(--indigo);}
+.node-frame img{border:1px solid var(--line);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(238,240,242,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:13.5px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;}
+.brand::before{content:"◈";color:var(--indigo);}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--indigo);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--indigo);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--indigo);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--indigo);display:inline-block;}
+.hero-title{font-size:clamp(2.4rem,6vw,4.2rem);line-height:1.05;margin-bottom:22px;font-weight:700;}
+.hero-title em{font-style:normal;color:var(--magenta);}
+.hero-sub{font-size:1.16rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;font-family:var(--font-body);}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+.btn-solid:hover{background:#2C3B6E;}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--paper2);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--card);border:1px solid var(--line-strong);border-left:4px solid var(--indigo);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--indigo);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.03rem;}
+.quick-answer strong{color:var(--ink);}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:56px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--indigo);margin-bottom:12px;}
+.section-title{font-size:clamp(1.7rem,3.2vw,2.35rem);margin-bottom:14px;font-weight:700;}
+.section-lede{color:var(--ink-soft);font-size:1.04rem;}
+
+/* ── brief rows ───────────────────────────────────────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:44px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--magenta);margin-bottom:10px;}
+.brief-title{font-size:1.75rem;margin-bottom:14px;font-weight:700;}
+.brief-text p{font-size:1rem;color:#2A3136;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-soft);}
+.brief-list li::before{content:"◈";position:absolute;left:0;color:var(--indigo);font-size:.75rem;top:3px;}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── role legend ──────────────────────────────────────────────────── */
+.role-legend{display:flex;flex-wrap:wrap;gap:16px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);margin:18px 0;}
+.role-legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;}
+
+/* ── pattern grid ─────────────────────────────────────────────────── */
+.pattern-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.pattern-card{background:var(--card);padding:24px 22px;}
+.pattern-card .k{font-family:var(--font-mono);font-size:10.5px;color:var(--indigo);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+.pattern-card h5{font-family:var(--font-display);font-size:1.08rem;margin-bottom:8px;font-weight:600;}
+.pattern-card p{font-size:.87rem;color:var(--ink-soft);}
+@media (max-width:820px){.pattern-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:520px){.pattern-grid{grid-template-columns:1fr;}}
+
+/* ── economics table ──────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--card);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.92rem;}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:600;color:var(--indigo);}
+tr:last-child td{border-bottom:none;}
+.tagpill{font-family:var(--font-mono);font-size:11px;padding:3px 9px;border-radius:2px;}
+.tagpill.low{background:var(--teal-tint);color:var(--teal);}
+.tagpill.high{background:var(--magenta-tint);color:var(--magenta);}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.05rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:600;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--indigo);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.98rem;max-width:820px;}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--ink);color:var(--paper);padding:64px 0;}
+.cta-band .section-kicker{color:#9DAFD6;}
+.cta-band h2{color:var(--paper);}
+.cta-band p{color:#C4CBD1;max-width:560px;margin-bottom:26px;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.9rem;color:#C4CBD1;}
+.cta-list li::before{content:"✓ ";color:var(--teal);}
+.cta-band .btn-solid{background:var(--magenta);border-color:var(--magenta);}
+.cta-band .btn-solid:hover{background:#8C3459;}
+.cta-band .btn-ghost{border-color:#3A424A;color:var(--paper);}
+.cta-band .btn-ghost:hover{background:#262E34;}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="#top">MULTI-AGENT SYSTEMS</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#patterns">Patterns</a></li>
+      <li><a href="#coordination">Coordination</a></li>
+      <li><a href="#economics">Economics</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Systems Architecture</span>
+    <h1 class="hero-title">One agent, or a<br/><em>team</em> of them?</h1>
+    <p class="hero-sub">Multi-agent systems split a task across specialized agents that coordinate, hand off work, and check each other's output. Done well, they beat a single generalist agent. Done by default, they mostly add token cost and coordination overhead for no real gain.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#patterns">See the six orchestration patterns →</a>
+      <a class="btn btn-ghost" href="#economics">Check the real economics</a>
+    </div>
+    <div class="node-frame reveal">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>01</b> — MULTI-AGENT SYSTEMS</span></div>
+      <img alt="Cover slide: Multi-Agent Systems" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>A multi-agent system</strong> coordinates two or more LLM-driven agents — each with a distinct role, prompt, model tier, or tool set — to complete a task that one generalist agent would handle worse, slower, or not at all. Three conditions justify the added complexity: <strong>specialization</strong> (a focused agent genuinely outperforms a generalist), <strong>parallelism</strong> (independent sub-tasks can run at once and shorten wall-clock time), or <strong>critique</strong> (a separate critic agent measurably improves quality beyond what self-review inside one agent achieves). Six orchestration patterns cover almost every production system: <strong>supervisor/worker</strong>, <strong>hierarchical</strong>, <strong>swarm</strong>, <strong>pipeline</strong>, <strong>debate</strong>, and <strong>fan-out</strong> — and the honest number worth knowing upfront is that multi-agent setups typically carry 58% to 285% more token overhead than a single well-designed agent, so it pays to confirm one of those three conditions actually applies before reaching for a team.</p>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 2 — WHEN IT'S WORTH IT ════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot" style="background:var(--teal);"></span><span class="frame-label">SLIDE <b>02</b> — WHEN MULTI-AGENT ACTUALLY PAYS OFF</span></div>
+      <img alt="Three conditions that justify a multi-agent architecture" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Not a default, a decision</span>
+      <h3 class="brief-title">Earn the added complexity</h3>
+      <p>It's one of the most over-prescribed shapes in applied AI: reaching for multiple agents because it sounds more sophisticated than it needs to be. A single well-scoped agent, given the right tools and enough context, handles most tasks just fine.</p>
+      <ul class="brief-list">
+        <li><strong>Specialization</strong> — a focused agent with a narrow prompt and tool set genuinely outperforms a generalist on this sub-task</li>
+        <li><strong>Parallelism</strong> — independent sub-tasks can run at the same time, shortening wall-clock time on a task a single agent would do serially</li>
+        <li><strong>Critique</strong> — a separate critic agent, reviewing with fresh eyes, catches errors that self-review inside one agent reliably misses</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 3 — SUPERVISOR / ORCHESTRATOR-WORKER ══════════════════ -->
+<section id="patterns">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The orchestration patterns</span>
+      <h2 class="section-title">Six shapes cover almost every production system</h2>
+      <p class="section-lede">Each pattern is a different answer to the same question: who decides what happens next, and how do results get back together.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media node-frame">
+        <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>03</b> — SUPERVISOR / ORCHESTRATOR-WORKER</span></div>
+        <img alt="Supervisor pattern: central coordinator dispatching to worker agents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-3.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">The 2026 production default</span>
+        <h3 class="brief-title">One coordinator, several specialists</h3>
+        <p>A central supervisor receives the goal, breaks it into subtasks, routes each to a specialist worker agent, and synthesizes the results. This is by far the most common shape in production — by some estimates, around seventy percent of deployed multi-agent systems use this orchestrator-worker topology.</p>
+        <p>It gives clear control and simple debugging, since every decision flows through one place. The trade-off is exactly that centralization: the supervisor is a potential bottleneck, and its growing context window — not the worker calls — usually dominates token spend.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#1F8A82" r="6"></circle><circle cx="46" cy="34" fill="#3B4E8C" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 4 — HIERARCHICAL ═══════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>04</b> — HIERARCHICAL (SUPERVISORS OF SUPERVISORS)</span></div>
+      <img alt="Hierarchical pattern: nested supervisors managing specialist worker teams" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-4.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-4.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-4.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-4.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">When one layer of delegation isn't enough</span>
+      <h3 class="brief-title">A tree of supervisors, not just workers</h3>
+      <p>Hierarchical systems stack supervisors into levels: a top-level orchestrator delegates to mid-level supervisors — say, a research team lead and a code team lead — each of whom manages their own team of specialist workers. Higher levels focus on coordination and planning; lower levels focus on execution.</p>
+      <p>This earns its added coordination overhead only when task complexity genuinely spans multiple distinct domains of expertise. Adding a hierarchy layer to a task a single supervisor could already handle just adds latency and cost without a matching benefit.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 5 — SWARM / DECENTRALIZED ══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot" style="background:var(--teal);"></span><span class="frame-label">SLIDE <b>05</b> — SWARM / DECENTRALIZED PEER-TO-PEER</span></div>
+      <img alt="Swarm pattern: peer agents coordinating without central control" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">No single point of failure — or control</span>
+      <h3 class="brief-title">Peers, not a chain of command</h3>
+      <p>In a swarm, autonomous agents work in parallel with minimal central coordination — sharing information directly with neighbors or through a publish-subscribe message bus, rather than reporting to a supervisor. There's no single bottleneck and no single point of failure.</p>
+      <p>The cost shows up elsewhere: without a coordinator, getting the overall system to converge on a coherent result becomes significantly more complex to reason about and to debug. Swarm shows up most often in research-and-summarize tasks, where independent parallel exploration genuinely pays off.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#A63D6B" r="6"></circle><circle cx="46" cy="34" fill="#3B4E8C" r="6"></circle><circle cx="82" cy="23" fill="#1F8A82" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 6 — PIPELINE ═══════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>06</b> — PIPELINE / SEQUENTIAL</span></div>
+      <img alt="Pipeline pattern: agents processing work in sequence" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The simplest topology that still counts as multi-agent</span>
+      <h3 class="brief-title">Each agent refines what the last one made</h3>
+      <p>Pipeline agents process work in a fixed sequence, each one refining the previous agent's output — a drafting agent, then an editing agent, then a fact-checking agent, in a straight line. Every step depends on the one before it, which makes the flow easy to reason about and debug, but also fully serial: no step starts before the last one finishes.</p>
+      <p>It fits workflows with a genuinely natural sequence — draft, then edit, then verify — better than tasks where steps could just as easily run in parallel.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 7 — DEBATE / CONSENSUS ═════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot" style="background:var(--magenta);"></span><span class="frame-label">SLIDE <b>07</b> — DEBATE / CONSENSUS</span></div>
+      <img alt="Debate pattern: multiple agents argue perspectives, a judge arbitrates" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-7.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-7.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-7.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-7.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Paying for a second opinion</span>
+      <h3 class="brief-title">Two perspectives, a judge decides</h3>
+      <p>In the debate pattern, two or more agents argue different perspectives on the same problem, and a separate judge — sometimes a different model entirely — arbitrates between them. It's the clearest way to operationalize the "critique" condition for going multi-agent: a genuinely independent second opinion catches errors a single agent's self-review misses.</p>
+      <p>The cost is real and worth quoting plainly: running a debate pattern typically costs around two and a half times a single-model call. Reserve it for decisions where being wrong is expensive enough to justify that premium.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#1F8A82" r="6"></circle><circle cx="46" cy="34" fill="#A63D6B" r="6"></circle><circle cx="82" cy="23" fill="#3B4E8C" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ PATTERN QUICK REFERENCE ═══════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Quick reference</span>
+      <h2 class="section-title">All six patterns, at a glance</h2>
+    </div>
+    <div class="pattern-grid reveal">
+      <div class="pattern-card"><div class="k">Central control</div><h5>Supervisor / Worker</h5><p>One coordinator dispatches and synthesizes. The 2026 production default.</p></div>
+      <div class="pattern-card"><div class="k">Nested control</div><h5>Hierarchical</h5><p>Supervisors of supervisors, for genuinely multi-domain complexity.</p></div>
+      <div class="pattern-card"><div class="k">No central control</div><h5>Swarm</h5><p>Autonomous peers, parallel exploration, harder to coordinate.</p></div>
+      <div class="pattern-card"><div class="k">Fixed order</div><h5>Pipeline</h5><p>Sequential hand-offs, each agent refining the last one's output.</p></div>
+      <div class="pattern-card"><div class="k">Adversarial</div><h5>Debate</h5><p>Competing perspectives plus a judge; costly but high-assurance.</p></div>
+      <div class="pattern-card"><div class="k">Scatter-gather</div><h5>Fan-out</h5><p>Parallel dispatch to independent workers, results gathered back.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 8 — COORDINATION & SHARED STATE ═══════════════════════ -->
+<section id="coordination">
+  <div class="wrap">
+    <div class="brief-row reveal">
+      <div class="brief-media node-frame">
+        <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>08</b> — COORDINATION &amp; SHARED STATE</span></div>
+        <img alt="Diagram of shared state and coordination challenges in multi-agent systems" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-8.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-8.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-8.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-8.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Where multi-agent POCs actually fail</span>
+        <h3 class="brief-title">Context loss, not pattern choice, sinks most systems</h3>
+        <p>Every orchestration pattern needs the same underlying thing: persistent, shared state that survives beyond any single agent's turn. Without it, systems hit the same handful of failures no matter which pattern they picked.</p>
+        <ul class="brief-list">
+          <li><strong>Context loss</strong> — intermediate results disappear between agent hand-offs</li>
+          <li><strong>Payload bloat</strong> — full context gets re-passed through every hand-off instead of a reference to shared state</li>
+          <li><strong>Race conditions</strong> — two agents overwrite each other's work with no coordination</li>
+          <li><strong>Recovery failures</strong> — no checkpoint exists to resume from after a crash</li>
+        </ul>
+        <p>Cross-vendor communication has its own emerging standard: the <strong>A2A protocol</strong>, now under the Linux Foundation, defines how agents from different frameworks or vendors can talk to each other regardless of which orchestration pattern sits on top.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#A63D6B" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#3B4E8C" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 9 — ECONOMICS ══════════════════════════════════════════ -->
+<section id="economics">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The honest cost picture</span>
+      <h2 class="section-title">Multi-agent is not free parallelism</h2>
+      <p class="section-lede">Every added agent adds tokens, and the coordination overhead compounds faster than most teams expect.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media node-frame">
+        <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>09</b> — TOKEN ECONOMICS BY TOPOLOGY</span></div>
+        <img alt="Token overhead by multi-agent topology, and model tiering by role" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-9.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Where the spend actually goes</span>
+        <h3 class="brief-title">The supervisor's context, not the workers, drives cost</h3>
+        <p>Independent, decentralized setups typically run around 58% more token overhead than a comparable single agent; centralized supervisor setups can run closer to 285% more, because every worker result eventually flows back through — and grows — the supervisor's own context window.</p>
+        <p>A common cost lever is model tiering: a larger, more capable model for the planner or supervisor role, and smaller, cheaper models for routing classifiers and narrow worker tasks — since the supervisor's reasoning quality matters more to the outcome than any single worker call.</p>
+      </div>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Topology</th><th>Typical token overhead</th><th>Cost driver</th></tr></thead>
+        <tbody>
+          <tr><td class="dim">Single agent (baseline)</td><td><span class="tagpill low">0%</span></td><td>—</td></tr>
+          <tr><td class="dim">Independent / decentralized</td><td><span class="tagpill low">~58% extra</span></td><td>Redundant context across peers</td></tr>
+          <tr><td class="dim">Centralized / supervisor</td><td><span class="tagpill high">~285% extra</span></td><td>Supervisor's growing context window</td></tr>
+          <tr><td class="dim">Debate / consensus</td><td><span class="tagpill high">~2.5x a single call</span></td><td>Multiple full reasoning passes plus a judge</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>10</b> — MATCHING PATTERN TO TASK</span></div>
+      <img alt="Summary: matching an orchestration pattern to task characteristics" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The decision that matters most</span>
+      <h3 class="brief-title">Pattern follows task, not the other way around</h3>
+      <p>Real systems often combine patterns — a hierarchical structure might run a pipeline inside each team, or a supervisor might spawn a swarm for a burst of parallel exploration before synthesizing the results. None of these hybrids are wrong; the mistake is picking a shape before understanding what the task actually needs.</p>
+      <p>Start with a single agent. Add a second only when specialization, parallelism, or critique clearly earns its keep — and budget for the token overhead that comes with it, honestly, before it shows up in a bill.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#1F8A82" r="6"></circle><circle cx="46" cy="34" fill="#A63D6B" r="6"></circle><circle cx="82" cy="23" fill="#3B4E8C" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Multi-agent systems FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">When should I actually use a multi-agent system instead of one agent?<span class="plus">+</span></button>
+        <div class="faq-a"><p>When at least one of three conditions clearly holds: a specialized agent measurably outperforms a generalist on the sub-task, independent sub-tasks can genuinely run in parallel and save wall-clock time, or a separate critic agent catches errors that self-review inside one agent reliably misses. If none of these apply, a single well-scoped agent is usually both cheaper and simpler to debug.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the most common multi-agent pattern in production?<span class="plus">+</span></button>
+        <div class="faq-a"><p>The supervisor / orchestrator-worker pattern, used in an estimated seventy percent of production multi-agent deployments. A central coordinator breaks the goal into subtasks, routes each to a specialist worker, and synthesizes the results — offering clear control at the cost of the supervisor becoming a potential bottleneck.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How much more expensive is a multi-agent system than a single agent?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Decentralized, independent setups typically run around 58% more token overhead than a single agent; centralized supervisor setups can run closer to 285% more, largely because the supervisor's context window keeps absorbing every worker's output. Debate patterns with a judge model run around 2.5 times the cost of a single model call.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between hierarchical and swarm patterns?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Hierarchical stacks supervisors into levels, with higher levels planning and coordinating while lower levels execute — still fundamentally centralized, just at multiple tiers. Swarm has no central coordinator at all: autonomous peer agents work in parallel and share information directly with each other, which removes the bottleneck but makes overall coordination harder to reason about.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why do multi-agent proof-of-concepts often fail in production?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Usually not because of the orchestration pattern chosen, but because of missing persistent shared state — leading to context loss between hand-offs, bloated payloads re-passed at every step, race conditions where agents overwrite each other's work, and no checkpoint to recover from after a crash. Solving coordination and state management matters more than picking the "right" topology.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is the A2A protocol?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Agent-to-Agent (A2A) is an open standard, now under the Linux Foundation, for cross-vendor agent communication — letting agents built on different frameworks or by different vendors coordinate regardless of which orchestration pattern sits above them.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to design your agent team?</h2>
+    <p>Start with a single agent, confirm one of the three conditions before adding a second, and pick the orchestration pattern that matches your task's actual shape — not the most impressive-sounding one.</p>
+    <ul class="cta-list">
+      <li>A single-agent-vs-multi-agent decision checklist</li>
+      <li>A pattern-selection guide mapped to task characteristics</li>
+      <li>A shared-state design template to avoid the most common production failures</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#coordination">Revisit shared-state design →</a>
+      <a class="btn btn-ghost" href="#economics">Back to the economics</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','patterns','coordination','economics','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

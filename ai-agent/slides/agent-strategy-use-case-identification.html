@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+<!-- ═══ PRIMARY SEO META ═══════════════════════════════════════════════ -->
+<title>Agent Strategy &amp; Use Case Identification: A Practical Framework</title>
+<meta content="A practical framework for AI agent strategy and use case identification — how to find, classify, and prioritize agentic AI opportunities using a discovery process, an impact-feasibility matrix, and a weighted scoring model, before you write a single line of agent code." name="description"/>
+<meta content="agent strategy, AI use case identification, agentic AI use cases, AI use case prioritization, impact feasibility matrix, AI discovery process, AI agent roadmap, generative AI use cases, AI weighted scoring model, enterprise AI strategy" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<meta content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" name="robots"/>
+<link href="https://prashant.dhingra.website/agent-ai/tutorial/" rel="canonical"/>
+
+<!-- ═══ OPEN GRAPH ══════════════════════════════════════════════════════ -->
+<meta content="article" property="og:type"/>
+<meta content="Agent Strategy &amp; Use Case Identification: A Practical Framework" property="og:title"/>
+<meta content="How to find, classify, and prioritize agentic AI use cases before investing in agent development — discovery process, impact-feasibility matrix, and weighted scoring." property="og:description"/>
+<meta content="https://prashant.dhingra.website/agent-ai/tutorial/" property="og:url"/>
+<meta content="Prashant Dhingra — Agent AI Tutorial" property="og:site_name"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide1000/agent-strategy-use-case-identification-1.png" property="og:image"/>
+<meta content="1000" property="og:image:width"/>
+<meta content="Agent Strategy and Use Case Identification framework overview" property="og:image:alt"/>
+<meta content="en_US" property="og:locale"/>
+
+<!-- ═══ TWITTER CARD ════════════════════════════════════════════════════ -->
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Agent Strategy &amp; Use Case Identification" name="twitter:title"/>
+<meta content="A discovery process, an impact-feasibility matrix, and a weighted scoring model for finding the right agentic AI use cases." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide1000/agent-strategy-use-case-identification-1.png" name="twitter:image"/>
+
+<!-- ═══ GENERATIVE ENGINE / AI-ANSWER OPTIMIZATION ════════════════════════ -->
+<meta content="none" name="generator"/>
+<meta content="Agent Strategy and Use Case Identification: A Practical Framework" name="citation_title"/>
+<meta content="Prashant Dhingra" name="citation_author"/>
+<meta content="2026-07-07" name="citation_publication_date"/>
+<meta content="agent strategy, use case identification, agentic AI, AI prioritization" name="citation_keywords"/>
+<meta content="A framework for identifying and prioritizing AI agent use cases: a structured discovery process that starts from business problems, three categories of AI use cases (deterministic, generative, agentic), an impact-feasibility matrix for prioritization, a weighted scoring model for tie-breaking, and a wave-based rollout roadmap." name="abstract"/>
+<meta content=".hero-title, .quick-answer, .brief-title, .brief-kicker" name="speakable-sections"/>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&amp;family=Literata:ital,wght@0,400;0,500;0,600;1,400&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --bg:#131A22;
+  --bg2:#1B2530;
+  --panel:#1F2A36;
+  --ink:#EDEFF2;
+  --ink-soft:#93A2B0;
+  --line:#2E3B48;
+  --line-strong:#3E4E5D;
+  --amber:#E8A33D;
+  --amber-soft:#3A3122;
+  --cyan:#4FB8C9;
+  --cyan-soft:#1D343A;
+  --red:#D9614F;
+  --red-soft:#3A2523;
+  --font-display:'Big Shoulders Display', sans-serif;
+  --font-body:'Literata', serif;
+  --font-mono:'Space Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:18px;
+  line-height:1.68;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:34px 34px;
+}
+.wrap{max-width:1140px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;}
+a{color:var(--cyan);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);letter-spacing:.01em;font-weight:700;}
+
+/* ── radar ticks divider (signature motif) ───────────────────────── */
+.ticks{height:26px;position:relative;opacity:.8;}
+.ticks::before{
+  content:"";position:absolute;left:0;right:0;top:50%;border-top:1px dashed var(--line-strong);
+}
+.ticks::after{
+  content:"◇";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:var(--bg);color:var(--amber);padding:0 12px;font-size:12px;
+}
+
+/* ── reticle frame (signature motif) ─────────────────────────────── */
+.reticle-frame{
+  position:relative;padding:16px;
+  background:
+    linear-gradient(var(--amber),var(--amber)) top left / 24px 2px no-repeat,
+    linear-gradient(var(--amber),var(--amber)) top left / 2px 24px no-repeat,
+    linear-gradient(var(--amber),var(--amber)) top right / 24px 2px no-repeat,
+    linear-gradient(var(--amber),var(--amber)) top right / 2px 24px no-repeat,
+    linear-gradient(var(--amber),var(--amber)) bottom left / 24px 2px no-repeat,
+    linear-gradient(var(--amber),var(--amber)) bottom left / 2px 24px no-repeat,
+    linear-gradient(var(--amber),var(--amber)) bottom right / 24px 2px no-repeat,
+    linear-gradient(var(--amber),var(--amber)) bottom right / 2px 24px no-repeat;
+}
+.reticle-frame img{border:1px solid var(--line);}
+.frame-label{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-soft);
+  display:block;margin-bottom:10px;text-transform:uppercase;
+}
+.frame-label b{color:var(--amber);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(19,26,34,0.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1140px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;}
+.brand::before{content:"◎";color:var(--amber);}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--amber);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--amber);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--amber);display:inline-block;}
+.hero-title{font-size:clamp(2.6rem,6.4vw,4.8rem);line-height:0.96;margin-bottom:22px;text-transform:uppercase;}
+.hero-title em{font-style:normal;color:var(--amber);}
+.hero-sub{font-size:1.2rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;font-family:var(--font-body);}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;letter-spacing:.02em;padding:13px 22px;border-radius:2px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--amber);color:var(--bg);border-color:var(--amber);}
+.btn-solid:hover{background:#F2B65C;}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--panel);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--panel);border:1px solid var(--line-strong);border-left:4px solid var(--amber);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.04rem;color:#DCE2E8;}
+.quick-answer strong{color:var(--ink);}
+
+/* ── reveal ───────────────────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:60px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;}
+.section-title{font-size:clamp(1.8rem,3.4vw,2.5rem);margin-bottom:14px;text-transform:uppercase;}
+.section-lede{color:var(--ink-soft);font-size:1.06rem;}
+
+/* ── briefing rows (image + text, alternating) ───────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:54px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;}
+.brief-title{font-size:1.9rem;margin-bottom:14px;text-transform:uppercase;}
+.brief-text p{color:#DCE2E8;font-size:1rem;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-soft);}
+.brief-list li::before{content:"▸";position:absolute;left:0;color:var(--amber);}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── department grid ──────────────────────────────────────────────── */
+.dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.dept-card{background:var(--panel);padding:22px 24px;}
+.dept-card h5{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.dept-card p{font-size:.9rem;color:var(--ink-soft);}
+@media (max-width:760px){.dept-grid{grid-template-columns:1fr;}}
+
+/* ── impact / feasibility matrix ──────────────────────────────────── */
+.matrix-wrap{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;}
+.quad{position:relative;aspect-ratio:1/1;border:1px solid var(--line-strong);background:var(--panel);}
+.quad::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed var(--line-strong);}
+.quad::after{content:"";position:absolute;top:50%;left:0;right:0;border-top:1px dashed var(--line-strong);}
+.quad-label{position:absolute;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);padding:8px 10px;}
+.quad-label.q1{top:0;right:0;color:var(--amber);}
+.quad-label.q2{top:0;left:0;color:var(--cyan);}
+.quad-label.q3{bottom:0;left:0;color:var(--ink-soft);}
+.quad-label.q4{bottom:0;right:0;color:var(--red);}
+.axis-x, .axis-y{position:absolute;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+.axis-x{bottom:-26px;left:50%;transform:translateX(-50%);}
+.axis-y{left:-14px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:center;}
+.blip{position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid var(--bg);}
+.blip-tip{position:absolute;font-family:var(--font-mono);font-size:9.5px;white-space:nowrap;color:var(--ink-soft);transform:translate(-50%, 10px);top:100%;left:50%;}
+.matrix-legend{list-style:none;display:flex;flex-direction:column;gap:14px;margin-top:10px;}
+.matrix-legend li{font-size:.92rem;color:var(--ink-soft);padding-left:24px;position:relative;}
+.matrix-legend .dot{width:11px;height:11px;border-radius:50%;position:absolute;left:0;top:5px;}
+@media (max-width:900px){.matrix-wrap{grid-template-columns:1fr;}}
+
+/* ── scoring table ─────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--panel);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.92rem;}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);background:var(--bg2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:700;color:var(--amber);}
+tr:last-child td{border-bottom:none;}
+.weight{font-family:var(--font-mono);color:var(--cyan);}
+
+/* ── roadmap waves ─────────────────────────────────────────────────── */
+.wave-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.wave-card{background:var(--panel);padding:28px 26px;position:relative;}
+.wave-card .w{font-family:var(--font-mono);font-size:11px;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.wave-card h4{font-size:1.25rem;margin-bottom:10px;text-transform:uppercase;}
+.wave-card p{font-size:.9rem;color:var(--ink-soft);}
+@media (max-width:760px){.wave-row{grid-template-columns:1fr;}}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.08rem;color:var(--ink);text-transform:uppercase;padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--amber);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.98rem;max-width:820px;font-family:var(--font-body);}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--bg2);padding:64px 0;border-top:1px solid var(--line-strong);}
+.cta-band p{color:var(--ink-soft);max-width:580px;margin-bottom:26px;font-size:1.02rem;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.9rem;color:var(--ink-soft);}
+.cta-list li::before{content:"✓ ";color:var(--amber);}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line-strong);}
+footer a{color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="#top">AGENT STRATEGY</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#discovery">Discovery</a></li>
+      <li><a href="#categories">Categories</a></li>
+      <li><a href="#matrix">Matrix</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Strategy &amp; Planning</span>
+    <h1 class="hero-title">Find the <em>right</em><br/>use case first.</h1>
+    <p class="hero-sub">Most agent programs don't fail because the model was weak. They fail because no one rigorously identified which problem the agent should solve, or whether it was worth solving at all. This is the framework for getting that decision right.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#discovery">Start the discovery process →</a>
+      <a class="btn btn-ghost" href="#matrix">Jump to the priority matrix</a>
+    </div>
+    <div class="reticle-frame reveal">
+      <span class="frame-label">SLIDE <b>01</b> — AGENT STRATEGY &amp; USE CASE IDENTIFICATION</span>
+      <img alt="Cover slide: Agent Strategy and Use Case Identification framework" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide1000/agent-strategy-use-case-identification-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide1000/agent-strategy-use-case-identification-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>AI use case identification</strong> is the structured process of finding where agentic AI can create measurable business value, before deciding how to build it. It starts from real business problems (not from the technology), classifies each opportunity into one of three categories — <strong>deterministic AI</strong>, <strong>generative AI</strong>, or <strong>agentic AI</strong> — and prioritizes the resulting shortlist using an <strong>impact-feasibility matrix</strong>, optionally refined with a <strong>weighted scoring model</strong> when multiple candidates land in the same quadrant. A <strong>use case is a problem worth solving</strong>; a <strong>project is the work to solve it</strong> — conflating the two is the single most common reason agent initiatives stall after the pilot.</p>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 2 — THE PROBLEM ═══════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>02</b> — WHY AGENT PROGRAMS STALL</span>
+      <img alt="Diagram: why most agent initiatives fail before reaching production" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The real failure point</span>
+      <h3 class="brief-title">Not the model. The target.</h3>
+      <p>With more than a dozen competing frameworks circulating from every major consultancy and cloud vendor, it's tempting to believe the hard part of an agent program is picking the right model or orchestration stack. It isn't. The organizations that struggle almost always skipped the step before any of that: rigorously identifying which business problem was worth pointing an agent at in the first place.</p>
+      <p>An agent deployed against a poorly chosen target — low frequency, low impact, or a workflow no one actually experiences as painful — will underperform no matter how capable the underlying model is. Discipline in targeting beats sophistication in tooling, every time.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 3 — USE CASE VS PROJECT ═══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>03</b> — USE CASE VS. PROJECT</span>
+      <img alt="Diagram distinguishing an AI use case from an AI project" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-3.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-3.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-3.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-3.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A definition worth pinning up</span>
+      <h3 class="brief-title">A problem, not a project</h3>
+      <p>A <strong>use case</strong> names a specific business problem or opportunity where an agent can plausibly deliver measurable value — stated as an activity and an expected result: "help claims adjusters triage routine claims so cycle time drops."</p>
+      <p>A <strong>project</strong> is everything that happens after that: the architecture, the data pipeline, the integration work, the rollout plan. Skipping straight to the project — choosing a framework, a vendor, an orchestration pattern — before the use case has been named and validated is how teams end up with an impressive agent that nobody asked for.</p>
+      <ul class="brief-list">
+        <li>Use case: named problem + expected result, technology-agnostic</li>
+        <li>Project: scoped work to deliver against that use case</li>
+        <li>Rule of thumb: if you can't state it without naming a tool, it's not a use case yet</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 4 — DISCOVERY PROCESS ═════════════════════════════════ -->
+<section id="discovery">
+  <div class="wrap">
+    <div class="brief-row reveal">
+      <div class="brief-media reticle-frame">
+        <span class="frame-label">SLIDE <b>04</b> — THE DISCOVERY PROCESS</span>
+        <img alt="Four-step AI use case discovery process diagram" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-4.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-4.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-4.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-4.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Four steps, worked in order</span>
+        <h3 class="brief-title">Start from the problem, work backward</h3>
+        <p>A repeatable discovery process keeps a team pointed at value instead of novelty. Work through it in sequence, every time, for every business domain under review.</p>
+        <ul class="brief-list">
+          <li><strong>Scan for pain</strong> — look for where results miss expectations: repeated manual effort, slow approvals, recurring escalations.</li>
+          <li><strong>Translate to a use case</strong> — turn the pain point into a short statement naming the activity and the expected result.</li>
+          <li><strong>Classify</strong> — decide whether the fix is individual productivity, business-process automation, or a multi-step agentic workflow.</li>
+          <li><strong>Score and shortlist</strong> — run every candidate through the same prioritization lens before any is greenlit.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 5 — MULTI-LENS SEARCH ═════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>05</b> — FIVE LENSES FOR OPPORTUNITY SEARCH</span>
+      <img alt="Five lenses for surfacing agentic AI opportunities" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Where to actually look</span>
+      <h3 class="brief-title">Scan the organization from five angles</h3>
+      <p>A single brainstorm rarely surfaces the full opportunity set. Running the same scan through five different lenses catches the use cases that any one perspective would miss.</p>
+      <ul class="brief-list">
+        <li><strong>Process friction</strong> — steps that take multiple handoffs or repeated manual rework</li>
+        <li><strong>Customer experience</strong> — moments where customers wait, repeat themselves, or escalate</li>
+        <li><strong>Data exhaust</strong> — signals already being captured but never acted on</li>
+        <li><strong>Competitive signal</strong> — capabilities competitors are shipping that raise the baseline</li>
+        <li><strong>Workforce time</strong> — where skilled people spend hours on low-judgment work</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 6 — THREE CATEGORIES ══════════════════════════════════ -->
+<section id="categories">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Classification</span>
+      <h2 class="section-title">Three categories of AI use case</h2>
+      <p class="section-lede">Not every problem calls for an agent. Sorting a candidate into the right category early saves months of building the wrong kind of system.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media reticle-frame">
+        <span class="frame-label">SLIDE <b>06</b> — DETERMINISTIC, GENERATIVE, AGENTIC</span>
+        <img alt="Three categories of AI use cases: deterministic, generative, and agentic" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-6.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-6.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-6.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-6.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Match the category to the problem</span>
+        <h3 class="brief-title">Pick a category on purpose</h3>
+        <p><strong>Deterministic AI</strong> fits well-defined workflows where the same input should always produce the same output — fraud scoring, demand forecasting, anomaly detection. Reach for it whenever consistency and auditability matter more than flexibility.</p>
+        <p><strong>Generative AI</strong> handles content creation, summarization, and language tasks that used to require human judgment. It typically needs less structured training data but far more careful guardrails, since evaluating its output is inherently more subjective.</p>
+        <p><strong>Agentic AI</strong> goes a step further: the system plans, decides, and executes multi-step workflows across systems with limited human intervention — autonomous customer-issue resolution, end-to-end procurement processing, or a multi-system investigation that used to take an analyst all day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 7 — BY FUNCTION ═══════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>07</b> — WHERE AGENTS CREATE VALUE, BY FUNCTION</span>
+      <img alt="Agent use cases by business function" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-7.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-7.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-7.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-7.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A starting shortlist, by department</span>
+      <h3 class="brief-title">Where to look, function by function</h3>
+      <p>Every function has its own recurring pattern of low-judgment, high-frequency work. This is a starting shortlist, not an exhaustive one — it's meant to prime the discovery workshop, not replace it.</p>
+    </div>
+  </div>
+  <div class="dept-grid reveal">
+    <div class="dept-card"><h5>Customer Service</h5><p>Conversational resolution agents, sentiment-aware routing, always-on tier-one support.</p></div>
+    <div class="dept-card"><h5>Operations</h5><p>Supply and inventory optimization, predictive maintenance scheduling, automated quality inspection.</p></div>
+    <div class="dept-card"><h5>Finance</h5><p>Fraud and anomaly detection, automated compliance monitoring, invoice-to-payment matching.</p></div>
+    <div class="dept-card"><h5>Human Resources</h5><p>Resume screening and shortlisting, workforce planning, engagement-signal analysis.</p></div>
+    <div class="dept-card"><h5>IT</h5><p>Anomaly detection, automated incident triage and response, infrastructure cost optimization.</p></div>
+    <div class="dept-card"><h5>Sales &amp; Marketing</h5><p>Lead scoring, personalized content generation, dynamic pricing recommendations.</p></div>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 8 — DEPT VS CROSS-FUNCTIONAL ══════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>08</b> — SCOPE VS. IMPACT TRADEOFF</span>
+      <img alt="Department-specific versus cross-functional agent use cases" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Choose your scope deliberately</span>
+      <h3 class="brief-title">Narrow scope, or bigger prize?</h3>
+      <p><strong>Department-specific use cases</strong> — a single team's ticket triage, a single desk's reporting — deliver value fast because they touch one system, one owner, and one budget line. They're the easiest place to prove an agent program works.</p>
+      <p><strong>Cross-functional use cases</strong> — a unified customer data agent, an enterprise-wide knowledge assistant — typically deliver a bigger prize, but require coordinating data, budget, and ownership across teams that don't normally share a roadmap. Sequence department-level wins first; let them fund the case for the cross-functional bets.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 9 — IMPACT × FEASIBILITY MATRIX ═══════════════════════ -->
+<section id="matrix">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Prioritization</span>
+      <h2 class="section-title">The impact × feasibility matrix</h2>
+      <p class="section-lede">Once the shortlist exists, plot every candidate on two axes. The matrix doesn't do the thinking for you — it forces the trade-off conversation to happen before months get spent on a use case that was doomed from the start.</p>
+    </div>
+    <div class="matrix-wrap reveal">
+      <div class="reticle-frame">
+        <span class="frame-label">SLIDE <b>09</b> — THE PRIORITIZATION MATRIX</span>
+        <img alt="Impact vs feasibility prioritization matrix for AI agent use cases" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-9.png 900w" width="900"/>
+      </div>
+      <div>
+        <div class="quad" style="margin:0 20px 34px 30px;">
+          <span class="quad-label q2">STRATEGIC BETS</span>
+          <span class="quad-label q1">QUICK WINS</span>
+          <span class="quad-label q3">AVOID / DEFER</span>
+          <span class="quad-label q4">FILL-INS</span>
+          <span class="axis-x">FEASIBILITY →</span>
+          <span class="axis-y">IMPACT →</span>
+          <div class="blip" style="background:var(--amber);left:78%;top:22%;"></div>
+          <span class="blip-tip" style="left:78%;top:22%;">Invoice-match agent</span>
+          <div class="blip" style="background:var(--cyan);left:26%;top:16%;"></div>
+          <span class="blip-tip" style="left:26%;top:16%;">Autonomous procurement</span>
+          <div class="blip" style="background:var(--ink-soft);left:70%;top:76%;"></div>
+          <span class="blip-tip" style="left:70%;top:76%;">Meeting-notes agent</span>
+          <div class="blip" style="background:var(--red);left:20%;top:82%;"></div>
+          <span class="blip-tip" style="left:20%;top:82%;">Fully autonomous negotiation</span>
+        </div>
+        <ul class="matrix-legend">
+          <li><span class="dot" style="background:var(--amber);"></span><strong>Quick wins</strong> — high impact, high feasibility. Sequence these first; they fund the rest of the program.</li>
+          <li><span class="dot" style="background:var(--cyan);"></span><strong>Strategic bets</strong> — high impact, low feasibility today. Worth investing in data and infrastructure to unlock.</li>
+          <li><span class="dot" style="background:var(--ink-soft);"></span><strong>Fill-ins</strong> — low impact, high feasibility. Pick up opportunistically; don't lead a roadmap with them.</li>
+          <li><span class="dot" style="background:var(--red);"></span><strong>Avoid / defer</strong> — low impact, low feasibility. Revisit later, not now.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 10 — WEIGHTED SCORING ═════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>10</b> — WEIGHTED SCORING MODEL</span>
+      <img alt="Weighted scoring model for tie-breaking AI use cases" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-10.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">When the matrix isn't enough</span>
+      <h3 class="brief-title">Break ties with weighted scoring</h3>
+      <p>A 2×2 matrix is a coarse instrument — it's common for several strong candidates to land in the same quadrant. A weighted scoring model, run either before the matrix to shortlist candidates or after it to break ties, adds the precision the matrix can't.</p>
+    </div>
+  </div>
+  <div class="table-wrap reveal">
+    <table>
+      <thead><tr><th>Scoring dimension</th><th>Question it answers</th><th>Typical weight</th></tr></thead>
+      <tbody>
+        <tr><td class="dim">Business Impact</td><td>Revenue, cost, or risk moved, and by how much</td><td class="weight">30%</td></tr>
+        <tr><td class="dim">Technical Feasibility</td><td>Does the required data, system access, and integration exist today</td><td class="weight">25%</td></tr>
+        <tr><td class="dim">Data Readiness</td><td>Is the training and operating data clean, labeled, and available</td><td class="weight">20%</td></tr>
+        <tr><td class="dim">Risk &amp; Compliance Exposure</td><td>How much regulatory or reputational exposure does autonomy introduce</td><td class="weight">15%</td></tr>
+        <tr><td class="dim">Time-to-Value</td><td>How quickly can a working pilot demonstrate the case</td><td class="weight">10%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 11 — CASE STUDY ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>11</b> — APPLYING IT IN THE FIELD</span>
+      <img alt="Case study illustration: applying the prioritization matrix at scale" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-11.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-11.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-11.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-11.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A pattern seen across industries</span>
+      <h3 class="brief-title">Fifty ideas, four that mattered first</h3>
+      <p>A useful pattern shows up repeatedly across large logistics and operations organizations that have run this process seriously: workshops across the business surface anywhere from thirty to over fifty candidate use cases, ranging from predictive maintenance to fully autonomous orchestration.</p>
+      <p>Run through the impact-feasibility matrix, only a handful typically land in the "quick win" quadrant — usually automated document processing, route or scheduling optimization, and predictive maintenance. Concentrating the first wave of investment there, rather than spreading it across all fifty ideas at once, is what turns a long candidate list into delivered value within a single budget cycle.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 12 — ROADMAP ═══════════════════════════════════════════ -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Execution</span>
+      <h2 class="section-title">A wave-based rollout roadmap</h2>
+      <p class="section-lede">Sequencing matters as much as selection. Each wave both delivers value and builds the governance muscle the next wave will need.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media reticle-frame">
+        <span class="frame-label">SLIDE <b>12</b> — THE THREE-WAVE ROADMAP</span>
+        <img alt="Three-wave rollout roadmap for agentic AI use cases" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-12.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-12.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-12.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-12.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Sequence, don't sprawl</span>
+        <h3 class="brief-title">Three waves, each one earns the next</h3>
+        <p>Resist the urge to launch every quadrant at once. A wave structure lets quick wins fund and de-risk the strategic bets that follow.</p>
+      </div>
+    </div>
+    <div class="wave-row reveal">
+      <div class="wave-card"><div class="w">Wave 1 · 0–3 months</div><h4>Quick wins</h4><p>Ship the highest-impact, highest-feasibility use cases first. Prove the operating model, establish baseline metrics, and build organizational trust in agent output.</p></div>
+      <div class="wave-card"><div class="w">Wave 2 · 3–9 months</div><h4>Strategic bets</h4><p>Invest in the data pipelines and integrations the harder, higher-impact use cases need. Stand up governance: monitoring, audit trails, human-in-the-loop review.</p></div>
+      <div class="wave-card"><div class="w">Wave 3 · 9+ months</div><h4>Scale &amp; platform</h4><p>Extend proven patterns cross-functionally, consolidate shared agent infrastructure, and revisit the "avoid / defer" quadrant as feasibility improves.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="ticks"></div>
+
+<!-- ═══ SLIDE 13 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media reticle-frame">
+      <span class="frame-label">SLIDE <b>13</b> — CLOSING THE LOOP</span>
+      <img alt="Summary: start with the problem, not the model" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide1000/agent-strategy-use-case-identification-13.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide600/agent-strategy-use-case-identification-13.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide700/agent-strategy-use-case-identification-13.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide900/agent-strategy-use-case-identification-13.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide1000/agent-strategy-use-case-identification-13.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The one rule that survives contact</span>
+      <h3 class="brief-title">Start with the problem, not the model</h3>
+      <p>Every framework in this guide — the discovery process, the three categories, the impact-feasibility matrix, the weighted scoring model — exists to enforce one discipline: name the business problem before naming the technology. Teams that do this consistently ship agents that survive past the pilot. Teams that don't end up with an impressive demo and no owner willing to fund what comes next.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ticks"></div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent strategy FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What is the difference between AI strategy and use case identification?<span class="plus">+</span></button>
+        <div class="faq-a"><p>AI strategy sets the overall direction — which business domains, risk posture, and investment level the organization commits to. Use case identification is the tactical, repeatable process nested inside that strategy: finding, naming, and validating the specific problems worth pointing AI or an agent at. Strategy answers "where do we play"; use case identification answers "exactly what do we build first."</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How is an agentic AI use case different from a generative AI use case?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Generative AI produces content — text, code, summaries — usually within a single interaction, with a human deciding what happens with the output. Agentic AI plans and executes a multi-step workflow autonomously, calling tools, making intermediate decisions, and interacting with other systems with limited human intervention. A generative use case might draft a customer email; an agentic use case might read the inbox, decide which emails need action, draft replies, and route the exceptions to a human.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is the impact-feasibility matrix and how do you use it?<span class="plus">+</span></button>
+        <div class="faq-a"><p>It's a 2×2 grid with business impact on one axis and technical/organizational feasibility on the other. Every candidate use case is plotted as a point. Use cases in the high-impact, high-feasibility quadrant become quick wins and get sequenced first; high-impact, low-feasibility candidates become strategic bets worth investing in; low-impact items get deferred or picked up opportunistically.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How many use cases should a first discovery round surface?<span class="plus">+</span></button>
+        <div class="faq-a"><p>There's no fixed target, but a healthy first pass across a mid-size organization typically surfaces somewhere between fifteen and fifty candidates once all five discovery lenses have been applied. The goal of that first pass isn't precision — it's coverage. Precision comes later, from the matrix and the scoring model.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Who should be in an agent use case discovery workshop?<span class="plus">+</span></button>
+        <div class="faq-a"><p>A mix of people who feel the pain and people who can judge feasibility: frontline process owners who know exactly where the friction is, a data or platform lead who can speak honestly to feasibility, someone from risk or compliance if the domain is regulated, and an executive sponsor who can make the eventual prioritization call stick.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How do you avoid picking use cases that never make it past a pilot?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Score feasibility honestly, including data readiness, not just business impact — most pilots die from a data or integration gap no one flagged at the start. Insist on a named owner before a use case gets prioritized. And sequence quick wins first, since early delivered value is what protects the budget for the harder, longer-feasibility use cases still waiting in the strategic-bets quadrant.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to run your own discovery pass?</h2>
+    <p>Bring the five-lens scan, the three-category classification, and the impact-feasibility matrix into your next planning cycle — before a single agent gets built.</p>
+    <ul class="cta-list">
+      <li>A one-day discovery workshop template, ready to run with any business unit</li>
+      <li>A shared scoring rubric so every candidate is judged on the same criteria</li>
+      <li>A wave-based roadmap format for sequencing quick wins ahead of strategic bets</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="https://prashant.dhingra.website/agent-ai/tutorial/">Explore the full tutorial →</a>
+      <a class="btn btn-ghost" href="#matrix">Revisit the matrix</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+<!-- ═══ JSON-LD STRUCTURED DATA ════════════════════════════════════════ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://prashant.dhingra.website/agent-ai/tutorial/#article",
+      "headline": "Agent Strategy and Use Case Identification: A Practical Framework",
+      "description": "A framework for identifying, classifying, and prioritizing agentic AI use cases using a five-lens discovery process, an impact-feasibility matrix, and a weighted scoring model.",
+      "image": {
+        "@type": "ImageObject",
+        "url": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-strategy-use-case-identification.pptx/images/Slide1000/agent-strategy-use-case-identification-1.png",
+        "width": 1000,
+        "height": 563
+      },
+      "author": { "@type": "Person", "name": "Prashant Dhingra", "url": "https://prashant.dhingra.website/agent-ai/tutorial/" },
+      "publisher": {
+        "@type": "Person",
+        "name": "Prashant Dhingra",
+        "url": "https://prashant.dhingra.website/agent-ai/tutorial/"
+      },
+      "datePublished": "2026-07-07",
+      "dateModified": "2026-07-07",
+      "mainEntityOfPage": "https://prashant.dhingra.website/agent-ai/tutorial/",
+      "about": [
+        { "@type": "Thing", "name": "Agentic AI", "sameAs": "https://en.wikipedia.org/wiki/Intelligent_agent" },
+        { "@type": "Thing", "name": "Artificial Intelligence", "sameAs": "https://en.wikipedia.org/wiki/Artificial_intelligence" },
+        { "@type": "Thing", "name": "Business Process Automation", "sameAs": "https://en.wikipedia.org/wiki/Business_process_automation" }
+      ],
+      "keywords": "agent strategy, use case identification, agentic AI, impact feasibility matrix, AI prioritization, weighted scoring model",
+      "articleSection": ["Discovery Process", "Use Case Categories", "Impact-Feasibility Matrix", "Weighted Scoring", "Rollout Roadmap"],
+      "wordCount": 2800,
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://prashant.dhingra.website/agent-ai/tutorial/#webpage",
+      "url": "https://prashant.dhingra.website/agent-ai/tutorial/",
+      "name": "Agent Strategy & Use Case Identification",
+      "description": "How to find, classify, and prioritize agentic AI use cases before investing in agent development.",
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prashant.dhingra.website/" },
+          { "@type": "ListItem", "position": 2, "name": "Agent AI Tutorial", "item": "https://prashant.dhingra.website/agent-ai/tutorial/" },
+          { "@type": "ListItem", "position": 3, "name": "Agent Strategy & Use Case Identification", "item": "https://prashant.dhingra.website/agent-ai/tutorial/" }
+        ]
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [".hero-title", ".quick-answer", ".brief-title", ".brief-kicker"]
+      }
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://prashant.dhingra.website/agent-ai/tutorial/#outline",
+      "name": "Agent Strategy & Use Case Identification — Slide Outline",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Agent Strategy & Use Case Identification — Overview" },
+        { "@type": "ListItem", "position": 2, "name": "Why Agent Programs Stall" },
+        { "@type": "ListItem", "position": 3, "name": "Use Case vs. Project" },
+        { "@type": "ListItem", "position": 4, "name": "The Discovery Process" },
+        { "@type": "ListItem", "position": 5, "name": "Five Lenses for Opportunity Search" },
+        { "@type": "ListItem", "position": 6, "name": "Three Categories: Deterministic, Generative, Agentic" },
+        { "@type": "ListItem", "position": 7, "name": "Use Cases by Business Function" },
+        { "@type": "ListItem", "position": 8, "name": "Department-Specific vs. Cross-Functional" },
+        { "@type": "ListItem", "position": 9, "name": "The Impact x Feasibility Matrix" },
+        { "@type": "ListItem", "position": 10, "name": "Weighted Scoring Model" },
+        { "@type": "ListItem", "position": 11, "name": "Applying It: A Field Case Study" },
+        { "@type": "ListItem", "position": 12, "name": "Three-Wave Rollout Roadmap" },
+        { "@type": "ListItem", "position": 13, "name": "Conclusion: Start With the Problem" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://prashant.dhingra.website/agent-ai/tutorial/#faq",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is the difference between AI strategy and use case identification?", "acceptedAnswer": { "@type": "Answer", "text": "AI strategy sets overall direction and investment posture. Use case identification is the tactical process of finding and validating specific problems worth solving with AI or agents, nested inside that strategy." } },
+        { "@type": "Question", "name": "How is an agentic AI use case different from a generative AI use case?", "acceptedAnswer": { "@type": "Answer", "text": "Generative AI produces content within a single interaction with a human deciding the next step. Agentic AI autonomously plans and executes multi-step workflows across systems with limited human intervention." } },
+        { "@type": "Question", "name": "What is the impact-feasibility matrix?", "acceptedAnswer": { "@type": "Answer", "text": "A 2x2 prioritization grid plotting business impact against feasibility, sorting candidate use cases into quick wins, strategic bets, fill-ins, and items to avoid or defer." } },
+        { "@type": "Question", "name": "How many use cases should a first discovery round surface?", "acceptedAnswer": { "@type": "Answer", "text": "Typically fifteen to fifty candidates for a mid-size organization after applying multiple discovery lenses, prioritizing coverage over precision on the first pass." } },
+        { "@type": "Question", "name": "Who should be in an agent use case discovery workshop?", "acceptedAnswer": { "@type": "Answer", "text": "Frontline process owners, a data or platform lead, a risk or compliance representative for regulated domains, and an executive sponsor who can enforce the prioritization decision." } }
+      ]
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','discovery','categories','matrix','roadmap','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

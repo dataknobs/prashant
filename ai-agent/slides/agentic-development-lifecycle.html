@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Agentic Development Lifecycle (ADLC) — A Visual Walkthrough</title>
+<meta content="A visual walkthrough of the Agentic Development Lifecycle (ADLC) — the closed-loop framework teams use to plan, build, test, deploy, operate, and improve AI agents in production." name="description"/>
+<meta content="agentic development lifecycle, ADLC, agent development lifecycle, AI agents, agentic AI, AI agent framework, agent lifecycle, autonomous agents, agent deployment, agent operations, LLM agents, agent governance" name="keywords"/>
+<meta content="Agentic Systems" name="author"/>
+<meta content="index, follow" name="robots"/>
+
+<meta content="article" property="og:type"/>
+<meta content="The Agentic Development Lifecycle (ADLC) — A Visual Walkthrough" property="og:title"/>
+<meta content="A visual walkthrough of the Agentic Development Lifecycle (ADLC) — the closed-loop framework teams use to plan, build, test, deploy, operate, and improve AI agents in production." property="og:description"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="The Agentic Development Lifecycle (ADLC)" name="twitter:title"/>
+<meta content="A visual walkthrough of the closed-loop framework for planning, building, testing, deploying, operating and improving AI agents." name="twitter:description"/>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<style>
+  :root{
+    --bg:#0A0E14;
+    --surface:#11151D;
+    --surface-2:#161B25;
+    --border:#232938;
+    --text:#E8ECF4;
+    --text-muted:#8B94A8;
+    --mint:#6EE7B7;
+    --amber:#F0B429;
+    --violet:#A78BFA;
+    --max:1080px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(110,231,183,0.08), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(167,139,250,0.07), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', system-ui, sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  ::selection{ background:var(--mint); color:#0A0E14; }
+
+  a{ color:inherit; }
+
+  .wrap{ max-width:var(--max); margin:0 auto; padding:0 28px; }
+
+  /* ---------- nav ---------- */
+  nav.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:26px 28px; max-width:var(--max); margin:0 auto;
+  }
+  .brand{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; letter-spacing:0.12em; color:var(--text-muted);
+    text-transform:uppercase;
+  }
+  .brand b{ color:var(--mint); font-weight:600; }
+  .navlinks{ display:flex; gap:28px; font-size:14px; }
+  .navlinks a{
+    text-decoration:none; color:var(--text-muted);
+    border-bottom:1px solid transparent; padding-bottom:2px;
+    transition:color .2s, border-color .2s;
+  }
+  .navlinks a:hover{ color:var(--text); border-color:var(--mint); }
+
+  /* ---------- hero ---------- */
+  header.hero{ padding:48px 0 30px; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--amber); margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{
+    content:""; width:18px; height:1px; background:var(--amber); display:inline-block;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(2.1rem, 5vw, 3.4rem);
+    line-height:1.08;
+    margin:0 0 22px;
+    letter-spacing:-0.01em;
+    max-width:14ch;
+  }
+  h1 .accent{ color:var(--mint); }
+  .lede{
+    font-size:1.08rem; color:var(--text-muted); max-width:62ch; margin:0 0 6px;
+  }
+  .lede strong{ color:var(--text); font-weight:600; }
+
+  /* ---------- orbit diagram ---------- */
+  .orbit-section{ padding:50px 0 20px; }
+  .orbit-wrap{
+    position:relative; width:100%; max-width:560px; margin:0 auto;
+    aspect-ratio:1/1;
+  }
+  .orbit-wrap svg{ width:100%; height:100%; overflow:visible; }
+  .orbit-ring{
+    fill:none; stroke:var(--border); stroke-width:1.4; stroke-dasharray:3 7;
+  }
+  .orbit-center{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    fill:var(--text-muted);
+  }
+  .orbit-center .big{
+    font-family:'Space Grotesk', sans-serif; font-size:17px; fill:var(--text);
+    letter-spacing:0; text-transform:none; font-weight:600;
+  }
+  .node-group{ cursor:pointer; }
+  .node-bg{
+    fill:var(--surface); stroke:var(--border); stroke-width:1.4;
+    transition:stroke .25s, fill .25s;
+  }
+  .node-num{
+    font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:600;
+    fill:var(--text-muted); text-anchor:middle; dominant-baseline:middle;
+    transition:fill .25s;
+  }
+  .node-label{
+    font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:500;
+    fill:var(--text-muted); text-anchor:middle;
+    transition:fill .25s;
+  }
+  .node-group.active .node-bg{ fill:var(--mint); stroke:var(--mint); }
+  .node-group.active .node-num{ fill:#0A0E14; }
+  .node-group.active .node-label{ fill:var(--text); }
+  .node-group:hover .node-bg{ stroke:var(--mint); }
+  .node-group:hover .node-label{ fill:var(--text); }
+  .orbit-arrow{ fill:var(--text-muted); opacity:0.6; }
+
+  /* ---------- deck section ---------- */
+  .deck-section{ padding:70px 0 30px; }
+  .section-head{ margin-bottom:38px; }
+  .section-title{
+    font-family:'Space Grotesk', sans-serif; font-weight:600;
+    font-size:1.6rem; margin:0 0 10px;
+  }
+  .section-sub{ color:var(--text-muted); max-width:60ch; margin:0; font-size:0.98rem; }
+
+  .slide-card{
+    display:grid;
+    grid-template-columns:84px 1fr;
+    gap:26px;
+    padding:30px 0;
+    border-top:1px solid var(--border);
+    scroll-margin-top:90px;
+  }
+  .slide-card:last-child{ border-bottom:1px solid var(--border); }
+
+  .slide-index{
+    font-family:'JetBrains Mono', monospace;
+  }
+  .slide-index .n{
+    font-size:2rem; font-weight:600; color:var(--border);
+    transition:color .3s; line-height:1;
+  }
+  .slide-card.in-view .slide-index .n{ color:var(--mint); }
+  .slide-tag{
+    display:inline-block; margin-top:10px;
+    font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--text-muted); writing-mode:vertical-rl; transform:rotate(180deg);
+  }
+
+  .slide-body h3{
+    font-family:'Space Grotesk', sans-serif; font-size:1.2rem; margin:0 0 8px;
+    font-weight:600;
+  }
+  .slide-body p.desc{
+    color:var(--text-muted); margin:0 0 18px; max-width:64ch; font-size:0.96rem;
+  }
+  .slide-figure{
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+    box-shadow:0 20px 50px -25px rgba(0,0,0,0.6);
+  }
+  .slide-figure img{
+    display:block; width:100%; height:auto; background:var(--surface-2);
+  }
+
+  @media (max-width:620px){
+    .slide-card{ grid-template-columns:48px 1fr; gap:14px; }
+    .slide-index .n{ font-size:1.4rem; }
+    .slide-tag{ display:none; }
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    border-top:1px solid var(--border);
+    margin-top:60px;
+    padding:34px 0 50px;
+  }
+  .footer-row{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
+    font-size:13px; color:var(--text-muted);
+  }
+  .footer-row a{ color:var(--text-muted); text-decoration:underline; text-underline-offset:3px; }
+  .footer-row a:hover{ color:var(--mint); }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="brand"><b>ADLC</b> · agentic systems</div>
+  <div class="navlinks">
+    <a href="#orbit">The loop</a>
+    <a href="#deck">The deck</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Agent Engineering</div>
+    <h1>The <span class="accent">Agentic Development</span> Lifecycle</h1>
+    <p class="lede">
+      Traditional software ships once and waits for the next release. An AI agent
+      keeps reasoning, calling tools, and making decisions on its own — which means
+      the way teams plan, build, and run it has to change too. The <strong>Agentic
+      Development Lifecycle (ADLC)</strong> is the closed loop that most teams
+      converge on: six recurring stages that take an agent from idea to production,
+      and feed what happens in production back into the next iteration.
+    </p>
+  </header>
+</div>
+
+<section class="orbit-section" id="orbit">
+  <div class="wrap">
+    <div class="orbit-wrap">
+      <svg aria-hidden="false" aria-label="Diagram of the six-stage agentic development lifecycle loop" id="orbitSvg" role="img" viewBox="0 0 560 560">
+        <circle class="orbit-ring" cx="280" cy="280" r="220"></circle>
+        <text class="orbit-center" text-anchor="middle" x="280" y="272">
+          <tspan class="big" dy="0" x="280">Closed loop</tspan>
+          <tspan dy="20" x="280">six stages, one cycle</tspan>
+        </text>
+        <g id="orbitNodes"></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="deck-section" id="deck">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="section-title">The deck</h2>
+      <p class="section-sub">
+        Six slides, one per stage. Click a stage above to jump straight to it, or
+        scroll through the loop in order below.
+      </p>
+    </div>
+
+    <div id="slideList"></div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var BASE = "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agentic-development-life-cycle/images/";
+  var WIDTHS = [400,500,600,700,800,900,1000];
+
+  var slides = [
+    { n:1, tag:"Plan",    title:"Plan",    desc:"Align stakeholders on the use case, the goals, and what success actually looks like — then write the agent's intended behavior down in plain language before any code exists." },
+    { n:2, tag:"Build",   title:"Build",   desc:"Choose the model, design the prompts and orchestration, and wire up the tools, data, and APIs the agent needs to act — under version control, not ad hoc." },
+    { n:3, tag:"Test",    title:"Test",    desc:"Run the agent against real and adversarial scenarios, not just the happy path. This is where silent failure modes get caught before they reach users." },
+    { n:4, tag:"Deploy",  title:"Deploy",  desc:"Move through staged environments with explicit gates and approvals, so a change to one agent can't quietly affect everyone in production." },
+    { n:5, tag:"Operate", title:"Operate", desc:"Watch every tool call, reasoning step, and outcome once the agent is live — cost, latency, and behavior drift all need eyes on them continuously." },
+    { n:6, tag:"Improve", title:"Improve", desc:"Feed production signal, feedback, and failures back into planning — closing the loop and starting the next cycle from a stronger baseline." }
+  ];
+
+  function buildSrcset(n){
+    return WIDTHS.map(function(w){
+      return BASE + "Slide" + w + "/agentic-development-life-cycle-" + n + ".png " + w + "w";
+    }).join(", ");
+  }
+
+  // ---- render slide cards ----
+  var listEl = document.getElementById("slideList");
+  slides.forEach(function(s){
+    var card = document.createElement("article");
+    card.className = "slide-card";
+    card.id = "stage-" + s.n;
+
+    card.innerHTML =
+      '<div class="slide-index">' +
+        '<div class="n">0' + s.n + '</div>' +
+        '<div class="slide-tag">' + s.tag + '</div>' +
+      '</div>' +
+      '<div class="slide-body">' +
+        '<h3>' + s.title + '</h3>' +
+        '<p class="desc">' + s.desc + '</p>' +
+        '<figure class="slide-figure">' +
+          '<img loading="lazy" decoding="async" ' +
+            'src="' + BASE + 'Slide1000/agentic-development-life-cycle-' + s.n + '.png" ' +
+            'srcset="' + buildSrcset(s.n) + '" ' +
+            'sizes="(max-width: 700px) 92vw, 760px" ' +
+            'width="1000" height="563" ' +
+            'alt="Slide ' + s.n + ' of the Agentic Development Lifecycle deck: ' + s.title + ' stage">' +
+        '</figure>' +
+      '</div>';
+    listEl.appendChild(card);
+  });
+
+  // ---- render orbit nodes ----
+  var svgNS = "http://www.w3.org/2000/svg";
+  var nodesG = document.getElementById("orbitNodes");
+  var cx = 280, cy = 280, r = 220, rNode = 30;
+
+  slides.forEach(function(s, i){
+    var angle = (-90 + i * (360 / slides.length)) * Math.PI / 180;
+    var x = cx + r * Math.cos(angle);
+    var y = cy + r * Math.sin(angle);
+
+    var g = document.createElementNS(svgNS, "g");
+    g.setAttribute("class", "node-group");
+    g.setAttribute("data-target", "stage-" + s.n);
+    g.setAttribute("tabindex", "0");
+    g.setAttribute("role", "button");
+    g.setAttribute("aria-label", "Jump to stage " + s.n + ": " + s.title);
+
+    var circle = document.createElementNS(svgNS, "circle");
+    circle.setAttribute("class", "node-bg");
+    circle.setAttribute("cx", x); circle.setAttribute("cy", y); circle.setAttribute("r", rNode);
+    g.appendChild(circle);
+
+    var num = document.createElementNS(svgNS, "text");
+    num.setAttribute("class", "node-num");
+    num.setAttribute("x", x); num.setAttribute("y", y - 2);
+    num.textContent = "0" + s.n;
+    g.appendChild(num);
+
+    var labelDist = r + rNode + 28;
+    var lx = cx + labelDist * Math.cos(angle);
+    var ly = cy + labelDist * Math.sin(angle);
+    var label = document.createElementNS(svgNS, "text");
+    label.setAttribute("class", "node-label");
+    label.setAttribute("x", lx); label.setAttribute("y", ly + 4);
+    label.textContent = s.tag;
+    g.appendChild(label);
+
+    g.addEventListener("click", function(){
+      document.getElementById("stage-" + s.n).scrollIntoView({behavior:"smooth", block:"center"});
+    });
+    g.addEventListener("keypress", function(e){
+      if(e.key === "Enter" || e.key === " "){
+        document.getElementById("stage-" + s.n).scrollIntoView({behavior:"smooth", block:"center"});
+      }
+    });
+
+    nodesG.appendChild(g);
+  });
+
+  // ---- sync active state with scroll position ----
+  var nodeGroups = Array.prototype.slice.call(document.querySelectorAll(".node-group"));
+  var cards = Array.prototype.slice.call(document.querySelectorAll(".slide-card"));
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      var id = entry.target.id;
+      var node = document.querySelector('.node-group[data-target="' + id + '"]');
+      if(entry.isIntersecting){
+        cards.forEach(function(c){ c.classList.remove("in-view"); });
+        nodeGroups.forEach(function(n){ n.classList.remove("active"); });
+        entry.target.classList.add("in-view");
+        if(node) node.classList.add("active");
+      }
+    });
+  }, { rootMargin: "-40% 0px -40% 0px", threshold: 0 });
+
+  cards.forEach(function(c){ io.observe(c); });
+
+  // activate first node by default
+  if(nodeGroups[0]) nodeGroups[0].classList.add("active");
+  if(cards[0]) cards[0].classList.add("in-view");
+})();
+</script>
+
+
+
+</body></html>

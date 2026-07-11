@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Operations: SLOs, Incident Response, and On-Call for Production AI Agents</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800&amp;family=Karla:ital,wght@0,400;0,500;0,600;1,400&amp;family=Martian+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --paper:#E9EEEC;
+  --paper2:#DCE3E0;
+  --card:#FAFCFB;
+  --ink:#151B19;
+  --ink-soft:#586661;
+  --line:#C7D2CC;
+  --line-strong:#A3B2AA;
+  --sev1:#D6402E;
+  --sev1-tint:#F5DAD4;
+  --sev2:#E08A1E;
+  --sev2-tint:#F7E4C6;
+  --sev3:#3E8F6E;
+  --sev3-tint:#DCEEE5;
+  --slate:#2E4A47;
+  --font-display:'Libre Franklin', sans-serif;
+  --font-body:'Karla', sans-serif;
+  --font-mono:'Martian Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.68;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;}
+a{color:var(--slate);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);font-weight:800;}
+
+/* ── timeline-tick divider (signature motif) ──────────────────────── */
+.timeline{height:44px;position:relative;display:flex;align-items:center;justify-content:center;gap:5px;}
+.timeline::before,.timeline::after{content:"";flex:1;border-top:1px dashed var(--line-strong);}
+.timeline .tick{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--slate);padding:0 12px;}
+
+/* ── runbook-tab frame (signature motif) ──────────────────────────── */
+.tab-frame{position:relative;background:var(--card);border:1px solid var(--line-strong);padding:22px 20px 16px;margin-top:14px;}
+.tab-label{position:absolute;top:-13px;left:18px;background:var(--slate);color:#fff;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:2px 2px 0 0;}
+.tab-label.sev1{background:var(--sev1);}
+.tab-label.sev2{background:var(--sev2);}
+.tab-label.sev3{background:var(--sev3);}
+.frame-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;}
+.frame-label b{color:var(--slate);}
+.tab-frame img{border:1px solid var(--line);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(233,238,236,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+.brand::before{content:"◷";color:var(--slate);}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--slate);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--slate);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--slate);display:inline-block;}
+.hero-title{font-size:clamp(2.3rem,5.8vw,4rem);line-height:1.08;margin-bottom:22px;font-weight:800;}
+.hero-title em{font-style:normal;color:var(--sev1);}
+.hero-sub{font-size:1.14rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--slate);color:#fff;border-color:var(--slate);}
+.btn-solid:hover{background:#1F3532;}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--paper2);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--card);border:1px solid var(--line-strong);border-left:4px solid var(--slate);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.02rem;}
+.quick-answer strong{color:var(--ink);}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:56px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:12px;}
+.section-title{font-size:clamp(1.7rem,3.2vw,2.3rem);margin-bottom:14px;font-weight:800;}
+.section-lede{color:var(--ink-soft);font-size:1.02rem;}
+
+/* ── brief rows ───────────────────────────────────────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;padding:44px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--sev2);margin-bottom:10px;}
+.brief-title{font-size:1.68rem;margin-bottom:14px;font-weight:800;}
+.brief-text p{font-size:.98rem;color:#242E2A;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.93rem;color:var(--ink-soft);}
+.brief-list li::before{content:"▸";position:absolute;left:0;color:var(--slate);}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── phase grid ───────────────────────────────────────────────────── */
+.phase-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.phase-card{background:var(--card);padding:20px 16px;}
+.phase-card .n{font-family:var(--font-mono);font-size:10.5px;color:var(--sev1);margin-bottom:8px;}
+.phase-card h5{font-family:var(--font-display);font-size:.98rem;margin-bottom:8px;font-weight:700;}
+.phase-card p{font-size:.82rem;color:var(--ink-soft);}
+@media (max-width:900px){.phase-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.phase-grid{grid-template-columns:1fr;}}
+
+/* ── autonomy tiers ───────────────────────────────────────────────── */
+.tier-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.tier-card{background:var(--card);padding:24px 22px;}
+.tier-card .t{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:2px;display:inline-block;margin-bottom:10px;}
+.tier-card.l1 .t{background:var(--sev3-tint);color:var(--sev3);}
+.tier-card.l2 .t{background:var(--sev2-tint);color:#8A5A0E;}
+.tier-card.l3 .t{background:var(--sev1-tint);color:var(--sev1);}
+.tier-card h4{font-size:1.1rem;margin-bottom:8px;font-weight:800;}
+.tier-card p{font-size:.87rem;color:var(--ink-soft);}
+@media (max-width:760px){.tier-row{grid-template-columns:1fr;}}
+
+/* ── table ────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--card);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem;}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:700;color:var(--slate);font-size:.85rem;}
+tr:last-child td{border-bottom:none;}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.03rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:700;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--sev1);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.96rem;max-width:820px;}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--slate);color:var(--paper);padding:64px 0;}
+.cta-band .section-kicker{color:#9AC4B9;}
+.cta-band h2{color:var(--paper);}
+.cta-band p{color:#C9D6D1;max-width:560px;margin-bottom:26px;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.88rem;color:#C9D6D1;}
+.cta-list li::before{content:"✓ ";color:var(--sev3);}
+.cta-band .btn-solid{background:var(--sev1);border-color:var(--sev1);}
+.cta-band .btn-solid:hover{background:#A6301F;}
+.cta-band .btn-ghost{border-color:#42625D;color:var(--paper);}
+.cta-band .btn-ghost:hover{background:#26403C;}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="#top">AGENT OPERATIONS</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#incident">Incident Loop</a></li>
+      <li><a href="#autonomy">Autonomy Tiers</a></li>
+      <li><a href="#cost">Cost &amp; Capacity</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Day-2 Operations</span>
+    <h1 class="hero-title">Shipping the agent<br/>was the <em>easy</em> part.</h1>
+    <p class="hero-sub">Agent operations is what happens after launch — the SLOs, the on-call rotation, the incident response loop, the runbooks, and the cost dashboards that keep a fleet of agents running reliably at 3 a.m. as well as it did in the demo.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#incident">See the incident response loop →</a>
+      <a class="btn btn-ghost" href="#autonomy">Check the autonomy tiers</a>
+    </div>
+    <div class="tab-frame reveal">
+      <span class="tab-label">overview</span>
+      <span class="frame-label">SLIDE <b>01</b> — AGENT OPERATIONS</span>
+      <img alt="Cover slide: Agent Operations" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide1000/agent-ops-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide1000/agent-ops-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Agent operations (AgentOps)</strong> is the SRE-style discipline of keeping a fleet of production AI agents reliable after they've shipped — service-level objectives, on-call rotations, incident response, runbooks, and cost and capacity management, applied to systems that don't fail the way traditional software does. Detection has to rely on statistical anomaly detection rather than hard thresholds, since agent outputs vary by design. On-call itself is changing shape too: a tiered autonomy model lets agents handle a narrow, well-understood slice of incidents independently, while the judgment calls that don't match a known pattern still route to a human. Done well, the pattern that holds across teams is agents absorbing the boring eighty percent of on-call, and humans keeping the interesting twenty percent that actually needs judgment.</p>
+  </div>
+</div>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 2 — WHAT AGENT OPS COVERS ═════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media">
+      <div class="tab-frame">
+        <span class="tab-label">scope</span>
+        <span class="frame-label">SLIDE <b>02</b> — WHAT AGENT OPERATIONS ACTUALLY COVERS</span>
+        <img alt="What agent operations covers: SLOs, on-call, incident response, cost management" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-2.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-2.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-2.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-2.png 900w" width="900"/>
+      </div>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Reliability isn't luck — it's engineering</span>
+      <h3 class="brief-title">Day-2 discipline for a fleet, not a demo</h3>
+      <p>Deployment gets an agent version safely into production. Operations is everything that keeps it healthy after that — defined severities and on-call rotations, incident response with real runbooks, postmortems that produce lessons instead of blame, and cost and capacity models that don't get discovered for the first time when the monthly bill arrives.</p>
+      <p>Without service-level objectives, every agent change is a risk with unknown consequences — there's no way to balance reliability against the speed of shipping improvements. AgentOps exists to make that trade-off deliberate rather than accidental.</p>
+    </div>
+  </div>
+</div>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 3 — SLOs FOR NON-DETERMINISTIC SYSTEMS ════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media">
+      <div class="tab-frame">
+        <span class="tab-label">SLOs</span>
+        <span class="frame-label">SLIDE <b>03</b> — SLOs FOR SYSTEMS THAT VARY BY DESIGN</span>
+        <img alt="Composite SLOs and statistical anomaly detection for agent reliability" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-3.png 900w" width="900"/>
+      </div>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A hard threshold assumes the wrong thing</span>
+      <h3 class="brief-title">Learn what normal looks like, then watch for drift</h3>
+      <p>Traditional SRE thresholds assume a metric that's stable when healthy. Agent outputs vary by design even when everything is working correctly, which makes a fixed threshold either too noisy or too blind. The alternative is statistical anomaly detection: learn an agent's normal behavioral range, then alert when it drifts outside configurable bounds — not when a single output looks unusual on its own.</p>
+      <p>Composite SLOs combine multiple signals into one reliability target, since no single metric captures whether an agent fleet is actually healthy. Reliability, quality, speed, and cost all need their own target, tied together, not tracked as four disconnected dashboards.</p>
+    </div>
+  </div>
+</div>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 4 — FIVE-PHASE INCIDENT RESPONSE LOOP ═════════════════ -->
+<section id="incident">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">When something breaks</span>
+      <h2 class="section-title">The five-phase incident response loop</h2>
+      <p class="section-lede">A single bad prompt can cascade across thousands of runs before the first alert lands — the loop exists to contain that before it compounds further.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media">
+        <div class="tab-frame">
+          <span class="tab-label sev1">incident</span>
+          <span class="frame-label">SLIDE <b>04</b> — DETECTION → CONTAINMENT → ERADICATION → RECOVERY → POSTMORTEM</span>
+          <img alt="Five-phase incident response loop for agentic workflows" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-4.png" srcset="
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-4.png 600w,
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-4.png 700w,
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-4.png 900w" width="900"/>
+        </div>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Every eradication action should be reversible</span>
+        <h3 class="brief-title">Roll it back, but keep the evidence</h3>
+        <p>Roll back a broken prompt, but capture the broken version for the postmortem. Pin a model, but keep logging the failure on the version that was rolled back so the upgrade can be safely re-attempted. A team that eradicates by deleting evidence loses the lesson the incident was trying to teach.</p>
+      </div>
+    </div>
+    <div class="phase-grid reveal">
+      <div class="phase-card"><div class="n">01</div><h5>Detection</h5><p>Statistical signals flag drift before it's visible to a user.</p></div>
+      <div class="phase-card"><div class="n">02</div><h5>Containment</h5><p>Stop the bleeding — quarantine the failing component.</p></div>
+      <div class="phase-card"><div class="n">03</div><h5>Eradication</h5><p>Remove the cause reversibly, preserving evidence for later.</p></div>
+      <div class="phase-card"><div class="n">04</div><h5>Recovery</h5><p>Unpause in measured tranches, verifying between each one.</p></div>
+      <div class="phase-card"><div class="n">05</div><h5>Postmortem</h5><p>Find the real cause, not just the symptom that was visible.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 5 — DETECTION SIGNALS ═════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media">
+      <div class="tab-frame">
+        <span class="tab-label sev2">detection</span>
+        <span class="frame-label">SLIDE <b>05</b> — THE SIGNALS THAT CATCH AGENT FAILURES</span>
+        <img alt="Detection signals that catch agent-specific failures classical monitoring misses" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-5.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-5.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-5.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-5.png 900w" width="900"/>
+      </div>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Every minute of detection is an order of magnitude of cost</span>
+      <h3 class="brief-title">Watching for agent failures, not web failures</h3>
+      <p>Classical-web monitoring instincts miss agent failures by design — cost can spike fifty-fold in an hour without a single traditional error rate moving. A fuller detection panel watches for agent decision drift against a baseline, human-escalation rate to the operator queue, tool selection entropy for a given workflow, and tenant-level outlier rates.</p>
+      <p>None of these signals exist without trace coverage at tool-call granularity and per-workflow cost attribution underneath them — the instrumentation layer detection depends on entirely.</p>
+    </div>
+  </div>
+</div>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 6 — AUTONOMY TIERS FOR ON-CALL AGENTS ═════════════════ -->
+<section id="autonomy">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">How much should the agent do alone</span>
+      <h2 class="section-title">Autonomy is a property of the action, not the agent</h2>
+      <p class="section-lede">The same agent can operate at a different autonomy level for different actions — cache invalidation, a service restart, and a database change don't deserve the same leash.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media">
+        <div class="tab-frame">
+          <span class="tab-label">on-call agents</span>
+          <span class="frame-label">SLIDE <b>06</b> — THREE-TIER AUTONOMY MODEL</span>
+          <img alt="Three-tier autonomy model for AI agents in on-call incident response" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-6.png" srcset="
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-6.png 600w,
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-6.png 700w,
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-6.png 900w" width="900"/>
+        </div>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">On-call isn't going away — it's changing shape</span>
+        <h3 class="brief-title">Not replacing on-call, augmenting it</h3>
+        <p>On-call isn't just running a runbook — it's noticing what isn't in the runbook and making a judgment call under pressure. Agents don't do that part well, and a realistic autonomy model doesn't ask them to. It reserves independent action for a narrow, pre-approved set of low-risk, high-frequency patterns.</p>
+      </div>
+    </div>
+    <div class="tier-row reveal">
+      <div class="tier-card l1"><span class="t">Advisory</span><h4>Suggests, human decides</h4><p>Agent reads logs and matches the incident to a runbook signature, suggesting a remediation. A human decides whether to run it.</p></div>
+      <div class="tier-card l2"><span class="t">Approval-gated</span><h4>Proposes, human confirms</h4><p>Agent proposes a specific action — "roll back the last deploy?" — and shows exactly what will change. Waits for explicit human confirmation before acting.</p></div>
+      <div class="tier-card l3"><span class="t">Conditional autonomy</span><h4>Acts, within a narrow scope</h4><p>For a small set of pre-approved, low-risk patterns — restarting a crash-looped stateless service — the agent acts independently, expanding scope only as safety metrics prove out.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 7 — MACHINE-READABLE RUNBOOKS ═════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media">
+      <div class="tab-frame">
+        <span class="tab-label">runbooks</span>
+        <span class="frame-label">SLIDE <b>07</b> — FROM WIKI PAGES TO MACHINE-READABLE PLAYS</span>
+        <img alt="Converting static runbooks into structured, agent-readable playbooks" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-7.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-7.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-7.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-7.png 900w" width="900"/>
+      </div>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A dusty wiki is too slow for an incident</span>
+      <h3 class="brief-title">Structured plays an agent can actually execute</h3>
+      <p>A static runbook page is fine for a human reading it at their own pace; an incident doesn't wait for that. The practical migration path starts small: pull the last few months of incidents, group them into recurring patterns, and convert the three to five highest-frequency, lowest-risk ones into structured steps an agent can dry-run before executing.</p>
+      <p>Wire those plays into the incident tool as an advisor first — showing the suggestion, letting a human execute manually — and only extend to one-click or automatic execution for the safest steps once the data shows the suggestions are reliably matching what the team would have done anyway.</p>
+    </div>
+  </div>
+</div>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 8 — COST & CAPACITY OPERATIONS ═════════════════════════ -->
+<section id="cost">
+  <div class="wrap">
+    <div class="brief-row reveal">
+      <div class="brief-media">
+        <div class="tab-frame">
+          <span class="tab-label sev2">cost &amp; capacity</span>
+          <span class="frame-label">SLIDE <b>08</b> — QUOTAS, BUDGETS, AND COMPOUNDING FORECASTS</span>
+          <img alt="Cost and capacity operations: quotas, budgets, and forecasting for agent fleets" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-8.png" srcset="
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-8.png 600w,
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-8.png 700w,
+              https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-8.png 900w" width="900"/>
+        </div>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Cost is an operational metric, not a finance surprise</span>
+        <h3 class="brief-title">Budget per agent, alert on the surge before the invoice</h3>
+        <p>Set quotas and cost budgets per agent and per user, monitor token and dollar cost per task continuously, and tie the resulting dashboards directly to SLOs rather than reviewing them separately once a month. Alerting on a surge the moment it starts is what turns a runaway cost incident into a five-minute fix instead of a line item someone discovers weeks later.</p>
+        <p>Capacity planning compounds in the same way: agentic forecasting models ingest operational telemetry — incident frequency, vendor lead times, request seasonality — that classical forecasts typically ignore, and every quarter's outcome sharpens the next quarter's prediction.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="timeline"><span class="tick">◷ T+0</span></div>
+
+<!-- ═══ SLIDE 9 — POSTMORTEMS WITHOUT AGENT-BLAME ═══════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media">
+      <div class="tab-frame">
+        <span class="tab-label sev3">postmortem</span>
+        <span class="frame-label">SLIDE <b>09</b> — POSTMORTEMS THAT FIND THE REAL CAUSE</span>
+        <img alt="Postmortem discipline that avoids agent-blame and finds the real root cause" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-9.png 900w" width="900"/>
+      </div>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">"The agent hallucinated" is a symptom, not a cause</span>
+      <h3 class="brief-title">Force the postmortem to look at the system</h3>
+      <p>The single most common failure mode in an agent postmortem is writing "the agent hallucinated" as the root cause and closing the ticket. That sentence describes what happened, not why — the real cause is almost always a missing guardrail, an eval-coverage gap, a context-engineering bug, or a mismatch between a tool's schema and what the agent expected.</p>
+      <p>A working postmortem template forces that system view with explicit prompts at each section, rather than trusting the writer to remember to look past the obvious symptom on their own.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media">
+      <div class="tab-frame">
+        <span class="tab-label">outcomes</span>
+        <span class="frame-label">SLIDE <b>10</b> — THE BORING 80%, HANDLED</span>
+        <img alt="Summary: agents handling the boring 80% of operations, humans keeping the interesting 20%" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide1000/agent-ops-10.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide600/agent-ops-10.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide700/agent-ops-10.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide900/agent-ops-10.png 900w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-ops/images/Slide1000/agent-ops-10.png 1000w" width="1000"/>
+      </div>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The result worth measuring</span>
+      <h3 class="brief-title">MTTR halved, without a different runbook</h3>
+      <p>The pattern that holds across teams that do this well: incident-response augmentation roughly halves mean-time-to-resolution within a quarter of deployment, without changing the underlying severity matrix or escalation policy. The win comes entirely from removing the slowest human steps inside the existing runbook — reading logs, finding the right one, drafting the update — not from a fundamentally different process.</p>
+      <p>New roles emerge around this rather than fewer people: an Incident Commander who manages the human-agent boundary live during response, and a Capacity Analyst whose compounding forecasts become one of the most influential inputs into operational leadership decisions over time. The goal was never fewer humans in operations — it's better-used ones.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent operations FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between agent deployment and agent operations?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Deployment gets a new agent version safely into production through staged rollout gates. Operations is everything that keeps it healthy after that point — SLOs, on-call, incident response, runbooks, postmortems, and cost and capacity management for the ongoing life of the system, not just the release moment.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why can't agent monitoring use hard alert thresholds like traditional software?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Because agent outputs vary by design even when the system is working correctly, so a fixed threshold is either too noisy to be useful or too blind to catch a real problem. Statistical anomaly detection instead learns an agent's normal behavioral range and alerts on meaningful drift from that baseline, rather than comparing every output to a single static number.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What are the five phases of agent incident response?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Detection (statistical signals flag drift), containment (stop the failure from spreading), eradication (remove the cause reversibly, preserving evidence), recovery (unpause in measured, verified tranches rather than all at once), and postmortem (find the actual root cause, not just the visible symptom).</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Should on-call agents be allowed to act autonomously?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Only for a narrow, pre-approved set of low-risk, high-frequency actions, and autonomy should be scoped per action rather than per agent — the same agent might act independently on cache invalidation while requiring explicit human confirmation for a service restart and full manual review for anything touching a database.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why is "the agent hallucinated" considered a bad postmortem root cause?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Because it describes the symptom of the failure, not its cause. The actual root cause behind a hallucination is almost always something more specific and fixable — a missing guardrail, a gap in evaluation coverage, a context-engineering bug, or a mismatch between what a tool expected and what the agent sent it.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How much can agent-assisted incident response actually reduce MTTR?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Teams that deploy agentic triage, log synthesis, and root-cause hypothesis generation commonly see mean-time-to-resolution cut roughly in half within a quarter — without changing the underlying severity matrix or escalation policy. The improvement comes from removing the slowest cognitive steps inside the existing runbook, not from a new process.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to build your agent operations playbook?</h2>
+    <p>Define composite SLOs before your next incident, convert your three highest-frequency runbooks into structured plays, and scope autonomy per action from day one.</p>
+    <ul class="cta-list">
+      <li>A composite SLO worksheet across reliability, quality, speed, and cost</li>
+      <li>A five-phase incident response template with forcing-function postmortem prompts</li>
+      <li>A runbook-to-playbook conversion checklist for your top incident patterns</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#incident">Revisit the incident response loop →</a>
+      <a class="btn btn-ghost" href="#autonomy">Back to autonomy tiers</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','incident','autonomy','cost','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>
