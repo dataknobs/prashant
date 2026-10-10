@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" data-related-json="folder-pages.json" data-related-keywords="data product ai genai" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Data Interoperability Across Communicating Domains</title>
+<style id="related-articles-noimage-css">
+
+#related-articles-root{margin:2rem auto;max-width:1100px;padding:1rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}#related-articles-root h2{margin:0 0 .25rem;font-size:1.45rem}#related-articles-root .dp-related-intro{color:#5d6678;margin:0 0 1rem}.related-articles-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.related-article-card{display:block;text-decoration:none;color:#172033;background:#fff;border:1px solid #dfe4ec;border-radius:12px;padding:.9rem;line-height:1.35;font-weight:700}.related-article-card:hover{border-color:#bdb6ff;background:#f2f0ff}@media(max-width:800px){.related-articles-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.related-articles-grid{grid-template-columns:1fr}}
+
+</style>
+<!-- Meta Description & Keywords -->
+<meta content="A comprehensive guide on achieving data interoperability across communicating domains through standardized identity, semantics, and message behavior.… This page focuses on…" name="description"/>
+<meta content="Data Interoperability, Cross-Domain Architecture, UUIDv7, CloudEvents, JSON-LD, Semantic Layer, Event-Driven Architecture, Data Mesh, Avro, Protobuf, Schema Evolution, API-led Connectivity, Master Data Management, Zero Trust" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Mermaid JS for Diagrams -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+<style>
+        /* Custom styles to complement Tailwind */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4 {
+            color: #111827;
+            margin-top: 2em;
+            margin-bottom: 0.75em;
+            font-weight: 700;
+        }
+        h1 { font-size: 2.25rem; margin-top: 1em; }
+        h2 { font-size: 1.875rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.3em; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+        p { margin-bottom: 1.25em; color: #374151; }
+        a { color: #2563eb; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { margin-bottom: 1.25em; padding-left: 1.5em; color: #374151; }
+        ul { list-style-type: disc; }
+        li { margin-bottom: 0.5em; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2em; font-size: 0.95rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75em 1em; text-align: left; vertical-align: top; }
+        th { background-color: #f3f4f6; font-weight: 600; color: #1f2937; }
+        tr:nth-child(even) { background-color: #f9fafb; }
+        pre { background-color: #1e293b; color: #f8fafc; padding: 1.25em; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1.5em; font-size: 0.875rem; }
+        code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        p code, li code { background-color: #f1f5f9; color: #ef4444; padding: 0.15em 0.3em; border-radius: 0.25rem; font-size: 0.875em; }
+        sup { color: #6b7280; font-size: 0.75em; }
+        .mermaid { margin: 2em 0; display: flex; justify-content: center; }
+    </style>
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="A comprehensive guide on achieving data interoperability across communicating domains through standardized identity, semantics, and message behavior.… This page focuses on…" name="ai-summary"/><meta content="Data Mesh" name="topic"/><link href="https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Data Interoperability Across Communicating Domains" property="og:title"/><meta content="A comprehensive guide on achieving data interoperability across communicating domains through standardized identity, semantics, and message behavior.… This page focuses on…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Data Interoperability Across Communicating Domains" name="twitter:title"/><meta content="A comprehensive guide on achieving data interoperability across communicating domains through standardized identity, semantics, and message behavior.… This page focuses on…" name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html#article","url":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html#webpage"},"headline":"Data Interoperability Across Communicating Domains","description":"A comprehensive guide on achieving data interoperability across communicating domains through standardized identity, semantics, and message behavior.… This page focuses on…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Data Mesh"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html#webpage","url":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html","name":"Data Interoperability Across Communicating Domains","description":"A comprehensive guide on achieving data interoperability across communicating domains through standardized identity, semantics, and message behavior.… This page focuses on…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Data Mesh","item":"https://prashant.dhingra.website/data-products/data-mesh/"},{"@type":"ListItem","position":3,"name":"Data Interoperability Across Communicating Domains","item":"https://prashant.dhingra.website/data-products/data-mesh/data-interoperability-guide.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="bg-gray-50 antialiased"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-white shadow-xl mt-8 mb-12 rounded-xl">
+<header class="mb-10 text-center">
+<h1 class="text-4xl font-extrabold tracking-tight text-gray-900 mb-4">Data Interoperability Across Communicating Domains</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Data Mesh</a></p>
+</header>
+<section>
+<h2>Executive summary</h2>
+<p>Interoperability across domains (e.g., Customer, Marketing, Finance; or Healthcare, Logistics, Payments) succeeds only when <strong>identity</strong>, <strong>meaning</strong>, and <strong>message behavior</strong> are standardized together then governed as a living system rather than a one-time integration project.</p>
+<p>At the identifier layer, domains need a clear split between <strong>locally-minted operational IDs</strong> (fast, non-semantic, collision-resistant) and <strong>globally meaningful, resolvable identifiers</strong> (stable across organizational boundaries and time). Modern UUID practice is increasingly time-ordered (e.g., UUIDv7) to reduce database index fragmentation while still being globally unique without central coordination. RFC 9562 defines UUIDs as 128-bit identifiers and explicitly introduces versions including v6 (reordered time-based) and v7 (Unix-epoch time-ordered), with guidance that systems not tied to legacy v1 "should use UUIDv7" for new designs. <sup>[1]</sup></p>
+<p>At the semantic layer, interoperability breaks down most often due to <strong>drift in business definitions</strong> ("customer," "consent," "revenue," "campaign attribution") rather than serialization choice. A shared semantic layer is typically expressed as (a) <strong>controlled vocabularies</strong> (SKOS), (b) <strong>formal ontologies</strong> (OWL/RDF), and/or (c) <strong>schema registries + metadata registries</strong> (for operational enforcement). W3C standards define RDF as a graph-based data model for describing resources and relationships, OWL 2 as an ontology language with formally defined meaning, and SKOS as a common model for sharing and linking controlled vocabularies. <sup>[2]</sup> For organizational governance of "data definitions," ISO/IEC 11179 establishes a framework for metadata registries, useful as a conceptual backbone for enterprise-wide term stewardship. <sup>[3]</sup></p>
+<p>At the event/message layer, challenges concentrate around <strong>schema evolution</strong>, <strong>idempotency</strong>, <strong>ordering</strong>, and <strong>error semantics</strong>. CloudEvents provides vendor-neutral event metadata so events can be routed/observed consistently across systems. The CloudEvents core spec defines required attributes (notably <code>id</code>, <code>source</code>, <code>type</code>, <code>specversion</code>) and states that producers must ensure uniqueness of <code>source</code> + <code>id</code>, while consumers may treat identical source and id as duplicates directly supporting deduplication patterns. <sup>[4]</sup> For modeling, Avro and Protobuf provide well-defined schema evolution mechanisms: Avro requires availability of the writer schema and defines how reader/writer differences are resolved; Protobuf emphasizes stable field numbers and classifies changes as wire-safe/unsafe, explicitly warning that reusing field numbers can cause severe issues including data corruption. <sup>[5]</sup></p>
+<p>Architecturally, cross-domain interoperability is usually a portfolio: <strong>API-led connectivity</strong> for request/response business capabilities, <strong>event-driven integration</strong> for propagation of facts and decoupling, and (in analytics-heavy environments) <strong>data mesh</strong> for domain-owned "data products." Data mesh is commonly framed around four principles domain-oriented ownership, data as a product, self-serve data platform, and federated computational governance. <sup>[6]</sup> Operationally, interoperability becomes reliable when these layers are bound into explicit <strong>data contracts</strong> (schema + semantics + SLAs + quality/security expectations). The Open Data Contract Standard (ODCS) is one concrete, open specification for expressing such contracts. <sup>[7]</sup></p>
+<p>The remainder of this report provides a rigorous breakdown of: identifier strategies (with governance and resolution), shared semantic layers (and versioning), standardized event formats (with idempotency/ordering), cross-domain architectures (trade-offs and use-case recommendations), and a detailed Customer→Marketing→Finance example flow complete with concrete message formats, semantic mapping, error handling, and reconciliation.</p>
+</section>
+<section>
+<h2>Global identifiers and persistent naming</h2>
+<p>A cross-domain system needs a <strong>layered identity strategy</strong> rather than a single "ID type." The practical goal is to ensure every important business entity and message can be (a) <strong>uniquely identified</strong>, (b) <strong>safely exchanged</strong>, (c) <strong>deconflicted across domains</strong>, and (d) <strong>optionally resolved</strong> to authoritative metadata while respecting privacy and lifecycle constraints.</p>
+<h3>Core identifier families and what they optimize for</h3>
+<ul>
+<li><strong>UUIDs (operational uniqueness, low coordination).</strong> RFC 9562 defines UUIDs as 128-bit identifiers intended to provide uniqueness across space and time, with no central registration requirement. <sup>[8]</sup> It defines multiple UUID versions; notably: UUIDv4 for random/pseudorandom generation, UUIDv6 as a reordering of UUIDv1 to improve database locality, and UUIDv7 as time-ordered using Unix epoch milliseconds. <sup>[9]</sup> This matters cross-domain because globally unique IDs remove the need for shared counters and reduce collision risk.</li>
+<li><strong>URNs (name persistence, managed namespaces).</strong> RFC 8141 defines URNs as URIs assigned under the <code>urn</code> scheme with the intent of being persistent and location-independent. It emphasizes managed namespace assignment. <sup>[10]</sup></li>
+<li><strong>HTTP(S) URIs (global uniqueness + web-native resolvability).</strong> RFC 3986 defines URI generic syntax. In practice, a domain-controlled URI namespace is the most straightforward way to get <strong>both a global identifier and resolvability</strong>. <sup>[11]</sup></li>
+<li><strong>DOIs and the DOI ecosystem (persistence + governance + resolution).</strong> ISO 26324:2025 specifies the DOI system’s syntax and resolution components. <sup>[12]</sup> This is generally the right fit for <strong>public, citable, long-lived digital assets</strong>.</li>
+<li><strong>Handle System identifiers (resolution infrastructure).</strong> RFC 3650 provides an overview of the Handle System as a secured global name service, enabling resolution of handles to current state information. <sup>[15]</sup></li>
+<li><strong>ARKs and N2T (resolver infrastructure across many schemes).</strong> The ARK ecosystem includes the N2T "Name-to-Thing" global resolver, illustrating that <strong>resolution can be implemented as a shared service layer</strong>. <sup>[16]</sup></li>
+</ul>
+<h3>Governance, resolution, and collision avoidance principles</h3>
+<p>Collision avoidance is not only a math problem; it’s a governance contract. CloudEvents formalizes a valuable collision-avoidance pattern at the messaging level: uniqueness is scoped as <code>source</code> + <code>id</code> rather than id alone. <sup>[4]</sup></p>
+<p>Privacy and compliance constraints shape identifier formats. Regulations like GDPR establish principles such as data minimization, which strongly argues against embedding PII directly in identifiers. <sup>[18]</sup></p>
+<h3>Comparative table of identifier schemes</h3>
+<div class="overflow-x-auto">
+<table>
+<thead>
+<tr>
+<th>Identifier type</th>
+<th>Primary strength</th>
+<th>Governance model</th>
+<th>Resolution model</th>
+<th>Collision avoidance</th>
+<th>Typical cross-domain use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UUID (v4/v7)</strong></td>
+<td>Global uniqueness without central registry; suitable for internal IDs</td>
+<td>Purely algorithmic (no registry required)</td>
+<td>Not inherent; can be embedded in URIs/URNs</td>
+<td>128-bit with defined versions; v7 time-ordered guidance</td>
+<td>Event IDs, entity surrogate keys, correlation IDs</td>
+</tr>
+<tr>
+<td><strong>URN</strong></td>
+<td>Persistent, location-independent naming under managed namespaces</td>
+<td>Namespace registration with IANA; assignment is managed</td>
+<td>Depends on resolvers; URN by itself is not a URL</td>
+<td>Namespace scoping minimizes name ambiguity</td>
+<td>Cross-community naming (e.g., urn:uuid:...; urn:doi:...)</td>
+</tr>
+<tr>
+<td><strong>HTTP(S) URI</strong></td>
+<td>Web-native global IDs; resolvability</td>
+<td>Owner-controlled via DNS + URI design plus long-term stewardship</td>
+<td>HTTP resolution (often with redirects and access control)</td>
+<td>Uniqueness via DNS authority where controlled</td>
+<td>"Global business IDs" used across domains and APIs</td>
+</tr>
+<tr>
+<td><strong>DOI</strong></td>
+<td>Persistent identification + standardized resolution + metadata ecosystem</td>
+<td>ISO 26324 system; DOI Foundation as registration authority</td>
+<td>DOI proxy/resolution using Handle System infrastructure</td>
+<td>Prefix governance+registry; designed for persistence</td>
+<td>Citable digital objects, datasets, publications, assets</td>
+</tr>
+<tr>
+<td><strong>Handle</strong></td>
+<td>Global name service designed for persistence over changing location</td>
+<td>Handle System governance; open protocol</td>
+<td>Resolution to current state values; secure resolution supported</td>
+<td>Naming authority prefix + suffix ensures uniqueness</td>
+<td>PID infrastructure, durable object identifiers</td>
+</tr>
+<tr>
+<td><strong>ARK (via N2T)</strong></td>
+<td>Flexible, archival-oriented identifiers; resolver ecosystem</td>
+<td>Community/organizational stewardship</td>
+<td>N2T routes/resolves many identifier types</td>
+<td>Uniqueness via assigned authorities + minting rules</td>
+<td>Archival objects; sometimes interoperable resolver layer</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Recommended identifier choices by use case</h3>
+<div class="overflow-x-auto">
+<table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Recommended choice</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High-volume internal entity IDs (Customer, Order, Invoice)</td>
+<td>UUIDv7 as the primary key; also publish a resolvable URI form</td>
+<td>UUIDv7 improves locality while remaining globally unique. A URI representation makes the ID globally referenceable.</td>
+</tr>
+<tr>
+<td>Cross-domain message deduplication</td>
+<td>CloudEvents <code>source</code> + <code>id</code> plus an idempotency store on consumers</td>
+<td>CloudEvents defines source + id uniqueness and allows consumers to treat identical pairs as duplicates.</td>
+</tr>
+<tr>
+<td>Long-lived citation of datasets/assets</td>
+<td>DOI (or Handle/ARK depending on community)</td>
+<td>DOI is standardized under ISO 26324 with established governance and resolution components.</td>
+</tr>
+<tr>
+<td>Identifiers that must not reveal information</td>
+<td>Opaque IDs (UUID/Handle/ARK), never PII-in-ID</td>
+<td>Aligns with privacy-by-design principles such as GDPR data minimization.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section>
+<h2>Shared semantic layers and metadata governance</h2>
+<p>Even perfect identifiers don’t solve interoperability if domains disagree on what those identifiers <strong>mean</strong>. A robust semantic layer combines <strong>machine-readable vocabularies/ontologies</strong>, <strong>human-governed definitions</strong>, and <strong>enforceable schemas</strong>.</p>
+<h3>Semantic building blocks</h3>
+<ul>
+<li><strong>RDF:</strong> A graph-based model allowing multiple graphs and named graphs, useful for representing domain facts. <sup>[21]</sup></li>
+<li><strong>OWL:</strong> For formal semantics and inference, supporting advanced cross-domain reasoning. <sup>[22]</sup></li>
+<li><strong>SKOS:</strong> The pragmatic sweet spot for defining controlled vocabularies and taxonomies. <sup>[23]</sup></li>
+<li><strong>JSON-LD:</strong> A powerful glue between event-driven architectures (that often standardize on JSON) and semantic interoperability. <sup>[24]</sup></li>
+<li><strong>Metadata registries:</strong> ISO/IEC 11179 provides a framework for treating enterprise definitions as "registered assets." <sup>[3]</sup></li>
+<li><strong>PROV-O:</strong> Essential for tracking provenance (who asserted what, when, and based on which sources). <sup>[26]</sup></li>
+</ul>
+<h3>Semantic governance and versioning patterns</h3>
+<p>A practical governance design separates semantic assets into three tiers: <strong>Foundational (enterprise) terms</strong>, <strong>Domain terms</strong>, and <strong>Local implementation fields</strong>. The <em>Message Translator</em> and <em>Canonical Data Model</em> patterns from Enterprise Integration Patterns help manage translation complexity. <sup>[28][29]</sup></p>
+<div class="overflow-x-auto mt-4">
+<table>
+<thead>
+<tr>
+<th>Semantic layer artifact</th>
+<th>What it standardizes</th>
+<th>Strengths</th>
+<th>Trade-offs</th>
+<th>Best-fit scenarios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SKOS vocabulary</strong></td>
+<td>Controlled terms, labels, hierarchies, mappings</td>
+<td>Pragmatic, tool-friendly, good for "code lists"</td>
+<td>Limited formal reasoning vs OWL</td>
+<td>Shared taxonomies (segments, categories, reason codes)</td>
+</tr>
+<tr>
+<td><strong>OWL ontology</strong></td>
+<td>Formal semantics, constraints, inference</td>
+<td>High expressiveness; supports reasoning</td>
+<td>Higher governance cost; requires expertise</td>
+<td>Cross-domain conceptual models; normalization</td>
+</tr>
+<tr>
+<td><strong>JSON-LD</strong></td>
+<td>Semantics for JSON via <code>@context</code></td>
+<td>Bridges JSON systems to IRIs; incremental adoption</td>
+<td>Context/version governance needed</td>
+<td>Event payloads needing semantic clarity</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section>
+<h2>Standardized event formats and evolution semantics</h2>
+<p>Cross-domain communication increasingly relies on events, but events only work at scale if <strong>metadata, schema evolution, deduplication, ordering expectations, and error semantics</strong> are standardized.</p>
+<h3>Event envelopes and routing metadata with CloudEvents</h3>
+<p>CloudEvents requires key context attributes (<code>id</code>, <code>source</code>, <code>type</code>, <code>specversion</code>) and standardizes how event metadata is carried independent of payload. The spec recommends event type values be prefixed with a reverse-DNS name. <sup>[30][31]</sup></p>
+<h3>Serialization and schema evolution: Avro vs Protobuf</h3>
+<ul>
+<li><strong>Avro:</strong> Defines explicit <em>schema resolution</em> rules for differences between writer and reader schemas. Requires the availability of the writer schema. <sup>[34][35]</sup></li>
+<li><strong>Protobuf:</strong> Emphasizes stable field numbers and classifies changes as wire-safe/unsafe. The guide explicitly warns that reusing field numbers can cause severe issues including data corruption. <sup>[36][37][38]</sup></li>
+</ul>
+</section>
+<section>
+<h2>Cross-domain interoperability architectures and patterns</h2>
+<h3>Patterns and their trade-offs</h3>
+<ul>
+<li><strong>API-led integration:</strong> Request/response capabilities for synchronous commands and user-facing interfaces. <sup>[47]</sup></li>
+<li><strong>Event-driven architectures:</strong> Standardized events for decoupling, state propagation, and scalable fan-out. <sup>[49]</sup></li>
+<li><strong>Data mesh:</strong> Analytics-oriented, domain-owned data products with federated computational governance. <sup>[6]</sup></li>
+<li><strong>Data contracts:</strong> Explicit interoperability units unifying schema, semantics, SLAs, and security (e.g., ODCS). <sup>[7]</sup></li>
+</ul>
+<h3>Security, privacy, and access control</h3>
+<p>Adopt a <strong>Zero Trust</strong> stance as defined by NIST SP 800-207, shifting defenses from static perimeters to focusing on users and assets. Use OAuth 2.0 and bearer tokens for API access, and design for privacy by minimizing PII exposure. <sup>[50][51]</sup></p>
+</section>
+<section>
+<h2>Worked example: Customer to Marketing to Finance flow</h2>
+<p>This example assumes <em>no specific vendor stack</em>, but uses: CloudEvents + JSON payloads (optionally JSON-LD), a schema registry, and explicit data contracts.</p>
+<h3>Reference architecture diagram</h3>
+<div class="mermaid">
+        flowchart TB
+          subgraph DomainA[Customer Domain]
+            CAPI[Customer API\n(OpenAPI)]
+            CDB[(Customer DB)]
+            COUT[Outbox/Publisher]
+          end
+          subgraph Bus[Interoperability Backbone]
+            EV[Event Backbone\nCloudEvents envelope]
+            SR[(Schema Registry)]
+            MR[(Mapping Registry\nSemantics + ID mappings)]
+          end
+          subgraph DomainB[Marketing Domain]
+            MCON[Marketing Consumer]
+            MDB[(Marketing DB)]
+            MOUT[Marketing Publisher]
+          end
+          subgraph DomainC[Finance Domain]
+            FCON[Finance Consumer]
+            FDB[(Finance DB)]
+            FOUT[Finance Publisher]
+          end
+          CAPI --&gt; CDB --&gt; COUT --&gt; EV
+          SR --- EV
+          MR --- EV
+          EV --&gt; MCON --&gt; MDB --&gt; MOUT --&gt; EV
+          EV --&gt; FCON --&gt; FDB --&gt; FOUT --&gt; EV
+        </div>
+<h3>Sequence diagram</h3>
+<div class="mermaid">
+        sequenceDiagram
+          autonumber
+          participant Customer as Customer Domain
+          participant EventBus as Event Backbone
+          participant Marketing as Marketing Domain
+          participant Finance as Finance Domain
+          Customer-&gt;&gt;Customer: CreateCustomer(command)
+          Customer-&gt;&gt;EventBus: Publish CustomerCreated (CloudEvent)
+          EventBus--&gt;&gt;Marketing: Deliver CustomerCreated
+          Marketing-&gt;&gt;Marketing: Idempotent consume + map identifiers
+          Marketing-&gt;&gt;EventBus: Publish MarketingContactUpserted (CloudEvent)
+          EventBus--&gt;&gt;Finance: Deliver CustomerCreated
+          Finance-&gt;&gt;Finance: Idempotent consume + create billing account
+          Finance-&gt;&gt;EventBus: Publish FinanceAccountCreated (CloudEvent)
+          EventBus--&gt;&gt;Customer: Optional: deliver FinanceAccountCreated for reference
+        </div>
+<h3>Concrete message formats</h3>
+<h4>CustomerCreated event (CloudEvents, JSON-LD)</h4>
+<pre><code class="language-json">{
+  "specversion": "1.0",
+  "type": "com.example.customer.created.v1",
+  "source": "https://customer.example.com",
+  "id": "018f3b55-7a75-7b7a-9c2b-9d5d8c2a3d12",
+  "time": "2026-03-15T18:12:45Z",
+  "subject": "https://id.example.com/customer/018f3b55-7a75-7b7a-9c2b-9d5d8c2a3d00",
+  "datacontenttype": "application/ld+json",
+  "dataschema": "https://schemas.example.com/customer/CustomerCreated/1.0.0",
+  "correlationid": "urn:uuid:018f3b55-7a75-7b7a-9c2b-9d5d8c2a3cff",
+  "data": {
+    "@context": {
+      "cust": "https://example.com/vocab/customer#",
+      "schema": "https://schema.org/",
+      "customer": "cust:Customer",
+      "customerId": "@id",
+      "email": "schema:email",
+      "consent": "cust:marketingConsent",
+      "consentTimestamp": "cust:marketingConsentTimestamp"
+    },
+    "@type": "customer",
+    "@id": "https://id.example.com/customer/018f3b55-7a75-7b7a-9c2b-9d5d8c2a3d00",
+    "email": "alice@example.com",
+    "consent": "opt_in",
+    "consentTimestamp": "2026-03-15T18:12:45Z"
+  }
+}</code></pre>
+<h4>MarketingContactUpserted event</h4>
+<pre><code class="language-json">{
+  "specversion": "1.0",
+  "type": "com.example.marketing.contact.upserted.v1",
+  "source": "https://marketing.example.com",
+  "id": "018f3b56-2cda-7d0a-8b12-6b557f3d90aa",
+  "time": "2026-03-15T18:12:49Z",
+  "subject": "https://id.example.com/customer/018f3b55-7a75-7b7a-9c2b-9d5d8c2a3d00",
+  "datacontenttype": "application/json",
+  "dataschema": "https://schemas.example.com/marketing/MarketingContactUpserted/1.0.0",
+  "correlationid": "urn:uuid:018f3b55-7a75-7b7a-9c2b-9d5d8c2a3cff",
+  "data": {
+    "customerUri": "https://id.example.com/customer/018f3b55-7a75-7b7a-9c2b-9d5d8c2a3d00",
+    "marketingContactId": "mkt_9f2a12c0",
+    "segment": "new_customer",
+    "consentStatus": "opt_in"
+  }
+}</code></pre>
+</section>
+<section>
+<h2>Best practices, governance checklist, and implementation roadmap</h2>
+<h3>Governance checklist</h3>
+<ul>
+<li><strong>Identifier governance:</strong> Named minting authorities, ID format catalog, deprecation rules.</li>
+<li><strong>Semantic governance:</strong> Canonical definitions, vocabulary versioning rules, provenance strategy.</li>
+<li><strong>Schema/event governance:</strong> Event catalog, CI gates (Protobuf/Avro compatibility), idempotency requirements.</li>
+<li><strong>Security and privacy governance:</strong> Zero Trust policy alignment, OAuth 2.0 profiles, PII minimization checks.</li>
+</ul>
+<h3>Implementation roadmap with milestones and estimated effort</h3>
+<div class="overflow-x-auto">
+<table>
+<thead>
+<tr>
+<th>Phase milestone</th>
+<th>Outcomes</th>
+<th>Typical effort (PW)</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interoperability foundation charter</td>
+<td>Governance bodies, RACI, initial standards baseline</td>
+<td>6–12 PW</td>
+<td>Includes aligning on CloudEvents adoption and ID policy.</td>
+</tr>
+<tr>
+<td>Shared semantic baseline</td>
+<td>Foundational vocabulary, mapping registry approach</td>
+<td>8–16 PW</td>
+<td>Use SKOS/OWL where appropriate; JSON-LD for event payloads.</td>
+</tr>
+<tr>
+<td>Eventing and schema governance platform</td>
+<td>Schema registry workflows, CI rules, event catalog</td>
+<td>12–24 PW</td>
+<td>Must encode Protobuf/Avro compatibility rules.</td>
+</tr>
+<tr>
+<td>Pilot flow delivery</td>
+<td>Production-grade events, idempotent consumers</td>
+<td>20–40 PW</td>
+<td>Use CloudEvents source+id dedupe semantics.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="mt-16 text-sm text-gray-500 border-t border-gray-200 pt-8">
+<h3 class="text-xl font-semibold mb-4 text-gray-700">References</h3>
+<ul class="break-words">
+<li>[1], [9] etc. Protocol Buffers Guides: <a href="https://protobuf.dev/programming-guides/proto3/" target="_blank">https://protobuf.dev/programming-guides/proto3/</a></li>
+<li>[2], [21] RDF 1.1 Concepts: <a href="https://www.w3.org/TR/rdf11-concepts/" target="_blank">https://www.w3.org/TR/rdf11-concepts/</a></li>
+<li>[3] ISO/IEC 11179: <a href="https://www.iso.org/standard/78914.html" target="_blank">https://www.iso.org/standard/78914.html</a></li>
+<li>[4], [30] CloudEvents Spec: <a href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md" target="_blank">https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md</a></li>
+<li>[5], [34] Apache Avro Spec: <a href="https://avro.apache.org/docs/1.11.1/specification/" target="_blank">https://avro.apache.org/docs/1.11.1/specification/</a></li>
+<li>[6], [56] Data Mesh Principles: <a href="https://martinfowler.com/articles/data-mesh-principles.html" target="_blank">https://martinfowler.com/articles/data-mesh-principles.html</a></li>
+<li>[7] Open Data Contract Standard: <a href="https://bitol-io.github.io/open-data-contract-standard/v2.2.2/home/" target="_blank">https://bitol-io.github.io/open-data-contract-standard/v2.2.2/home/</a></li>
+<li>[8] RFC 9562 (UUIDs): <a href="https://datatracker.ietf.org/doc/html/rfc9562" target="_blank">https://datatracker.ietf.org/doc/html/rfc9562</a></li>
+<li>[10] RFC 8141 (URNs): <a href="https://datatracker.ietf.org/doc/html/rfc8141" target="_blank">https://datatracker.ietf.org/doc/html/rfc8141</a></li>
+<li>[11], [64] RFC 3986 (URIs): <a href="https://www.rfc-editor.org/rfc/rfc3986" target="_blank">https://www.rfc-editor.org/rfc/rfc3986</a></li>
+<li>[24] JSON-LD Spec: <a href="https://www.w3.org/news/2020/json-ld-1-1-specifications-are-w3c-recommendations/" target="_blank">https://www.w3.org/news/2020/json-ld-1-1-specifications-are-w3c-recommendations/</a></li>
+<li>[29] Canonical Data Model (EIP): <a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/CanonicalDataModel.html" target="_blank">https://www.enterpriseintegrationpatterns.com/patterns/messaging/CanonicalDataModel.html</a></li>
+<li>[50], [74] NIST Zero Trust Architecture: <a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank">https://csrc.nist.gov/pubs/sp/800/207/final</a></li>
+<li>[51], [68] RFC 6749 (OAuth 2.0): <a href="https://www.rfc-editor.org/rfc/rfc6749" target="_blank">https://www.rfc-editor.org/rfc/rfc6749</a></li>
+</ul>
+<p class="mt-4 italic">Note: See the original document for the complete exhaustive list of reference URLs.</p>
+</section>
+</div>
+<script id="related-articles-noimage-js">
+
+(function(){const root=document.getElementById('related-articles-root');if(!root||root.dataset.rendered==='true')return;fetch('/data-products/assets/site-index.json').then(r=>r.json()).then(items=>{const here=location.pathname.replace(/^\/data-products\/?/,'').replace(/\/$/,'/index.html')||'index.html';const current=items.find(x=>x.public===here);const pool=items.filter(x=>x.public!==here&&x.indexable!==false);pool.sort((a,b)=>((b.category===current?.category)-(a.category===current?.category)));const chosen=pool.slice(0,Number(root.dataset.limit||4));root.innerHTML='<h2>'+(root.dataset.heading||'Related reading')+'</h2><p class="dp-related-intro">'+(root.dataset.intro||'Continue with closely related guides.')+'</p><div class="related-articles-grid">'+chosen.map(x=>'<a class="related-article-card" href="'+x.href+'">'+x.title+'</a>').join('')+'</div>';}).catch(()=>{});})();
+
+</script>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/data-mesh/">Data Mesh and Data Products: Architecture and Governance</a><a href="/data-products/data-mesh/data-mesh-ai-report.html">Data Mesh for Data Product Development with AI | Data Mesh | Page 2</a><a href="/data-products/data-mesh/data-mesh-tutorial.html">Data Mesh Knowledge Tutorial | Architecture &amp; Best Practices</a><a href="/data-products/data-mesh/data-mesh-genai-interactive.html">Data Mesh for Data Product Development | Data Mesh Genai In | Page 2</a></div></aside><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-ai-report.html">Data Mesh Ai Report</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-genai-interactive.html">Data Mesh Genai Interactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-with-ai.html">Data Mesh With Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-mesh/data-mesh-with-genai.html">Data Mesh With Genai</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 prashant.dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer></body></html>

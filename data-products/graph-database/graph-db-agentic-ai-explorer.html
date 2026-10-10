@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" data-related-json="folder-pages.json" data-related-keywords="data product ai genai" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="An interactive exploration of Graph Databases: discover crucial use cases, the impact of Agentic AI and Knowledge Graphs, and the technical challenges of connected data." name="description"/>
+<meta content="Graph Database, GraphDB, Knowledge Graphs, Agentic AI, GenAI, GraphRAG, Fraud Detection, Recommendation Engines, Supply Chain, NoSQL, Cypher, Data Visualization" name="keywords"/>
+<title>Graph Databases &amp; Agentic AI: The Con | Graph Db Agentic AI Explorer</title>
+<style id="related-articles-noimage-css">
+
+#related-articles-root{margin:2rem auto;max-width:1100px;padding:1rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}#related-articles-root h2{margin:0 0 .25rem;font-size:1.45rem}#related-articles-root .dp-related-intro{color:#5d6678;margin:0 0 1rem}.related-articles-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.related-article-card{display:block;text-decoration:none;color:#172033;background:#fff;border:1px solid #dfe4ec;border-radius:12px;padding:.9rem;line-height:1.35;font-weight:700}.related-article-card:hover{border-color:#bdb6ff;background:#f2f0ff}@media(max-width:800px){.related-articles-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.related-articles-grid{grid-template-columns:1fr}}
+
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+        }
+        .nav-item.active {
+            background-color: #eff6ff;
+            color: #2563eb;
+            border-right: 3px solid #2563eb;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; 
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px; 
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 400px; }
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .step-line {
+            position: absolute;
+            left: 50%;
+            top: 100%;
+            width: 2px;
+            height: 2rem;
+            background-color: #cbd5e1;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+        @media (min-width: 768px) {
+            .step-line {
+                left: 100%;
+                top: 50%;
+                width: 2rem;
+                height: 2px;
+                transform: translateY(-50%);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<!-- Chosen Palette: Warm Neutral (Stone) with Tech Blue Accents -->
+<!-- Application Structure Plan: 
+         1. Sidebar Navigation: Organized logically by concept, use case, AI integration, and challenges.
+         2. Hero/Intro: Explains "Why Relationships Matter" with an interactive SQL vs Graph toggle.
+         3. Use Case Hub: Dynamic dashboard where users select a domain (Fraud, Social, etc.) to see specific topologies via Chart.js.
+         4. AI & Agents Section: Visualizes the GraphRAG pipeline and the symbiotic relationship between LLMs and Knowledge Graphs.
+         5. Challenges Section: A Radar chart visualizes the technical trade-offs.
+         Why: This structure educates the user on theory before showing high-impact practical applications and future-tech (AI).
+    -->
+<!-- Visualization & Content Choices:
+         1. Comparison: Grid-based visual logic.
+         2. Use Case Hub: Chart.js Scatter Plot with custom Edge Plugin.
+         3. AI Pipeline: Segmented process flow using Tailwind and flexbox.
+         4. Challenges: Chart.js Radar Chart for multi-dimensional comparison.
+    -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="noindex, follow" name="robots"/><meta content="An interactive exploration of Graph Databases: discover crucial use cases, the impact of Agentic AI and Knowledge Graphs, and the technical challenges of connected data." name="ai-summary"/><meta content="AI Agents" name="topic"/><link href="https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Graph Databases &amp; Agentic AI: The Con | Graph Db Agentic AI Explorer" property="og:title"/><meta content="An interactive exploration of Graph Databases: discover crucial use cases, the impact of Agentic AI and Knowledge Graphs, and the technical challenges of connected data." property="og:description"/><meta content="https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Graph Databases &amp; Agentic AI: The Con | Graph Db Agentic AI Explorer" name="twitter:title"/><meta content="An interactive exploration of Graph Databases: discover crucial use cases, the impact of Agentic AI and Knowledge Graphs, and the technical challenges of connected data." name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html#article","url":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html#webpage"},"headline":"Graph Databases & Agentic AI: The Con | Graph Db Agentic AI Explorer","description":"An interactive exploration of Graph Databases: discover crucial use cases, the impact of Agentic AI and Knowledge Graphs, and the technical challenges of connected data.","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"AI Agents"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html#webpage","url":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html","name":"Graph Databases & Agentic AI: The Con | Graph Db Agentic AI Explorer","description":"An interactive exploration of Graph Databases: discover crucial use cases, the impact of Agentic AI and Knowledge Graphs, and the technical challenges of connected data.","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"AI Agents","item":"https://prashant.dhingra.website/data-products/ai-agents/"},{"@type":"ListItem","position":3,"name":"Graph Databases & Agentic AI: The Con | Graph Db Agentic AI Explorer","item":"https://prashant.dhingra.website/data-products/graph-db/graph-db-agentic-ai-explorer.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="bg-stone-50 text-stone-800 h-screen flex flex-col md:flex-row overflow-hidden"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<!-- Mobile Header -->
+<header class="md:hidden bg-white border-b border-stone-200 p-4 flex justify-between items-center z-20">
+<h1 class="text-lg font-bold text-blue-800">GraphDB Explorer</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">AI Agents</a></p>
+<button class="text-stone-600 focus:outline-none" id="menu-btn">
+<span class="text-2xl">☰</span>
+</button>
+</header>
+<!-- Sidebar Navigation -->
+<nav class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 w-64 bg-white border-r border-stone-200 flex flex-col z-30 transition-transform duration-300 shadow-xl md:shadow-none" id="sidebar">
+<div class="p-6 border-b border-stone-100">
+<h2 class="text-2xl font-bold text-blue-900 tracking-tight">Graph Nexus</h2>
+<p class="text-xs text-stone-500 mt-1 uppercase tracking-wider">Connected Knowledge</p>
+</div>
+<div class="flex-1 overflow-y-auto py-4">
+<ul class="space-y-1">
+<li><button class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors active" data-target="intro" onclick="navTo('intro')">1. The Graph Concept</button></li>
+<li><button class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors" data-target="use-cases" onclick="navTo('use-cases')">2. Crucial Use Cases</button></li>
+<li><button class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors" data-target="ai-integration" onclick="navTo('ai-integration')">3. Agentic AI &amp; GenAI</button></li>
+<li><button class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors" data-target="challenges" onclick="navTo('challenges')">4. Challenges &amp; Limits</button></li>
+</ul>
+</div>
+<div class="p-6 bg-stone-50 border-t border-stone-200">
+<p class="text-[10px] text-stone-400 leading-tight">Interactive report on the state of Graph Database technologies.</p>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto custom-scroll relative p-4 md:p-8 scroll-smooth" id="main-content">
+<!-- Section 1: Introduction -->
+<section class="section-block max-w-5xl mx-auto mb-16 fade-in" id="intro">
+<div class="mb-8">
+<h2 class="text-3xl md:text-4xl font-bold text-stone-800 mb-4">Why Relationships Matter</h2>
+<p class="text-lg text-stone-600 leading-relaxed">
+                    Traditional databases manage tables; <span class="font-semibold text-blue-700">Graph Databases</span> manage connections. By storing data as nodes and edges, graphs allow for deep-link queries that uncover hidden patterns in real-time, bridging the gap between raw data and actionable intelligence.
+                </p>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-stone-700">Structural Contrast</h3>
+<div class="bg-stone-100 rounded-lg p-1 flex text-xs font-medium">
+<button class="px-3 py-1 rounded bg-white shadow text-blue-800 transition-all" id="btn-sql" onclick="toggleModel('sql')">Relational (SQL)</button>
+<button class="px-3 py-1 rounded text-stone-500 transition-all" id="btn-graph" onclick="toggleModel('graph')">Graph (Native)</button>
+</div>
+</div>
+<div class="h-64 flex flex-col justify-center items-center bg-stone-50 rounded-lg border border-stone-100 p-4 relative overflow-hidden" id="visual-sql">
+<div class="w-full max-w-xs bg-white border border-stone-300 shadow-sm mb-2 text-xs">
+<div class="bg-stone-200 p-1 font-bold border-b border-stone-300">Customer Table</div>
+<div class="p-1 grid grid-cols-2 gap-1">
+<div class="bg-stone-50 p-1">PK: 101</div>
+<div class="bg-stone-50 p-1">Name: J. Doe</div>
+</div>
+</div>
+<div class="text-stone-300 text-lg font-bold my-1">⇅ Foreign Key Link</div>
+<div class="w-full max-w-xs bg-white border border-stone-300 shadow-sm text-xs">
+<div class="bg-stone-200 p-1 font-bold border-b border-stone-300">Transaction Table</div>
+<div class="p-1 grid grid-cols-2 gap-1">
+<div class="bg-stone-50 p-1">CustID: 101</div>
+<div class="bg-stone-50 p-1">Amt: $450</div>
+</div>
+</div>
+<p class="absolute bottom-2 text-xs text-stone-400 italic">Relationships require computation (Joins).</p>
+</div>
+<div class="h-64 hidden bg-stone-50 rounded-lg border border-stone-100 relative overflow-hidden" id="visual-graph">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative w-full h-full">
+<div class="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
+<div class="w-12 h-12 rounded-full bg-blue-100 border-2 border-blue-500 flex items-center justify-center font-bold text-blue-700 shadow-md">Doe</div>
+<span class="text-[10px] mt-1 font-semibold text-stone-500">(:Person)</span>
+</div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-1 bg-blue-200 -rotate-45 origin-center z-0"></div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-0.5 text-[10px] text-blue-600 font-mono border border-blue-100 rounded z-10">(:PURCHASED)</div>
+<div class="absolute bottom-1/4 right-1/4 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
+<div class="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-500 flex items-center justify-center font-bold text-emerald-700 shadow-md">$450</div>
+<span class="text-[10px] mt-1 font-semibold text-stone-500">(:Order)</span>
+</div>
+</div>
+</div>
+<p class="absolute bottom-2 w-full text-center text-xs text-stone-400 italic">Relationships are physically stored.</p>
+</div>
+</div>
+<div class="flex flex-col justify-center space-y-4">
+<h3 class="font-bold text-stone-700">The Power of Adjacency</h3>
+<div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+<h4 class="font-semibold text-blue-900">Index-Free Traversal</h4>
+<p class="text-sm text-stone-600">Traversal speed is constant (O(1) per step), meaning performance is independent of total data volume, making it perfect for multi-hop queries.</p>
+</div>
+<div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-emerald-500">
+<h4 class="font-semibold text-emerald-900">Semantic Modeling</h4>
+<p class="text-sm text-stone-600">Maps directly to how the human brain and AI understands concepts, making the data model intuitive and highly expressive.</p>
+</div>
+<div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-stone-300">
+<h4 class="font-semibold text-stone-700 italic">Standard Syntax (GQL)</h4>
+<p class="text-sm text-stone-600 font-mono bg-stone-50 p-2 rounded mt-1 border border-stone-200">
+                            MATCH (p:Person {name:"Doe"})<br/>
+                            -[:PURCHASED]-&gt;(o:Order)<br/>
+                            RETURN o.amount
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Use Cases Explorer -->
+<section class="section-block max-w-6xl mx-auto mb-16 hidden fade-in" id="use-cases">
+<div class="mb-6">
+<h2 class="text-3xl font-bold text-stone-800">Crucial Use Cases</h2>
+<p class="text-stone-600">Select a domain to see how graphs navigate complex networks where traditional databases fail.</p>
+</div>
+<div class="grid lg:grid-cols-3 gap-6 h-auto">
+<div class="lg:col-span-1 space-y-3">
+<button class="use-case-btn w-full text-left p-4 rounded-xl border border-stone-200 bg-white hover:border-blue-400 hover:shadow-md transition-all group active-case" id="btn-fraud" onclick="loadUseCase('fraud')">
+<div class="flex justify-between items-center">
+<span class="font-bold text-stone-700 group-hover:text-blue-700">Fraud Detection</span>
+<span class="text-xl">🕵️‍♂️</span>
+</div>
+<p class="text-xs text-stone-500 mt-1">Spotting ring patterns in real-time.</p>
+</button>
+<button class="use-case-btn w-full text-left p-4 rounded-xl border border-stone-200 bg-white hover:border-blue-400 hover:shadow-md transition-all group" id="btn-social" onclick="loadUseCase('social')">
+<div class="flex justify-between items-center">
+<span class="font-bold text-stone-700 group-hover:text-blue-700">Recommendation Engines</span>
+<span class="text-xl">🛍️</span>
+</div>
+<p class="text-xs text-stone-500 mt-1">Real-time interest-based mapping.</p>
+</button>
+<button class="use-case-btn w-full text-left p-4 rounded-xl border border-stone-200 bg-white hover:border-blue-400 hover:shadow-md transition-all group" id="btn-supply" onclick="loadUseCase('supply')">
+<div class="flex justify-between items-center">
+<span class="font-bold text-stone-700 group-hover:text-blue-700">Supply Chain</span>
+<span class="text-xl">🚚</span>
+</div>
+<p class="text-xs text-stone-500 mt-1">Impact analysis across global logistics.</p>
+</button>
+<button class="use-case-btn w-full text-left p-4 rounded-xl border border-stone-200 bg-white hover:border-blue-400 hover:shadow-md transition-all group" id="btn-knowledge" onclick="loadUseCase('knowledge')">
+<div class="flex justify-between items-center">
+<span class="font-bold text-stone-700 group-hover:text-blue-700">Knowledge Graphs</span>
+<span class="text-xl">🧠</span>
+</div>
+<p class="text-xs text-stone-500 mt-1">Unified semantic layer for GenAI.</p>
+</button>
+</div>
+<div class="lg:col-span-2 bg-white rounded-xl border border-stone-200 p-6 flex flex-col shadow-sm">
+<div class="flex justify-between items-end mb-4 border-b border-stone-100 pb-2">
+<div>
+<h3 class="text-xl font-bold text-blue-800" id="uc-title">Fraud Detection</h3>
+<p class="text-sm text-stone-500" id="uc-subtitle">Crucial Metric: Traversal Depth</p>
+</div>
+<div class="text-right hidden sm:block">
+<span class="text-xs font-semibold text-stone-400 uppercase">Interactive Topology</span>
+</div>
+</div>
+<div class="flex-grow flex items-center justify-center bg-stone-50 rounded-lg relative overflow-hidden p-2">
+<div class="chart-container">
+<canvas id="networkChart"></canvas>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-4">
+<div class="bg-blue-50 p-3 rounded-lg">
+<span class="text-xs font-bold text-blue-600 uppercase">Legacy Limitation</span>
+<p class="text-xs text-stone-700 mt-1" id="uc-problem">SQL struggles with circular patterns, often timing out on 4+ hop ring checks.</p>
+</div>
+<div class="bg-emerald-50 p-3 rounded-lg">
+<span class="text-xs font-bold text-emerald-600 uppercase">The Graph Edge</span>
+<p class="text-xs text-stone-700 mt-1" id="uc-solution">Native graphs identify 'closed loops' instantly, preventing fraud before it happens.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: AI & GenAI -->
+<section class="section-block max-w-5xl mx-auto mb-16 hidden fade-in" id="ai-integration">
+<div class="mb-10 text-center">
+<h2 class="text-3xl font-bold text-stone-800">Agentic AI &amp; GenAI</h2>
+<p class="text-stone-600 max-w-2xl mx-auto mt-2">
+                    LLMs provide the "reasoning," while Knowledge Graphs provide the "long-term memory" and "grounded truth."
+                </p>
+</div>
+<div class="relative bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
+<h3 class="text-lg font-bold text-stone-700 mb-8 border-b border-stone-100 pb-2">The GraphRAG (Retrieval Augmented Generation) Pipeline</h3>
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 relative">
+<div class="relative group w-full md:w-1/4">
+<div class="bg-stone-50 border-2 border-stone-200 rounded-xl p-4 text-center hover:border-blue-400 transition-all z-10 relative">
+<div class="text-3xl mb-2">📥</div>
+<h4 class="font-bold text-stone-800">Input</h4>
+<p class="text-[10px] text-stone-500 mt-1">User asks a complex contextual question.</p>
+</div>
+<div class="step-line"></div>
+</div>
+<div class="relative group w-full md:w-1/4">
+<div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-center hover:bg-blue-100 transition-all z-10 relative">
+<div class="text-3xl mb-2">🛠️</div>
+<h4 class="font-bold text-blue-900">Translation</h4>
+<p class="text-[10px] text-blue-700 mt-1">Agent converts intent to Cypher query.</p>
+</div>
+<div class="step-line"></div>
+</div>
+<div class="relative group w-full md:w-1/4">
+<div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 text-center hover:bg-indigo-100 transition-all z-10 relative">
+<div class="text-3xl mb-2">🔍</div>
+<h4 class="font-bold text-indigo-900">Retrieval</h4>
+<p class="text-[10px] text-indigo-700 mt-1">Graph fetches the full "context subgraph."</p>
+</div>
+<div class="step-line"></div>
+</div>
+<div class="relative group w-full md:w-1/4">
+<div class="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 text-center hover:bg-emerald-100 transition-all z-10 relative">
+<div class="text-3xl mb-2">✅</div>
+<h4 class="font-bold text-emerald-900">Response</h4>
+<p class="text-[10px] text-emerald-700 mt-1">LLM generates answer grounded in facts.</p>
+</div>
+</div>
+</div>
+<div class="mt-12 grid md:grid-cols-2 gap-6">
+<div class="p-5 bg-stone-50 rounded-lg border border-stone-200">
+<h4 class="font-bold text-blue-800 mb-2">Agent Autonomy</h4>
+<p class="text-sm text-stone-600 leading-relaxed">
+                            AI Agents use graphs to navigate enterprise silos. Instead of searching keywords, they traverse <strong>entities</strong> (Companies, People, Contracts), allowing them to act as digital subject matter experts.
+                        </p>
+</div>
+<div class="p-5 bg-stone-50 rounded-lg border border-stone-200">
+<h4 class="font-bold text-emerald-800 mb-2">Curing Hallucination</h4>
+<p class="text-sm text-stone-600 leading-relaxed">
+                            By forcing the model to rely on established nodes and edges, Knowledge Graphs provide a hard "truth constraint" that prevents LLMs from inventing relationships that don't exist.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Challenges -->
+<section class="section-block max-w-4xl mx-auto mb-16 hidden fade-in" id="challenges">
+<div class="mb-6">
+<h2 class="text-3xl font-bold text-stone-800">Challenges &amp; Limits</h2>
+<p class="text-stone-600">While powerful, implementing Graph DBs requires a mindset shift from rigid schemas to fluid networks.</p>
+</div>
+<div class="grid md:grid-cols-2 gap-8 items-center">
+<div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 flex justify-center">
+<div class="chart-container">
+<canvas id="radarChart"></canvas>
+</div>
+</div>
+<div class="space-y-4">
+<div class="p-4 bg-red-50 rounded-lg border border-red-100">
+<h4 class="font-bold text-red-800 text-sm">Data Density (Supernodes)</h4>
+<p class="text-[11px] text-stone-600 mt-1">Nodes with millions of edges (e.g., a "New York City" location node) can cause performance bottlenecks during traversal.</p>
+</div>
+<div class="p-4 bg-orange-50 rounded-lg border border-orange-100">
+<h4 class="font-bold text-orange-800 text-sm">Sharding &amp; Scalability</h4>
+<p class="text-[11px] text-stone-600 mt-1">Splitting a graph across multiple servers is topologically complex compared to horizontal scaling in relational DBs.</p>
+</div>
+<div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
+<h4 class="font-bold text-amber-800 text-sm">Mental Mapping</h4>
+<p class="text-[11px] text-stone-600 mt-1">Moving from "normalization" to "connection" requires a shift in data architecture skills and tooling.</p>
+</div>
+</div>
+</div>
+</section>
+<div data-heading="Related Articles" data-intro="Explore more guides and technology articles." data-limit="4" id="related-articles-root"></div>
+<footer class="text-center text-xs text-stone-400 py-12 border-t border-stone-200 mt-auto">
+<p>Interactive Graph Knowledge Engine • Analysis of Modern Data Architectures</p>
+</footer>
+</main>
+<script>
+        // --- Navigation ---
+        const navItems = document.querySelectorAll('.nav-item');
+        const sidebar = document.getElementById('sidebar');
+
+        function navTo(targetId) {
+            document.querySelectorAll('.section-block').forEach(el => el.classList.add('hidden'));
+            document.getElementById(targetId).classList.remove('hidden');
+            
+            navItems.forEach(btn => {
+                if(btn.dataset.target === targetId) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            if(window.innerWidth < 768) sidebar.classList.add('-translate-x-full');
+
+            if (targetId === 'use-cases' && !networkChart) initNetworkChart();
+            if (targetId === 'challenges' && !radarChart) initRadarChart();
+        }
+
+        document.getElementById('menu-btn').addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        // --- Model Toggle ---
+        function toggleModel(model) {
+            const sqlBtn = document.getElementById('btn-sql');
+            const graphBtn = document.getElementById('btn-graph');
+            const sqlVis = document.getElementById('visual-sql');
+            const graphVis = document.getElementById('visual-graph');
+
+            if (model === 'sql') {
+                sqlBtn.classList.add('bg-white', 'shadow', 'text-blue-800');
+                graphBtn.classList.remove('bg-white', 'shadow', 'text-blue-800');
+                graphBtn.classList.add('text-stone-500');
+                sqlVis.classList.remove('hidden');
+                graphVis.classList.add('hidden');
+            } else {
+                graphBtn.classList.add('bg-white', 'shadow', 'text-blue-800');
+                sqlBtn.classList.remove('bg-white', 'shadow', 'text-blue-800');
+                sqlBtn.classList.add('text-stone-500');
+                graphVis.classList.remove('hidden');
+                sqlVis.classList.add('hidden');
+            }
+        }
+
+        // --- Charts & Visualization ---
+        const useCaseData = {
+            fraud: {
+                title: "Fraud Detection",
+                subtitle: "Detecting Rings & Collusion",
+                problem: "SQL self-joins for 4+ levels of indirect connection are computationally expensive.",
+                solution: "Graphs spot 'path loops' instantly. If Account A shares an IP with B, who shares a phone with C...",
+                nodes: [
+                    {x: 50, y: 50, label: "Acct:A", color: "#EF4444"}, 
+                    {x: 35, y: 40, label: "IP:192.16", color: "#3B82F6"},
+                    {x: 65, y: 40, label: "Phone:555", color: "#3B82F6"},
+                    {x: 50, y: 25, label: "Acct:B", color: "#EF4444"},
+                    {x: 30, y: 20, label: "Addr:123", color: "#3B82F6"},
+                    {x: 50, y: 5, label: "Acct:C", color: "#EF4444"}
+                ],
+                edges: [[0,1], [0,2], [3,1], [3,4], [5,2], [5,4]]
+            },
+            social: {
+                title: "Recommendation Engines",
+                subtitle: "Real-time Personalization",
+                problem: "User-item matrices are sparse and slow to compute as they grow linearly.",
+                solution: "Traversal from User -> likes -> Interest -> includes -> Item finds neighbors in O(log N).",
+                nodes: [
+                    {x: 20, y: 50, label: "User:Me", color: "#F59E0B"},
+                    {x: 40, y: 65, label: "Sci-Fi", color: "#10B981"},
+                    {x: 40, y: 35, label: "Space", color: "#10B981"},
+                    {x: 60, y: 50, label: "OtherUser", color: "#6366F1"},
+                    {x: 85, y: 50, label: "NewMovie", color: "#10B981"}
+                ],
+                edges: [[0,1], [0,2], [3,1], [3,2], [3,4]]
+            },
+            supply: {
+                title: "Supply Chain",
+                subtitle: "Deep Traceability",
+                problem: "Tracking a specific raw batch through 10 manufacturing steps across 3 continents.",
+                solution: "Recursive traversal finds all affected SKUs within seconds of a batch recall notification.",
+                nodes: [
+                    {x: 10, y: 50, label: "Batch_01", color: "#6B7280"},
+                    {x: 30, y: 40, label: "ComponentA", color: "#6B7280"},
+                    {x: 30, y: 60, label: "ComponentB", color: "#6B7280"},
+                    {x: 55, y: 50, label: "FinalAssembly", color: "#3B82F6"},
+                    {x: 75, y: 50, label: "Warehouse", color: "#10B981"},
+                    {x: 90, y: 40, label: "Retail_A", color: "#F59E0B"},
+                    {x: 90, y: 60, label: "Retail_B", color: "#F59E0B"}
+                ],
+                edges: [[0,1], [0,2], [1,3], [2,3], [3,4], [4,5], [4,6]]
+            },
+            knowledge: {
+                title: "Knowledge Graphs",
+                subtitle: "Semantic Intelligence",
+                problem: "Company data is fragmented across emails, ERPs, and unstructured documents.",
+                solution: "Graphs link unstructured text to structured entities, allowing AI agents to query 'The World.'",
+                nodes: [
+                    {x: 50, y: 50, label: "Tesla", color: "#8B5CF6"},
+                    {x: 30, y: 70, label: "PDF:AnnualReport", color: "#EC4899"},
+                    {x: 70, y: 70, label: "SQL:EmployeeDB", color: "#EC4899"},
+                    {x: 50, y: 20, label: "Elon Musk", color: "#3B82F6"},
+                    {x: 20, y: 20, label: "Austin, TX", color: "#F59E0B"}
+                ],
+                edges: [[0,1], [0,2], [3,0], [3,4], [0,4]]
+            }
+        };
+
+        let networkChart = null;
+        let radarChart = null;
+
+        const edgePlugin = {
+            id: 'edgePlugin',
+            beforeDatasetsDraw(chart) {
+                const { ctx, data } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!data.edges) return;
+                ctx.save();
+                ctx.beginPath();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#e2e8f0';
+                data.edges.forEach(edge => {
+                    const start = meta.data[edge[0]];
+                    const end = meta.data[edge[1]];
+                    if (start && end) {
+                        ctx.moveTo(start.x, start.y);
+                        ctx.lineTo(end.x, end.y);
+                    }
+                });
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+        function initNetworkChart() {
+            const ctx = document.getElementById('networkChart').getContext('2d');
+            const data = useCaseData.fraud;
+            networkChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        data: data.nodes,
+                        backgroundColor: data.nodes.map(n => n.color),
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }],
+                    edges: data.edges
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { display: false, min: 0, max: 100 }, y: { display: false, min: 0, max: 100 } },
+                    plugins: { 
+                        tooltip: { callbacks: { label: (c) => c.raw.label } },
+                        legend: { display: false } 
+                    }
+                },
+                plugins: [edgePlugin]
+            });
+        }
+
+        function loadUseCase(key) {
+            const data = useCaseData[key];
+            document.getElementById('uc-title').innerText = data.title;
+            document.getElementById('uc-subtitle').innerText = data.subtitle;
+            document.getElementById('uc-problem').innerText = data.problem;
+            document.getElementById('uc-solution').innerText = data.solution;
+
+            document.querySelectorAll('.use-case-btn').forEach(btn => btn.classList.remove('active-case', 'border-blue-500', 'bg-blue-50'));
+            document.getElementById(`btn-${key}`).classList.add('active-case', 'border-blue-500', 'bg-blue-50');
+
+            if (networkChart) {
+                networkChart.data.datasets[0].data = data.nodes;
+                networkChart.data.datasets[0].backgroundColor = data.nodes.map(n => n.color);
+                networkChart.data.edges = data.edges;
+                networkChart.update();
+            }
+        }
+
+        function initRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Traversal Speed', 'Memory Use', 'Schema Flex', 'Write Speed', 'Skill Entry'],
+                    datasets: [{
+                        label: 'Graph DB',
+                        data: [5, 4, 5, 3, 2],
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: '#2563eb'
+                    }, {
+                        label: 'Relational DB',
+                        data: [2, 3, 2, 4, 5],
+                        backgroundColor: 'rgba(120, 113, 108, 0.1)',
+                        borderColor: '#78716c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { suggestedMin: 0, ticks: { display: false } } },
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+    </script>
+<script id="related-articles-noimage-js">
+
+(function(){const root=document.getElementById('related-articles-root');if(!root||root.dataset.rendered==='true')return;fetch('/data-products/assets/site-index.json').then(r=>r.json()).then(items=>{const here=location.pathname.replace(/^\/data-products\/?/,'').replace(/\/$/,'/index.html')||'index.html';const current=items.find(x=>x.public===here);const pool=items.filter(x=>x.public!==here&&x.indexable!==false);pool.sort((a,b)=>((b.category===current?.category)-(a.category===current?.category)));const chosen=pool.slice(0,Number(root.dataset.limit||4));root.innerHTML='<h2>'+(root.dataset.heading||'Related reading')+'</h2><p class="dp-related-intro">'+(root.dataset.intro||'Continue with closely related guides.')+'</p><div class="related-articles-grid">'+chosen.map(x=>'<a class="related-article-card" href="'+x.href+'">'+x.title+'</a>').join('')+'</div>';}).catch(()=>{});})();
+
+</script>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>

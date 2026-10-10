@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<!-- ============== PRIMARY SEO META ============== -->
+<title>Comparison of Encrypted Analytics: Trusted Execution Environments vs Multi-Party Computation vs Fully Homomorphic Encryption (2026) | Pr</title>
+<meta content="A 2026 research brief comparing trusted execution environments (TEEs), secure multi-party computation (MPC), and fully homomorphic encryption (FHE) for encrypted analytics…" name="description"/>
+<meta content="encrypted analytics, confidential computing, trusted execution environment, TEE, Intel SGX, Intel TDX, AMD SEV-SNP, Arm CCA, secure multi-party computation, MPC, fully homomorphic encryption, FHE, privacy enhancing technologies, PETs, private inference, confidential GPU, NVIDIA confidential computing, remote attestation, OpenFHE, Microsoft SEAL, TFHE-rs, Concrete ML, MP-SPDZ, SecretFlow, Opaque SQL, Zama, encrypted machine learning, TEE vs MPC vs FHE 2026" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/>
+<!-- ============== OPEN GRAPH / SOCIAL ============== -->
+<meta content="article" property="og:type"/>
+<meta content="Comparison of Encrypted Analytics: Trusted Execution Environments vs Multi-Party Computation vs Fully Homomorphic Encryption (2026) | Pr" property="og:title"/>
+<meta content="A 2026 research brief comparing trusted execution environments (TEEs), secure multi-party computation (MPC), and fully homomorphic encryption (FHE) for encrypted analytics…" property="og:description"/>
+<meta content="https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html" property="og:url"/>
+<meta content="Data Products &amp; Enterprise AI" property="og:site_name"/>
+<meta content="en_US" property="og:locale"/>
+<meta content="Prashant Dhingra" property="article:author"/>
+<meta content="2026-06-04" property="article:published_time"/>
+<meta content="2026-06-04" property="article:modified_time"/>
+<meta content="Data &amp; Privacy Engineering" property="article:section"/>
+<meta content="Confidential Computing" property="article:tag"/>
+<meta content="Homomorphic Encryption" property="article:tag"/>
+<meta content="Multi-Party Computation" property="article:tag"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Comparison of Encrypted Analytics: Trusted Execution Environments vs Multi-Party Computation vs Fully Homomorphic Encryption (2026) | Pr" name="twitter:title"/>
+<meta content="A 2026 research brief comparing trusted execution environments (TEEs), secure multi-party computation (MPC), and fully homomorphic encryption (FHE) for encrypted analytics…" name="twitter:description"/>
+<!-- ============== GENERATIVE ENGINE OPTIMIZATION (GEO) STRUCTURED DATA ============== -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --paper:#f5f1e8;
+  --paper-2:#fffdf7;
+  --paper-3:#faf6ec;
+  --ink:#1c1b16;
+  --ink-dim:#55514700;
+  --ink-dim:#565248;
+  --ink-faint:#8d8779;
+  --rule:#d9d2bf;
+  --rule-soft:#e7e0cf;
+  --brand:#34407a;       --brand-bg:rgba(52,64,122,.07);
+  --tee:#a8651e;         --tee-bg:rgba(168,101,30,.09);   --tee-line:rgba(168,101,30,.4);
+  --mpc:#13767a;         --mpc-bg:rgba(19,118,122,.09);   --mpc-line:rgba(19,118,122,.4);
+  --fhe:#6a45a3;         --fhe-bg:rgba(106,69,163,.09);   --fhe-line:rgba(106,69,163,.4);
+  --serif:"Newsreader",Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --maxw:1140px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:17px;line-height:1.72;letter-spacing:.005em;overflow-x:hidden;
+}
+/* faint paper texture + top hairline frame */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background:
+    radial-gradient(1100px 500px at 85% -5%,rgba(106,69,163,.05),transparent 60%),
+    radial-gradient(800px 500px at 0% 8%,rgba(19,118,122,.04),transparent 55%);}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.wrap{position:relative;z-index:2;max-width:var(--maxw);margin:0 auto;padding:0 30px}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--tee),var(--mpc),var(--fhe))}
+
+/* masthead bar */
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(6px);
+  background:rgba(245,241,232,.86);border-bottom:1px solid var(--rule)}
+.topbar .row{display:flex;align-items:center;justify-content:space-between;height:56px}
+.brand{display:flex;align-items:baseline;gap:9px;font-family:var(--serif);font-size:18px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+.brand b{font-weight:600}.brand span{color:var(--ink-faint);font-size:14px;font-style:italic}
+.topnav{display:flex;gap:24px;font-family:var(--mono);font-size:12px;letter-spacing:.02em;text-transform:uppercase}
+.topnav a{color:var(--ink-dim);text-decoration:none;transition:color .2s}
+.topnav a:hover{color:var(--brand)}
+@media(max-width:820px){.topnav{display:none}}
+
+/* masthead / hero */
+.masthead{padding:60px 0 38px;border-bottom:2px solid var(--ink)}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--brand);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-bottom:24px}
+.kicker .pip{width:6px;height:6px;border-radius:50%;background:var(--brand)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.5rem,6vw,4.4rem);
+  line-height:1.02;letter-spacing:-.02em;color:var(--ink);max-width:18ch}
+h1 .it{font-style:italic;font-weight:500}
+.tk{font-style:italic}
+.tk.tee{color:var(--tee)}.tk.mpc{color:var(--mpc)}.tk.fhe{color:var(--fhe)}
+.standfirst{font-family:var(--serif);font-size:1.4rem;line-height:1.5;color:var(--ink-dim);
+  max-width:60ch;margin-top:26px;font-weight:400}
+.standfirst b{color:var(--ink);font-weight:600}
+.dateline{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin-top:34px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.02em;text-transform:uppercase}
+.dateline .by{display:flex;align-items:center;gap:10px;color:var(--ink);text-transform:none;font-size:13px;font-family:var(--sans);font-weight:600}
+.seal{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;
+  font-family:var(--serif);font-weight:600;font-size:13px;color:var(--ink)}
+.dateline .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-faint)}
+.dateline a{color:var(--brand);text-decoration:none;text-transform:none;font-size:13px;font-family:var(--sans)}
+
+/* layout */
+.layout{display:grid;grid-template-columns:222px 1fr;gap:56px;padding:34px 0 90px;align-items:start}
+@media(max-width:940px){.layout{grid-template-columns:1fr;gap:0}}
+.toc{position:sticky;top:78px}
+@media(max-width:940px){.toc{display:none}}
+.toc h4{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.toc ol{list-style:none;counter-reset:t}
+.toc li{counter-increment:t}
+.toc a{display:flex;gap:10px;padding:6px 0;font-size:14px;color:var(--ink-dim);text-decoration:none;line-height:1.3;
+  font-family:var(--serif);transition:color .2s}
+.toc a::before{content:counter(t,decimal-leading-zero);font-family:var(--mono);font-size:10.5px;
+  color:var(--ink-faint);padding-top:3px}
+.toc a:hover{color:var(--ink)}
+.toc a.active{color:var(--brand);font-weight:600}
+.toc a.active::before{color:var(--brand)}
+
+/* article */
+article{max-width:720px}
+article section{margin-bottom:34px;scroll-margin-top:74px}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.85rem,3.6vw,2.6rem);line-height:1.08;
+  letter-spacing:-.015em;color:var(--ink);margin:54px 0 14px;padding-top:30px;border-top:1px solid var(--rule);position:relative}
+h2 .n{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--brand);
+  text-transform:uppercase;margin-bottom:12px;font-weight:500}
+h2:first-of-type{margin-top:0}
+h3{font-family:var(--serif);font-weight:600;font-size:1.42rem;color:var(--ink);margin:34px 0 10px;letter-spacing:-.01em}
+h4.sub{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--brand);margin:28px 0 12px}
+p{margin:0 0 18px}article p{color:#3c3930}
+strong{color:var(--ink);font-weight:600}
+.lead{font-family:var(--serif);font-size:1.24rem;line-height:1.55;color:var(--ink-dim)}
+.tee-t{color:var(--tee);font-weight:600}.mpc-t{color:var(--mpc);font-weight:600}.fhe-t{color:var(--fhe);font-weight:600}
+
+ul.bul{list-style:none;margin:6px 0 20px}
+ul.bul li{position:relative;padding-left:24px;margin-bottom:11px;color:#3c3930}
+ul.bul li::before{content:"";position:absolute;left:2px;top:12px;width:8px;height:1px;background:var(--ink)}
+
+/* abstract box */
+.abstract{background:var(--paper-2);border:1px solid var(--rule);border-left:3px solid var(--brand);
+  padding:26px 30px;margin:6px 0 38px}
+.abstract .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);margin-bottom:14px}
+.abstract ul{list-style:none}
+.abstract li{position:relative;padding-left:24px;margin-bottom:11px;font-size:15.5px;color:#46423a;line-height:1.55}
+.abstract li:last-child{margin-bottom:0}
+.abstract li::before{content:"\00A7";position:absolute;left:0;top:0;color:var(--brand);font-family:var(--serif);font-weight:600}
+.abstract li b{color:var(--ink)}
+
+/* three-tech definitional row */
+.defs{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:28px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--rule)}
+@media(max-width:680px){.defs{grid-template-columns:1fr}}
+.dcol{padding:20px 20px 22px;border-right:1px solid var(--rule)}
+.dcol:last-child{border-right:none}
+@media(max-width:680px){.dcol{border-right:none;border-bottom:1px solid var(--rule)}.dcol:last-child{border-bottom:none}}
+.dcol .ab{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em;margin-bottom:3px}
+.dcol.tee .ab{color:var(--tee)}.dcol.mpc .ab{color:var(--mpc)}.dcol.fhe .ab{color:var(--fhe)}
+.dcol .nm{font-family:var(--serif);font-weight:600;font-size:1.18rem;line-height:1.15;color:var(--ink);margin-bottom:12px}
+.dcol p{font-size:14px;color:var(--ink-dim);margin:0;line-height:1.55}
+.dcol .ex{margin-top:13px;font-family:var(--mono);font-size:11px;color:var(--ink-faint);line-height:1.5}
+
+/* mental model */
+.mm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0}
+@media(max-width:680px){.mm-grid{grid-template-columns:1fr}}
+.mm{border:1px solid var(--rule);background:var(--paper-2);padding:20px;text-align:center;transition:all .3s}
+.mm.tee{border-top:3px solid var(--tee)}.mm.mpc{border-top:3px solid var(--mpc)}.mm.fhe{border-top:3px solid var(--fhe)}
+.mm:hover{background:var(--paper-3);transform:translateY(-2px)}
+.mm .ic{width:40px;height:40px;margin:0 auto 12px;display:grid;place-items:center}
+.mm.tee .ic{color:var(--tee)}.mm.mpc .ic{color:var(--mpc)}.mm.fhe .ic{color:var(--fhe)}
+.mm .ic svg{width:30px;height:30px}
+.mm .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.mm.tee .lab{color:var(--tee)}.mm.mpc .lab{color:var(--mpc)}.mm.fhe .lab{color:var(--fhe)}
+.mm .mt{font-family:var(--serif);font-style:italic;font-size:1.18rem;color:var(--ink);margin-bottom:7px}
+.mm .ms{font-size:13px;color:var(--ink-dim);line-height:1.45}
+
+/* journal tables */
+.tablewrap{margin:26px 0;overflow:auto;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+table.cmp{border-collapse:collapse;width:100%;min-width:680px;font-size:13.5px}
+table.cmp thead th{text-align:left;padding:12px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--ink);vertical-align:bottom}
+table.cmp thead th.dim{color:var(--ink-faint)}
+table.cmp thead th.h-tee{color:var(--tee)}table.cmp thead th.h-mpc{color:var(--mpc)}table.cmp thead th.h-fhe{color:var(--fhe)}
+table.cmp tbody th{text-align:left;padding:12px 14px;font-family:var(--serif);font-weight:600;font-size:15px;
+  color:var(--ink);vertical-align:top;white-space:nowrap;border-bottom:1px solid var(--rule-soft)}
+table.cmp td{padding:12px 14px;color:var(--ink-dim);line-height:1.5;vertical-align:top;border-bottom:1px solid var(--rule-soft)}
+table.cmp td.c-tee{background:var(--tee-bg)}
+table.cmp td.c-mpc{background:var(--mpc-bg)}
+table.cmp td.c-fhe{background:var(--fhe-bg)}
+table.cmp tbody tr:last-child th,table.cmp tbody tr:last-child td{border-bottom:none}
+.rate{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:1px 7px;border-radius:2px;
+  margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase}
+.r-best{background:var(--mpc);color:#fff}
+.r-good{background:var(--tee);color:#fff}
+.r-weak{background:transparent;color:var(--ink-faint);border:1px solid var(--rule)}
+.scrollhint{font-family:var(--mono);font-size:11px;color:var(--ink-faint);text-align:center;margin-top:-14px;margin-bottom:26px}
+@media(min-width:820px){.scrollhint{display:none}}
+
+/* figures / stats */
+.figs{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:28px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+@media(max-width:680px){.figs{grid-template-columns:1fr}}
+.fig{padding:20px;border-right:1px solid var(--rule)}
+.fig:last-child{border-right:none}
+@media(max-width:680px){.fig{border-right:none;border-bottom:1px solid var(--rule)}.fig:last-child{border-bottom:none}}
+.fig .n{font-family:var(--serif);font-weight:600;font-size:2.1rem;line-height:1;margin-bottom:7px;letter-spacing:-.02em}
+.fig.tee .n{color:var(--tee)}.fig.mpc .n{color:var(--mpc)}.fig.fhe .n{color:var(--fhe)}
+.fig .l{font-size:12.5px;color:var(--ink-dim);line-height:1.45}
+
+/* dispatch / update box */
+.dispatch{border:1px solid var(--brand);background:var(--brand-bg);padding:24px 28px;margin:30px 0;position:relative}
+.dispatch .tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--brand);margin-bottom:14px;font-weight:600}
+.dispatch .tag .blink{width:7px;height:7px;border-radius:50%;background:var(--brand);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.dispatch h3{margin-top:0}
+.dispatch ul.bul li::before{background:var(--brand)}
+
+/* caution / note */
+.note{border-left:3px solid var(--tee);background:var(--tee-bg);padding:18px 22px;margin:24px 0}
+.note .h{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--tee);margin-bottom:8px;font-weight:600}
+.note p{margin:0;color:#4a4334;font-size:15px}
+
+/* checklist */
+.checklist{list-style:none;counter-reset:c;margin:20px 0}
+.checklist li{counter-increment:c;position:relative;padding:14px 16px 14px 52px;border-bottom:1px solid var(--rule);
+  color:#3c3930;font-size:15px;line-height:1.55}
+.checklist li:first-child{border-top:1px solid var(--rule)}
+.checklist li::before{content:counter(c);position:absolute;left:8px;top:14px;
+  font-family:var(--serif);font-weight:600;font-size:1.3rem;color:var(--brand);line-height:1}
+
+/* FAQ */
+.faq details{border-bottom:1px solid var(--rule)}
+.faq details:first-child{border-top:1px solid var(--rule)}
+.faq summary{padding:18px 4px;cursor:pointer;font-family:var(--serif);font-weight:600;color:var(--ink);font-size:1.18rem;
+  list-style:none;display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .pl{font-family:var(--mono);color:var(--brand);font-size:20px;transition:transform .3s;flex:0 0 auto}
+.faq details[open] summary .pl{transform:rotate(45deg)}
+.faq .ans{padding:0 4px 20px;color:var(--ink-dim);font-size:15.5px;line-height:1.64}
+
+/* footnote sources */
+.sources ol{list-style:none;counter-reset:s;font-size:13px;font-family:var(--mono);column-count:2;column-gap:34px}
+@media(max-width:680px){.sources ol{column-count:1}}
+.sources li{counter-increment:s;position:relative;padding:8px 0 8px 30px;break-inside:avoid;line-height:1.45;border-bottom:1px solid var(--rule-soft)}
+.sources li::before{content:"["counter(s)"]";position:absolute;left:0;top:8px;color:var(--brand);font-weight:600;font-size:11px}
+.sources a{color:var(--ink);text-decoration:none}
+.sources a:hover{color:var(--brand);text-decoration:underline}
+.sources .src-name{display:block;font-family:var(--sans);font-weight:600;font-size:13px;color:var(--ink);margin-bottom:2px}
+
+footer{border-top:2px solid var(--ink);padding:40px 0 64px;margin-top:36px}
+.fauthor{display:flex;align-items:center;gap:15px;margin-bottom:24px}
+.fauthor .seal{width:46px;height:46px;font-size:18px}
+.fauthor .meta b{display:block;color:var(--ink);font-size:17px;font-family:var(--serif);font-weight:600}
+.fauthor .meta span{color:var(--ink-faint);font-size:12.5px;font-family:var(--mono)}
+.fnote{font-size:13px;color:var(--ink-faint);line-height:1.65;max-width:64ch}
+.flinks{display:flex;flex-wrap:wrap;gap:22px;margin-top:20px;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.flinks a{color:var(--ink-dim);text-decoration:none}.flinks a:hover{color:var(--brand)}
+
+::selection{background:rgba(52,64,122,.18)}
+</style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="A 2026 research brief comparing trusted execution environments (TEEs), secure multi-party computation (MPC), and fully homomorphic encryption (FHE) for encrypted analytics…" name="ai-summary"/><meta content="Governance, Quality &amp; Privacy" name="topic"/><link href="https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html" rel="canonical"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html#article","url":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html#webpage"},"headline":"Comparison of Encrypted Analytics: Trusted Execution Environments vs Multi-Party Computation vs Fully Homomorphic Encryption (2026) | Pr","description":"A 2026 research brief comparing trusted execution environments (TEEs), secure multi-party computation (MPC), and fully homomorphic encryption (FHE) for encrypted analytics…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Governance, Quality & Privacy"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html#webpage","url":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html","name":"Comparison of Encrypted Analytics: Trusted Execution Environments vs Multi-Party Computation vs Fully Homomorphic Encryption (2026) | Pr","description":"A 2026 research brief comparing trusted execution environments (TEEs), secure multi-party computation (MPC), and fully homomorphic encryption (FHE) for encrypted analytics…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Governance, Quality & Privacy","item":"https://prashant.dhingra.website/data-products/data-products/"},{"@type":"ListItem","position":3,"name":"Comparison of Encrypted Analytics: Trusted Execution Environments vs Multi-Party Computation vs Fully Homomorphic Encryption (2026) | Pr","item":"https://prashant.dhingra.website/data-products/data-clean-rooms/encrypted-analytics-tee-mpc-fhe.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<div id="progress"></div>
+<header class="topbar">
+<div class="wrap row">
+<a class="brand" href="https://www.dataproduct.net/data-products/secured-data-rooms"><b>Prashant Dhingra</b><span>field notes</span></a>
+<nav class="topnav">
+<a href="#tech">Technologies</a>
+<a href="#coverage">Analytics</a>
+<a href="#security">Security</a>
+<a href="#performance">Performance</a>
+<a href="#decision">Decide</a>
+<a href="#faq">FAQ</a>
+</nav>
+</div>
+</header>
+<div class="wrap">
+<section class="masthead">
+<div class="kicker"><span class="pip"></span>Field Guide · Data &amp; Privacy Engineering <span class="dot" style="opacity:.4">·</span> No. 02 · June 2026</div>
+<h1>Encrypted analytics, <span class="it">three ways</span>: <span class="tk tee">TEEs</span>, <span class="tk mpc">MPC</span> &amp; <span class="tk fhe">FHE</span></h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Governance, Quality &amp; Privacy</a></p>
+<p class="standfirst">Trusted execution environments, multi-party computation, and fully homomorphic encryption all have a shared goal. <b>Conduct calculations on confidential information without exposing the original data to unauthorized parties.</b> Nonetheless, they are not interchangeable. An informative guide on their unique traits, strengths in analysis, weaknesses, and guidelines for when to deploy each one.</p>
+<div class="dateline">
+<span class="by"><span class="seal">PD</span> Prashant Dhingra</span>
+<span class="dot"></span><span>~24 min read</span>
+<span class="dot"></span><span>3 technologies</span>
+<span class="dot"></span><a href="#sources">Sources ↓</a>
+</div>
+</section>
+</div>
+<div class="wrap layout">
+<aside class="toc">
+<h4>Contents</h4>
+<ol>
+<li><a href="#tech">The three technologies</a></li>
+<li><a href="#foundations">Foundations &amp; trade-off</a></li>
+<li><a href="#coverage">Analytics coverage</a></li>
+<li><a href="#security">Security &amp; threat models</a></li>
+<li><a href="#performance">Performance &amp; cost</a></li>
+<li><a href="#ecosystem">Ecosystem &amp; maturity</a></li>
+<li><a href="#new2026">Dispatch: 2026</a></li>
+<li><a href="#compliance">Compliance &amp; operations</a></li>
+<li><a href="#decision">Decision framework</a></li>
+<li><a href="#checklist">Adoption checklist</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a href="#sources">Sources</a></li>
+</ol>
+</aside>
+<article>
+<!-- ABSTRACT -->
+<div class="abstract">
+<div class="lbl">Abstract · the short version</div>
+<ul>
+<li><b><span class="tee-t">TEEs</span></b> protect data <em>in use</em> With established hardware and robust support for SQL, ML, and streaming technologies, along with exceptional low-latency performance.</li>
+<li><b><span class="mpc-t">MPC</span></b> fosters trust among all stakeholders to maintain confidentiality of inputs, making it perfect for analytics <em>across mutually distrustful organizations</em>.</li>
+<li><b><span class="fhe-t">FHE</span></b> encryption without a server-side key: ideal for securing sensitive data. <em>never</em> exist server-side, especially private inference.</li>
+<li>The deciding question is <b>where trust sits</b>In the CPU vendor's Trusted Execution Environment (TEE), there is a presumption of non-collusion (MPC) or the presence of cryptographic hardness (F</li>
+<li>In production, the strongest answer is often <b>hybrid</b> TEE is used for orchestration, MPC is used for cross-party joins, and FHE is used for the most sensitive client-server operations.</li>
+</ul>
+</div>
+<!-- 1 -->
+<section id="tech">
+<h2><span class="n">01 :: Overview</span>The three technologies at a glance</h2>
+<p class="lead">They answer the same question with completely different methods. The best way to understand the difference is to analyze one category at a time.</p>
+<div class="defs">
+<div class="dcol tee">
+<div class="ab">TEE</div>
+<div class="nm">Trusted Execution Environment</div>
+<p>Hardware execution in isolation safeguards code and data from external entities like the OS, hypervisor, and peers, enabling remote verification of processes prior to sharing sensitive information.</p>
+<div class="ex">Intel SGX/TDX · AMD SEV-SNP · Arm CCA Realms</div>
+</div>
+<div class="dcol mpc">
+<div class="ab">MPC</div>
+<div class="nm">Secure Multi-Party Computation</div>
+<p>Cryptographic protocols allow parties to jointly compute a function using their private inputs, while only disclosing the output, using secret sharing, garbled circuits, and homomorphic encryption methods.</p>
+<div class="ex">MP-SPDZ · ABY3 · SecretFlow · SCQL</div>
+</div>
+<div class="dcol fhe">
+<div class="ab">FHE</div>
+<div class="nm">Fully Homomorphic Encryption</div>
+<p>One key function allows for unlimited computations on encrypted data without the need for the secret key :: the server operates on cipher text, and decryption is exclusively done by the client (or a specified endpoint).</p>
+<div class="ex">OpenFHE · Microsoft SEAL · TFHE-rs · Concrete ML</div>
+</div>
+</div>
+<p>For encrypted analytics specifically: <span class="tee-t">TEEs</span> Enclaves or confidential VMs allow for the smooth integration of common SQL, joins, ETL, batch processing similar to Spark, pre-existing ML training, and streaming with minimal software adjustments. <span class="mpc-t">MPC</span> Works best when multiple data owners need to combine aggregates, merge sets, intersect sets, or train in a privacy-preserving manner without exposing plaintext to a central operator. <span class="fhe-t">FHE</span> is optimal for limited inference, vectorized calculations, compact tabular models, and specialized encrypted data-frame operations when a client needs an untrusted service to perform computations on its encrypted data without depending on hardware trust assumptions.</p>
+</section>
+<!-- 2 -->
+<section id="foundations">
+<h2><span class="n">02 :: Foundations</span>Foundations and the core trade-off</h2>
+<p>The decisive question is <strong>where trust sits</strong>:</p>
+<ul class="bul">
+<li><span class="tee-t">TEEs</span> Trust in CPU vendors, firmware, attestation roots, and methods to address or prevent exploitable side channels.</li>
+<li><span class="mpc-t">MPC</span> Lessens dependence on a single infrastructure provider, as long as various parties uphold integrity and comply with the corruption threshold outlined by the protocol, while also verifying the correctness of the execution.</li>
+<li><span class="fhe-t">FHE</span> Decreases dependence on server trust and minimizes susceptibility to hardware attacks, however, necessitates careful parameter selection, secure key management, side-channel-resistant implementations, and protection against output and metadata disclosure.</li>
+</ul>
+<p>The historical background of these technologies is significant. MPC has its roots in Yao's two-party computation and the GMW extension for multi-party scenarios with an honest majority. FHE was first conceptualized by Gentry in 2009 using ideal-lattice constructions and has since advanced to incorporate RLWE/LWE-based schemes with standardized security parameters. TEEs have been created by various companies such as Intel (SGX, TDX), AMD (SEV-SNP, which enhances memory-integrity protection against malicious hypervisors), and Arm (CCA 'Realms' managed by a Realm Management Monitor).</p>
+<h4 class="sub">A useful mental model</h4>
+<div class="mm-grid">
+<div class="mm tee">
+<div class="ic"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect height="14" rx="2" width="18" x="3" y="4"></rect><path d="M8 21h8M12 18v3"></path><rect height="6" rx="1" width="8" x="8" y="8"></rect></svg></div>
+<div class="lab">TEE</div>
+<div class="mt">Confidential execution</div>
+<div class="ms">Plaintext lives inside attested hardware</div>
+</div>
+<div class="mm mpc">
+<div class="ic"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"></circle><circle cx="18" cy="6" r="2.4"></circle><circle cx="12" cy="18" r="2.4"></circle><path d="M7.7 7.7 10.3 16M16.3 7.7 13.7 16M8 6h8"></path></svg></div>
+<div class="lab">MPC</div>
+<div class="mt">Distributed trust</div>
+<div class="ms">Data split so no one party sees it whole</div>
+</div>
+<div class="mm fhe">
+<div class="ic"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect height="10" rx="2" width="16" x="4" y="10"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v3"></path></svg></div>
+<div class="lab">FHE</div>
+<div class="mt">Encrypted algebra</div>
+<div class="ms">Server computes on ciphertext, never decrypts</div>
+</div>
+</div>
+<h4 class="sub">Core properties side by side</h4>
+<div class="tablewrap">
+<table class="cmp">
+<thead><tr><th class="dim">Property</th><th class="h-tee">TEEs</th><th class="h-mpc">MPC</th><th class="h-fhe">FHE</th></tr></thead>
+<tbody>
+<tr><th>Protection mechanism</th><td class="c-tee">Hardware isolation + attestation</td><td class="c-mpc">Secret sharing / garbled circuits / HE across parties</td><td class="c-fhe">Ciphertext-level computation</td></tr>
+<tr><th>Trust anchor</th><td class="c-tee">CPU vendor, firmware, attestation chain</td><td class="c-mpc">Corruption threshold &amp; non-collusion</td><td class="c-fhe">Cryptographic hardness &amp; parameter correctness</td></tr>
+<tr><th>Plaintext visible at runtime</th><td class="c-tee">Yes :: inside enclave/CVM memory</td><td class="c-mpc">No single party sees full plaintext</td><td class="c-fhe">No :: server sees ciphertext only</td></tr>
+<tr><th>Best fit</th><td class="c-tee">General analytics on existing stacks</td><td class="c-mpc">Cross-party collaborative analytics</td><td class="c-fhe">Client-server private compute on narrow circuits/models</td></tr>
+<tr><th>Hardware requirement</th><td class="c-tee">Special CPU support (SGX, SEV-SNP, CCA)</td><td class="c-mpc">None intrinsic</td><td class="c-fhe">None intrinsic; accelerators help</td></tr>
+</tbody>
+</table>
+</div>
+<p class="scrollhint">← swipe the table →</p>
+</section>
+<!-- 3 -->
+<section id="coverage">
+<h2><span class="n">03 :: Analytics</span>Analytics coverage by workload</h2>
+<p>practical implications that matter. <strong>shape of analytics each supports without heroic redesign</strong>TEE technology provides flexibility to integrated systems, whether it involves migrating unmodified Linux applications with Gramine's 'lift-and-shift' approach or running encrypted Spark SQL in enclaves. MPC offers a variety of capabilities, customized for specific workloads through protocols like MP-SPDZ, ABY3, SCQL, VaultDB, and SECRECY. FHE, initially limited in function and cost, is expanding with advancements such as OpenFHE's CKKS/BFV/BGV, Concrete ML's encrypted inference and data-frames, and TFHE-rs for integer/Boolean/string operations with GPU bootstrapping.</p>
+<div class="tablewrap">
+<table class="cmp">
+<thead><tr><th class="dim">Workload</th><th class="h-tee">TEEs</th><th class="h-mpc">MPC</th><th class="h-fhe">FHE</th></tr></thead>
+<tbody>
+<tr><th>Aggregation</th><td class="c-tee"><span class="rate r-good">strong</span><br/>Arbitrary SQL/Spark aggregation runs naturally</td><td class="c-mpc"><span class="rate r-best">strong</span><br/>A core secure-computation primitive</td><td class="c-fhe"><span class="rate r-good">good</span><br/>Arithmetic/vectorized; depends on circuit depth</td></tr>
+<tr><th>SQL select / filter / group-by</th><td class="c-tee"><span class="rate r-good">strong</span><br/>Closest to plaintext execution</td><td class="c-mpc"><span class="rate r-good">costlier</span><br/>SCQL, VaultDB, SECRECY, SMCQL</td><td class="c-fhe"><span class="rate r-weak">limited</span><br/>Specialized data-frames, not general SQL</td></tr>
+<tr><th>Joins</th><td class="c-tee"><span class="rate r-good">strong</span><br/>Large equi-joins via existing engines</td><td class="c-mpc"><span class="rate r-good">supported</span><br/>Often the dominant cost center</td><td class="c-fhe"><span class="rate r-weak">weak</span><br/>Replaced by equality circuits, PSI, narrow flows</td></tr>
+<tr><th>ML inference</th><td class="c-tee"><span class="rate r-best">excellent</span><br/>General models</td><td class="c-mpc"><span class="rate r-good">strong</span><br/>Common PPML settings</td><td class="c-fhe"><span class="rate r-good">strong</span><br/>Client-server private inference; some hybrid deep models</td></tr>
+<tr><th>ML training</th><td class="c-tee"><span class="rate r-good">strong</span><br/>Enclave XGBoost, broader confidential stacks</td><td class="c-mpc"><span class="rate r-good">good</span><br/>Linear, trees, collaborative; deep is costly</td><td class="c-fhe"><span class="rate r-weak">selective</span><br/>Only some models; far narrower than inference</td></tr>
+<tr><th>Streaming analytics</th><td class="c-tee"><span class="rate r-good">good</span><br/>Existing stream processors in confidential envs</td><td class="c-mpc"><span class="rate r-weak">specialized</span><br/>Aggregate/sketch settings</td><td class="c-fhe"><span class="rate r-weak">weak today</span><br/>Better for narrow encrypted transforms</td></tr>
+<tr><th>Private set ops / entity resolution</th><td class="c-tee"><span class="rate r-good">possible</span><br/>But hardware trust stays central</td><td class="c-mpc"><span class="rate r-best">excellent</span><br/>PSI &amp; private joins are mature</td><td class="c-fhe"><span class="rate r-weak">possible</span><br/>Specialized; less turnkey than MPC</td></tr>
+</tbody>
+</table>
+</div>
+<p class="scrollhint">← swipe the table →</p>
+<p>A second pattern worth highlighting is the growing role of <strong>hybrids</strong>SecretFlow combines various privacy-enhancing technologies, such as MPC, HE, and other PETs, within one platform. OpenFHE provides assistance for threshold and multiparty extensions, with TEEs increasingly used for attestation and secret-release functions in cryptographic kernels. Teams often opt for hybrid approaches to maintain a balance between minimizing trust and ensuring acceptable latency.</p>
+</section>
+<!-- 4 -->
+<section id="security">
+<h2><span class="n">04 :: Security</span>Security guarantees and threat models</h2>
+<p><span class="tee-t">TEEs</span> present a strong narrative opposing a vulnerable host operating system or a malicious hypervisor <em>within the vendor's threat model</em> The guarantees' effectiveness depends entirely on the model's limitations and patching strategy, a factor that is not just theoretical, but crucial.</p>
+<ul class="bul">
+<li><strong>Foreshadow</strong> broke core SGX confidentiality through speculative execution; <strong>Plundervolt</strong> compromised enclave integrity via undervolting.</li>
+<li>Recent confidential-VM research demonstrated <strong>interrupt-based attacks</strong> against SEV-SNP and TDX.</li>
+<li>Even in 2026, AMD issued bulletin <strong>AMD-SB-3034</strong> A routing misconfiguration in SEV-SNP could potentially compromise integrity in privileged attack scenarios.</li>
+</ul>
+<p>The takeaway is not that TEEs are ineffective, but instead that TEE security is a significant worry. <strong>moving systems-security target</strong>, not a one-time cryptographic proof.</p>
+<p><span class="mpc-t">MPC</span> The dispute between the cleaner and the cloud operator depends on factors like the parties involved, their honesty, adversaries, and collusion potential. It's essential to recognize that protocol security isn't completely ensured by theorems. A 2025 study on SPDZ implementations exposed security problems despite the malicious-security design, highlighting the need for software assurance and concurrency testing.</p>
+<p><span class="fhe-t">FHE</span> provides the cleanest <strong>server-side confidentiality</strong> Since the server never sees plaintext, it's crucial to consider that while FHE offers robust encryption, it may not fully hide metadata, access patterns, model structure, and outputs at the application level due to the complexity of LWE/RLWE with HomomorphicEncryption.org standards. Moreover, there have been cases of implementation side channels targeting FHE libraries. Thus, additional precautions like output filtering, model partitioning, or threshold decryption policies may be needed to bolster security beyond FHE's cryptographic safeguards.</p>
+<div class="tablewrap">
+<table class="cmp">
+<thead><tr><th class="dim">Dimension</th><th class="h-tee">TEEs</th><th class="h-mpc">MPC</th><th class="h-fhe">FHE</th></tr></thead>
+<tbody>
+<tr><th>Protects vs compromised OS / hypervisor</th><td class="c-tee">Yes, by design</td><td class="c-mpc">Yes, if protocol assumptions hold</td><td class="c-fhe">Yes :: server runs without plaintext</td></tr>
+<tr><th>Side-channel exposure</th><td class="c-tee">High relative concern (microarch, interrupt/fault)</td><td class="c-mpc">Lower hardware dependence; output leakage remains</td><td class="c-fhe">Avoids TEE boundary; impl &amp; metadata can leak</td></tr>
+<tr><th>Trust in hardware vendor</th><td class="c-tee">High</td><td class="c-mpc">Low</td><td class="c-fhe">Low</td></tr>
+<tr><th>Trust in non-collusion</th><td class="c-tee">Low to none</td><td class="c-mpc">Central</td><td class="c-fhe">Usually none (threshold decryption may add it)</td></tr>
+<tr><th>Attestation / proof of environment</th><td class="c-tee">Core requirement</td><td class="c-mpc">Not hardware-based; correctness from protocol</td><td class="c-fhe">Circuit &amp; cryptographic evaluation dependent</td></tr>
+</tbody>
+</table>
+</div>
+<p class="scrollhint">← swipe the table →</p>
+</section>
+<!-- 5 -->
+<section id="performance">
+<h2><span class="n">05 :: Performance</span>Performance, scalability, and cost</h2>
+<p><span class="tee-t">TEEs</span> Consistently excelling in raw workload flexibility and frequently taking the lead in latency, various statistics from current research corroborate this idea:</p>
+<div class="figs">
+<div class="fig tee"><div class="n">7–31%</div><div class="l">Opaque / SGX: I/O-encryption (~7.5%) to end-to-end (~31.7%) overhead in the cited setup; oblivious mode adds ~1.2×–46×</div></div>
+<div class="fig mpc"><div class="n">~20 min</div><div class="l">MPC is restricted by network when executing a 2M-row query on password reuse, which typically takes around 1.2 hours for a recurring C. diff query.</div></div>
+<div class="fig fhe"><div class="n">~1 ms</div><div class="l">Concrete ML focuses on using small linear or GLM models in FHE while explicitly avoiding generalizing to ensembles, deep models, or SQL.</div></div>
+</div>
+<p>A study conducted in 2024 showed that Confidential-VM TEEs are more efficient than SGX for 'lift-and-shift' analytics, thanks to their avoidance of SGX's per-process enclave model and small protected-memory limits. The study found that confidential VMs running on streaming workloads (NEXMark) experienced approximately an 8.5% throughput overhead. <span class="mpc-t">MPC</span> Batch processing significantly decreased communication latency by two to four orders of magnitude, enabling the transfer of 100 million 64-bit shares in about 2 seconds. In an ideal honest-majority setting, ABY3 demonstrated the capacity to process billions of AND gates per second. <span class="fhe-t">FHE</span> remains the slowest, as standardized benchmarks show that the top performer varies based on workload type (TFHE is strong with binary circuits, while HElib is favored for batching multiple instances), with a shift in modern fully homomorphic encryption towards GPU or accelerator execution rather than solely relying on the CPU.</p>
+<h4 class="sub">Cost &amp; operational burden</h4>
+<div class="tablewrap">
+<table class="cmp">
+<thead><tr><th class="dim">Burden area</th><th class="h-tee">TEEs</th><th class="h-mpc">MPC</th><th class="h-fhe">FHE</th></tr></thead>
+<tbody>
+<tr><th>Compute cost</th><td class="c-tee">Lowest premium of the three</td><td class="c-mpc">Higher :: multiple parties + protocol overhead</td><td class="c-fhe">Highest; acceleration often needed</td></tr>
+<tr><th>Network / egress</th><td class="c-tee">Moderate</td><td class="c-mpc">Often high :: protocol messages dominate</td><td class="c-fhe">Moderate, but ciphertexts/keys are large</td></tr>
+<tr><th>Key management</th><td class="c-tee">Attestation-bound secret release + KMS</td><td class="c-mpc">Multi-party key &amp; secret-share lifecycle</td><td class="c-fhe">Client keygen, eval keys, threshold decryption</td></tr>
+<tr><th>Orchestration</th><td class="c-tee">Attestation, container policy, enclave/CVM scheduling</td><td class="c-mpc">Party coordination, fault handling, sessions</td><td class="c-fhe">Compilation pipeline, circuit packaging, accelerators</td></tr>
+<tr><th>Monitoring / debugging</th><td class="c-tee">Hard :: introspection breaks trust boundary</td><td class="c-mpc">Hard :: transcripts distributed &amp; sensitive</td><td class="c-fhe">Hard :: compiled, encrypted execution is opaque</td></tr>
+</tbody>
+</table>
+</div>
+<p class="scrollhint">← swipe the table →</p>
+</section>
+<!-- 6 -->
+<section id="ecosystem">
+<h2><span class="n">06 :: Ecosystem</span>Ecosystem, tooling, and maturity</h2>
+<p>The maturity timeline is asymmetric: <strong>MPC is the oldest conceptually, TEEs boast the most advanced infrastructure, and FHE is quickly advancing on the practical frontier.</strong></p>
+<ul class="bul">
+<li><span class="tee-t">TEEs</span> With the most cutting-edge platform ecosystem, our framework integrates Intel/AMD/Arm hardware stacks, the cross-TEE Open Enclave SDK, Gramine for Linux SGX workloads, Enarx for WebAssembly portability, and Confidential Containers for Kubernetes attestation and secret delivery. The complexity of secure operations is the only limitation, not the lack of available tools.</li>
+<li><span class="mpc-t">MPC</span> Research tooling such as MP-SPDZ, ABY3, SecretFlow, and SCQL are widely used and increasingly available, providing a range of protocols and security measures. Usability is often achieved through restricted workloads or defined policies.</li>
+<li><span class="fhe-t">FHE</span> demands a quick tempo: OpenFHE (diverse applications, FHE threshold, scheme interchange), Microsoft SEAL (BFV/CKKS), TFHE-rs (focus on Boolean/integer), HEBench (evaluating performance), and Concrete ML (Python API, deployment, mixed execution). It calls for a more profound comprehension of cryptography beyond conventional examples.</li>
+</ul>
+<div class="tablewrap">
+<table class="cmp">
+<thead><tr><th class="dim">Dimension</th><th class="h-tee">TEEs</th><th class="h-mpc">MPC</th><th class="h-fhe">FHE</th></tr></thead>
+<tbody>
+<tr><th>Hardware / platform maturity</th><td class="c-tee">High</td><td class="c-mpc">Not hardware-dependent</td><td class="c-fhe">Moderate, improving; accelerator ecosystem emerging</td></tr>
+<tr><th>Developer abstraction</th><td class="c-tee">Strong via enclaves/CVMs/containers</td><td class="c-mpc">Moderate; improving with SQL/ML frameworks</td><td class="c-fhe">Moderate for packaged ML; lower for custom analytics</td></tr>
+<tr><th>Production readiness (general analytics)</th><td class="c-tee">Highest</td><td class="c-mpc">Moderate</td><td class="c-fhe">Lowest for arbitrary analytics; stronger for focused inference</td></tr>
+</tbody>
+</table>
+</div>
+<p class="scrollhint">← swipe the table →</p>
+</section>
+<!-- 7 -->
+<section id="new2026">
+<h2><span class="n">07 :: Dispatch</span>What's new in 2025–2026</h2>
+<div class="dispatch">
+<span class="tag"><span class="blink"></span>Field dispatch · recently updated</span>
+<h3>The frontier moved :: especially on hardware and FHE</h3>
+<ul class="bul">
+<li><strong>GPU TEEs went mainstream.</strong> NVIDIA Confidential Computing now covers Hopper (H100/H200) and Blackwell (B200/B300, RTX Pro 6000) GPUs, ensuring the encryption of model parameters, activations, and KV-cache stored in VRAM. AWS, Azure, and Google Cloud offer CPU-TEE confidential virtual machines, with Azure also providing end-to-end NVIDIA-CC GPU confidential virtual machines.</li>
+<li><strong>Composite attestation arrived.</strong> Intel Trust Authority and NVIDIA collaborate to validate a secure VM and confidential-computing GPU in one streamlined process, addressing a critical gap in confidential AI.</li>
+<li><strong>GPU-TEE overhead is small for LLM work.</strong> Hopper CC benchmarks indicate that LLM-inference overhead typically remains below 7%, with minimal effect on larger models or extended sequences. The primary bottleneck lies in the data transfer between the PCIe CPU and GPU, rather than the GPU's computational capabilities. Nonetheless, a survey carried out in February 2026 cautions that specific GPU-TEE hardware elements, like power management and the PCIe bus, are still in their initial development phases.</li>
+<li><strong>FHE commercialized fast.</strong> Zama became the first FHE "unicorn" (June 2025), reports ~20–100× speedups since inception, and targets 500–1,000 TPS via GPU by end of 2026; TFHE-rs adds CUDA GPU and AMD Alveo FPGA acceleration. Apple shipped a <em>production</em> FHE feature (Live Caller ID Lookup) along with specialized accelerators (FPGA, processing-in-memory, ASICs) are addressing the bootstrapping/off-chip</li>
+<li><strong>Scale-out TEEs are on roadmaps.</strong> The current trend in the industry is moving away from single physical server TEEs towards scale-out solutions, which could greatly expand the use of confidential analytics.</li>
+</ul>
+</div>
+<p>The distinction between 'hardware-trust' and 'no-hardware-trust' privacy is fading as confidential GPUs make TEE-based private AI more affordable and FHE acceleration narrows the cost difference for complex tasks.</p>
+</section>
+<!-- 8 -->
+<section id="compliance">
+<h2><span class="n">08 :: Compliance</span>Compliance and operational realities</h2>
+<p>All three are best viewed as <strong>risk-reducing technical measures, not scope-elimination machines</strong>GDPR Article 32 requires encryption and pseudonymization for security during processing, while HIPAA's Security Rule emphasizes risk-based measures to protect ePHI integrity. PCI DSS highlights retention minimization and strong cryptography. However, lawful-basis analysis, data-minimization choices, auditing, retention constraints, and output governance remain essential under these regulations.</p>
+<p>Operationally, each technology centers on a different discipline:</p>
+<ul class="bul">
+<li><span class="tee-t">TEEs</span> center on <strong>attestation and secret release</strong> Monitoring becomes difficult because of the balance needed between introspection and confidentiality when managing reference values, integrating KMS, managing certificate lifecycles, signing images, and re-attesting patches.</li>
+<li><span class="mpc-t">MPC</span> centers on <strong>party coordination</strong> The importance of hosting compute parties, preventing collusion, rotating sessions, managing offline parties, and governing outputs is highlighted in SCQL's column-control list, emphasizing the need to implement output policies to prevent data leakage through permissive result policies or unregulated repeated queries.</li>
+<li><span class="fhe-t">FHE</span> centers on <strong>key and circuit lifecycle</strong> Concrete ML architecture distinguishes between client-side cryptographic parameters and server-side compiled model artifacts, emphasizing the potential slowness of key generation and the large size of keys. It also warns that the compiled artifacts are unique to the architecture. The FHE CI/CD system resembles a compiler toolchain integrated with a crypto-parameter pipeline, rather than the usual model serving approach.</li>
+</ul>
+<div class="note">
+<div class="h">The shared caveat</div>
+<p>TEE, MPC, and FHE have the potential to greatly improve a control environment. Nevertheless, they should not be seen as substitutes for secure software engineering, as their security capabilities are continuously developing across all three categories. It is advisable to consider them as individual components within a holistic design approach, rather than as foolproof measures.</p>
+</div>
+</section>
+<!-- 9 -->
+<section id="decision">
+<h2><span class="n">09 :: Decide</span>Decision framework by use case</h2>
+<p>The strongest overall mapping for most analytics programs:</p>
+<div class="tablewrap">
+<table class="cmp">
+<thead><tr><th class="dim">Use case</th><th class="dim">First choice</th><th class="dim">Why · when to differ</th></tr></thead>
+<tbody>
+<tr><th>Single-org confidential SQL / ETL / BI</th><td><span class="tee-t">TEE</span></td><td>For FHE to achieve extensive engine compatibility and optimal latency, it is essential to strictly adhere to the requirement of 'no plaintext on server ever' and limit the query set.</td></tr>
+<tr><th>Cross-org joins, clean rooms, collaborative aggregates</th><td><span class="mpc-t">MPC</span></td><td>Operators are constrained by limited data visibility, but the SQL/PSI ecosystems are deemed reliable. Utilize TEE for coordination and integrate FHE for client-server interactions.</td></tr>
+<tr><th>Private ML inference as a service</th><td><span class="fhe-t">FHE</span> / hybrid</td><td>Strong confidentiality is guaranteed on the server side through established client/server patterns, with the choice to prioritize Trusted Execution Environments (TEE) for enhanced speed and flexibility without compromising trust.</td></tr>
+<tr><th>Confidential ML training on existing frameworks</th><td><span class="tee-t">TEE</span></td><td>High compatibility with software. MPC enables collaborative training between parties with trust issues; FHE restricted to certain model classes at the moment.</td></tr>
+<tr><th>Streaming analytics on sensitive data</th><td><span class="tee-t">TEE</span></td><td>Preferred option for present stream processors. MPC tailored for particular aggregates/sketches; FHE generally constrained to specific transformations.</td></tr>
+<tr><th>Regulated sharing where hardware trust is unacceptable</th><td><span class="mpc-t">MPC</span></td><td>Best trust reduction method for multi-owner analytics. Fully Homomorphic Encryption (FHE) suggested for single client/server situations with increased runtime expenses.</td></tr>
+<tr><th>Lowest operational friction, near-term rollout</th><td><span class="tee-t">TEE</span></td><td>Selecting MPC/FHE is crucial when trust is of utmost importance and following standard infrastructure practices is necessary for optimal ecosystem support.</td></tr>
+</tbody>
+</table>
+</div>
+<p class="scrollhint">← swipe the table →</p>
+<p>Boiled down: <strong><span class="tee-t">TEE-first</span></strong> to update internal analytics, adhere to BI regulations, work on confidential feature development, and ensure secure streaming. <strong><span class="mpc-t">MPC-first</span></strong> Clean rooms for data, federated analytics in healthcare and finance, cross-company joins, and measuring advertising effectiveness. <strong><span class="fhe-t">FHE-first</span></strong> Private inference services, encrypted client-server scoring, and specific arithmetic analytics are employed in cases where storing plaintext data on the server is not permissible. <strong>Hybrid-first</strong> When collaboration, trust, and practical performance are all equally crucial at the same time.</p>
+</section>
+<!-- 10 -->
+<section id="checklist">
+<h2><span class="n">10 :: Checklist</span>Adoption checklist</h2>
+<ol class="checklist">
+<li>State the <strong>trust requirement</strong> Which adversary must be defeated (host OS, cloud operator, cooperating party, the server itself)? This single answer effectively limits the potential threats.</li>
+<li>Map the <strong>workload shape</strong> Examining the analytics-coverage table reveals the differences between general SQL/streaming, cross-party joins, and client-server inference.</li>
+<li>Pin the <strong>latency and cost budget</strong>, and then confirm it using standard benchmarks (TEE close to native performance; MPC limited by network speed; FHE relies on accelerator).</li>
+<li>Decide <strong>attestation and key management</strong> initial: establishment of reference values and key management systems for trusted execution environments; creation of party/session setup and secret-sharing lifecycle for secure multi-party computation; development of key generation and compiled-circuit pipeline for fully homomorphic encryption</li>
+<li>Write the <strong>output-governance policy</strong> :: thresholds, allowable columns, and query repetition constraints :: as even precise implementation can result in data exposure.</li>
+<li>Finish one specific task from beginning to end, confirm security assessment aligns with threat model, then move forward with industrialization.</li>
+<li>Plan for <strong>hybrids</strong>For production purposes, implementing TEE alongside MPC primitives or utilizing FHE at the crucial client-server edge is often the most feasible approach.</li>
+</ol>
+</section>
+<!-- 11 -->
+<section id="faq">
+<h2><span class="n">11 :: FAQ</span>Frequently asked questions</h2>
+<div class="faq">
+<details open="">
+<summary>What's the difference between TEEs, MPC, and FHE? <span class="pl">+</span></summary>
+<div class="ans">All three Conduct calculations on confidential information without exposing the original data to unauthorized parties., but they place trust differently. A TEE protects data in use inside attested hardware. MPC distributes trust across parties so no single one sees the inputs. FHE lets an untrusted server compute on ciphertext without the decryption key. TEEs offer the broadest compatibility, MPC fits cross-organization collaboration, and FHE offers the strongest no-plaintext-on-server guarantee for narrow workloads.</div>
+</details>
+<details>
+<summary>Which is best for encrypted analytics? <span class="pl">+</span></summary>
+<div class="ans">Various technologies should be considered based on where trust requirements are located. Trusted Execution Environments (TEEs) are well-suited for rapid implementation compared to existing SQL/ML/streaming stacks, while Secure Multi-Party Computation (MPC) is preferred for collaborative analytics between organizations with shared distrust. Fully Homomorphic Encryption (FHE) is appropriate for specific analytics or private inference when there is no trust in server plaintext or hardware. In reality, many production systems integrate all three technologies.</div>
+</details>
+<details>
+<summary>Is FHE fast enough for production in 2026? <span class="pl">+</span></summary>
+<div class="ans">While FHE is still slower than plaintext, the gap is narrowing. Basic linear models can now run in about 1 millisecond, and GPU acceleration is becoming more widespread in libraries like TFHE-rs. Apple has even incorporated a FHE caller-ID feature in a real-world application. Although FHE holds potential for private inference and data-heavy analytics, it is not yet prepared to entirely replace conventional SQL warehouses.</div>
+</details>
+<details>
+<summary>Are TEEs secure given side-channel attacks? <span class="pl">+</span></summary>
+<div class="ans">Viewing TEE security as a static guarantee is not advisable, given recent attacks such as Foreshadow and Plundervolt that have revealed vulnerabilities in interrupt-based attacks on SEV-SNP and TDX. Despite defenses against compromised OS or hypervisor within the vendor's threat model, TEEs heavily depend on side-channel mitigations and patch management for security assurances. AMD's bulletin AMD-SB-3034 in 2026 emphasizes that TEE security is an ever-changing objective, not a one-off demonstration.</div>
+</details>
+<details>
+<summary>Do these technologies remove GDPR or HIPAA obligations? <span class="pl">+</span></summary>
+<div class="ans">The three techniques discussed - encryption, pseudonymisation, and retention minimization with strong cryptography - are all risk-reducing measures rather than scope-eliminating machines. They are outlined in GDPR Article 32, HIPAA's Security Rule, and PCI DSS. While they improve control environments, they do not replace the need for lawful-basis analysis, data minimization, auditing, retention limits, or output governance.</div>
+</details>
+<details>
+<summary>What is a confidential GPU and why does it matter? <span class="pl">+</span></summary>
+<div class="ans">By implementing NVIDIA Confidential Computing on Hopper and Blackwell GPUs, TEE protections are enhanced to secure GPU memory and execution. This ensures that confidential data like model weights, activations, and KV-cache are encrypted in VRAM, even when accessed by a privileged host. This innovative technology, when paired with a CPU TEE, enables secure and efficient private AI inference and training, with only a minimal overhead of approximately 7% for LLM workloads.</div>
+</details>
+</div>
+</section>
+<!-- SOURCES -->
+<section id="sources">
+<h2><span class="n">12 :: Sources</span>Sources &amp; further reading</h2>
+<p>Sourced from vendor documents, research papers, peer-reviewed benchmarks, industry norms, and future forecasts for 2025-</p>
+<div class="sources">
+<ol>
+<li><a href="/data-products/data-clean-rooms/" target="_blank"><span class="src-name">Data Product</span> Data as Infra</a></li>
+</ol>
+</div>
+</section>
+</article>
+</div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+const prog=document.getElementById('progress');
+addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  prog.style.width=((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';
+},{passive:true});
+
+const tocLinks=[...document.querySelectorAll('.toc a')];
+const map={};
+tocLinks.forEach(a=>{map[a.getAttribute('href').slice(1)]=a;});
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      tocLinks.forEach(l=>l.classList.remove('active'));
+      const a=map[e.target.id]; if(a)a.classList.add('active');
+    }
+  });
+},{rootMargin:'-18% 0px -72% 0px'});
+document.querySelectorAll('article section[id]').forEach(s=>obs.observe(s));
+</script>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/data-clean-rooms/confidential-computing-mpc-fhe.html">Confidential Computing, MPC, and FHE Compared: A Guide to Encrypted Analytics for 2026 by Dataknobs</a><a href="/data-products/data-clean-rooms/encrypted-data-analytics.html">Prashant Dhingra's 2026 Guide to Privacy-Enhancing Technologies in Encrypted Data Analytics</a><a href="/data-products/data-clean-rooms/">Confidential Computing, MPC, and FHE for Encrypted Analytics</a><a href="/data-products/data-clean-rooms/data-clean-rooms.html">Data Clean Rooms: An Extensive Guide and Tutorial for 2026 Including Vendor Suggestions by Prashant Dhingra</a></div></aside><footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>

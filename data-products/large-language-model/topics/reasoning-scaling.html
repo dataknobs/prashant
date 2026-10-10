@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>LLM Volume 3: Reasoning Models, Scaling Inference, and Architectural Design by DataKnobs</title>
+<!-- SEO -->
+<meta content="LLM Volume 3: Deep dive into reasoning models (o1, DeepSeek-R1), chain-of-thought prompting, inference-time compute scaling, test-time compute…" name="description"/>
+<meta content="LLM reasoning models, chain of thought, inference time scaling, test time compute, DeepSeek R1, OpenAI o1, mixture of experts, MoE LLM, LLM scaling laws, model distillation, LLM efficiency, RLVR, reinforcement learning LLM, speculative decoding, LLM architecture 2025, slow thinking fast thinking, frontier AI research, DataKnobs, LLM series vol 3" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/>
+<meta content="LLM Volume 3: Reasoning Models, Scaling Inference, and Architectural Design by DataKnobs" property="og:title"/>
+<meta content="LLM Volume 3: Deep dive into reasoning models (o1, DeepSeek-R1), chain-of-thought prompting, inference-time compute scaling, test-time compute…" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-24.png" property="og:image"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,700;0,900;1,300;1,700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root {
+      --white:   #ffffff;
+      --off:     #f2f2f0;
+      --paper:   #ebebea;
+      --rule:    #d0d0ce;
+      --rule2:   #b8b8b5;
+      --ink:     #0f0f0e;
+      --ink2:    #222220;
+      --ink3:    #444440;
+      --muted:   #808078;
+      --ghost:   #c8c8c4;
+      --red:     #e02020;
+      --red-bg:  #fff0f0;
+      --yellow:  #f5c800;
+      --yel-bg:  #fffbe0;
+      --teal:    #00897b;
+      --teal-bg: #e8f5f3;
+      --sans:    'Inter', sans-serif;
+      --cond:    'Barlow Condensed', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--white);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .header-top {
+      background: var(--ink);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 2.5rem;
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+
+    .ht-right { color: rgba(255,255,255,0.45); }
+
+    .header-main {
+      padding: 2rem 2.5rem 0;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 2rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .vol-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--sans);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--red);
+      color: var(--white);
+      padding: 0.2rem 0.65rem;
+      margin-bottom: 0.85rem;
+    }
+
+    h1 {
+      font-family: var(--cond);
+      font-size: clamp(4rem, 9vw, 9rem);
+      font-weight: 900;
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    h1 .thin {
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink3);
+    }
+
+    .header-meta {
+      padding-bottom: 1.5rem;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    .slide-pill {
+      font-family: var(--cond);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border: 2px solid var(--ink);
+    }
+
+    .header-desc-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2.5rem;
+      padding: 1.25rem 2.5rem;
+    }
+
+    .header-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .header-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      align-content: flex-start;
+    }
+
+    .topic-tag {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--rule2);
+      color: var(--ink3);
+      background: var(--off);
+    }
+
+    /* ── STICKY NAV ── */
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 44px;
+    }
+
+    .sn-links {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .sn-links::-webkit-scrollbar { display: none; }
+
+    .sn-link {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      padding: 0 1rem;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+      transition: color 0.15s, background 0.15s;
+    }
+    .sn-link:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+
+    .sn-counter {
+      font-family: var(--cond);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    /* ── FILM STRIP VIEWER ── */
+    .film-section {
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .film-strip-top {
+      background: var(--ink2);
+      padding: 0.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .film-strip-top::-webkit-scrollbar { display: none; }
+
+    .film-hole {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      background: var(--ink);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      flex-shrink: 0;
+    }
+
+    .film-thumb {
+      width: 80px;
+      flex-shrink: 0;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s, transform 0.15s;
+      position: relative;
+    }
+
+    .film-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.55;
+      transition: opacity 0.15s;
+    }
+
+    .film-thumb.active {
+      border-color: var(--yellow);
+    }
+
+    .film-thumb.active img,
+    .film-thumb:hover img { opacity: 1; }
+
+    .film-thumb:hover:not(.active) { transform: scale(1.05); }
+
+    .film-num {
+      position: absolute;
+      bottom: 2px; right: 3px;
+      font-size: 0.5rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      font-family: var(--cond);
+      letter-spacing: 0.04em;
+    }
+
+    /* Main display */
+    .main-display {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+    }
+
+    .md-slide {
+      border-right: 2px solid var(--ink);
+      cursor: zoom-in;
+      position: relative;
+      background: var(--ink2);
+    }
+
+    .md-slide img {
+      width: 100%;
+      display: block;
+      transition: opacity 0.25s ease;
+    }
+    .md-slide img.fade { opacity: 0; }
+
+    .md-side {
+      background: var(--off);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mds-top {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      flex: 1;
+    }
+
+    .mds-slide-num {
+      font-family: var(--cond);
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--ghost);
+      letter-spacing: -0.04em;
+      margin-bottom: 0.5rem;
+    }
+
+    .mds-title {
+      font-family: var(--cond);
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .mds-desc {
+      font-size: 0.78rem;
+      color: var(--ink3);
+      line-height: 1.65;
+    }
+
+    .mds-nav {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-top: 1px solid var(--rule);
+      background: var(--paper);
+    }
+
+    .nav-btn {
+      width: 36px; height: 36px;
+      background: var(--ink);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
+    }
+    .nav-btn:hover { background: var(--red); }
+
+    .nav-prog {
+      flex: 1;
+      height: 3px;
+      background: var(--rule);
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .nav-prog-fill {
+      height: 100%;
+      background: var(--ink);
+      transition: width 0.3s ease;
+    }
+
+    .nav-count {
+      font-family: var(--cond);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── FEATURE GRID ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 3px solid var(--ink);
+    }
+
+    .fg-cell {
+      border-right: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      padding: 2rem 1.75rem;
+      position: relative;
+    }
+
+    .fg-cell:nth-child(4n) { border-right: none; }
+
+    .fg-cell-accent {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 4px;
+    }
+
+    .fg-num {
+      font-family: var(--cond);
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.6rem;
+    }
+
+    .fg-cell h3 {
+      font-family: var(--cond);
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.6rem;
+    }
+
+    .fg-cell p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── FULL-SPREAD SECTION ── */
+    .spread {
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .spread-left {
+      background: var(--ink);
+      color: var(--white);
+      padding: 4rem 2.5rem;
+      border-right: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .spread-right {
+      background: var(--off);
+      padding: 4rem 2.5rem;
+    }
+
+    .sp-eyebrow {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .spread-left .sp-eyebrow { color: rgba(255,255,255,0.35); }
+    .spread-right .sp-eyebrow { color: var(--muted); }
+
+    .sp-h2 {
+      font-family: var(--cond);
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      line-height: 1.0;
+      margin-bottom: 1.5rem;
+    }
+
+    .spread-left .sp-h2 { color: var(--white); }
+
+    .sp-text {
+      font-size: 0.86rem;
+      line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+
+    .spread-left .sp-text { color: rgba(255,255,255,0.6); }
+    .spread-right .sp-text { color: var(--ink3); }
+
+    .sp-callout {
+      border-left: 3px solid;
+      padding: 0.85rem 1rem;
+      margin: 1.25rem 0;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .callout-yellow {
+      border-color: var(--yellow);
+      background: var(--yel-bg);
+      color: var(--ink2);
+    }
+
+    .callout-teal {
+      border-color: var(--teal);
+      background: var(--teal-bg);
+      color: #004d44;
+    }
+
+    .callout-red {
+      border-color: var(--red);
+      background: var(--red-bg);
+      color: #8b0000;
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .table-section {
+      border-bottom: 3px solid var(--ink);
+      padding: 4rem 2.5rem;
+      background: var(--white);
+    }
+
+    .ts-inner { max-width: 1200px; margin: 0 auto; }
+
+    .sec-tag {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      background: var(--ink);
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .ts-h2 {
+      font-family: var(--cond);
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      margin-bottom: 2.5rem;
+    }
+
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid var(--ink);
+    }
+
+    .cmp-table th {
+      background: var(--ink);
+      color: var(--white);
+      font-family: var(--cond);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .cmp-table td {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--rule);
+      font-size: 0.82rem;
+      color: var(--ink2);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .cmp-table tr:nth-child(even) td { background: var(--off); }
+    .cmp-table td:first-child {
+      font-weight: 600;
+      color: var(--ink);
+      border-left: 2px solid var(--ink);
+    }
+
+    .badge-r { background: var(--red-bg); color: var(--red); font-weight: 700; padding: 0.1rem 0.4rem; font-size: 0.72rem; }
+    .badge-y { background: var(--yel-bg); color: #806600; font-weight: 700; padding: 0.1rem 0.4rem; font-size: 0.72rem; }
+    .badge-g { background: var(--teal-bg); color: var(--teal); font-weight: 700; padding: 0.1rem 0.4rem; font-size: 0.72rem; }
+
+    /* ── ALL SLIDES STRIP ── */
+    .all-slides {
+      border-bottom: 3px solid var(--ink);
+      padding: 3rem 2.5rem;
+      background: var(--off);
+    }
+
+    .as-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .as-h2 {
+      font-family: var(--cond);
+      font-size: 1.4rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .as-hint {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .slides-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .sl-card {
+      background: var(--white);
+      border: 2px solid var(--rule2);
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+      overflow: hidden;
+    }
+
+    .sl-card:hover {
+      border-color: var(--ink);
+      transform: translateY(-2px);
+    }
+
+    .sl-card img {
+      width: 100%;
+      display: block;
+    }
+
+    .sl-card-foot {
+      padding: 0.55rem 0.75rem;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sl-num {
+      font-family: var(--cond);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--ghost);
+    }
+
+    .sl-title {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-align: right;
+      max-width: 55%;
+      line-height: 1.3;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline-section {
+      border-bottom: 3px solid var(--ink);
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    .tl-label-col {
+      background: var(--yellow);
+      padding: 3rem 2rem;
+      border-right: 2px solid var(--ink);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .tl-label-col h2 {
+      font-family: var(--cond);
+      font-size: 2.2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+
+    .tl-label-col p {
+      font-size: 0.78rem;
+      color: var(--ink3);
+      line-height: 1.6;
+    }
+
+    .tl-items-col {
+      padding: 3rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 2.5rem;
+    }
+
+    .tl-item {
+      border-left: 3px solid var(--ink);
+      padding-left: 1rem;
+    }
+
+    .tl-year {
+      font-family: var(--cond);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--red);
+      margin-bottom: 0.25rem;
+    }
+
+    .tl-item h4 {
+      font-family: var(--cond);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .tl-item p { font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.35);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 1.5rem 2.5rem;
+      gap: 1rem;
+    }
+
+    .ft-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .ft-logo {
+      font-family: var(--cond);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--white);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+
+    .ft-series {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .ft-center {
+      text-align: center;
+      font-size: 0.65rem;
+    }
+
+    .ft-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      justify-content: flex-end;
+    }
+
+    .ft-right a {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+    .ft-right a:hover { color: var(--white); }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .lightbox.open { display: flex; }
+
+    .lb-inner {
+      position: relative;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    .lb-inner img {
+      width: 100%;
+      display: block;
+    }
+
+    .lb-btn {
+      position: fixed;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: var(--white);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
+    }
+    .lb-btn:hover { background: var(--red); border-color: var(--red); }
+
+    .lb-close {
+      top: 1rem; right: 1rem;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+    }
+
+    .lb-arr {
+      top: 50%; transform: translateY(-50%);
+      width: 42px; height: 42px;
+      border-radius: 0;
+      font-size: 0.9rem;
+    }
+    .lb-arr.prev { left: -52px; }
+    .lb-arr.next { right: -52px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 980px) {
+      .main-display { grid-template-columns: 1fr; }
+      .md-side { border-top: 2px solid var(--ink); display: grid; grid-template-columns: 1fr auto; }
+      .mds-top { border-bottom: none; border-right: 1px solid var(--rule); }
+      .feature-grid { grid-template-columns: 1fr 1fr; }
+      .fg-cell:nth-child(2n) { border-right: none; }
+      .fg-cell:nth-child(4n) { border-right: 2px solid var(--ink); }
+      .spread { grid-template-columns: 1fr; }
+      .spread-left { border-right: none; border-bottom: 2px solid rgba(255,255,255,0.1); }
+      .slides-row { grid-template-columns: 1fr 1fr; }
+      .timeline-section { grid-template-columns: 1fr; }
+      .tl-label-col { border-right: none; border-bottom: 2px solid var(--ink); }
+      .tl-items-col { grid-template-columns: 1fr; gap: 1.25rem; }
+      footer { grid-template-columns: 1fr; text-align: center; gap: 0.75rem; }
+      .ft-left, .ft-right { justify-content: center; }
+    }
+
+    @media (max-width: 640px) {
+      .header-main { grid-template-columns: 1fr; }
+      .header-desc-row { grid-template-columns: 1fr; }
+      h1 { font-size: 4rem; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .fg-cell { border-right: none !important; }
+      .slides-row { grid-template-columns: 1fr 1fr; }
+      .lb-arr.prev { left: 4px; }
+      .lb-arr.next { right: 4px; }
+      .sticky-nav, .header-top, .film-strip-top { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .spread-left, .spread-right, .table-section, .all-slides, .timeline-section { padding: 2.5rem 1.25rem; }
+      .tl-items-col { padding: 2rem 1.25rem; }
+    }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="LLM Volume 3: Deep dive into reasoning models (o1, DeepSeek-R1), chain-of-thought prompting, inference-time compute scaling, test-time compute…" name="ai-summary"/><meta content="Generative AI &amp; LLMs" name="topic"/><link href="https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html" rel="canonical"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html" property="og:url"/><meta content="summary_large_image" name="twitter:card"/><meta content="LLM Volume 3: Reasoning Models, Scaling Inference, and Architectural Design by DataKnobs" name="twitter:title"/><meta content="LLM Volume 3: Deep dive into reasoning models (o1, DeepSeek-R1), chain-of-thought prompting, inference-time compute scaling, test-time compute…" name="twitter:description"/><meta content="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-24.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html#article","url":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html#webpage"},"headline":"LLM Volume 3: Reasoning Models, Scaling Inference, and Architectural Design by DataKnobs","description":"LLM Volume 3: Deep dive into reasoning models (o1, DeepSeek-R1), chain-of-thought prompting, inference-time compute scaling, test-time compute…","image":"https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-24.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Generative AI & LLMs"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html#webpage","url":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html","name":"LLM Volume 3: Reasoning Models, Scaling Inference, and Architectural Design by DataKnobs","description":"LLM Volume 3: Deep dive into reasoning models (o1, DeepSeek-R1), chain-of-thought prompting, inference-time compute scaling, test-time compute…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Generative AI & LLMs","item":"https://prashant.dhingra.website/data-products/genai/"},{"@type":"ListItem","position":3,"name":"LLM Volume 3: Reasoning Models, Scaling Inference, and Architectural Design by DataKnobs","item":"https://prashant.dhingra.website/data-products/large-language-model/topics/reasoning-scaling.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<!-- HEADER -->
+<header class="site-header">
+<div class="header-top">
+<span>DataKnobs · LLM Education Series</span>
+<span class="ht-right">Vol. 3 · Slides 24–31</span>
+</div>
+<div class="header-main">
+<div>
+<div class="vol-badge">Volume 3 · Advanced Architecture</div>
+<h1>Reasoning<br/><span class="thin">Models &amp;</span><br/>Inference<br/>Scaling</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Generative AI &amp; LLMs</a></p>
+</div>
+<div class="header-meta">
+<div class="slide-pill">8 Slides</div>
+<div class="slide-pill">Slides 24–31</div>
+</div>
+</div>
+<div class="header-desc-row">
+<p class="header-desc">
+      The frontier of LLM research: how reasoning models like o1 and DeepSeek-R1 use test-time compute
+      to solve harder problems, why mixture-of-experts unlocks massive scale at manageable cost, and
+      what scaling laws tell us about where AI is heading.
+    </p>
+<div class="header-topics">
+<span class="topic-tag">Chain-of-Thought</span>
+<span class="topic-tag">Reasoning Models</span>
+<span class="topic-tag">Test-Time Compute</span>
+<span class="topic-tag">Mixture-of-Experts</span>
+<span class="topic-tag">Scaling Laws</span>
+<span class="topic-tag">Distillation</span>
+<span class="topic-tag">Speculative Decoding</span>
+<span class="topic-tag">RLVR</span>
+</div>
+</div>
+</header>
+<!-- STICKY NAV -->
+<nav class="sticky-nav">
+<div class="sn-links">
+<a class="sn-link" href="#viewer">Slides</a>
+<a class="sn-link" href="#concepts">Concepts</a>
+<a class="sn-link" href="#reasoning">Reasoning</a>
+<a class="sn-link" href="#architecture">Architecture</a>
+<a class="sn-link" href="#compare">Compare</a>
+<a class="sn-link" href="#gallery">Gallery</a>
+<a class="sn-link" href="#timeline">Timeline</a>
+</div>
+<span class="sn-counter" id="navCounter">01 / 08</span>
+</nav>
+<!-- FILM STRIP VIEWER -->
+<div class="film-section" id="viewer">
+<div class="film-strip-top" id="filmStrip">
+<!-- holes + thumbs built by JS -->
+</div>
+<div class="main-display">
+<div class="md-slide" onclick="openLb(current)">
+<img alt="LLM Vol.3 :: Slide 24" decoding="async" id="mainImg" loading="eager" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-24.png"/>
+</div>
+<div class="md-side">
+<div class="mds-top">
+<div class="mds-slide-num" id="sideNum">24</div>
+<div class="mds-title" id="sideTitle">Chain-of-Thought &amp; Reasoning</div>
+<p class="mds-desc" id="sideDesc">
+          Reasoning models generate intermediate thinking steps before producing a final answer ::
+          dramatically improving performance on complex tasks like math, coding, and multi-step logic.
+        </p>
+</div>
+<div class="mds-nav">
+<button class="nav-btn" onclick="move(-1)">←</button>
+<div class="nav-prog">
+<div class="nav-prog-fill" id="progFill" style="width:12.5%"></div>
+</div>
+<button class="nav-btn" onclick="move(1)">→</button>
+<span class="nav-count" id="navCount">01 / 08</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CONCEPT CELLS -->
+<div class="feature-grid" id="concepts">
+<div class="fg-cell">
+<div class="fg-cell-accent" style="background:var(--red);"></div>
+<div class="fg-num" style="color:var(--red);">01</div>
+<h3>Chain-of-Thought</h3>
+<p>Encouraging models to provide detailed intermediate steps prior to reaching a final solution enhances performance in complex mathematical, logical, and coding tasks, especially when applied on a large scale.</p>
+</div>
+<div class="fg-cell">
+<div class="fg-cell-accent" style="background:var(--ink);"></div>
+<div class="fg-num" style="color:var(--ghost);">02</div>
+<h3>Test-Time Compute</h3>
+<p>Increasing computational resources during inference, rather than during training, can lead to improved answers. Models can improve their performance by exploring multiple reasoning paths and choosing the most accurate one through majority voting or reward systems.</p>
+</div>
+<div class="fg-cell">
+<div class="fg-cell-accent" style="background:var(--yellow);"></div>
+<div class="fg-num" style="color:var(--yellow);">03</div>
+<h3>Mixture of Experts</h3>
+<p>MoE directs every token to a limited number of specialized sub-networks. Even models with trillions of parameters only utilize billions per token, achieving frontier-scale performance at a fraction of the inference cost.</p>
+</div>
+<div class="fg-cell" style="border-right:none;">
+<div class="fg-cell-accent" style="background:var(--teal);"></div>
+<div class="fg-num" style="color:var(--teal);">04</div>
+<h3>Scaling Laws</h3>
+<p>Chinchilla scaling showed that in 2020, many models were not adequately trained due to the rapid increase in data scaling relative to model size.</p>
+</div>
+<div class="fg-cell">
+<div class="fg-cell-accent" style="background:var(--ink);"></div>
+<div class="fg-num" style="color:var(--ghost);">05</div>
+<h3>Model Distillation</h3>
+<p>Developing a compact 'student' model to replicate the performance of a larger 'teacher' model, DeepSeek-R1 successfully distilled reasoning abilities into 7B and 14B models, surpassing the performance of larger base models on various benchmarks.</p>
+</div>
+<div class="fg-cell">
+<div class="fg-cell-accent" style="background:var(--red);"></div>
+<div class="fg-num" style="color:var(--red);">06</div>
+<h3>RLVR Training</h3>
+<p>Training Language Model Models on tasks with verifiable rewards such as math and code eliminates the dependency on human preference labels and significantly enhances reasoning accuracy.</p>
+</div>
+<div class="fg-cell">
+<div class="fg-cell-accent" style="background:var(--yellow);"></div>
+<div class="fg-num" style="color:var(--yellow);">07</div>
+<h3>Speculative Decoding</h3>
+<p>A compact draft model simultaneously suggests various potential tokens, while a larger model confirms them all in a single forward pass. This leads to a 2–4× increase in speed without compromising the accuracy of the final output compared to greedy decoding.</p>
+</div>
+<div class="fg-cell" style="border-right:none;">
+<div class="fg-cell-accent" style="background:var(--teal);"></div>
+<div class="fg-num" style="color:var(--teal);">08</div>
+<h3>KV Cache &amp; Efficiency</h3>
+<p>Key-value caching prevents the need to recalculate attention for each token, making long-document analysis and multi-turn agents feasible at 200K context.</p>
+</div>
+</div>
+<!-- SPREAD: REASONING DEEP DIVE -->
+<div class="spread" id="reasoning">
+<div class="spread-left">
+<div class="sp-eyebrow">Deep Dive</div>
+<h2 class="sp-h2">The Reasoning<br/>Revolution</h2>
+<p class="sp-text">
+      OpenAI's o1 demonstrated that spending more compute at inference time :: generating longer
+      chains of thought :: could unlock qualitative capability jumps on tasks that stumped previous
+      models: graduate-level math, competitive coding, and scientific reasoning.
+    </p>
+<div class="sp-callout callout-yellow">
+      o1 scored in the 89th percentile on competitive programming problems. Its predecessor
+      GPT-4 scored in the 11th percentile :: an 8× relative improvement through reasoning alone,
+      not additional pretraining.
+    </div>
+<p class="sp-text">
+      DeepSeek-R1 showed that reinforcement learning with verifiable rewards (RLVR) :: training
+      on problems with objectively correct answers :: can instill sophisticated reasoning without
+      expensive human preference data. Its 7B distilled variant outperforms GPT-4 on math benchmarks.
+    </p>
+</div>
+<div class="spread-right" id="architecture">
+<div class="sp-eyebrow">Architecture</div>
+<h2 class="sp-h2">Why Mixture<br/>of Experts</h2>
+<p class="sp-text">
+      Dense transformers scale parameter count linearly with compute cost. Mixture-of-Experts
+      decouples the two: a routing layer selects 2–8 specialist sub-networks per token, leaving
+      the rest dormant. GPT-4 is widely reported to use MoE with ~8 experts, activating ~2 per token.
+    </p>
+<div class="sp-callout callout-teal">
+      With MoE, a model can have 1 trillion total parameters but activate only ~100B per forward pass ::
+      matching the inference cost of a much smaller dense model while retaining the capacity
+      of a much larger one.
+    </div>
+<p class="sp-text">
+      The trade-offs: MoE models require more memory to store all expert weights, have higher
+      communication overhead in distributed setups, and can suffer from load-imbalance where
+      some experts are consistently over-selected. Auxiliary loss terms during training
+      encourage balanced routing.
+    </p>
+<div class="sp-callout callout-red">
+      Key challenge: MoE models often perform worse than dense models in few-shot transfer settings,
+      as experts specialize during pretraining and may not generalize as flexibly to new tasks.
+    </div>
+</div>
+</div>
+<!-- COMPARISON TABLE -->
+<div class="table-section" id="compare">
+<div class="ts-inner">
+<div class="sec-tag">Comparison</div>
+<h2 class="ts-h2">Reasoning Model Landscape</h2>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>Model</th>
+<th>Training Approach</th>
+<th>Reasoning Method</th>
+<th>Parameters</th>
+<th>Strength</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI o1 / o3</td>
+<td>RLHF + process reward models</td>
+<td>Internal chain-of-thought (hidden)</td>
+<td>Undisclosed</td>
+<td><span class="badge-r">Math &amp; Science</span></td>
+</tr>
+<tr>
+<td>DeepSeek-R1</td>
+<td>RLVR on verifiable tasks</td>
+<td>Explicit long CoT, visible to user</td>
+<td>671B MoE (37B active)</td>
+<td><span class="badge-g">Cost Efficiency</span></td>
+</tr>
+<tr>
+<td>DeepSeek-R1 Distilled</td>
+<td>Knowledge distillation from R1</td>
+<td>CoT inherited from teacher</td>
+<td>7B / 14B / 32B</td>
+<td><span class="badge-g">Small-scale SOTA</span></td>
+</tr>
+<tr>
+<td>QwQ-32B</td>
+<td>RLVR + self-improvement</td>
+<td>Extended reasoning traces</td>
+<td>32B dense</td>
+<td><span class="badge-y">Open weights</span></td>
+</tr>
+<tr>
+<td>Claude (Extended Thinking)</td>
+<td>Constitutional AI + RLHF</td>
+<td>Visible scratchpad thinking</td>
+<td>Undisclosed</td>
+<td><span class="badge-r">Safety + Reasoning</span></td>
+</tr>
+<tr>
+<td>Gemini Thinking</td>
+<td>Multimodal RLHF</td>
+<td>Internal multi-hypothesis reasoning</td>
+<td>Undisclosed</td>
+<td><span class="badge-g">Multimodal</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- ALL SLIDES -->
+<div class="all-slides" id="gallery">
+<div class="as-head">
+<span class="as-h2">All Slides · 24–31</span>
+<span class="as-hint">Click any slide to enlarge</span>
+</div>
+<div class="slides-row" id="slideRow"></div>
+</div>
+<!-- TIMELINE -->
+<div class="timeline-section" id="timeline">
+<div class="tl-label-col">
+<h2>The Reasoning<br/>Milestones</h2>
+<p>The pivotal moments that marked the reasoning revolution ranged from prompting chain-of-thought to scaling compute at test-time.</p>
+</div>
+<div class="tl-items-col">
+<div class="tl-item">
+<div class="tl-year">2022</div>
+<h4>Chain-of-Thought Prompting</h4>
+<p>Wei and colleagues demonstrated that incorporating the phrase 'let's think step by step' into prompts significantly enhanced the performance of LLMs on multi-step reasoning assignments, without the need for fine-tuning.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2023</div>
+<h4>Process Reward Models</h4>
+<p>OpenAI developed reward models that evaluate intermediate reasoning steps, rather than just the end results, allowing reinforcement learning to enhance every stage in a solution sequence.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2024 · Sept</div>
+<h4>OpenAI o1 Launch</h4>
+<p>o1 proved that scaling inference computation (creating longer CoT) could outperform significantly larger dense models in math and coding, marking the beginning of the 'inference scaling law' era.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2025 · Jan</div>
+<h4>DeepSeek-R1 &amp; RLVR</h4>
+<p>A reasoning model trained using verifiable rewards, not human preference data, and its 7B distilled version outperformed GPT-4 on MATH benchmarks, making frontier reasoning more accessible.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2025</div>
+<h4>Inference Scaling Laws</h4>
+<p>Research has shown that increasing the use of inference compute methods such as best-of-N sampling, MCTS, and self-refinement can be traded off predictably against accuracy, providing practitioners with a new tool for improving performance.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2025–2026</div>
+<h4>Reasoning as Default</h4>
+<p>All cutting-edge models like GPT-5, Claude Opus 4.6, Gemini 3, and Grok 4 are now equipped with reasoning/thinking modes. The focus has moved from questioning the capability of LLMs to reason to optimizing routing strategies.</p>
+</div>
+</div>
+</div>
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lb" onclick="lbBg(event)">
+<button class="lb-btn lb-close" onclick="closeLb()">✕</button>
+<div class="lb-inner">
+<button class="lb-btn lb-arr prev" onclick="lbMove(-1);event.stopPropagation()">←</button>
+<img alt="LLM Slide" decoding="async" id="lbImg" loading="lazy" src=""/>
+<button class="lb-btn lb-arr next" onclick="lbMove(1);event.stopPropagation()">→</button>
+</div>
+</div>
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+  const TOTAL = 8;
+  const SLIDE_NUMS = [24,25,26,27,28,29,30,31];
+  const BASE = 'https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-';
+
+  const TITLES = [
+    'Chain-of-Thought & Reasoning',
+    'How Reasoning Models Work',
+    'Test-Time Compute Scaling',
+    'Reinforcement Learning for Reasoning',
+    'Mixture-of-Experts Architecture',
+    'Scaling Laws & Chinchilla',
+    'Model Distillation & Efficiency',
+    'The Future of LLM Architecture'
+  ];
+
+  const DESCS = [
+    'Reasoning models enhance performance on complex tasks such as math, coding, and multi-step logic by generating intermediate thinking steps before reaching a final answer.',
+    'OpenAI o1, DeepSeek-R1, and QwQ-32B use extended chain-of-thought reasoning at inference time :: spending more compute to think harder, not train larger.',
+    'Allocating more compute at inference through best-of-N sampling, Monte Carlo Tree Search, and self-refinement. A new dimension of the scaling curve beyond parameter count.',
+    'RLVR (Reinforcement Learning with Verifiable Rewards) trains on tasks with objectively correct answers :: removing the need for human preference labels and incentivizing genuine reasoning.',
+    'MoE routes each token to a sparse subset of expert sub-networks :: enabling trillion-parameter models with the inference cost of much smaller dense models.',
+    'Empirical laws relating model size, training tokens, and compute to performance. Chinchilla showed most 2020-era models were undertrained :: data matters as much as parameters.',
+    'Training a smaller student model to mimic a larger teacher. DeepSeek distilled R1 into 7B–32B models that match GPT-4 on benchmarks at a fraction of the inference cost.',
+    'Reasoning as default, agentic architectures, multimodal understanding, and hardware-software co-design :: where LLM architecture research is heading next.'
+  ];
+
+  let current = 0;
+  let lbCurrent = 0;
+
+  function imgUrl(idx) { return BASE + SLIDE_NUMS[idx] + '.png'; }
+
+  // Build film strip
+  const strip = document.getElementById('filmStrip');
+  for (let i = 0; i < TOTAL; i++) {
+    const hole = document.createElement('div');
+    hole.className = 'film-hole';
+    strip.appendChild(hole);
+
+    const thumb = document.createElement('div');
+    thumb.className = 'film-thumb' + (i === 0 ? ' active' : '');
+    thumb.innerHTML = `<img src="${imgUrl(i)}" alt="Slide ${SLIDE_NUMS[i]}" loading="lazy" /><span class="film-num">${SLIDE_NUMS[i]}</span>`;
+    thumb.addEventListener('click', () => goTo(i));
+    strip.appendChild(thumb);
+  }
+  // trailing hole
+  const lastHole = document.createElement('div');
+  lastHole.className = 'film-hole';
+  strip.appendChild(lastHole);
+
+  // Build gallery row
+  const row = document.getElementById('slideRow');
+  for (let i = 0; i < TOTAL; i++) {
+    const card = document.createElement('div');
+    card.className = 'sl-card';
+    card.innerHTML = `
+      <img src="${imgUrl(i)}" alt="Slide ${SLIDE_NUMS[i]}: ${TITLES[i]}" loading="lazy" />
+      <div class="sl-card-foot">
+        <span class="sl-num">SLIDE ${SLIDE_NUMS[i]}</span>
+        <span class="sl-title">${TITLES[i]}</span>
+      </div>`;
+    card.addEventListener('click', () => openLb(i));
+    row.appendChild(card);
+  }
+
+  function goTo(idx) {
+    current = idx;
+    const img = document.getElementById('mainImg');
+    img.classList.add('fade');
+    setTimeout(() => {
+      img.src = imgUrl(idx);
+      img.alt = `LLM Vol.3 :: Slide ${SLIDE_NUMS[idx]}: ${TITLES[idx]}`;
+      img.classList.remove('fade');
+    }, 220);
+    document.getElementById('sideNum').textContent = SLIDE_NUMS[idx];
+    document.getElementById('sideTitle').textContent = TITLES[idx];
+    document.getElementById('sideDesc').textContent = DESCS[idx];
+    const label = `${String(idx+1).padStart(2,'0')} / 08`;
+    document.getElementById('navCount').textContent = label;
+    document.getElementById('navCounter').textContent = label;
+    document.getElementById('progFill').style.width = `${((idx+1)/TOTAL)*100}%`;
+    document.querySelectorAll('.film-thumb').forEach((t,i) => t.classList.toggle('active', i === idx));
+  }
+
+  function move(dir) { goTo((current + dir + TOTAL) % TOTAL); }
+
+  function openLb(idx) {
+    lbCurrent = idx;
+    document.getElementById('lbImg').src = imgUrl(idx);
+    document.getElementById('lb').classList.add('open');
+  }
+
+  function lbMove(dir) {
+    lbCurrent = (lbCurrent + dir + TOTAL) % TOTAL;
+    document.getElementById('lbImg').src = imgUrl(lbCurrent);
+  }
+
+  function lbBg(e) { if (e.target === document.getElementById('lb')) closeLb(); }
+  function closeLb() { document.getElementById('lb').classList.remove('open'); }
+
+  document.addEventListener('keydown', e => {
+    const lbOpen = document.getElementById('lb').classList.contains('open');
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft')  lbOpen ? lbMove(-1) : move(-1);
+    if (e.key === 'ArrowRight') lbOpen ? lbMove(1)  : move(1);
+  });
+</script>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/large-language-model/topics/">Large Language Models (LLMs) :: A Complete Guide | DataKnobs</a><a href="/data-products/large-language-model/topics/ai-assistant.html">AI Assistants - Fueled by LLM Technology | Various Types, Characteristics &amp; Uses</a><a href="/data-products/large-language-model/topics/ai-assistants.html">AI Assistants - Utilizing LLM Technology | Various Types, Functions &amp; Uses</a><a href="/data-products/large-language-model/topics/lifecycle.html">Lifecycle Production of LLM Apps: A Comprehensive Guide from Data to Deployment</a></div></aside><footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>

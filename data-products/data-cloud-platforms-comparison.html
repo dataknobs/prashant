@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Comprehensive comparison of data cloud platforms: Google BigQuery, Amazon Redshift, Snowflake, and Databricks Lakehouse. Feature matrix, architecture comparison…" name="description"/>
+<meta content="Data Warehouse, Cloud Data Platform, BigQuery, Redshift, Snowflake, Databricks, Data Cloud, Analytics, DWH Comparison" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<title>Comparison of Data Cloud Platforms: BigQuery, Redshift, Snowflake, and Databricks</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1em;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #764ba2;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .slide-image {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .slide-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .comparison-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f5f7fa;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .platform-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f7 100%);
+            padding: 30px;
+            border-radius: 10px;
+            border-top: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
+        }
+
+        .platform-card h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .platform-card p {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .strengths-list, .weaknesses-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .strengths-list li, .weaknesses-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #555;
+            font-size: 0.95em;
+            border-bottom: 1px solid #eee;
+        }
+
+        .strengths-list li:last-child, .weaknesses-list li:last-child {
+            border-bottom: none;
+        }
+
+        .strengths-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .weaknesses-list li:before {
+            content: "✗";
+            position: absolute;
+            left: 0;
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .detail-section {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .detail-section h5 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .detail-section p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .column-box {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            border-top: 4px solid #667eea;
+        }
+
+        .column-box h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .column-box ul {
+            list-style-position: inside;
+            color: #666;
+        }
+
+        .column-box li {
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .section-intro {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-intro p {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .highlight-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .use-case-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .use-case-box h5 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .use-case-box p {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .decision-framework {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .decision-item {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .decision-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .decision-item p {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-table {
+                font-size: 0.9em;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="Comprehensive comparison of data cloud platforms: Google BigQuery, Amazon Redshift, Snowflake, and Databricks Lakehouse. Feature matrix, architecture comparison…" name="ai-summary"/><meta content="Data Product Strategy" name="topic"/><link href="https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Comparison of Data Cloud Platforms: BigQuery, Redshift, Snowflake, and Databricks" property="og:title"/><meta content="Comprehensive comparison of data cloud platforms: Google BigQuery, Amazon Redshift, Snowflake, and Databricks Lakehouse. Feature matrix, architecture comparison…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html" property="og:url"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-1.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Comparison of Data Cloud Platforms: BigQuery, Redshift, Snowflake, and Databricks" name="twitter:title"/><meta content="Comprehensive comparison of data cloud platforms: Google BigQuery, Amazon Redshift, Snowflake, and Databricks Lakehouse. Feature matrix, architecture comparison…" name="twitter:description"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-1.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html#article","url":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html#webpage"},"headline":"Comparison of Data Cloud Platforms: BigQuery, Redshift, Snowflake, and Databricks","description":"Comprehensive comparison of data cloud platforms: Google BigQuery, Amazon Redshift, Snowflake, and Databricks Lakehouse. Feature matrix, architecture comparison…","image":"https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-1.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Data Product Strategy"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html#webpage","url":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html","name":"Comparison of Data Cloud Platforms: BigQuery, Redshift, Snowflake, and Databricks","description":"Comprehensive comparison of data cloud platforms: Google BigQuery, Amazon Redshift, Snowflake, and Databricks Lakehouse. Feature matrix, architecture comparison…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Data Product Strategy","item":"https://prashant.dhingra.website/data-products/data-products/"},{"@type":"ListItem","position":3,"name":"Comparison of Data Cloud Platforms: BigQuery, Redshift, Snowflake, and Databricks","item":"https://prashant.dhingra.website/data-products/data-cloud-platforms-comparison.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<header>
+<h1>Data Cloud Platforms Comparison</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Data Product Strategy</a></p>
+<p>BigQuery vs Redshift vs Snowflake vs Databricks</p>
+<p style="font-size: 0.95em; margin-top: 10px; opacity: 0.9;">Complete Feature Comparison &amp; Selection Guide</p>
+</header>
+<div class="container">
+<!-- Section 1: Feature Matrix Overview -->
+<div class="section">
+<h2>Data Cloud Platforms: Feature Matrix</h2>
+<div class="slide-image">
+<img alt="Feature Metrics Comparison" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-1.png"/>
+</div>
+<div class="section-intro">
+<p>To navigate the modern data cloud landscape effectively, one must consider the four major platforms, each with unique architectures, strengths, and use cases. Selecting the best platform for your organization involves assessing your specific requirements, current infrastructure, and future goals. This thorough guide offers the analysis necessary to make a well-informed choice.</p>
+</div>
+<h3>At-a-Glance Feature Matrix</h3>
+<div class="comparison-table">
+                
+                    
+                        Feature
+                        Google BigQuery
+                        Amazon Redshift
+                        Snowflake
+                        Databricks Lakehouse
+                    
+                
+                
+                    
+                        <strong>Primary Paradigm</strong>
+                        Serverless DWH
+                        Provisioned DWH
+                        Cloud-Native DWH
+                        Unified Lakehouse
+                    
+                    
+                        <strong>Architecture</strong>
+                        Decoupled Compute/Storage
+                        Managed Storage (RA3)
+                        Multi-Cluster, Shared Data
+                        Lakehouse (Delta Lake)
+                    
+                    
+                        <strong>Best For</strong>
+                        Ad-hoc Analytics, BI
+                        BI, AWS-centric orgs
+                        Concurrency, Data Sharing
+                        AI/ML, Data Engineering
+                    
+                    
+                        <strong>Scalability Model</strong>
+                        Automatic
+                        Manual/Scheduled Resize
+                        Instant, Elastic
+                        Cluster Auto-Scaling
+                    
+                    
+                        <strong>Data Support</strong>
+                        Structured, Semi-structured
+                        Primarily Structured
+                        Structured, Semi-structured
+                        All types (inc. Unstructured)
+                    
+                    
+                        <strong>Maintenance</strong>
+                        Very Low
+                        Medium
+                        Low
+                        Medium-High
+                    
+                
+            
+
+            <div class="highlight-box">
+<h4>Key Decision Factors</h4>
+<p><strong>Cloud Provider:</strong> Existing infrastructure and ecosystem preferences matter. <strong>Workload Type:</strong> Analytics, ML, or data engineering focus. <strong>Scale &amp; Concurrency:</strong> Number of concurrent users and query complexity. <strong>Cost Model:</strong> Predictable vs. variable costs. <strong>Data Types:</strong> Structured only vs. multi-modal data. <strong>Maintenance Tolerance:</strong> Fully-managed vs. hands-on preference.</p>
+</div>
+</div>
+<!-- Section 2: Google BigQuery -->
+<div class="section">
+<h2>Google BigQuery: Serverless Data Warehouse</h2>
+<div class="slide-image">
+<img alt="Google BigQuery" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-2.png"/>
+</div>
+<div class="section-intro">
+<p>BigQuery is a serverless data warehouse managed by Google that allows for lightning-fast SQL queries thanks to its extensive infrastructure. Its unique architecture, which separates compute and storage, offers both flexibility and cost savings.</p>
+</div>
+<h3>BigQuery Overview</h3>
+<div class="two-column">
+<div class="column-box">
+<h4>Architecture</h4>
+<p>Serverless storage (Colossus) and compute (Dremel) are decoupled and automatically provisioned, requiring minimal maintenance.</p>
+</div>
+<div class="column-box">
+<h4>Pricing Model</h4>
+<p>Choose between pay-per-query (on-demand) or flat-rate capacity pricing, with storage billed separately at a low cost. There is a possibility of cost variability with on-demand pricing.</p>
+</div>
+</div>
+<div class="detail-section">
+<h5>Strengths</h5>
+<ul class="strengths-list">
+<li>Zero-ops/Serverless::no cluster management needed</li>
+<li>Excellent for ad-hoc analysis and BI</li>
+<li>Built-in ML capabilities (BigQuery ML)</li>
+<li>High-speed queries on large datasets</li>
+</ul>
+</div>
+<div class="detail-section">
+<h5>Weaknesses</h5>
+<ul class="weaknesses-list">
+<li>On-demand pricing can be unpredictable</li>
+<li>Less fine-grained control over resources</li>
+<li>Can be slower with very high concurrency</li>
+</ul>
+</div>
+<h3>Use Cases</h3>
+<div class="use-case-box">
+<h5>Ad-hoc Analytics &amp; Exploration</h5>
+<p>Ideal for data analysts who need to explore data without prior knowledge of the number of queries required, with no need for cluster sizing.</p>
+</div>
+<div class="use-case-box">
+<h5>BI &amp; Reporting</h5>
+<p>Ideal for business intelligence applications requiring rapid queries and consistent concurrency. Seamlessly integrates with a variety of BI tools.</p>
+</div>
+<div class="use-case-box">
+<h5>Google Cloud-native Organizations</h5>
+<p>Ideal for companies that are currently leveraging Google Cloud services, seamlessly integrates with BigQuery ML, Vertex AI, and other GCP offerings.</p>
+</div>
+</div>
+<!-- Section 3: Amazon Redshift -->
+<div class="section">
+<h2>Amazon Redshift: AWS-Integrated Data Warehouse</h2>
+<div class="slide-image">
+<img alt="Amazon Redshift" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-3.png"/>
+</div>
+<div class="section-intro">
+<p>A high-speed, fully-managed data warehouse service capable of handling petabyte-scale workloads, utilizing PostgreSQL and optimized for OLAP tasks. The RA3 architecture, featuring managed storage, separates compute and storage functions, though it lacks the elasticity found in Snowflake or BigQuery.</p>
+</div>
+<h3>Redshift Overview</h3>
+<div class="two-column">
+<div class="column-box">
+<h4>Architecture</h4>
+<p>Cluster-based nodes with managed storage, such as RA3, separate compute and storage, however, they lack the same level of elasticity as Snowflake or BigQuery.</p>
+</div>
+<div class="column-box">
+<h4>Pricing Model</h4>
+<p>Concurrency scaling provides temporary clusters to handle query bursts, based on the number and type of nodes provisioned and billed on a pay-per-hour basis.</p>
+</div>
+</div>
+<div class="detail-section">
+<h5>Strengths</h5>
+<ul class="strengths-list">
+<li>Deep integration with AWS ecosystem</li>
+<li>Excellent price-performance at scale</li>
+<li>Mature and stable platform</li>
+</ul>
+</div>
+<div class="detail-section">
+<h5>Weaknesses</h5>
+<ul class="weaknesses-list">
+<li>Requires more management (cluster resizing)</li>
+<li>Scaling can cause downtime</li>
+<li>Concurrency can be bottleneck without extra cost</li>
+</ul>
+</div>
+<h3>Use Cases</h3>
+<div class="use-case-box">
+<h5>AWS-Centric Organizations</h5>
+<p>Extensive integration with AWS services makes this a perfect fit for organizations deeply involved in the AWS ecosystem.</p>
+</div>
+<div class="use-case-box">
+<h5>Cost-Conscious at Scale</h5>
+<p>Great value for money is achieved by accurately predicting your computational requirements and adjusting your cluster size accordingly.</p>
+</div>
+<div class="use-case-box">
+<h5>Mature BI &amp; Analytics</h5>
+<p>Established platform with advanced tools and extensive operational expertise within the community.</p>
+</div>
+</div>
+<!-- Section 4: Snowflake -->
+<div class="section">
+<h2>Snowflake: Cloud-Native Data Platform</h2>
+<div class="slide-image">
+<img alt="Snowflake" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-4.png"/>
+</div>
+<div class="section-intro">
+<p>Snowflake is a cloud-native data platform specifically designed for the cloud, featuring a multi-cluster shared data architecture that enables near-infinite, instant concurrency and distinguishes it from its competitors.</p>
+</div>
+<h3>Snowflake Overview</h3>
+<div class="two-column">
+<div class="column-box">
+<h4>Architecture</h4>
+<p>Distinctive 3-tier structure: disconnected storage, multiple-cluster processing ('virtual warehouses'), and cloud functionalities. Scalability of compute and storage can be adjusted separately and immediately.</p>
+</div>
+<div class="column-box">
+<h4>Pricing Model</h4>
+<p>Charged per second for compute (virtual warehouses) according to size (T-shirt sizing), with storage billed separately. Utilizes a credits-based system.</p>
+</div>
+</div>
+<div class="detail-section">
+<h5>Strengths</h5>
+<ul class="strengths-list">
+<li>Instant and elastic scalability</li>
+<li>Near-unlimited concurrency</li>
+<li>Easy data sharing ('Secure Data Sharing')</li>
+<li>Supports structured and semi-structured data seamlessly</li>
+</ul>
+</div>
+<div class="detail-section">
+<h5>Weaknesses</h5>
+<ul class="weaknesses-list">
+<li>Can become expensive if compute not managed carefully</li>
+<li>Less mature ML/AI offerings compared to competitors</li>
+<li>Ecosystem integration is good but less native than GCP/AWS</li>
+</ul>
+</div>
+<h3>Use Cases</h3>
+<div class="use-case-box">
+<h5>High-Concurrency Environments</h5>
+<p>Snowflake's instant scaling is ideal for organizations with numerous concurrent users or fluctuating workloads.</p>
+</div>
+<div class="use-case-box">
+<h5>Data Sharing &amp; Collaboration</h5>
+<p>The secure sharing of data in Snowflake is perfect for organizations that require data sharing among teams or external partners.</p>
+</div>
+<div class="use-case-box">
+<h5>Multi-Cloud Strategy</h5>
+<p>Ideal for organizations seeking cloud provider flexibility, as it is compatible with AWS, Azure, and GCP.</p>
+</div>
+</div>
+<!-- Section 5: Databricks -->
+<div class="section">
+<h2>Databricks: Unified Lakehouse Platform</h2>
+<div class="slide-image">
+<img alt="Databricks Lakehouse" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-5.png"/>
+</div>
+<div class="section-intro">
+<p>A cutting-edge platform that merges data warehousing and data lakes into a 'lakehouse' framework, leveraging Apache Spark for optimal performance in AI, ML, and data engineering tasks. While it may be challenging to operate, it offers unparalleled power for advanced applications.</p>
+</div>
+<h3>Databricks Overview</h3>
+<div class="two-column">
+<div class="column-box">
+<h4>Architecture</h4>
+<p>Lakehouse architecture built on Delta Lake, utilizing open data formats to separate compute and storage. Leverages cloud object storage and offers data warehousing features through Databricks SQL.</p>
+</div>
+<div class="column-box">
+<h4>Pricing Model</h4>
+<p>Pricing tiers for various workloads are determined by the size and type of compute resources used, as measured in Databricks Units (DBUs).</p>
+</div>
+</div>
+<div class="detail-section">
+<h5>Strengths</h5>
+<ul class="strengths-list">
+<li>Best-in-class for AI/ML and data science</li>
+<li>Unified platform for data engineering, SQL, and ML</li>
+<li>Based on open standards (Delta Lake, Spark)</li>
+<li>Strong streaming capabilities</li>
+</ul>
+</div>
+<div class="detail-section">
+<h5>Weaknesses</h5>
+<ul class="weaknesses-list">
+<li>More complex to manage than pure data warehouses</li>
+<li>SQL warehouse is newer than competitors</li>
+<li>Requires more data engineering expertise to maximize</li>
+</ul>
+</div>
+<h3>Use Cases</h3>
+<div class="use-case-box">
+<h5>AI/ML &amp; Data Science</h5>
+<p>Advanced machine learning capabilities with integrated notebooks, MLflow, and seamless Spark integration.</p>
+</div>
+<div class="use-case-box">
+<h5>Data Engineering</h5>
+<p>Perfect for companies constructing intricate data pipelines and transformations using Apache Spark.</p>
+</div>
+<div class="use-case-box">
+<h5>Unified Analytics Platform</h5>
+<p>Companies seeking a single platform to handle SQL analytics, machine learning, and data engineering without the need to switch between multiple tools.</p>
+</div>
+</div>
+<!-- Section 6: Feature Comparison -->
+<div class="section">
+<h2>Detailed Feature Comparison</h2>
+<div class="slide-image">
+<img alt="Feature Comparison Details" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/data-cloud/images/Slide1000/slide-6.png"/>
+</div>
+<div class="section-intro">
+<p>This comprehensive comparison offers a detailed analysis of each platform's features across important decision factors.</p>
+</div>
+</div>
+<!-- Section 7: Selection Framework -->
+<div class="section">
+<h2>Selection Framework &amp; Decision Guide</h2>
+<div class="section-intro">
+<p>To select the appropriate data platform, careful consideration of your individual requirements is necessary. Utilize this guide to help guide your decision-making process.</p>
+</div>
+<div class="decision-framework">
+<div class="decision-item">
+<strong>1. What's your primary cloud provider?</strong>
+<p><strong>Google Cloud:</strong> BigQuery is the natural choice. <strong>AWS:</strong> While Redshift offers deep integration, Snowflake and Databricks are also solid options. <strong>Azure:</strong> Snowflake is the top choice for multi-cloud flexibility, but Databricks is a solid alternative. <strong>Multi-cloud:</strong> Snowflake is the only pure multi-cloud option.</p>
+</div>
+<div class="decision-item">
+<strong>2. What are your primary workloads?</strong>
+<p><strong>BI &amp; Analytics:</strong> BigQuery or Redshift excel. <strong>AI/ML &amp; Data Science:</strong> Databricks is unmatched. <strong>Ad-hoc Analysis:</strong> BigQuery is ideal. <strong>High-Concurrency Apps:</strong> Snowflake's instant scaling handles this best. <strong>Mixed (SQL + ML):</strong> Databricks or Snowflake.</p>
+</div>
+<div class="decision-item">
+<strong>3. What's your data profile?</strong>
+<p><strong>Primarily structured:</strong> Any option works. <strong>Mix of structured/unstructured:</strong> Snowflake or Databricks. <strong>Complex multi-modal data:</strong> Databricks is your best bet. <strong>Large-scale tabular:</strong> BigQuery or Redshift excel.</p>
+</div>
+<div class="decision-item">
+<strong>4. How important are operations?</strong>
+<p><strong>Minimal ops wanted:</strong> BigQuery (truly serverless). <strong>Willing to manage:</strong> Redshift or Snowflake. <strong>Hands-on fine control:</strong> Databricks. <strong>Cost optimization important:</strong> Snowflake (careful management) or Redshift (right-sizing).</p>
+</div>
+<div class="decision-item">
+<strong>5. What's your concurrency profile?</strong>
+<p><strong>Predictable, low concurrency:</strong> Redshift (right-size cluster). <strong>Variable concurrency:</strong> Snowflake (instant scaling). <strong>Many concurrent users:</strong> Snowflake's instant scaling shines. <strong>Complex analytics jobs:</strong> BigQuery or Databricks.</p>
+</div>
+<div class="decision-item">
+<strong>6. Budget constraints?</strong>
+<p><strong>Fixed budget:</strong> Redshift (capacity pricing). <strong>Variable cost OK:</strong> BigQuery or Snowflake. <strong>Cost optimization important:</strong> Redshift at scale. <strong>Budget not primary concern:</strong> Databricks (powerful but can be expensive).</p>
+</div>
+</div>
+<h3>Quick Selection Guide</h3>
+<div class="platform-grid">
+<div class="platform-card">
+<h4>Choose BigQuery If:</h4>
+<p>If you desire a fully serverless experience without any operational tasks, Google Cloud is the solution for you. Whether you require quick ad-hoc analytics or basic machine learning capabilities, this platform is ideal for analysts, BI teams, and ad-hoc users.</p>
+</div>
+<div class="platform-card">
+<h4>Choose Redshift If:</h4>
+<p>Ideal for AWS organizations and BI teams, whether you prioritize deep ecosystem integration, cluster customization, cost predictability, or have mature BI workloads.</p>
+</div>
+<div class="platform-card">
+<h4>Choose Snowflake If:</h4>
+<p>Best suited for large organizations, requiring instant scaling for variable workloads and high concurrency, seeking multi-cloud flexibility and easy data sharing options.</p>
+</div>
+<div class="platform-card">
+<h4>Choose Databricks If:</h4>
+<p>If you are developing AI and machine learning projects, requiring integrated data engineering, analytics, and machine learning capabilities, handling intricate Spark workloads, or seeking compatibility with open standards, this platform is ideal for data scientists, ML engineers, and data engineers.</p>
+</div>
+</div>
+</div>
+<!-- Section 8: Summary -->
+<div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+<h2 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">Making Your Data Platform Decision</h2>
+<p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
+<strong>There is no universally "best" data platform.</strong> Every option is tailored to excel in various scenarios, so the best selection will be based on your individual requirements, current setup, and organizational capacities.
+            </p>
+<p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
+<strong>Key factors to weigh:</strong> Consider the trade-offs between cloud provider lock-in and flexibility, operational complexity and hands-on control, fixed and variable costs, workload specialization and generality, as well as team expertise. Avoid making decisions based solely on hype or vendor relationships.
+            </p>
+<p style="color: white; font-size: 1.05em; line-height: 1.8;">
+<strong>The investment in choosing correctly pays dividends for years.</strong> Choosing the right platform at the start of your data journey is crucial as it will impact your architecture, tools, and team skills for a long time. Take the time to assess your needs and consider the options thoughtfully. The evaluation frameworks provided in this guide can assist in determining the most suitable platform for your unique circumstances.
+            </p>
+</div>
+</div>
+<footer>
+<p>© 2024 Data Cloud Platforms Comparison Guide</p>
+<p>BigQuery | Redshift | Snowflake | Databricks</p>
+<p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">Data Knobs</p>
+</footer>
+</div><aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/dataproduct-vs-data-as-product.html">Data Product vs. Data-as-a-Product: A Comprehensive Comparison</a><a href="/data-products/which-database-to-use/snowflake-vs-databricks.html">Data Platform Architect: Snowflake vs. Databricks</a><a href="/data-products/which-database-to-use/bigquery-vs-snowflake.html">Cloud Data Architect: BigQuery vs. Snowflake</a><a href="/data-products/evolution/5-evolution-db-feature-layer.html">Evolution: Data Architecture</a></div></aside><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/0-data-product-tutorial.html">0 Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/1-data-product-101.html">1 Data Product 101</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/10-data-product-operating-model.html">10 Data Product Operating Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/11-data-product-life-cycle.html">11 Data Product Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/12-dataknobs-approach-for-data-product-building.html">12 Dataknobs Approach For Data Product Building</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/13-user-data-task-triad.html">13 User Data Task Triad</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/14-data-product-value-chain.html">14 Data Product Value Chain</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/15-data-product-usage-value.html">15 Data Product Usage Value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/2-data-as-resource-vs-data-as-product.html">2 Data As Resource Vs Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/3-data-product-mindset.html">3 Data Product Mindset</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/4-what-is-data-product.html">4 What Is Data Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/5-data-product-attributes.html">5 Data Product Attributes</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/6-software-product-vs-data-products.html">6 Software Product Vs Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/7-inherent-tension-algorithm-usability.html">7 Inherent Tension Algorithm Usability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/8-data-product-experimentation.html">8 Data Product Experimentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/9-drive-train-approach.html">9 Drive Train Approach</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-product-eco-system.html">Data Product Eco System</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-product-experiment-framework.html">Data Product Experiment Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-product-kpis.html">Data Product Kpis</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/data-product-value-chain.html">Data Product Value Chain</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/from-data-as-resource-to-data-as-product.html">From Data As Resource To Data As Product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.prashant.dhingra.website/data-products/scaling-with-dovernance.html">Scaling With Dovernance</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 prashant.dhingra. All rights reserved.</p>
+</div>
+</div>
+</footer></body></html>

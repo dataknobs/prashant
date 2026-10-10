@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" data-related-json="folder-pages.json" data-related-keywords="data product ai genai" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI-Driven Compliance Audit: Risk &amp; Violation Analysis</title>
+<style id="related-articles-noimage-css">
+
+#related-articles-root{margin:2rem auto;max-width:1100px;padding:1rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}#related-articles-root h2{margin:0 0 .25rem;font-size:1.45rem}#related-articles-root .dp-related-intro{color:#5d6678;margin:0 0 1rem}.related-articles-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.related-article-card{display:block;text-decoration:none;color:#172033;background:#fff;border:1px solid #dfe4ec;border-radius:12px;padding:.9rem;line-height:1.35;font-weight:700}.related-article-card:hover{border-color:#bdb6ff;background:#f2f0ff}@media(max-width:800px){.related-articles-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.related-articles-grid{grid-template-columns:1fr}}
+
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafaf9; /* Stone-50 */
+            color: #44403c; /* Stone-700 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 280px;
+            }
+        }
+        .nav-active {
+            border-bottom: 2px solid #b45309; /* Amber-700 */
+            font-weight: 600;
+            color: #78350f; /* Amber-900 */
+        }
+        .transcript-line {
+            padding: 8px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .violation-highlight {
+            background-color: #fee2e2; /* Red-100 */
+            border-left: 4px solid #ef4444; /* Red-500 */
+        }
+        .safe-highlight {
+            background-color: #f0fdf4; /* Green-100 */
+            border-left: 4px solid #22c55e; /* Green-500 */
+        }
+        /* Custom scrollbar for transcript area */
+        .scroller::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scroller::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .scroller::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 3px;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<!-- Chosen Palette: Warm Stone & Amber - Grounded in warm neutrals (Stone-50/100/800) for a serious, professional report feel, utilizing Amber (700/600) for interactive elements and calls to action, and muted Red/Green for risk status indicators. -->
+<!-- Application Structure Plan: 
+         1. Dashboard View (Overview): Provides executive summary metrics using Chart.js (compliance trends, risk distribution) to establish the scale of the problem.
+         2. Risk Matrix (Deep Dive): Uses interactive filtering to switch between Call Types (Sales, Collection, Services). This allows the user to explore specific regulatory risks (FDCPA, UDAAP) relevant to each domain without clutter.
+         3. Audit Methodology (Process): A step-by-step visual flow using HTML/CSS grid to explain how the Agentic AI pipeline works (Transcription -> Context -> Policy Check).
+         4. Simulation Lab (Interactive Tool): The core "Wow" factor. Users select a mock call scenario, and the system simulates the AI's real-time analysis, highlighting text in the transcript and generating a scorecard. This demonstrates the "Audit" capability practically.
+    -->
+<!-- Visualization & Content Choices:
+         - Compliance Trend (Line Chart): To show improvement over time with AI monitoring. Goal: Inform.
+         - Violation Distribution (Doughnut Chart): To categorize top risks. Goal: Inform.
+         - Risk Frequency by Category (Bar Chart): Interactive chart that updates based on the selected domain (Sales/Collection). Goal: Compare.
+         - Process Flow (Styled HTML Cards): To explain the technical architecture without static images. Goal: Organize.
+         - Live Transcript Analyzer (DOM Manipulation): To simulate the agentic experience. Goal: Engagement/Impact.
+         - Justification: All libraries are standard (Chart.js), no SVG/Mermaid used to ensure compatibility and performance within a single file.
+    -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="This section provides a high-level view of regulatory adherence across all outgoing call channels. Utilizing Agentic AI for 100% audit coverage reveals trends that random…" name="description"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="This section provides a high-level view of regulatory adherence across all outgoing call channels. Utilizing Agentic AI for 100% audit coverage reveals trends that random…" name="ai-summary"/><meta content="AI Agents" name="topic"/><link href="https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="AI-Driven Compliance Audit: Risk &amp; Violation Analysis" property="og:title"/><meta content="This section provides a high-level view of regulatory adherence across all outgoing call channels. Utilizing Agentic AI for 100% audit coverage reveals trends that random…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="AI-Driven Compliance Audit: Risk &amp; Violation Analysis" name="twitter:title"/><meta content="This section provides a high-level view of regulatory adherence across all outgoing call channels. Utilizing Agentic AI for 100% audit coverage reveals trends that random…" name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html#article","url":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html#webpage"},"headline":"AI-Driven Compliance Audit: Risk & Violation Analysis","description":"This section provides a high-level view of regulatory adherence across all outgoing call channels. Utilizing Agentic AI for 100% audit coverage reveals trends that random…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"AI Agents"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html#webpage","url":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html","name":"AI-Driven Compliance Audit: Risk & Violation Analysis","description":"This section provides a high-level view of regulatory adherence across all outgoing call channels. Utilizing Agentic AI for 100% audit coverage reveals trends that random…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"AI Agents","item":"https://prashant.dhingra.website/data-products/ai-agents/"},{"@type":"ListItem","position":3,"name":"AI-Driven Compliance Audit: Risk & Violation Analysis","item":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/ai-audit-using-llm.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="flex flex-col min-h-screen"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<!-- Header -->
+<header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center">
+<span class="text-2xl mr-2">🛡️</span>
+<h1 class="text-xl font-bold text-stone-800 tracking-tight">LLM Based <span class="text-amber-700">AI</span> Audit</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">AI Agents</a></p>
+</div>
+<nav class="hidden md:flex space-x-8">
+<button class="nav-item nav-active px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 transition" id="nav-dashboard" onclick="navigateTo('dashboard')">Executive Dashboard</button>
+<button class="nav-item px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 transition" id="nav-risks" onclick="navigateTo('risks')">Risk Matrix</button>
+<button class="nav-item px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 transition" id="nav-methodology" onclick="navigateTo('methodology')">Audit Methodology</button>
+<button class="nav-item px-3 py-2 text-sm font-medium text-amber-700 hover:text-amber-900 transition" id="nav-simulation" onclick="navigateTo('simulation')">Live Simulation</button>
+</nav>
+<div class="md:hidden">
+<!-- Mobile menu button placeholder -->
+<button class="text-stone-500 hover:text-stone-900">☰</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+<!-- SECTION: EXECUTIVE DASHBOARD -->
+<section class="space-y-8 fade-in" id="dashboard">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-100">
+<h2 class="text-2xl font-bold text-stone-800 mb-2">Compliance Landscape Overview</h2>
+<p class="text-stone-600 max-w-3xl">
+                    This section provides a high-level view of regulatory adherence across all outgoing call channels. 
+                    Utilizing Agentic AI for 100% audit coverage reveals trends that random manual sampling often misses. 
+                    The data below reflects the integration of Large Language Models (LLMs) to detect violations of FDCPA (Collections), UDAAP (Sales), and Privacy (Services).
+                </p>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm text-center hover:shadow-md transition">
+<p class="text-sm text-stone-500 uppercase tracking-wide">Audit Coverage</p>
+<p class="text-3xl font-bold text-stone-800 mt-1">100%</p>
+<p class="text-xs text-green-600 mt-1">↑ from 2% (Manual)</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm text-center hover:shadow-md transition">
+<p class="text-sm text-stone-500 uppercase tracking-wide">Risk Detection Rate</p>
+<p class="text-3xl font-bold text-stone-800 mt-1">94.2%</p>
+<p class="text-xs text-amber-600 mt-1">Precision Score</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm text-center hover:shadow-md transition">
+<p class="text-sm text-stone-500 uppercase tracking-wide">Avg. Audit Cost</p>
+<p class="text-3xl font-bold text-stone-800 mt-1">$0.04</p>
+<p class="text-xs text-green-600 mt-1">↓ 92% per call</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm text-center hover:shadow-md transition">
+<p class="text-sm text-stone-500 uppercase tracking-wide">Critical Flags</p>
+<p class="text-3xl font-bold text-red-600 mt-1">12</p>
+<p class="text-xs text-stone-400 mt-1">Last 24 Hours</p>
+</div>
+</div>
+<!-- Dashboard Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Chart 1: Trend -->
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-semibold text-stone-700">Compliance Score Trend (6 Months)</h3>
+<span class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">Avg. Score / 100</span>
+</div>
+<div class="chart-container">
+<canvas id="trendChart"></canvas>
+</div>
+<p class="text-xs text-stone-500 mt-4 text-center italic">Implementation of real-time agent prompts at Month 3 shows distinct improvement.</p>
+</div>
+<!-- Chart 2: Distribution -->
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-semibold text-stone-700">Violation Distribution by Category</h3>
+<select class="text-xs border-stone-300 rounded text-stone-600 bg-stone-50 p-1" id="distFilter">
+<option value="all">All Channels</option>
+<option value="sales">Sales</option>
+<option value="collections">Collections</option>
+</select>
+</div>
+<div class="chart-container">
+<canvas id="distributionChart"></canvas>
+</div>
+<p class="text-xs text-stone-500 mt-4 text-center italic">"Procedural" errors are most common, but "Legal/Regulatory" carry highest risk.</p>
+</div>
+</div>
+</section>
+<!-- SECTION: RISK MATRIX -->
+<section class="hidden space-y-8 fade-in" id="risks">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-100">
+<h2 class="text-2xl font-bold text-stone-800 mb-2">Risk Deep Dive by Channel</h2>
+<p class="text-stone-600">
+                    Different outgoing call types carry unique regulatory burdens. The Agentic AI Auditor utilizes specific
+                    context-windows and policy documents (RAG) to assess calls against the correct legal frameworks.
+                    Explore the breakdown below.
+                </p>
+</div>
+<div class="flex flex-col md:flex-row gap-6">
+<!-- Controls -->
+<div class="w-full md:w-1/4 space-y-2">
+<h3 class="font-semibold text-stone-700 mb-2">Select Channel:</h3>
+<button class="w-full text-left px-4 py-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 font-medium transition hover:bg-amber-100" id="btn-sales" onclick="updateRiskView('sales')">
+                        📞 Sales Calls
+                        <span class="block text-xs font-normal opacity-75 mt-1">Risk: UDAAP, Misrepresentation</span>
+</button>
+<button class="w-full text-left px-4 py-3 rounded-lg border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50" id="btn-collection" onclick="updateRiskView('collection')">
+                        💳 Collection Calls
+                        <span class="block text-xs font-normal opacity-75 mt-1">Risk: FDCPA, Harassment</span>
+</button>
+<button class="w-full text-left px-4 py-3 rounded-lg border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50" id="btn-service" onclick="updateRiskView('service')">
+                        🎧 Service Calls
+                        <span class="block text-xs font-normal opacity-75 mt-1">Risk: Privacy (PII), Auth</span>
+</button>
+<div class="bg-stone-800 text-stone-200 p-4 rounded-lg mt-6 text-sm">
+<h4 class="font-bold text-amber-500 mb-2">Risk Definition</h4>
+<p class="opacity-90" id="risk-def">
+<strong>Unfair, Deceptive, or Abusive Acts or Practices (UDAAP):</strong> 
+                            Agents must clearly disclose terms and avoid pressure tactics. AI monitors for keyword absences and sentiment spikes indicating coercion.
+                        </p>
+</div>
+</div>
+<!-- Visualization -->
+<div class="w-full md:w-3/4 bg-white p-6 rounded-lg border border-stone-200 shadow-sm flex flex-col">
+<h3 class="text-lg font-semibold text-stone-800 mb-4" id="risk-chart-title">Top Violations: Sales</h3>
+<div class="chart-container">
+<canvas id="riskBarChart"></canvas>
+</div>
+</div>
+</div>
+<!-- Detailed Table -->
+<div class="bg-white rounded-lg shadow-sm border border-stone-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-stone-200 bg-stone-50">
+<h3 class="font-semibold text-stone-700">Recent Critical Flags</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left text-stone-600">
+<thead class="text-xs text-stone-700 uppercase bg-stone-100">
+<tr>
+<th class="px-6 py-3">Call ID</th>
+<th class="px-6 py-3">Type</th>
+<th class="px-6 py-3">Violation</th>
+<th class="px-6 py-3">Confidence</th>
+<th class="px-6 py-3">Status</th>
+</tr>
+</thead>
+<tbody id="risk-table-body">
+<!-- Populated by JS -->
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- SECTION: METHODOLOGY -->
+<section class="hidden space-y-8 fade-in" id="methodology">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-100">
+<h2 class="text-2xl font-bold text-stone-800 mb-2">The Agentic AI Audit Framework</h2>
+<p class="text-stone-600">
+                    How do we move from raw audio to actionable compliance insights? The system uses a multi-stage pipeline. 
+                    Unlike simple keyword spotting, Agentic AI "understands" context, intent, and tone using Large Language Models.
+                </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
+<!-- Step 1 -->
+<div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm hover:border-amber-400 transition cursor-help group relative">
+<div class="text-4xl mb-2">🎧</div>
+<h3 class="font-bold text-stone-800">1. Ingestion</h3>
+<p class="text-xs text-stone-500 mt-2">Stereo Audio Capture</p>
+<div class="absolute inset-0 bg-stone-900 bg-opacity-90 rounded-lg p-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200 text-white text-xs">
+                        Separates Agent/Customer channels for precise attribution.
+                    </div>
+</div>
+<!-- Arrow -->
+<div class="hidden md:flex items-center justify-center text-stone-300 text-2xl">➔</div>
+<!-- Step 2 -->
+<div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm hover:border-amber-400 transition cursor-help group relative">
+<div class="text-4xl mb-2">📝</div>
+<h3 class="font-bold text-stone-800">2. Transcription</h3>
+<p class="text-xs text-stone-500 mt-2">STT &amp; Diarization</p>
+<div class="absolute inset-0 bg-stone-900 bg-opacity-90 rounded-lg p-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200 text-white text-xs">
+                        Converts speech to text with timestamps. 98% accuracy models.
+                    </div>
+</div>
+<!-- Arrow -->
+<div class="hidden md:flex items-center justify-center text-stone-300 text-2xl">➔</div>
+<!-- Step 3 -->
+<div class="bg-white p-4 rounded-lg border border-amber-400 shadow-md transform md:-translate-y-2">
+<div class="text-4xl mb-2">🤖</div>
+<h3 class="font-bold text-amber-700">3. LLM Agent</h3>
+<p class="text-xs text-stone-500 mt-2">Contextual Analysis</p>
+<div class="mt-3 text-left bg-amber-50 p-2 rounded text-xs border border-amber-100">
+<ul class="list-disc ml-4 space-y-1">
+<li>Intent Recognition</li>
+<li>Tone Analysis</li>
+<li>Rebuttal Check</li>
+</ul>
+</div>
+</div>
+<!-- Arrow -->
+<div class="hidden md:flex items-center justify-center text-stone-300 text-2xl">➔</div>
+<!-- Step 4 -->
+<div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm hover:border-amber-400 transition cursor-help group relative">
+<div class="text-4xl mb-2">⚖️</div>
+<h3 class="font-bold text-stone-800">4. Policy RAG</h3>
+<p class="text-xs text-stone-500 mt-2">Rule Verification</p>
+<div class="absolute inset-0 bg-stone-900 bg-opacity-90 rounded-lg p-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200 text-white text-xs">
+                        Retrieves specific clauses (e.g., FDCPA Sec 805) to validate agent claims.
+                    </div>
+</div>
+</div>
+<div class="bg-stone-800 text-stone-300 p-6 rounded-lg mt-8">
+<h3 class="text-lg font-bold text-white mb-3">Why "Agentic" AI?</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+<div>
+<strong class="text-amber-500">Traditional Regex/Keywords:</strong>
+<p class="mt-1">Flagged if "Mini-Miranda" phrase is missing exact words. High false positives if agent paraphrases correctly.</p>
+</div>
+<div>
+<strong class="text-green-400">Agentic LLM:</strong>
+<p class="mt-1">Understands <em>semantic meaning</em>. If agent says "I'm calling to collect a debt," the AI recognizes compliance even without exact phrasing, reducing noise.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION: SIMULATION -->
+<section class="hidden space-y-8 fade-in" id="simulation">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-100">
+<h2 class="text-2xl font-bold text-stone-800 mb-2">Live Audit Simulator</h2>
+<p class="text-stone-600">
+                    Experience the system in action. Select a scenario below. The system will load a mock transcript, 
+                    run the analysis logic, and generate a real-time compliance scorecard.
+                </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[600px]">
+<!-- Left Panel: Scenario Selection & Transcript -->
+<div class="lg:col-span-2 bg-white rounded-lg border border-stone-200 shadow-sm flex flex-col h-[600px]">
+<div class="p-4 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
+<h3 class="font-bold text-stone-700">Call Transcript</h3>
+<select class="bg-white border border-stone-300 text-stone-700 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2" id="scenario-select" onchange="runSimulation()">
+<option value="clean_sales">Scenario A: Compliant Sales Call</option>
+<option value="risky_collection">Scenario B: High-Risk Collection</option>
+<option value="rude_service">Scenario C: Service Interaction (Tone)</option>
+</select>
+</div>
+<div class="p-6 overflow-y-auto flex-grow scroller bg-white font-mono text-sm leading-relaxed" id="transcript-container">
+<!-- JS injects transcript here -->
+<div class="text-center text-stone-400 mt-20">Select a scenario to begin analysis...</div>
+</div>
+</div>
+<!-- Right Panel: AI Findings -->
+<div class="bg-stone-900 rounded-lg shadow-lg flex flex-col h-[600px] text-stone-100 overflow-hidden">
+<div class="p-4 bg-stone-800 border-b border-stone-700">
+<h3 class="font-bold text-amber-500 flex items-center">
+<span class="animate-pulse mr-2">●</span> AI Auditor Log
+                        </h3>
+</div>
+<div class="p-4 overflow-y-auto flex-grow scroller space-y-3 text-xs" id="audit-log">
+<div class="opacity-50 italic">Waiting for input stream...</div>
+</div>
+<!-- Scorecard Summary at Bottom of Right Panel -->
+<div class="p-4 bg-stone-800 border-t border-stone-700">
+<div class="flex justify-between items-end">
+<div>
+<div class="text-stone-400 text-xs uppercase">Compliance Score</div>
+<div class="text-3xl font-bold text-white" id="sim-score">--</div>
+</div>
+<div class="px-3 py-1 rounded text-xs font-bold bg-stone-700 text-stone-400" id="sim-badge">PENDING</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<script>
+        // --- DATA STORAGE ---
+        
+        // 1. Chart Data
+        const trendData = {
+            labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
+            datasets: [{
+                label: 'Compliance Score',
+                data: [72, 74, 88, 91, 93, 95], // Jump at month 3 due to AI implementation
+                borderColor: '#b45309', // Amber-700
+                backgroundColor: 'rgba(180, 83, 9, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        const distributionData = {
+            labels: ['Procedural (Script)', 'FDCPA (Legal)', 'UDAAP (Sales)', 'Privacy (PII)', 'Tone/Sentiment'],
+            datasets: [{
+                data: [45, 15, 20, 10, 10],
+                backgroundColor: ['#d6d3d1', '#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+                borderWidth: 0
+            }]
+        };
+
+        const riskData = {
+            sales: {
+                labels: ['Misrepresentation', 'Pressure Tactics', 'Failure to Disclose', 'Rebuttal Failure', 'Pricing Error'],
+                data: [65, 45, 30, 25, 10],
+                desc: "Unfair, Deceptive, or Abusive Acts or Practices (UDAAP): Agents must clearly disclose terms and avoid pressure tactics."
+            },
+            collection: {
+                labels: ['Mini-Miranda Missing', 'Harassment', 'Third Party Disclosure', 'Wrong Time Call', 'Threats'],
+                data: [80, 20, 15, 10, 5],
+                desc: "Fair Debt Collection Practices Act (FDCPA): Strict rules on when/how to contact and what must be stated (Mini-Miranda)."
+            },
+            service: {
+                labels: ['Failed Auth', 'PII Leak', 'Rude Behavior', 'Hold Time Violation', 'Incomplete Notes'],
+                data: [50, 40, 30, 20, 15],
+                desc: "Privacy & Quality Assurance: Focusing on verification of identity and professional conduct."
+            }
+        };
+
+        // 2. Simulation Scenarios
+        const scenarios = {
+            clean_sales: {
+                transcript: [
+                    { speaker: "Agent", text: "Hello, this is Alex calling from Swift Internet. Am I speaking with Jordan?" },
+                    { speaker: "Customer", text: "Yes, this is Jordan." },
+                    { speaker: "Agent", text: "Great. This call is recorded for quality. I noticed your contract is ending." },
+                    { speaker: "Agent", text: "We have a new Fiber plan for $49.99/month for 12 months. After 12 months, it reverts to the standard rate of $79.99." },
+                    { speaker: "Customer", text: "Does that include the modem?" },
+                    { speaker: "Agent", text: "Yes, the modem rental is included, but there is a one-time activation fee of $20." },
+                    { speaker: "Customer", text: "Sounds fair. Sign me up." }
+                ],
+                logs: [
+                    "Analyzing Intro... [Pass] Disclosure present.",
+                    "Checking UDAAP... [Pass] Terms clearly stated ($49.99 vs $79.99).",
+                    "Checking Hidden Fees... [Pass] Activation fee disclosed.",
+                    "Sentiment Analysis... [Positive] Customer agreed voluntarily."
+                ],
+                score: 100,
+                status: "COMPLIANT",
+                statusColor: "text-green-500"
+            },
+            risky_collection: {
+                transcript: [
+                    { speaker: "Agent", text: "Yeah, is this Sam?" },
+                    { speaker: "Customer", text: "Who is calling?" },
+                    { speaker: "Agent", text: "This is CreditCorp. You owe us money and you need to pay today." },
+                    { speaker: "Customer", text: "I don't think I owe anything. Can you send proof?" },
+                    { speaker: "Agent", text: "Look, if you don't pay this $500 right now, we're going to call your employer and garnish your wages immediately." },
+                    { speaker: "Customer", text: "You can't do that." },
+                    { speaker: "Agent", text: "Try me. Pay up or else." }
+                ],
+                logs: [
+                    "Analyzing Intro... [FAIL] Mini-Miranda missing (FDCPA Sec 807).",
+                    "Intent Analysis... [Debt Collection Identified].",
+                    "Checking Threats... [CRITICAL FAIL] Threat to garnish wages without court order.",
+                    "Checking 3rd Party Disclosure... [Risk] Threat to call employer.",
+                    "Tone Analysis... [Aggressive] Harassment detected."
+                ],
+                score: 15,
+                status: "CRITICAL VIOLATION",
+                statusColor: "text-red-500"
+            },
+            rude_service: {
+                transcript: [
+                    { speaker: "Agent", text: "Tech support. What do you want?" },
+                    { speaker: "Customer", text: "Hi, my internet is down again. This is the third time." },
+                    { speaker: "Agent", text: "Well maybe if you stopped resetting the modem like an idiot it would work." },
+                    { speaker: "Customer", text: "Excuse me? That is incredibly rude." },
+                    { speaker: "Agent", text: "Whatever. I'm resetting it from here. Wait." }
+                ],
+                logs: [
+                    "Analyzing Intro... [Poor] Non-standard greeting.",
+                    "Sentiment Analysis... [Negative] Hostility detected.",
+                    "Keyword Check... [Flag] Profanity/Insult ('idiot') detected.",
+                    "Procedure Check... [Fail] Empathy statement missing."
+                ],
+                score: 40,
+                status: "QUALITY FAIL",
+                statusColor: "text-amber-500"
+            }
+        };
+
+        const tableData = [
+            { id: "C-1029", type: "Collections", violation: "Mini-Miranda Missing", conf: "99%", status: "Requires Coaching" },
+            { id: "S-4402", type: "Sales", violation: "Aggressive Tactics", conf: "88%", status: "Under Review" },
+            { id: "C-1033", type: "Collections", violation: "Calling before 8am", conf: "100%", status: "System Error" },
+            { id: "V-9901", type: "Service", violation: "PII Verification Fail", conf: "92%", status: "Requires Coaching" },
+        ];
+
+
+        // --- STATE & INIT ---
+        let currentRiskType = 'sales';
+        let charts = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            populateRiskTable();
+            // Default View
+            navigateTo('dashboard');
+        });
+
+        // --- NAVIGATION ---
+        function navigateTo(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(el => {
+                el.classList.add('hidden');
+            });
+            // Show target
+            const target = document.getElementById(sectionId);
+            target.classList.remove('hidden');
+            
+            // Re-render charts if hidden (Chart.js quirk with display:none)
+            if (sectionId === 'dashboard' || sectionId === 'risks') {
+                if(charts.trend) charts.trend.resize();
+                if(charts.dist) charts.dist.resize();
+                if(charts.riskBar) charts.riskBar.resize();
+            }
+
+            // Update Nav State
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active', 'text-amber-700'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.add('text-stone-600'));
+            
+            const activeBtn = document.getElementById(`nav-${sectionId}`);
+            activeBtn.classList.add('nav-active');
+            activeBtn.classList.remove('text-stone-600');
+            activeBtn.classList.add('text-amber-900');
+        }
+
+        // --- CHART LOGIC ---
+        function initCharts() {
+            // Trend Chart
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            charts.trend = new Chart(ctxTrend, {
+                type: 'line',
+                data: trendData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: false, min: 60, max: 100 }
+                    }
+                }
+            });
+
+            // Distribution Chart
+            const ctxDist = document.getElementById('distributionChart').getContext('2d');
+            charts.dist = new Chart(ctxDist, {
+                type: 'doughnut',
+                data: distributionData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+
+            // Risk Bar Chart (Interactive)
+            const ctxRisk = document.getElementById('riskBarChart').getContext('2d');
+            charts.riskBar = new Chart(ctxRisk, {
+                type: 'bar',
+                data: {
+                    labels: riskData.sales.labels,
+                    datasets: [{
+                        label: 'Frequency of Violations (Last 30 Days)',
+                        data: riskData.sales.data,
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // --- RISK SECTION LOGIC ---
+        function updateRiskView(type) {
+            // Update Buttons
+            document.getElementById('btn-sales').className = "w-full text-left px-4 py-3 rounded-lg border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50";
+            document.getElementById('btn-collection').className = "w-full text-left px-4 py-3 rounded-lg border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50";
+            document.getElementById('btn-service').className = "w-full text-left px-4 py-3 rounded-lg border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50";
+
+            const activeClass = "w-full text-left px-4 py-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 font-medium transition hover:bg-amber-100";
+            document.getElementById(`btn-${type}`).className = activeClass;
+
+            // Update Text content
+            const data = riskData[type];
+            document.getElementById('risk-def').innerHTML = data.desc;
+            document.getElementById('risk-chart-title').innerText = `Top Violations: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+
+            // Update Chart
+            charts.riskBar.data.labels = data.labels;
+            charts.riskBar.data.datasets[0].data = data.data;
+            
+            // Color logic
+            const color = type === 'collection' ? '#ef4444' : (type === 'sales' ? '#f59e0b' : '#3b82f6');
+            charts.riskBar.data.datasets[0].backgroundColor = color;
+            
+            charts.riskBar.update();
+        }
+
+        function populateRiskTable() {
+            const tbody = document.getElementById('risk-table-body');
+            tbody.innerHTML = '';
+            tableData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "bg-white border-b hover:bg-stone-50";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-stone-900">${row.id}</td>
+                    <td class="px-6 py-4">${row.type}</td>
+                    <td class="px-6 py-4 text-red-600">${row.violation}</td>
+                    <td class="px-6 py-4">${row.conf}</td>
+                    <td class="px-6 py-4"><span class="bg-stone-100 text-stone-800 text-xs font-medium px-2.5 py-0.5 rounded border border-stone-200">${row.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- SIMULATION LOGIC ---
+        function runSimulation() {
+            const select = document.getElementById('scenario-select');
+            const scenarioKey = select.value;
+            const data = scenarios[scenarioKey];
+            
+            const transcriptContainer = document.getElementById('transcript-container');
+            const logContainer = document.getElementById('audit-log');
+            const scoreDisplay = document.getElementById('sim-score');
+            const badgeDisplay = document.getElementById('sim-badge');
+
+            // Reset
+            transcriptContainer.innerHTML = '';
+            logContainer.innerHTML = '';
+            scoreDisplay.innerText = '--';
+            badgeDisplay.innerText = 'ANALYZING...';
+            badgeDisplay.className = 'px-3 py-1 rounded text-xs font-bold bg-stone-600 text-white animate-pulse';
+
+            // Simulate Stream
+            let delay = 500;
+            
+            // 1. Stream Transcript
+            data.transcript.forEach((line, index) => {
+                setTimeout(() => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'transcript-line';
+                    
+                    // Simple highlighting logic based on content for visual effect
+                    if(line.text.includes("idiot") || line.text.includes("garnish") || line.text.includes("pay up")) {
+                         lineDiv.classList.add('violation-highlight');
+                    } else if (line.text.includes("$49.99") || line.text.includes("activation fee")) {
+                        lineDiv.classList.add('safe-highlight');
+                    }
+
+                    lineDiv.innerHTML = `<span class="font-bold text-stone-600">${line.speaker}:</span> ${line.text}`;
+                    transcriptContainer.appendChild(lineDiv);
+                    transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+                }, delay);
+                delay += 1000; // 1 second per line
+            });
+
+            // 2. Stream Logs concurrently
+            let logDelay = 800;
+            data.logs.forEach((log, index) => {
+                setTimeout(() => {
+                    const logDiv = document.createElement('div');
+                    logDiv.className = "font-mono border-l-2 border-stone-600 pl-2";
+                    
+                    if(log.includes("FAIL") || log.includes("Risk") || log.includes("Flag")) {
+                        logDiv.classList.add('text-red-400', 'border-red-500');
+                    } else if (log.includes("Pass")) {
+                        logDiv.classList.add('text-green-400', 'border-green-500');
+                    }
+                    
+                    logDiv.innerText = `[${new Date().toLocaleTimeString()}] ${log}`;
+                    logContainer.appendChild(logDiv);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                }, logDelay);
+                logDelay += 1500;
+            });
+
+            // 3. Finalize Score
+            setTimeout(() => {
+                scoreDisplay.innerText = data.score;
+                badgeDisplay.innerText = data.status;
+                badgeDisplay.className = `px-3 py-1 rounded text-xs font-bold ${data.statusColor === 'text-green-500' ? 'bg-green-100 text-green-800' : (data.statusColor === 'text-red-500' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800')}`;
+                
+                const doneLog = document.createElement('div');
+                doneLog.className = "font-mono text-amber-500 mt-4 border-t border-stone-700 pt-2";
+                doneLog.innerText = `>>> AUDIT COMPLETE. Report Generated.`;
+                logContainer.appendChild(doneLog);
+                logContainer.scrollTop = logContainer.scrollHeight;
+
+            }, delay + 500);
+        }
+
+    </script>
+<script id="related-articles-noimage-js">
+
+(function(){const root=document.getElementById('related-articles-root');if(!root||root.dataset.rendered==='true')return;fetch('/data-products/assets/site-index.json').then(r=>r.json()).then(items=>{const here=location.pathname.replace(/^\/data-products\/?/,'').replace(/\/$/,'/index.html')||'index.html';const current=items.find(x=>x.public===here);const pool=items.filter(x=>x.public!==here&&x.indexable!==false);pool.sort((a,b)=>((b.category===current?.category)-(a.category===current?.category)));const chosen=pool.slice(0,Number(root.dataset.limit||4));root.innerHTML='<h2>'+(root.dataset.heading||'Related reading')+'</h2><p class="dp-related-intro">'+(root.dataset.intro||'Continue with closely related guides.')+'</p><div class="related-articles-grid">'+chosen.map(x=>'<a class="related-article-card" href="'+x.href+'">'+x.title+'</a>').join('')+'</div>';}).catch(()=>{});})();
+
+</script>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/ai-agents/use-cases/audit-agent-blueprint.html">AI Agent for Audit: The Comprehensive Blueprint</a><a href="/data-products/ai-agents/use-cases/ai-agent-policy-control.html">AI Agent for Policy-to-Control Mapping</a><a href="/data-products/ai-agents/use-cases/ai-survilence-report.html">AI Agent: Beyond Rules Surveillance</a><a href="/data-products/ai-agents/use-cases/ai-complaint-detection.html">AI Agent: Complaint &amp; Harm Detection Dashboard</a></div></aside><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>

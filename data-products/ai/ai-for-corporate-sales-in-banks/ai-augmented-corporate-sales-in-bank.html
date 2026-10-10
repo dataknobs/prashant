@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI in Corporate Banking: Sales Insights Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Chosen Palette: Warm Corporate Neutrals. Background: stone-50, Cards: white, Accents: blue-800 & emerald-600, Text: stone-800 -->
+<!-- Application Structure Plan: A dashboard-style SPA featuring a persistent top navigation bar controlling four primary views: Overview, Business Processes, Use Cases, and Business Impact. This structure allows users to logically explore from high-level adoption metrics down to specific sales processes, detailed interactive use cases (using a master-detail layout), and finally the quantifiable outcomes. This non-linear, tabbed exploration reduces cognitive load compared to a long scrolling report. -->
+<!-- Visualization & Content Choices: 
+         1. Overview: AI Allocation -> Donut Chart -> Interactive hover -> Shows where banks invest.
+         2. Business Processes: Maturity by Product -> Radar Chart -> Visual shape of adoption -> Compares FX, Loans, Cash Mgmt.
+         3. Use Cases: Master-Detail List -> Click interaction -> Updates text & mini-chart dynamically -> Explains specific insights without overwhelming the user.
+         4. Impact: Conversion/Time Saved -> Dual-axis Bar/Line Chart -> Tooltips -> Quantifies the qualitative benefits of AI. 
+         - Confirming NO SVG/Mermaid used. Standard Chart.js Canvas and HTML/CSS structure used exclusively. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Strict Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        
+        .mini-chart-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+        }
+
+        /* Tab active state */
+        .tab-active {
+            border-bottom: 2px solid #1e40af; /* blue-800 */
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        /* Interactive list item active state */
+        .list-active {
+            background-color: #f0fdf4; /* emerald-50 */
+            border-left: 4px solid #059669; /* emerald-600 */
+        }
+        
+        /* Custom scrollbar for content areas */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    </style>
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Tier-1 institutions like JPMorgan Chase are transitioning corporate banking from a strictly relationship-driven model to a data-augmented paradigm.…" name="description"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="Tier-1 institutions like JPMorgan Chase are transitioning corporate banking from a strictly relationship-driven model to a data-augmented paradigm.…" name="ai-summary"/><meta content="Use Cases &amp; Industry" name="topic"/><link href="https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="AI in Corporate Banking: Sales Insights Dashboard" property="og:title"/><meta content="Tier-1 institutions like JPMorgan Chase are transitioning corporate banking from a strictly relationship-driven model to a data-augmented paradigm.…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="AI in Corporate Banking: Sales Insights Dashboard" name="twitter:title"/><meta content="Tier-1 institutions like JPMorgan Chase are transitioning corporate banking from a strictly relationship-driven model to a data-augmented paradigm.…" name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html#article","url":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html#webpage"},"headline":"AI in Corporate Banking: Sales Insights Dashboard","description":"Tier-1 institutions like JPMorgan Chase are transitioning corporate banking from a strictly relationship-driven model to a data-augmented paradigm.…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Use Cases & Industry"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html#webpage","url":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html","name":"AI in Corporate Banking: Sales Insights Dashboard","description":"Tier-1 institutions like JPMorgan Chase are transitioning corporate banking from a strictly relationship-driven model to a data-augmented paradigm.…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Use Cases & Industry","item":"https://prashant.dhingra.website/data-products/use-cases/"},{"@type":"ListItem","position":3,"name":"AI in Corporate Banking: Sales Insights Dashboard","item":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="bg-stone-50 text-stone-800 antialiased min-h-screen flex flex-col"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center">
+<span class="text-2xl mr-2 text-blue-800">🏦</span> <!-- Bank Unicode -->
+<h1 class="text-xl font-bold text-stone-900 tracking-tight">Enterprise Insight <span class="text-blue-800">AI</span></h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Use Cases &amp; Industry</a></p>
+</div>
+<div class="hidden md:flex space-x-8">
+<button class="tab-btn tab-active py-4 px-1 text-sm font-medium text-stone-500 hover:text-stone-700 transition-colors" data-target="view-overview">Executive Overview</button>
+<button class="tab-btn py-4 px-1 text-sm font-medium text-stone-500 hover:text-stone-700 transition-colors" data-target="view-processes">Processes &amp; Products</button>
+<button class="tab-btn py-4 px-1 text-sm font-medium text-stone-500 hover:text-stone-700 transition-colors" data-target="view-usecases">Sales Use Cases</button>
+<button class="tab-btn py-4 px-1 text-sm font-medium text-stone-500 hover:text-stone-700 transition-colors" data-target="view-impact">Performance Impact</button>
+</div>
+<!-- Mobile menu placeholder -->
+<div class="md:hidden flex items-center">
+<span class="text-2xl">☰</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+<!-- VIEW 1: Overview -->
+<section class="view-section block animate-fade-in" id="view-overview">
+<div class="mb-8">
+<h2 class="text-3xl font-bold text-stone-900 mb-2">The Shift to AI-Augmented Corporate Sales</h2>
+<p class="text-lg text-stone-600 max-w-3xl leading-relaxed">
+                    Tier-1 institutions like JPMorgan Chase are transitioning corporate banking from a strictly relationship-driven model to a data-augmented paradigm. AI and Machine Learning are now critical engines for generating actionable intelligence, transforming vast oceans of transaction data into precise sales opportunities and highly customized proposals.
+                </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+<h3 class="text-lg font-semibold mb-4 border-b border-stone-100 pb-2">AI Investment Distribution in Corporate Banking</h3>
+<p class="text-sm text-stone-500 mb-4">A breakdown of where major banks direct AI R&amp;D budgets within institutional divisions.</p>
+<div class="chart-container">
+<canvas id="overviewChart"></canvas>
+</div>
+</div>
+<div class="flex flex-col space-y-6">
+<div class="bg-blue-50 border border-blue-100 p-6 rounded-xl">
+<span class="text-3xl mb-2 block">💡</span> <!-- Lightbulb Unicode -->
+<h4 class="font-bold text-blue-900 mb-2">Core Strategic Shift</h4>
+<p class="text-blue-800 text-sm">Historically, Relationship Managers (RMs) relied on intuition and manual CRM reviews. Today, AI models (like JPMC's COiN for contract intelligence or predictive sales models) proactively push <em>"Next Best Actions"</em> to RMs, significantly reducing discovery time and increasing pitch relevance.</p>
+</div>
+<div class="bg-emerald-50 border border-emerald-100 p-6 rounded-xl">
+<span class="text-3xl mb-2 block">📈</span> <!-- Chart Unicode -->
+<h4 class="font-bold text-emerald-900 mb-2">Key Value Driver</h4>
+<p class="text-emerald-800 text-sm">The primary value lies in <strong>hyper-personalization at scale</strong>. AI allows banks to treat mid-market corporate clients with the same level of analytical rigor and customized advisory previously reserved only for top-tier multinational conglomerates.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- VIEW 2: Processes & Products -->
+<section class="view-section hidden animate-fade-in" id="view-processes">
+<div class="mb-8">
+<h2 class="text-3xl font-bold text-stone-900 mb-2">Where AI Meets Financial Products</h2>
+<p class="text-lg text-stone-600 max-w-3xl leading-relaxed">
+                    AI's applicability varies significantly across the corporate banking product suite. Data-rich, high-frequency transactional processes see higher AI maturity compared to bespoke, relationship-heavy advisory services. Explore the landscape below.
+                </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="col-span-2 bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+<h3 class="text-lg font-semibold mb-4 text-center">AI Maturity Index by Product Category</h3>
+<div class="chart-container" style="height: 400px; max-height: 450px;">
+<canvas id="radarChart"></canvas>
+</div>
+</div>
+<div class="col-span-1 space-y-4">
+<h3 class="text-lg font-semibold mb-2">Key Application Areas</h3>
+<div class="p-4 bg-white border border-stone-200 rounded-lg hover:border-blue-300 transition-colors">
+<h4 class="font-bold text-stone-800">Cash Management &amp; Treasury</h4>
+<p class="text-xs text-stone-500 mt-1">High data volume. AI predicts working capital deficits and recommends overdraft facilities or short-term liquidity sweeps proactively.</p>
+</div>
+<div class="p-4 bg-white border border-stone-200 rounded-lg hover:border-blue-300 transition-colors">
+<h4 class="font-bold text-stone-800">Global Trade Finance</h4>
+<p class="text-xs text-stone-500 mt-1">AI reads bills of lading and letters of credit via OCR/NLP, identifying anomalies and recommending supply chain financing to suppliers.</p>
+</div>
+<div class="p-4 bg-white border border-stone-200 rounded-lg hover:border-blue-300 transition-colors">
+<h4 class="font-bold text-stone-800">FX &amp; Derivatives</h4>
+<p class="text-xs text-stone-500 mt-1">Algorithms analyze corporate cross-border payment flows to suggest bespoke currency hedging strategies right before expected market volatility.</p>
+</div>
+<div class="p-4 bg-white border border-stone-200 rounded-lg hover:border-blue-300 transition-colors">
+<h4 class="font-bold text-stone-800">Syndicated Lending</h4>
+<p class="text-xs text-stone-500 mt-1">Lower maturity. AI assists mostly in rapid covenant analysis and sentiment scoring of potential syndicate partners.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- VIEW 3: Use Cases -->
+<section class="view-section hidden animate-fade-in" id="view-usecases">
+<div class="mb-8">
+<h2 class="text-3xl font-bold text-stone-900 mb-2">Deriving Sales Insights: Interactive Use Cases</h2>
+<p class="text-lg text-stone-600 max-w-3xl leading-relaxed">
+                    Select a use case from the menu to understand the specific nature of insights generated by AI, the data sources utilized, and how it directly empowers corporate sales teams to formulate winning proposals.
+                </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white rounded-xl shadow-sm border border-stone-100 overflow-hidden min-h-[500px]">
+<!-- Interactive List -->
+<div class="col-span-1 bg-stone-50 border-r border-stone-100 p-0 flex flex-col">
+<button class="usecase-btn list-active text-left p-5 border-b border-stone-200 transition-colors" data-case="nba">
+<h4 class="font-bold text-stone-900">Next-Best-Action (NBA)</h4>
+<p class="text-xs text-stone-500 mt-1 truncate">Predictive product recommendations</p>
+</button>
+<button class="usecase-btn text-left p-5 border-b border-stone-200 transition-colors hover:bg-stone-100" data-case="rfp">
+<h4 class="font-bold text-stone-900">Automated Pitch &amp; RFP</h4>
+<p class="text-xs text-stone-500 mt-1 truncate">GenAI for tailored proposals</p>
+</button>
+<button class="usecase-btn text-left p-5 border-b border-stone-200 transition-colors hover:bg-stone-100" data-case="attrition">
+<h4 class="font-bold text-stone-900">Early Warning Systems</h4>
+<p class="text-xs text-stone-500 mt-1 truncate">Predicting client churn/defects</p>
+</button>
+<button class="usecase-btn text-left p-5 border-b border-stone-200 transition-colors hover:bg-stone-100" data-case="sentiment">
+<h4 class="font-bold text-stone-900">Earnings Call Sentiment</h4>
+<p class="text-xs text-stone-500 mt-1 truncate">NLP on public corporate events</p>
+</button>
+</div>
+<!-- Detail Panel -->
+<div class="col-span-2 p-8" id="usecase-detail-panel">
+<!-- Dynamic Content populated by JS -->
+</div>
+</div>
+</section>
+<!-- VIEW 4: Performance Impact -->
+<section class="view-section hidden animate-fade-in" id="view-impact">
+<div class="mb-8">
+<h2 class="text-3xl font-bold text-stone-900 mb-2">Quantifying the Effects on Sales</h2>
+<p class="text-lg text-stone-600 max-w-3xl leading-relaxed">
+                    The implementation of AI insight engines yields measurable improvements in sales efficiency and effectiveness. The data demonstrates a clear shift from time spent on research to time spent on client engagement.
+                </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Chart -->
+<div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+<h3 class="text-lg font-semibold mb-4">Sales Performance: Pre vs Post AI Adoption</h3>
+<div class="chart-container">
+<canvas id="impactChart"></canvas>
+</div>
+</div>
+<!-- Qualitative Metrics -->
+<div class="space-y-6">
+<div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+<h3 class="text-lg font-semibold mb-3 border-b border-stone-100 pb-2">Quantitative Results</h3>
+<ul class="space-y-3">
+<li class="flex items-start">
+<span class="text-emerald-500 mr-2">▲</span>
+<div>
+<span class="font-bold text-stone-800">15% - 22% Win Rate Increase</span>
+<p class="text-sm text-stone-500">In cross-selling scenarios where "Next-Best-Action" recommendations were utilized.</p>
+</div>
+</li>
+<li class="flex items-start">
+<span class="text-emerald-500 mr-2">▲</span>
+<div>
+<span class="font-bold text-stone-800">40% Reduction in Pitch Prep Time</span>
+<p class="text-sm text-stone-500">Automated data aggregation and LLM-drafted proposal outlines save roughly 6 hours per major RFP.</p>
+</div>
+</li>
+<li class="flex items-start">
+<span class="text-blue-500 mr-2">▼</span>
+<div>
+<span class="font-bold text-stone-800">12% Decrease in Client Attrition</span>
+<p class="text-sm text-stone-500">Proactive outreach triggered by Early Warning Systems salvaged at-risk relationships.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="bg-stone-800 text-stone-50 p-6 rounded-xl shadow-sm">
+<h3 class="text-lg font-semibold mb-3 text-stone-100 border-b border-stone-600 pb-2">Qualitative Outcomes</h3>
+<p class="text-sm mb-3"><strong>Shift to Strategic Advisory:</strong> Relationship Managers report feeling more like strategic partners rather than product pushers, as AI-generated insights provide a valid, data-backed "reason to call."</p>
+<p class="text-sm"><strong>Democratization of Expertise:</strong> Junior sales staff perform at higher levels faster, relying on AI models to flag complex financial needs (like FX hedging) they might not have recognized organically.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- JavaScript Logic -->
+<script>
+        // Data Storage
+        const useCaseData = {
+            'nba': {
+                title: 'Next-Best-Action (NBA) Models',
+                insightNature: 'Predicts the specific financial product a corporate client is most likely to buy within the next 90 days.',
+                example: '“Client XYZ’s cross-border transaction volume to the EU has increased by 35% this quarter. High probability (82%) they require an expanded Euro FX Hedging facility.”',
+                dataSources: ['Historical transaction flows', 'CRM interactions', 'Peer group purchasing patterns'],
+                chartData: [65, 82, 45, 90], // Probability scores
+                chartLabels: ['Trade Finance', 'FX Hedging', 'Equipment Loan', 'Cash Mgmt']
+            },
+            'rfp': {
+                title: 'Automated Pitch & RFP Generation',
+                insightNature: 'Uses Large Language Models (LLMs) to automatically synthesize client data and bank capabilities into a customized proposal draft.',
+                example: 'Generates a 40-page draft highlighting JPMC’s specific API integration capabilities after identifying from the client’s public filings that they are undergoing a digital treasury transformation.',
+                dataSources: ['Past winning RFPs', 'Client 10-K/10-Q reports', 'Internal product wikis'],
+                chartData: [40, 15, 5, 2], // Hours spent
+                chartLabels: ['Data Gathering', 'Drafting', 'Reviewing', 'Formatting']
+            },
+            'attrition': {
+                title: 'Early Warning Systems (EWS)',
+                insightNature: 'Identifies subtle behavioral changes indicating a client is shifting wallet share to a competitor.',
+                example: '“Alert: Client ABC’s daily cash sweep balances have steadily declined by 15% over 4 weeks, with increased external ACH outflows. Recommend immediate Relationship Manager outreach.”',
+                dataSources: ['Daily ledger balances', 'Payment routing data', 'Service desk ticket sentiment'],
+                chartData: [10, 35, 75, 95], // Churn probability over time
+                chartLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4']
+            },
+            'sentiment': {
+                title: 'Earnings Call Sentiment Analysis',
+                insightNature: 'Applies Natural Language Processing (NLP) to public earnings calls of clients/prospects to detect strategic shifts or distress.',
+                example: '“CEO mentioned \'supply chain bottlenecks\' 5 times. Insight: Pitch our customized supply chain financing program to help them support their critical vendors.”',
+                dataSources: ['Earnings call transcripts', 'News aggregator APIs', 'Social media sentiment'],
+                chartData: [80, 20, 60, 40], // Sentiment vs Opportunity
+                chartLabels: ['Positive Tone', 'Negative Tone', 'Expansion Talk', 'Cost Cutting']
+            }
+        };
+
+        // State Management
+        let currentChartInstances = {};
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            initCharts();
+            loadUseCaseDetail('nba'); // Load default use case
+            initUseCaseInteractions();
+        });
+
+        // Functional Navigation
+        function initNavigation() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const views = document.querySelectorAll('.view-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    // Update tab styling
+                    tabs.forEach(t => t.classList.remove('tab-active', 'text-blue-800', 'border-blue-800'));
+                    e.target.classList.add('tab-active');
+
+                    // Show selected view, hide others
+                    const targetId = e.target.getAttribute('data-target');
+                    views.forEach(view => {
+                        if(view.id === targetId) {
+                            view.classList.remove('hidden');
+                            view.classList.add('block');
+                        } else {
+                            view.classList.remove('block');
+                            view.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        }
+
+        // Use Case Interaction Logic
+        function initUseCaseInteractions() {
+            const buttons = document.querySelectorAll('.usecase-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Styling
+                    buttons.forEach(b => {
+                        b.classList.remove('list-active', 'bg-emerald-50', 'border-emerald-600');
+                        b.classList.add('hover:bg-stone-100');
+                    });
+                    const currentBtn = e.currentTarget;
+                    currentBtn.classList.remove('hover:bg-stone-100');
+                    currentBtn.classList.add('list-active', 'bg-emerald-50', 'border-emerald-600');
+
+                    // Load Data
+                    const caseKey = currentBtn.getAttribute('data-case');
+                    loadUseCaseDetail(caseKey);
+                });
+            });
+        }
+
+        function loadUseCaseDetail(caseKey) {
+            const data = useCaseData[caseKey];
+            const panel = document.getElementById('usecase-detail-panel');
+            
+            // Build HTML snippet
+            let sourcesHTML = data.dataSources.map(s => `<span class="inline-block bg-stone-100 text-stone-600 text-xs px-2 py-1 rounded mr-2 mb-2">${s}</span>`).join('');
+
+            panel.innerHTML = `
+                <div class="animate-fade-in">
+                    <h3 class="text-2xl font-bold text-stone-900 mb-4">${data.title}</h3>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-1">Nature of Insight</h4>
+                        <p class="text-stone-800">${data.insightNature}</p>
+                    </div>
+
+                    <div class="mb-6 bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <h4 class="text-sm font-semibold text-blue-900 uppercase tracking-wider mb-1">Generated Example output for Sales</h4>
+                        <p class="text-blue-800 italic">${data.example}</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-2">Data Processed</h4>
+                        <div>${sourcesHTML}</div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-2">Model Output Visualization</h4>
+                        <div class="mini-chart-container">
+                            <canvas id="miniUsecaseChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Render specific chart for use case
+            renderMiniChart(caseKey, data);
+        }
+
+        // --- Chart.js Rendering Functions ---
+
+        // Global Chart defaults
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#57534e'; // stone-500
+
+        function initCharts() {
+            renderOverviewChart();
+            renderRadarChart();
+            renderImpactChart();
+        }
+
+        function renderOverviewChart() {
+            const ctx = document.getElementById('overviewChart').getContext('2d');
+            currentChartInstances['overview'] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sales & Marketing (Client Insights)', 'Risk & Compliance', 'Operations & Back Office', 'Trading / Quants'],
+                    datasets: [{
+                        data: [35, 25, 20, 20],
+                        backgroundColor: ['#1e40af', '#059669', '#d97706', '#64748b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 20, boxWidth: 12 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + '% of AI Budget';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function renderRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            currentChartInstances['radar'] = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Cash Management', 'Trade Finance', 'Syndicated Loans', 'FX / Hedging', 'M&A Advisory', 'Asset Servicing'],
+                    datasets: [{
+                        label: 'AI Adoption / Maturity Score (1-10)',
+                        data: [8.5, 6.0, 4.5, 9.0, 3.5, 7.0],
+                        fill: true,
+                        backgroundColor: 'rgba(30, 64, 175, 0.2)', // blue-800 transparent
+                        borderColor: '#1e40af',
+                        pointBackgroundColor: '#1e40af',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#1e40af'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { size: 12, weight: '500' } },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderImpactChart() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            currentChartInstances['impact'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4 (AI Rolled Out)', 'Q5', 'Q6'],
+                    datasets: [
+                        {
+                            label: 'Avg Deals Closed per Rep',
+                            data: [12, 13, 12, 15, 18, 22],
+                            backgroundColor: '#1e40af', // blue-800
+                            order: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Time Spent on Prep (Hours/Week)',
+                            data: [25, 26, 25, 18, 14, 12],
+                            type: 'line',
+                            borderColor: '#059669', // emerald-600
+                            backgroundColor: '#059669',
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            order: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Deals Closed' },
+                            grid: { drawOnChartArea: false } // only want grid lines for one axis
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Prep Time (Hrs)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderMiniChart(caseKey, data) {
+            const ctx = document.getElementById('miniUsecaseChart');
+            if(!ctx) return;
+
+            // Destroy existing to prevent overlap
+            if(currentChartInstances['mini']) {
+                currentChartInstances['mini'].destroy();
+            }
+
+            let type = 'bar';
+            let bgColors = '#1e40af';
+            let indexAxis = 'x';
+
+            // Customizations based on case
+            if(caseKey === 'nba') { type = 'bar'; indexAxis = 'y'; bgColors = ['#059669', '#1e40af', '#94a3b8', '#94a3b8']; }
+            if(caseKey === 'rfp') { type = 'pie'; bgColors = ['#94a3b8', '#1e40af', '#059669', '#d97706']; }
+            if(caseKey === 'attrition') { type = 'line'; bgColors = '#dc2626'; }
+
+            currentChartInstances['mini'] = new Chart(ctx.getContext('2d'), {
+                type: type,
+                data: {
+                    labels: data.chartLabels,
+                    datasets: [{
+                        label: 'Value',
+                        data: data.chartData,
+                        backgroundColor: bgColors,
+                        borderColor: type === 'line' ? bgColors : 'transparent',
+                        fill: type === 'line' ? false : true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: indexAxis,
+                    plugins: { legend: { display: false } },
+                    scales: type === 'pie' ? {} : {
+                        x: { display: true, grid: { display: false } },
+                        y: { display: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    }
+                }
+            });
+        }
+    </script>
+<!-- Simple fade-in utility via JS (replaces complex CSS animations for simplicity) -->
+<style>
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/ai/ai-for-corporate-sales-in-banks/ai-for-coporate-sales.html">AI in Corporate Banking: Revenue Acceleration &amp; Strategic Intelligence</a><a href="/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html">Corporate Sales Intelligence Dashboard</a><a href="/data-products/use-cases/">Enterprise Data and AI Use Cases</a><a href="/data-products/marketing-sales/">AI for Marketing and Sales Guides</a></div></aside><footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>

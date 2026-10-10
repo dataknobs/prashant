@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Corporate Sales Intelligence Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Chosen Palette: Corporate Warmth (Stone/Slate/Amber) -->
+<!-- Application Structure Plan: A single-page dashboard with a fixed sidebar navigation and a scrollable main content area. This structure allows Relationship Managers (RMs) to seamlessly flow through the four pillars of data-driven sales (Identify, Prioritize, Recommend, Retain) without losing context. Each section pairs explanatory text, a real-world banking scenario, and interactive data visualization to reinforce the concepts. -->
+<!-- Visualization & Content Choices: 
+         1. Identification -> Bar Chart (Event Triggers) -> Shows volume of signals -> Chart.js -> NO SVG.
+         2. Prioritization -> Scatter/Bubble Chart (Value vs Propensity) -> Helps visual sorting -> Chart.js -> NO SVG.
+         3. Recommendation -> Doughnut Chart (Product Uptake) -> Shows conversion success -> Chart.js -> NO SVG.
+         4. Churn Signals -> Line Chart (Activity Decline) -> Shows temporal trends -> Chart.js -> NO SVG. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9; /* stone-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+            padding: 1rem;
+            background: #ffffff;
+            border: 1px solid #e7e5e4;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        .nav-link.active {
+            background-color: #f5f5f4; /* stone-100 */
+            border-left: 4px solid #b45309; /* amber-700 */
+            font-weight: 600;
+            color: #b45309;
+        }
+        .case-study-content {
+            display: none;
+            transition: all 0.3s ease-in-out;
+        }
+        .case-study-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fafaf9; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    </style>
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="For global corporate banks like J.P. Morgan, Chase, and Citi, the traditional relationship-driven sales model has evolved. Today, driving wallet share requires interpreting…" name="description"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="For global corporate banks like J.P. Morgan, Chase, and Citi, the traditional relationship-driven sales model has evolved. Today, driving wallet share requires interpreting…" name="ai-summary"/><meta content="Use Cases &amp; Industry" name="topic"/><link href="https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Corporate Sales Intelligence Dashboard" property="og:title"/><meta content="For global corporate banks like J.P. Morgan, Chase, and Citi, the traditional relationship-driven sales model has evolved. Today, driving wallet share requires interpreting…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Corporate Sales Intelligence Dashboard" name="twitter:title"/><meta content="For global corporate banks like J.P. Morgan, Chase, and Citi, the traditional relationship-driven sales model has evolved. Today, driving wallet share requires interpreting…" name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html#article","url":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html#webpage"},"headline":"Corporate Sales Intelligence Dashboard","description":"For global corporate banks like J.P. Morgan, Chase, and Citi, the traditional relationship-driven sales model has evolved. Today, driving wallet share requires interpreting…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Use Cases & Industry"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html#webpage","url":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html","name":"Corporate Sales Intelligence Dashboard","description":"For global corporate banks like J.P. Morgan, Chase, and Citi, the traditional relationship-driven sales model has evolved. Today, driving wallet share requires interpreting…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Use Cases & Industry","item":"https://prashant.dhingra.website/data-products/use-cases/"},{"@type":"ListItem","position":3,"name":"Corporate Sales Intelligence Dashboard","item":"https://prashant.dhingra.website/data-products/ai/ai-for-corporate-sales-in-banks/corporate-banking-sales-intelligence.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="flex h-screen overflow-hidden antialiased"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<aside class="w-64 bg-white border-r border-stone-200 flex flex-col hidden md:flex z-10 shadow-sm">
+<div class="p-6 border-b border-stone-200">
+<h1 class="text-xl font-bold tracking-tight text-slate-900">Corporate Banking</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Use Cases &amp; Industry</a></p>
+<p class="text-xs font-medium text-amber-700 uppercase tracking-wider mt-1">Sales Intelligence</p>
+</div>
+<nav class="flex-1 overflow-y-auto py-4">
+<ul class="space-y-1">
+<li><a class="nav-link block px-6 py-3 text-sm text-slate-600 hover:bg-stone-50 hover:text-slate-900 transition-colors active" data-target="intro" href="#intro">Executive Summary</a></li>
+<li><a class="nav-link block px-6 py-3 text-sm text-slate-600 hover:bg-stone-50 hover:text-slate-900 transition-colors" data-target="identify" href="#identify">1. Opportunity ID</a></li>
+<li><a class="nav-link block px-6 py-3 text-sm text-slate-600 hover:bg-stone-50 hover:text-slate-900 transition-colors" data-target="prioritize" href="#prioritize">2. Prioritization</a></li>
+<li><a class="nav-link block px-6 py-3 text-sm text-slate-600 hover:bg-stone-50 hover:text-slate-900 transition-colors" data-target="recommend" href="#recommend">3. Next Best Action</a></li>
+<li><a class="nav-link block px-6 py-3 text-sm text-slate-600 hover:bg-stone-50 hover:text-slate-900 transition-colors" data-target="churn" href="#churn">4. Churn Signals</a></li>
+</ul>
+</nav>
+<div class="p-6 border-t border-stone-200 bg-stone-50">
+<p class="text-xs text-slate-500">Data reflects aggregated, anonymized enterprise modeling scenarios.</p>
+</div>
+</aside>
+<!-- Mobile Header -->
+<div class="md:hidden fixed top-0 w-full bg-white border-b border-stone-200 z-20 px-4 py-3 flex justify-between items-center shadow-sm">
+<div>
+<h2 class="text-lg font-bold text-slate-900">Corporate Banking</h2>
+<p class="text-xs text-amber-700 font-medium">Sales Intelligence</p>
+</div>
+<select class="bg-stone-100 border border-stone-300 text-slate-700 text-sm rounded focus:ring-amber-500 focus:border-amber-500 block p-2" id="mobile-nav">
+<option value="intro">Executive Summary</option>
+<option value="identify">1. Opportunity ID</option>
+<option value="prioritize">2. Prioritization</option>
+<option value="recommend">3. Next Best Action</option>
+<option value="churn">4. Churn Signals</option>
+</select>
+</div>
+<main class="flex-1 h-full overflow-y-auto pt-16 md:pt-0 scroll-smooth" id="main-content">
+<div class="max-w-5xl mx-auto p-6 md:p-10 pb-24 space-y-24">
+<section class="scroll-mt-10" id="intro">
+<div class="mb-8">
+<h2 class="text-3xl font-bold text-slate-900 mb-4">Enhancing Corporate Sales Through Data Intelligence</h2>
+<p class="text-lg text-slate-600 leading-relaxed">
+                        For global corporate banks like J.P. Morgan, Chase, and Citi, the traditional relationship-driven sales model has evolved. Today, driving wallet share requires interpreting vast lakes of transaction data, market signals, and client behavior. This interactive guide outlines the four pillars of data-driven corporate banking sales, detailing how raw data is transformed into actionable intelligence for Relationship Managers (RMs).
+                    </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm border-t-4 border-t-amber-600">
+<div class="text-2xl mb-2">🔍</div>
+<h3 class="font-semibold text-slate-800">Identify</h3>
+<p class="text-sm text-slate-500 mt-1">Detecting hidden needs through behavioral and market triggers.</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm border-t-4 border-t-amber-600">
+<div class="text-2xl mb-2">⚔</div>
+<h3 class="font-semibold text-slate-800">Prioritize</h3>
+<p class="text-sm text-slate-500 mt-1">Ranking outreach by potential value and propensity to buy.</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm border-t-4 border-t-amber-600">
+<div class="text-2xl mb-2">💡</div>
+<h3 class="font-semibold text-slate-800">Recommend</h3>
+<p class="text-sm text-slate-500 mt-1">Algorithmic mapping of the Next Best Product to pitch.</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-stone-200 shadow-sm border-t-4 border-t-amber-600">
+<div class="text-2xl mb-2">⚠</div>
+<h3 class="font-semibold text-slate-800">Retain</h3>
+<p class="text-sm text-slate-500 mt-1">Identifying early churn signals to deploy defensive strategies.</p>
+</div>
+</div>
+</section>
+<hr class="border-stone-200"/>
+<section class="scroll-mt-10" id="identify">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+<div>
+<span class="text-xs font-bold tracking-widest text-amber-700 uppercase">Phase 1</span>
+<h2 class="text-2xl font-bold text-slate-900 mt-2 mb-4">Opportunity Identification</h2>
+<p class="text-slate-600 mb-6 leading-relaxed">
+                            Instead of relying solely on scheduled quarterly reviews, modern banks utilize event-driven architectures to identify sales opportunities in real-time. By monitoring both internal transaction flows (e.g., sudden spikes in wires to a specific region) and external data feeds (e.g., news of a merger, job postings for international operations), the bank can surface implicit client needs before a competitor does.
+                        </p>
+<div class="bg-stone-100 rounded-lg p-1 border border-stone-200 mb-6">
+<button class="w-full text-left px-4 py-3 font-semibold text-slate-800 flex justify-between items-center toggle-btn" data-target="case1">
+<span>View Real Example: Geographic Expansion</span>
+<span class="text-lg toggle-icon">+</span>
+</button>
+<div class="case-study-content px-4 pb-4 pt-2 border-t border-stone-200 mt-1" id="case1">
+<p class="text-sm text-slate-700 mb-2"><strong>Client:</strong> Mid-Cap Manufacturing Firm ($500M Revenue)</p>
+<p class="text-sm text-slate-600"><strong>The Signal:</strong> The bank's algorithms detect a 300% month-over-month increase in small wire transfers to Mexico, combined with external news of the client acquiring a facility in Monterrey.</p>
+<p class="text-sm text-slate-600 mt-2"><strong>The Opportunity:</strong> The RM is alerted. The client is currently using ad-hoc, expensive wire transfers. The RM pitches setting up a localized Multi-Currency Account, FX hedging facilities to manage Peso volatility, and a Cross-Border Supply Chain Finance program for their new local vendors.</p>
+</div>
+</div>
+</div>
+<div>
+<div class="chart-container">
+<canvas id="triggerChart"></canvas>
+</div>
+<p class="text-xs text-center text-slate-500 mt-3">Distribution of automatically generated sales leads by trigger type.</p>
+</div>
+</div>
+</section>
+<hr class="border-stone-200"/>
+<section class="scroll-mt-10" id="prioritize">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+<div class="order-2 lg:order-1">
+<div class="chart-container">
+<canvas id="priorityChart"></canvas>
+</div>
+<p class="text-xs text-center text-slate-500 mt-3">Client portfolio mapping: Target quadrant is Top Right (High Value + High Propensity).</p>
+</div>
+<div class="order-1 lg:order-2">
+<span class="text-xs font-bold tracking-widest text-amber-700 uppercase">Phase 2</span>
+<h2 class="text-2xl font-bold text-slate-900 mt-2 mb-4">Opportunity Prioritization</h2>
+<p class="text-slate-600 mb-6 leading-relaxed">
+                            An RM covering 40 corporate clients might receive 100 system-generated signals a month. Prioritization models rank these opportunities using a combination of "Estimated Revenue Value" (closing the wallet share gap) and "Propensity to Buy" (historical conversion rates for similar profiles). This ensures expensive sales resources are directed at high-yield, highly-probable targets.
+                        </p>
+<div class="bg-stone-100 rounded-lg p-1 border border-stone-200 mb-6">
+<button class="w-full text-left px-4 py-3 font-semibold text-slate-800 flex justify-between items-center toggle-btn" data-target="case2">
+<span>View Real Example: Wallet Share Gap</span>
+<span class="text-lg toggle-icon">+</span>
+</button>
+<div class="case-study-content px-4 pb-4 pt-2 border-t border-stone-200 mt-1" id="case2">
+<p class="text-sm text-slate-700 mb-2"><strong>Client:</strong> Regional Healthcare Provider</p>
+<p class="text-sm text-slate-600"><strong>The Data:</strong> The bank holds $150M in operating deposits for this client (High Liquidity), but zero debt or merchant processing volume. The model calculates the "Wallet Share Gap" for a company of this size in the healthcare sector.</p>
+<p class="text-sm text-slate-600 mt-2"><strong>The Action:</strong> The system prioritizes this client as a "Tier 1 Target." Despite no immediate external trigger event, the sheer mathematical probability of cross-selling Treasury Management and Commercial Card services moves them to the top of the RM's call list, yielding a higher ROI than chasing a smaller client with a recent news event.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<hr class="border-stone-200"/>
+<section class="scroll-mt-10" id="recommend">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+<div>
+<span class="text-xs font-bold tracking-widest text-amber-700 uppercase">Phase 3</span>
+<h2 class="text-2xl font-bold text-slate-900 mt-2 mb-4">Recommendation of Product</h2>
+<p class="text-slate-600 mb-6 leading-relaxed">
+                            Once a client is prioritized, what exactly should the RM pitch? "Next Best Action" (NBA) engines utilize collaborative filtering similar to consumer recommendation algorithms. By analyzing the product portfolios of "lookalike" clients (similar industry, revenue size, transaction volume, and credit rating), the system recommends the precise corporate banking products with the highest statistical likelihood of adoption.
+                        </p>
+<div class="bg-stone-100 rounded-lg p-1 border border-stone-200 mb-6">
+<button class="w-full text-left px-4 py-3 font-semibold text-slate-800 flex justify-between items-center toggle-btn" data-target="case3">
+<span>View Real Example: Virtual Card Networks</span>
+<span class="text-lg toggle-icon">+</span>
+</button>
+<div class="case-study-content px-4 pb-4 pt-2 border-t border-stone-200 mt-1" id="case3">
+<p class="text-sm text-slate-700 mb-2"><strong>Client:</strong> Growing B2B Software SaaS</p>
+<p class="text-sm text-slate-600"><strong>The Analysis:</strong> The NBA engine notes that 75% of similar tech clients in the bank's portfolio who process over 1,000 vendor payments monthly eventually adopt Virtual Card Networks (VCN) for accounts payable automation and cash rebates.</p>
+<p class="text-sm text-slate-600 mt-2"><strong>The Pitch:</strong> Instead of a generic check-in, the RM is armed with a specific pitch deck highlighting VCNs, demonstrating projected cost savings and rebate revenue based on the client's actual wire data. The tailored, data-backed pitch significantly reduces the sales cycle.</p>
+</div>
+</div>
+</div>
+<div>
+<div class="chart-container flex justify-center items-center">
+<div class="w-full h-full max-w-[300px]">
+<canvas id="recommendChart"></canvas>
+</div>
+</div>
+<p class="text-xs text-center text-slate-500 mt-3">Conversion rates of NBA algorithm recommendations vs. traditional RM intuition.</p>
+</div>
+</div>
+</section>
+<hr class="border-stone-200"/>
+<section class="scroll-mt-10" id="churn">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+<div class="order-2 lg:order-1">
+<div class="chart-container">
+<canvas id="churnChart"></canvas>
+</div>
+<p class="text-xs text-center text-slate-500 mt-3">Early warning indicators frequently precede actual account closure by 60-90 days.</p>
+</div>
+<div class="order-1 lg:order-2">
+<span class="text-xs font-bold tracking-widest text-amber-700 uppercase">Phase 4</span>
+<h2 class="text-2xl font-bold text-slate-900 mt-2 mb-4">Detecting Churn Signals</h2>
+<p class="text-slate-600 mb-6 leading-relaxed">
+                            Protecting the base is as crucial as acquiring new wallet share. Corporate clients rarely leave abruptly; they usually bleed out slowly over months by diverting transaction flows to a secondary banking partner. Early Warning Systems (EWS) track behavioral anomalies drop in API calls, fewer logins to the treasury portal, declining average daily balances, or sudden unresponsiveness to emails.
+                        </p>
+<div class="bg-stone-100 rounded-lg p-1 border border-stone-200 mb-6">
+<button class="w-full text-left px-4 py-3 font-semibold text-slate-800 flex justify-between items-center toggle-btn" data-target="case4">
+<span>View Real Example: Treasury Attrition</span>
+<span class="text-lg toggle-icon">+</span>
+</button>
+<div class="case-study-content px-4 pb-4 pt-2 border-t border-stone-200 mt-1" id="case4">
+<p class="text-sm text-slate-700 mb-2"><strong>Client:</strong> Global Logistics Company</p>
+<p class="text-sm text-slate-600"><strong>The Red Flag:</strong> The EWS alerts the coverage team that the client's logins to the bank's liquidity management dashboard have dropped by 60% over the last 8 weeks. Concurrently, inbound ACH volume has decreased by 15%.</p>
+<p class="text-sm text-slate-600 mt-2"><strong>The Intervention:</strong> The bank identifies this as a "silent testing" phase where the client is trialing a competitor's platform. The RM immediately schedules an executive review, proactively offering improved pricing on API integration and a free module upgrade to retain the operating relationship before the formal RFP process begins.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Interaction: Case Study Toggles
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetContent = document.getElementById(targetId);
+                    const icon = this.querySelector('.toggle-icon');
+                    
+                    if (targetContent.classList.contains('active')) {
+                        targetContent.classList.remove('active');
+                        icon.innerHTML = '&#43;'; // Plus symbol
+                        this.classList.remove('text-amber-700');
+                    } else {
+                        // Close others in the same section (optional, keeping it simple here)
+                        targetContent.classList.add('active');
+                        icon.innerHTML = '&#8722;'; // Minus symbol
+                        this.classList.add('text-amber-700');
+                    }
+                });
+            });
+
+            // Interaction: Navigation Highlighting
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mainContent = document.getElementById('main-content');
+
+            const highlightNav = () => {
+                let scrollY = mainContent.scrollTop;
+                
+                sections.forEach(current => {
+                    const sectionHeight = current.offsetHeight;
+                    const sectionTop = current.offsetTop - 100;
+                    const sectionId = current.getAttribute('id');
+                    
+                    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if(link.getAttribute('data-target') === sectionId) {
+                                link.classList.add('active');
+                            }
+                        });
+                        // Sync mobile nav
+                        const mobileNav = document.getElementById('mobile-nav');
+                        if(mobileNav.value !== sectionId) {
+                            mobileNav.value = sectionId;
+                        }
+                    }
+                });
+            };
+
+            mainContent.addEventListener('scroll', highlightNav);
+
+            // Interaction: Mobile Nav Select
+            document.getElementById('mobile-nav').addEventListener('change', function(e) {
+                const targetId = e.target.value;
+                const targetElement = document.getElementById(targetId);
+                mainContent.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Smooth scrolling for sidebar links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    mainContent.scrollTo({
+                        top: targetElement.offsetTop - 40,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Charting Logic ---
+            
+            // Common Chart Options
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: 'Inter' }, color: '#475569' }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                        titleFont: { family: 'Inter', size: 13 },
+                        bodyFont: { family: 'Inter', size: 12 },
+                        padding: 10,
+                        cornerRadius: 4,
+                        displayColors: true
+                    }
+                }
+            };
+
+            // 1. Identification Chart (Bar)
+            const ctxTrigger = document.getElementById('triggerChart').getContext('2d');
+            new Chart(ctxTrigger, {
+                type: 'bar',
+                data: {
+                    labels: ['M&A Activity', 'Geo Expansion', 'Exec Change', 'Capital Raise', 'Supply Chain Shift'],
+                    datasets: [{
+                        label: 'Generated Opportunities (YTD)',
+                        data: [340, 280, 210, 150, 420],
+                        backgroundColor: '#b45309', // amber-700
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f5f5f4' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Prioritization Chart (Bubble/Scatter rep)
+            const ctxPriority = document.getElementById('priorityChart').getContext('2d');
+            new Chart(ctxPriority, {
+                type: 'bubble',
+                data: {
+                    datasets: [
+                        {
+                            label: 'High Priority Targets',
+                            data: [
+                                {x: 85, y: 90, r: 15}, {x: 75, y: 80, r: 10}, {x: 95, y: 70, r: 20}
+                            ],
+                            backgroundColor: 'rgba(180, 83, 9, 0.7)', // amber
+                            borderColor: '#b45309'
+                        },
+                        {
+                            label: 'Monitor / Nurture',
+                            data: [
+                                {x: 40, y: 45, r: 8}, {x: 30, y: 60, r: 12}, {x: 50, y: 30, r: 6},
+                                {x: 20, y: 20, r: 5}, {x: 60, y: 50, r: 10}
+                            ],
+                            backgroundColor: 'rgba(148, 163, 184, 0.5)', // slate
+                            borderColor: '#94a3b8'
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        ...commonOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Propensity: ${context.raw.x}%, Value Score: ${context.raw.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            title: { display: true, text: 'Estimated Rev Value' },
+                            min: 0, max: 100,
+                            grid: { color: '#f5f5f4' }
+                        },
+                        x: { 
+                            title: { display: true, text: 'Propensity to Buy (%)' },
+                            min: 0, max: 100,
+                            grid: { color: '#f5f5f4' }
+                        }
+                    }
+                }
+            });
+
+            // 3. Recommendation Chart (Doughnut)
+            const ctxRecommend = document.getElementById('recommendChart').getContext('2d');
+            new Chart(ctxRecommend, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Algo Recommended (Closed)', 'RM Intuition (Closed)', 'Lost/Stalled'],
+                    datasets: [{
+                        data: [45, 20, 35],
+                        backgroundColor: [
+                            '#b45309', // amber-700
+                            '#d6d3d1', // stone-300
+                            '#f5f5f4'  // stone-100
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // 4. Churn Chart (Line)
+            const ctxChurn = document.getElementById('churnChart').getContext('2d');
+            new Chart(ctxChurn, {
+                type: 'line',
+                data: {
+                    labels: ['T-120', 'T-90', 'T-60', 'T-30', 'Churn Event'],
+                    datasets: [
+                        {
+                            label: 'Avg Daily Balance ($M)',
+                            data: [150, 145, 110, 80, 20],
+                            borderColor: '#0f172a', // slate-900
+                            backgroundColor: 'transparent',
+                            yAxisID: 'y',
+                            tension: 0.3,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Portal Logins (Weekly)',
+                            data: [45, 42, 25, 10, 2],
+                            borderColor: '#b45309', // amber-700
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            yAxisID: 'y1',
+                            tension: 0.3,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Balance ($M)' },
+                            grid: { color: '#f5f5f4' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Logins' },
+                            grid: { drawOnChartArea: false } // only draw grid lines for one axis
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        });
+    </script>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/ai/ai-for-corporate-sales-in-banks/ai-augmented-corporate-sales-in-bank.html">AI in Corporate Banking: Sales Insights Dashboard</a><a href="/data-products/ai/ai-for-corporate-sales-in-banks/ai-for-coporate-sales.html">AI in Corporate Banking: Revenue Acceleration &amp; Strategic Intelligence</a><a href="/data-products/marketing-sales/">AI for Marketing and Sales Guides</a><a href="/data-products/use-cases/">Enterprise Data and AI Use Cases</a></div></aside><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>

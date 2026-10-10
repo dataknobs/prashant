@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Comprehensive guide to metrics for evaluating AI assistants. Learn about user satisfaction metrics, response quality measures, technical LLM metrics, search effectiveness…" name="description"/>
+<meta content="AI Assistant Metrics, LLM Evaluation, Satisfaction Rate, Task Completion, Conversation Length, Self Service Rate, Engagement Rate, BLEU Score, ROUGE, METEOR, Perplexity, Search Metrics, Recommendation Metrics" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<title>Metrics to Evaluate AI Assistants | Comprehensive Guide</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2em;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #1e3c72;
+            font-size: 2em;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #2a5298;
+        }
+
+        .section h3 {
+            color: #2a5298;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+
+        .slide-image {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .slide-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f7 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #2a5298;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(42, 82, 152, 0.2);
+        }
+
+        .metric-card h4 {
+            color: #1e3c72;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .metric-card .number {
+            display: inline-block;
+            background: #2a5298;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+
+        .metric-card p {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .metric-detail {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2a5298;
+        }
+
+        .metric-detail h5 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .metric-detail p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .comparison-table table {
+            width: 100%;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #1e3c72;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .comparison-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f5f7fa;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(42, 82, 152, 0.1) 0%, rgba(30, 60, 114, 0.1) 100%);
+            border-left: 4px solid #2a5298;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .highlight-box h4 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #2a5298;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+            font-weight: 600;
+        }
+
+        .badge.technical {
+            background: #0066cc;
+        }
+
+        .badge.behavioral {
+            background: #27ae60;
+        }
+
+        .badge.quality {
+            background: #f39c12;
+        }
+
+        .metric-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .metric-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .metric-list li:last-child {
+            border-bottom: none;
+        }
+
+        .metric-list li strong {
+            color: #1e3c72;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .metric-list li span {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .section-intro {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .section-intro p {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .column-card {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            border-top: 4px solid #2a5298;
+        }
+
+        .column-card h4 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .cta-box h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .cta-box p {
+            font-size: 1.05em;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-table {
+                font-size: 0.9em;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="Comprehensive guide to metrics for evaluating AI assistants. Learn about user satisfaction metrics, response quality measures, technical LLM metrics, search effectiveness…" name="ai-summary"/><meta content="Data Product Strategy" name="topic"/><link href="https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Metrics to Evaluate AI Assistants | Comprehensive Guide" property="og:title"/><meta content="Comprehensive guide to metrics for evaluating AI assistants. Learn about user satisfaction metrics, response quality measures, technical LLM metrics, search effectiveness…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html" property="og:url"/><meta content="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-17.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Metrics to Evaluate AI Assistants | Comprehensive Guide" name="twitter:title"/><meta content="Comprehensive guide to metrics for evaluating AI assistants. Learn about user satisfaction metrics, response quality measures, technical LLM metrics, search effectiveness…" name="twitter:description"/><meta content="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-17.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html#article","url":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html#webpage"},"headline":"Metrics to Evaluate AI Assistants | Comprehensive Guide","description":"Comprehensive guide to metrics for evaluating AI assistants. Learn about user satisfaction metrics, response quality measures, technical LLM metrics, search effectiveness…","image":"https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-17.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Data Product Strategy"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html#webpage","url":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html","name":"Metrics to Evaluate AI Assistants | Comprehensive Guide","description":"Comprehensive guide to metrics for evaluating AI assistants. Learn about user satisfaction metrics, response quality measures, technical LLM metrics, search effectiveness…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Data Product Strategy","item":"https://prashant.dhingra.website/data-products/data-products/"},{"@type":"ListItem","position":3,"name":"Metrics to Evaluate AI Assistants | Comprehensive Guide","item":"https://prashant.dhingra.website/data-products/ai/ai-assistant-metrics-kpi.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<header>
+<h1>Metrics to Evaluate AI Assistants</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Data Product Strategy</a></p>
+<p>How Effective AI Assistant Responses Are</p>
+</header>
+<div class="container">
+<!-- Section 1: Core User Satisfaction Metrics -->
+<div class="section">
+<h2>01. Core User Satisfaction Metrics</h2>
+<div class="slide-image">
+<img alt="Metrics to Evaluate AI Assistants" decoding="async" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-17.png"/>
+</div>
+<div class="section-intro">
+<p>The key to evaluating an AI assistant lies in grasping user satisfaction and engagement. These five fundamental metrics gauge the performance of your AI assistant from the user's point of view.</p>
+</div>
+<div class="metrics-grid">
+<div class="metric-card">
+<h4><span class="number">01</span>Task and Goal Completion</h4>
+<p>Determines if the user achieved their intended task and goals, which is the key indicator of assistant performance.</p>
+</div>
+<div class="metric-card">
+<h4><span class="number">02</span>Satisfaction Rate</h4>
+<p>Assesses if the user is content with the given response, usually determined through post-interaction surveys or ratings.</p>
+</div>
+<div class="metric-card">
+<h4><span class="number">03</span>Conversation Length</h4>
+<p>Monitors the number of steps or turns needed to achieve closure, with fewer indicating higher efficiency and a more intuitive assistant.</p>
+</div>
+<div class="metric-card">
+<h4><span class="number">04</span>Self Service Rate</h4>
+<p>Calculates the proportion of users capable of self-assistance without human involvement. Increased percentages signify improved automation and decreased support expenses.</p>
+</div>
+<div class="metric-card">
+<h4><span class="number">05</span>Engagement Rate</h4>
+<p>Monitors user engagement and repeat visits to the assistant, reflecting trust and the perceived value of the system.</p>
+</div>
+</div>
+<h3>Understanding Each Metric</h3>
+<div class="metric-detail">
+<h5>📊 Task and Goal Completion Rate</h5>
+<p><strong>Definition:</strong> The proportion of discussions where the user successfully met their main goal.</p>
+<p><strong>Why it matters:</strong> This metric is of utmost importance. A high completion rate shows that your assistant is truly valuable and effectively addresses user issues.</p>
+<p><strong>Target:</strong> Aim for 80-95% completion rate, depending on task complexity.</p>
+</div>
+<div class="metric-detail">
+<h5>😊 Satisfaction Rate</h5>
+<p><strong>Definition:</strong> Percentage of users giving the assistant response a positive rating (usually 4-5 stars out of 5).</p>
+<p><strong>Why it matters:</strong> Shows how users feel about the assistant in terms of its quality and usefulness.</p>
+<p><strong>Target:</strong> Aim for 75-85% positive satisfaction ratings.</p>
+</div>
+<div class="metric-detail">
+<h5>💬 Conversation Length</h5>
+<p><strong>Definition:</strong> Average number of turns/exchanges needed to resolve a user issue.</p>
+<p><strong>Why it matters:</strong> Brief interactions indicate that the assistant can promptly grasp user needs and offer straightforward solutions.</p>
+<p><strong>Target:</strong> 2-5 turns for optimal efficiency, depending on problem complexity.</p>
+</div>
+<div class="metric-detail">
+<h5>🎯 Self Service Rate</h5>
+<p><strong>Definition:</strong> Percentage of interactions resolved without escalation to human support.</p>
+<p><strong>Why it matters:</strong> Has a direct impact on operational costs and customer satisfaction while also decreasing the burden on the support team.</p>
+<p><strong>Target:</strong> Aim for 70-90% self-service, with escalation for complex issues.</p>
+</div>
+<div class="metric-detail">
+<h5>🔄 Engagement Rate</h5>
+<p><strong>Definition:</strong> The proportion of users who come back to utilize the assistant following their initial interaction.</p>
+<p><strong>Why it matters:</strong> Long-term value and user trust in the system are evident, leading to higher satisfaction among returning users.</p>
+<p><strong>Target:</strong> Aim for 40-60% return user rate, indicating consistent value delivery.</p>
+</div>
+</div>
+<!-- Section 2: Response Quality Metrics -->
+<div class="section">
+<h2>02. Response Quality Metrics</h2>
+<div class="slide-image">
+<img alt="Metrics to Evaluate AI Assistant Response" decoding="async" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-18.png"/>
+</div>
+<div class="section-intro">
+<p>User satisfaction metrics provide insight into the overall experience, whereas response quality metrics assess the effectiveness of individual responses by directly measuring their performance.</p>
+</div>
+<h3>Five Key Response Quality Measures</h3>
+<div class="two-column">
+<div class="column-card">
+<h4>⚡ Response Time</h4>
+<p>Response generation and delivery time is expected to be quick - typically under 2-3 seconds - to meet user expectations for optimal experience.</p>
+</div>
+<div class="column-card">
+<h4>💰 Cost</h4>
+<p>The operational cost per response, which includes token usage and infrastructure, is crucial for ensuring the profitability and scalability of the system.</p>
+</div>
+</div>
+<div class="two-column">
+<div class="column-card">
+<h4>🎯 Accuracy</h4>
+<p>The accuracy and factual correctness of the answer is crucial for establishing user trust and preventing misinformation.</p>
+</div>
+<div class="column-card">
+<h4>✅ Completeness</h4>
+<p>When there are multiple topics in the user query, what percentage of those topics were covered in the response? A higher coverage rate indicates a more effective response.</p>
+</div>
+</div>
+<div class="column-card" style="margin: 20px 0;">
+<h4>🔁 Number of Prompts</h4>
+<p>The number of prompts required to receive a satisfactory answer indicates the level of initial understanding and responsiveness. A lower number of prompts needed reflects a higher level of comprehension and efficiency.</p>
+</div>
+<div class="highlight-box">
+<h4>Quality Metrics Summary</h4>
+<table style="width: 100%; border-collapse: collapse;">
+<tbody><tr style="background: #f0f4f8;">
+<td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Metric</strong></td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Measurement</strong></td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;"><strong>Target</strong></td>
+</tr>
+<tr>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">Response Time</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">Seconds to deliver</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">&lt; 3 seconds</td>
+</tr>
+<tr style="background: #f9f9f9;">
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">Accuracy</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">% correct answers</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">90%+</td>
+</tr>
+<tr>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">Completeness</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">% topics covered</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">85%+</td>
+</tr>
+<tr style="background: #f9f9f9;">
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">Cost per Response</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">Tokens used</td>
+<td style="padding: 10px; border-bottom: 1px solid #ddd;">Depends on model</td>
+</tr>
+<tr>
+<td style="padding: 10px;"># of Prompts</td>
+<td style="padding: 10px;">Iterations needed</td>
+<td style="padding: 10px;">1-2 prompts</td>
+</tr>
+</tbody></table>
+</div>
+</div>
+<!-- Section 3: Technical LLM Metrics -->
+<div class="section">
+<h2>03. Technical Metrics to Evaluate LLM</h2>
+<div class="slide-image">
+<img alt="Technical Metrics to Evaluate LLM" decoding="async" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-19.png"/>
+</div>
+<div class="section-intro">
+<p>Sophisticated language models underpin every AI assistant, with technical metrics gauging the quality and performance of the LLM at a mathematical and computational level. Knowing these metrics is crucial for optimizing model selection and fine-tuning.</p>
+</div>
+<h3>Five Essential Technical Metrics</h3>
+<div class="metric-list">
+<li>
+<strong>📏 BLEU Score (Bilingual Evaluation Understudy)</strong>
+<span>Calculates the resemblance between produced text and reference text by assessing n-gram overlap. Scores range from 0 to 1, with 1 indicating an exact match. Valuable for evaluating output in comparison to ideal responses.</span>
+</li>
+<li>
+<strong>📊 GLEU Score (Google BLEU)</strong>
+<span>Calculates the model's accuracy for each individual task, with a focus on partial matches and task-specific nuances, making it more forgiving than BLEU and providing a more accurate representation of real-world assistant performance.</span>
+</li>
+<li>
+<strong>🔍 ROUGE (Recall-Oriented Understudy for Gisting Evaluation)</strong>
+<span>Evaluates responses by comparing n-grams with reference texts, especially beneficial for assessing summarization and text generation tasks, prioritizing recall over precision.</span>
+</li>
+<li>
+<strong>🌐 METEOR (Metric for Evaluation of Translation with Explicit ORdering)</strong>
+<span>Utilizes n-gram matching and synonym correlation for assessing semantic similarity, delving deeper than mere word matching to grasp context and meaning. Typically superior to BLEU in capturing human interpretation.</span>
+</li>
+<li>
+<strong>📈 Perplexity</strong>
+<span>Evaluates the accuracy of a language model in predicting the next word, with lower perplexity indicating improved performance. Lower values (usually between 20 and 100) indicate higher prediction accuracy, reflecting the model's confidence and quality.</span>
+</li>
+</div>
+<h3>When to Use Each Metric</h3>
+<div class="highlight-box">
+<h4>Choosing the Right Technical Metric</h4>
+<ul style="margin-left: 20px; margin-top: 15px; line-height: 2;">
+<li><strong>BLEU:</strong> Best for machine translation and comparing multiple candidates</li>
+<li><strong>GLEU:</strong> Better for task-specific evaluation with more nuanced grading</li>
+<li><strong>ROUGE:</strong> Ideal for summarization and information retrieval tasks</li>
+<li><strong>METEOR:</strong> Excellent for understanding semantic similarity and synonym variations</li>
+<li><strong>Perplexity:</strong> Most comprehensive for overall language model quality assessment</li>
+</ul>
+</div>
+<div class="metric-detail" style="margin-top: 25px;">
+<h5>🔧 Practical Application</h5>
+<p>A blend of metrics offers the best insight for the majority of AI assistant deployments. <strong>METEOR</strong> for semantic understanding, <strong>Perplexity</strong> for baseline model quality, and <strong>ROUGE</strong> if your assistant involves text generation or summarization.</p>
+</div>
+</div>
+<!-- Section 4: Search Effectiveness Metrics -->
+<div class="section">
+<h2>04. Metrics for LLM-Based Search</h2>
+<div class="slide-image">
+<img alt="Metrics for LLM Based Search" decoding="async" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-20.png"/>
+</div>
+<div class="section-intro">
+<p>Search plays a vital role in AI assistants by enabling them to access pertinent information from knowledge bases. Measuring search performance involves assessing both technical metrics (such as item ranking accuracy) and behavioral metrics (like user engagement with search results).</p>
+</div>
+<h3>Technical Metrics for Search</h3>
+<div class="metrics-grid">
+<div class="metric-card">
+<h4><span class="badge technical">Technical</span>Precision &amp; Recall</h4>
+<p><strong>Precision:</strong> % of returned results that are relevant. <strong>Recall:</strong> It is crucial to strike a balance in retrieving a percentage of all pertinent documents.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge technical">Technical</span>Mean Reciprocal Rank</h4>
+<p>The mean reciprocal rank (MRR) is a crucial metric for evaluating search quality, as it measures the average position of the first relevant result in search results. A higher MRR indicates that relevant items are displayed</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge technical">Technical</span>DCG &amp; NDCG</h4>
+<p>Discounted Cumulative Gain accounts for ranking quality by factoring in position, ensuring that items with higher relevance are ranked higher. NDCG standardizes results across queries.</p>
+</div>
+</div>
+<h3>Behavioral Metrics for Search</h3>
+<div class="metrics-grid">
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Click-Through Rate</h4>
+<p>The percentage of users clicking on search results directly correlates with the relevance of the results - a high CTR indicates relevance, while a low CTR may point to search quality problems.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Time on Result Page</h4>
+<p>The amount of time users spend searching through search results can indicate the level of difficulty in finding the desired information.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Search Refinements</h4>
+<p>The frequency of search query adjustments made by users. A high rate of refinement suggests that the initial results did not meet expectations.</p>
+</div>
+</div>
+<div class="cta-box">
+<h3>Optimal Search Performance</h3>
+<p>Strive for high precision (90%+), strong recall (75%+), impressive click-through rates (15-25%), and minimal refinement rates (&lt; 20% of searches needing adjustment) to demonstrate successful information retrieval.</p>
+</div>
+</div>
+<!-- Section 5: Recommendation Quality Metrics -->
+<div class="section">
+<h2>05. Metrics for LLM-Based Recommendation</h2>
+<div class="slide-image">
+<img alt="Metrics for LLM Based Recommendation" decoding="async" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-21.png"/>
+</div>
+<div class="section-intro">
+<p>Recommendation is an advanced AI assistant feature that involves evaluating both the ranking quality (technical metrics) and the user impact (behavioral metrics).</p>
+</div>
+<h3>Ranking Metrics for Recommendation Quality</h3>
+<div class="metrics-grid">
+<div class="metric-card">
+<h4><span class="badge technical">Technical</span>DCG (Discounted Cumulative Gain)</h4>
+<p>Takes into account both the relevance and position of recommendations. A higher DCG indicates that the most relevant items are placed at the top, leading to an improved user experience.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge technical">Technical</span>MRR (Mean Reciprocal Rank)</h4>
+<p>The average reciprocal rank of the initial relevant item measures how quickly users locate desired information, with a higher MRR indicating superior ranking.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge technical">Technical</span>MAP@K (Mean Average Precision)</h4>
+<p>Average precision up to K items considers relevance and position balance, with a higher MAP@K indicating improved recommendation quality overall.</p>
+</div>
+</div>
+<div class="slide-image">
+<img alt="Behavioral Metrics for Recommendation" decoding="async" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-22.png"/>
+</div>
+<h3>Behavioral Metrics for Recommendation Impact</h3>
+<div class="metrics-grid">
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Click-Through Rate (CTR)</h4>
+<p>Click-through rate (CTR) is a measure of the effectiveness of recommendations, reflecting the perceived relevance and quality. CTR typically falls within the range of 2-10%, varying based on</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Conversion Rate</h4>
+<p>Percentage of users who complete a desired action after engaging with a recommendation, crucial for evaluating business success and return on investment.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Serendipity</h4>
+<p>Evaluating the system's capacity to suggest intriguing and unforeseen items, gauging its effectiveness in introducing users to valuable content they were not previously aware of.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Novelty</h4>
+<p>Percentage of recommendations that are either fresh or unfamiliar to the user. Striking a balance between personalized and varied suggestions.</p>
+</div>
+<div class="metric-card">
+<h4><span class="badge behavioral">Behavioral</span>Diversity</h4>
+<p>Diverse suggestions in various categories help avoid recommendation bubbles and expand user discovery.</p>
+</div>
+</div>
+<h3>Balancing Recommendation Metrics</h3>
+<div class="highlight-box">
+<h4>The Recommendation Metrics Triangle</h4>
+<p style="margin-bottom: 15px;">Recommendation systems must balance three competing objectives:</p>
+<ul style="margin-left: 20px; line-height: 2;">
+<li><strong>Relevance:</strong> Recommend items users will like (DCG, MRR, CTR)</li>
+<li><strong>Novelty:</strong> Introduce new items users haven't seen (Novelty, Serendipity)</li>
+<li><strong>Diversity:</strong> Show variety across categories (Diversity, Serendipity)</li>
+</ul>
+<p style="margin-top: 15px;">Top-performing systems excel in all three areas: suggesting highly relevant items, introducing unexpected discoveries, and maintaining a diverse range of categories.</p>
+</div>
+</div>
+<!-- Section 6: Comprehensive Metrics Summary -->
+<div class="section">
+<h2>06. Comprehensive Evaluation Framework</h2>
+<div class="slide-image">
+<img alt="Complete metrics framework" decoding="async" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1000/Slide-23.png"/>
+</div>
+<h3>Metrics by AI Assistant Type</h3>
+<div class="comparison-table">
+<table>
+<thead>
+<tr>
+<th>Assistant Type</th>
+<th>Primary Metrics</th>
+<th>Secondary Metrics</th>
+<th>Success Indicators</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Search Assistant</strong></td>
+<td>Precision, Recall, CTR</td>
+<td>NDCG, Response Time</td>
+<td>Precision &gt;90%, CTR &gt;10%</td>
+</tr>
+<tr>
+<td><strong>Q&amp;A Assistant</strong></td>
+<td>Accuracy, Completeness, Task Completion</td>
+<td>METEOR, Response Time</td>
+<td>Accuracy &gt;90%, Completion &gt;80%</td>
+</tr>
+<tr>
+<td><strong>Recommendation Assistant</strong></td>
+<td>DCG, Conversion Rate, CTR</td>
+<td>Novelty, Diversity</td>
+<td>CTR &gt;5%, Conversion &gt;2%</td>
+</tr>
+<tr>
+<td><strong>Support Assistant</strong></td>
+<td>Self-Service Rate, Satisfaction, Task Completion</td>
+<td>Conversation Length, Engagement</td>
+<td>Self-Service &gt;70%, Satisfaction &gt;75%</td>
+</tr>
+<tr>
+<td><strong>Planning Assistant</strong></td>
+<td>Plan Feasibility, Task Completion, User Satisfaction</td>
+<td>Conversation Length, Engagement</td>
+<td>Plan Completion &gt;80%, Satisfaction &gt;75%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Building Your Metrics Dashboard</h3>
+<div class="highlight-box">
+<h4>Essential Metrics to Track Always</h4>
+<ul style="margin-left: 20px; margin-top: 15px; line-height: 2;">
+<li><span class="badge quality">Quality</span> <strong>Task Completion Rate</strong> - Shows if your assistant actually helps</li>
+<li><span class="badge quality">Quality</span> <strong>User Satisfaction</strong> - Indicates perceived value</li>
+<li><span class="badge quality">Quality</span> <strong>Response Accuracy</strong> - Critical for trust and credibility</li>
+<li><span class="badge quality">Quality</span> <strong>Response Time</strong> - Impacts user experience</li>
+<li><span class="badge quality">Quality</span> <strong>Self-Service Rate</strong> - Reduces operational costs</li>
+<li><span class="badge quality">Quality</span> <strong>Cost per Interaction</strong> - Ensures business viability</li>
+</ul>
+</div>
+<h3>Metrics Implementation Timeline</h3>
+<div class="two-column">
+<div class="column-card">
+<h4>🚀 Phase 1: Launch (Week 1-2)</h4>
+<p>Monitor fundamental metrics such as task completion rate, satisfaction levels, and conversation duration to establish a benchmark for performance.</p>
+</div>
+<div class="column-card">
+<h4>📈 Phase 2: Optimization (Week 3-8)</h4>
+<p>Implement response quality metrics, pinpoint areas of concern, and initiate A/B testing for enhancements.</p>
+</div>
+</div>
+<div class="two-column">
+<div class="column-card">
+<h4>🔬 Phase 3: Advanced (Week 9+)</h4>
+<p>Implement technical metrics. Use feature-specific metrics (search, recommendation, etc.)</p>
+</div>
+<div class="column-card">
+<h4>🎯 Phase 4: Optimization (Ongoing)</h4>
+<p>Real-time monitoring. Continuous improvement. Predictive analytics for emerging issues.</p>
+</div>
+</div>
+</div>
+<!-- Section 7: Key Takeaways -->
+<div class="section">
+<h2>Key Takeaways &amp; Best Practices</h2>
+<div class="highlight-box">
+<h4>✅ What Makes Metrics Effective</h4>
+<ul style="margin-left: 20px; margin-top: 15px; line-height: 2;">
+<li><strong>Aligned with Business Goals:</strong> Metrics should measure what matters for your business</li>
+<li><strong>User-Centric:</strong> Prioritize metrics that reflect actual user experience</li>
+<li><strong>Actionable:</strong> Metrics should guide specific improvements and decisions</li>
+<li><strong>Balanced:</strong> Combine quality, efficiency, and behavioral metrics for full picture</li>
+<li><strong>Comparable:</strong> Track trends over time and compare against benchmarks</li>
+</ul>
+</div>
+<div class="cta-box">
+<h3>The Bottom Line</h3>
+<p>The most effective AI assistants are developed by incorporating a range of metrics, including user satisfaction, response quality, and specialized technical and behavioral data. By consistently monitoring, analyzing, and refining based on data-driven insights, AI assistants can continually evolve and improve over time.</p>
+</div>
+</div>
+</div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/ai/ai-assistant-vs-ai-human-vs-ai-robot.html">AI Assistants vs Digital Humans vs Robots | Comprehensive Comparison</a><a href="/data-products/ai/principles-of-cooperative-conversations.html">Principles of Cooperative Conversations | Grice's Maxims for AI</a><a href="/data-products/ai/digital-human.html">Digital Human Design | AI-Human Interaction &amp; Cooperative Conversation</a><a href="/data-products/data-product-all-with-site-menu.html">Data Product Visual Guide</a></div></aside><footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>

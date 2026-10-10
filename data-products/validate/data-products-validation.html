@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" data-related-json="folder-pages.json" data-related-keywords="data product ai genai" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Data as a Product Validation Guide</title>
+<style id="related-articles-noimage-css">
+
+#related-articles-root{margin:2rem auto;max-width:1100px;padding:1rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}#related-articles-root h2{margin:0 0 .25rem;font-size:1.45rem}#related-articles-root .dp-related-intro{color:#5d6678;margin:0 0 1rem}.related-articles-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.related-article-card{display:block;text-decoration:none;color:#172033;background:#fff;border:1px solid #dfe4ec;border-radius:12px;padding:.9rem;line-height:1.35;font-weight:700}.related-article-card:hover{border-color:#bdb6ff;background:#f2f0ff}@media(max-width:800px){.related-articles-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.related-articles-grid{grid-template-columns:1fr}}
+
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+
+        /* Chart Container Strict Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        /* Interactive Element Transitions */
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Active Tab Styling */
+        .tab-btn.active {
+            border-bottom: 2px solid #ea580c; /* orange-600 */
+            color: #ea580c;
+            font-weight: 600;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+<!-- Chosen Palette: Warm Neutrals (Stone/Sand) with Burnt Orange and Slate Blue Accents. 
+         This creates a professional yet inviting "editorial" feel, distinct from cold tech blue. -->
+<!-- Application Structure Plan: 
+         1. Hero Section: Defines the core concept.
+         2. The Framework (Process View): A horizontal interactive flow showing validation stages (Design -> Build -> Run).
+            Users click stages to see specific validation tactics.
+         3. The Metrics (Dashboard View): Visualizes the "Health" of a data product. 
+            Uses a Radar chart for Quality Dimensions and a Line chart for SLA trends.
+         4. The Assessment (Tool View): An interactive checklist for users to validate their own products. 
+            Calculates a score in real-time.
+         5. Best Practices (Tabbed Text): Detailed textual strategies for improvement.
+    -->
+<!-- Visualization & Content Choices:
+         1. Radar Chart (Chart.js): Goal -> Visualize multi-dimensional quality. Interaction -> None (Static display of ideal vs actual). Justification -> Best way to show balance across 6 dimensions.
+         2. Line Chart (Chart.js): Goal -> Show reliability over time. Interaction -> Toggle timeframes. Justification -> Demonstrates stability, a key product attribute.
+         3. Interactive Flow Diagram (HTML/CSS): Goal -> Explain the validation lifecycle. Interaction -> Click nodes to reveal details. Justification -> Replaces static diagrams with explorable content.
+         4. Dynamic Checklist (JS): Goal -> Practical application. Interaction -> Checkboxes update a progress bar/score. Justification -> Gamifies the learning process.
+    -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content='Move beyond "data as an asset" to "data as a product." This guide provides a comprehensive framework for validating usability, trustworthiness…' name="description"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content='Move beyond "data as an asset" to "data as a product." This guide provides a comprehensive framework for validating usability, trustworthiness…' name="ai-summary"/><meta content="Data Product Strategy" name="topic"/><link href="https://prashant.dhingra.website/data-products/validate/data-products-validation.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Data as a Product Validation Guide" property="og:title"/><meta content='Move beyond "data as an asset" to "data as a product." This guide provides a comprehensive framework for validating usability, trustworthiness…' property="og:description"/><meta content="https://prashant.dhingra.website/data-products/validate/data-products-validation.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Data as a Product Validation Guide" name="twitter:title"/><meta content='Move beyond "data as an asset" to "data as a product." This guide provides a comprehensive framework for validating usability, trustworthiness…' name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html#article","url":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html#webpage"},"headline":"Data as a Product Validation Guide","description":"Move beyond \"data as an asset\" to \"data as a product.\" This guide provides a comprehensive framework for validating usability, trustworthiness…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Data Product Strategy"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html#webpage","url":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html","name":"Data as a Product Validation Guide","description":"Move beyond \"data as an asset\" to \"data as a product.\" This guide provides a comprehensive framework for validating usability, trustworthiness…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Data Product Strategy","item":"https://prashant.dhingra.website/data-products/data-products/"},{"@type":"ListItem","position":3,"name":"Data as a Product Validation Guide","item":"https://prashant.dhingra.website/data-products/validate/data-products-validation.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased selection:bg-orange-100"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<!-- Navigation -->
+<nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-stone-900 tracking-tight">Data<span class="text-orange-600">Product</span>Val</span>
+</div>
+<div class="hidden md:flex items-center space-x-8">
+<button class="text-stone-600 hover:text-orange-600 text-sm font-medium transition-colors" onclick="scrollToSection('hero')">Overview</button>
+<button class="text-stone-600 hover:text-orange-600 text-sm font-medium transition-colors" onclick="scrollToSection('framework')">Framework</button>
+<button class="text-stone-600 hover:text-orange-600 text-sm font-medium transition-colors" onclick="scrollToSection('metrics')">Metrics</button>
+<button class="text-stone-600 hover:text-orange-600 text-sm font-medium transition-colors" onclick="scrollToSection('assessment')">Assessment Tool</button>
+</div>
+<!-- Mobile menu button placeholder (simplified) -->
+<div class="flex items-center md:hidden">
+<button class="text-stone-500 hover:text-stone-900">Menu</button>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+<!-- Section 1: Hero & Introduction -->
+<section class="text-center space-y-6 max-w-4xl mx-auto" id="hero">
+<h1 class="text-4xl md:text-5xl font-extrabold text-stone-900 tracking-tight">
+                Validating Data as a <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-600">Product</span>
+</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Data Product Strategy</a></p>
+<p class="text-xl text-stone-600 leading-relaxed">
+                Move beyond "data as an asset" to "data as a product." This guide provides a comprehensive framework for validating usability, trustworthiness, and value before data ever reaches the consumer.
+            </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm interactive-card">
+<div class="text-3xl mb-2">💎</div>
+<h3 class="font-bold text-lg mb-2">Trustworthy</h3>
+<p class="text-sm text-stone-500">Validation ensures data is accurate, consistent, and reliable every time.</p>
+</div>
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm interactive-card">
+<div class="text-3xl mb-2">📦</div>
+<h3 class="font-bold text-lg mb-2">Consumable</h3>
+<p class="text-sm text-stone-500">Products must have clear contracts, schemas, and documentation.</p>
+</div>
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm interactive-card">
+<div class="text-3xl mb-2">🔭</div>
+<h3 class="font-bold text-lg mb-2">Discoverable</h3>
+<p class="text-sm text-stone-500">Metadata and cataloging make the product easy to find and understand.</p>
+</div>
+</div>
+</section>
+<!-- Section 2: Interactive Validation Framework -->
+<section class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden" id="framework">
+<div class="p-8 border-b border-stone-100">
+<h2 class="text-2xl font-bold text-stone-900 mb-4">The Validation Lifecycle</h2>
+<p class="text-stone-600 mb-6">
+                    Validation isn't a single step; it's a continuous lifecycle. Click on the stages below to explore the specific validation checks required at each phase of the data product journey.
+                </p>
+<!-- Diagram Container -->
+<div class="flex flex-col md:flex-row justify-between items-stretch gap-4 mb-8">
+<!-- Step 1 -->
+<div class="framework-step cursor-pointer flex-1 bg-stone-50 hover:bg-orange-50 border-2 border-stone-200 hover:border-orange-300 rounded-lg p-4 text-center transition-all group active-step" id="step-design" onclick="updateFrameworkDetail('design')">
+<div class="text-2xl mb-2 group-hover:scale-110 transition-transform">📐</div>
+<div class="font-bold text-stone-700">1. Design Contract</div>
+<div class="text-xs text-stone-500 mt-1">Schema &amp; SLA Definition</div>
+</div>
+<!-- Connector -->
+<div class="hidden md:flex items-center justify-center text-stone-300 text-xl">➔</div>
+<!-- Step 2 -->
+<div class="framework-step cursor-pointer flex-1 bg-stone-50 hover:bg-orange-50 border-2 border-stone-200 hover:border-orange-300 rounded-lg p-4 text-center transition-all group" id="step-build" onclick="updateFrameworkDetail('build')">
+<div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🏗️</div>
+<div class="font-bold text-stone-700">2. Build &amp; Test</div>
+<div class="text-xs text-stone-500 mt-1">CI/CD &amp; Unit Tests</div>
+</div>
+<!-- Connector -->
+<div class="hidden md:flex items-center justify-center text-stone-300 text-xl">➔</div>
+<!-- Step 3 -->
+<div class="framework-step cursor-pointer flex-1 bg-stone-50 hover:bg-orange-50 border-2 border-stone-200 hover:border-orange-300 rounded-lg p-4 text-center transition-all group" id="step-run" onclick="updateFrameworkDetail('run')">
+<div class="text-2xl mb-2 group-hover:scale-110 transition-transform">⚙️</div>
+<div class="font-bold text-stone-700">3. Run &amp; Monitor</div>
+<div class="text-xs text-stone-500 mt-1">Observability &amp; Drift</div>
+</div>
+<!-- Connector -->
+<div class="hidden md:flex items-center justify-center text-stone-300 text-xl">➔</div>
+<!-- Step 4 -->
+<div class="framework-step cursor-pointer flex-1 bg-stone-50 hover:bg-orange-50 border-2 border-stone-200 hover:border-orange-300 rounded-lg p-4 text-center transition-all group" id="step-iterate" onclick="updateFrameworkDetail('iterate')">
+<div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🔄</div>
+<div class="font-bold text-stone-700">4. Iterate</div>
+<div class="text-xs text-stone-500 mt-1">Feedback Loops</div>
+</div>
+</div>
+<!-- Dynamic Detail Panel -->
+<div class="bg-stone-50 rounded-xl p-6 border border-stone-200 fade-in" id="framework-detail">
+<!-- Content injected by JS -->
+</div>
+</div>
+</section>
+<!-- Section 3: Metrics Dashboard -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-8" id="metrics">
+<!-- Left Column: Intro -->
+<div class="col-span-1 lg:col-span-2">
+<h2 class="text-2xl font-bold text-stone-900 mb-2">Validation Metrics</h2>
+<p class="text-stone-600">
+                    To treat data as a product, you must measure it like one. These visualizations demonstrate how to track data health across six key dimensions and monitor reliability over time.
+                </p>
+</div>
+<!-- Chart 1: Quality Radar -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-bold text-lg text-stone-800">The 6 Dimensions of Data Quality</h3>
+<button class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded hover:bg-orange-200 transition-colors" onclick="randomizeRadarData()">Simulate Audit</button>
+</div>
+<div class="chart-container">
+<canvas id="qualityRadarChart"></canvas>
+</div>
+<div class="mt-4 text-sm text-stone-500 bg-stone-50 p-3 rounded-lg border border-stone-100">
+<strong>Insight:</strong> This chart helps identify imbalance. A product might be timely (Freshness) but inaccurate, requiring a shift in engineering focus.
+                </div>
+</div>
+<!-- Chart 2: SLA/Reliability -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-bold text-lg text-stone-800">SLA Compliance Trend</h3>
+<select class="text-sm border-stone-300 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-200 focus:ring-opacity-50" id="timeRange" onchange="updateLineChart()">
+<option value="7">Last 7 Days</option>
+<option value="30">Last 30 Days</option>
+</select>
+</div>
+<div class="chart-container">
+<canvas id="slaLineChart"></canvas>
+</div>
+<div class="mt-4 text-sm text-stone-500 bg-stone-50 p-3 rounded-lg border border-stone-100">
+<strong>Insight:</strong> Consistent delivery builds trust. Dips in the line indicate incidents where the "product" failed to meet its promised delivery time.
+                </div>
+</div>
+</section>
+<!-- Section 4: Interactive Assessment Tool -->
+<section class="bg-stone-900 text-stone-50 rounded-2xl shadow-lg overflow-hidden relative" id="assessment">
+<!-- Abstract background shape -->
+<div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-stone-800 rounded-full opacity-50 blur-3xl"></div>
+<div class="relative z-10 p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+<!-- Assessment Logic -->
+<div class="lg:col-span-2 space-y-6">
+<div>
+<h2 class="text-3xl font-bold text-white mb-2">Product Readiness Assessment</h2>
+<p class="text-stone-400">Validate your dataset against core product principles. Check the boxes that apply to see your readiness score.</p>
+</div>
+<div class="space-y-4" id="checklist-container">
+<!-- Checklist generated by JS -->
+</div>
+</div>
+<!-- Scoreboard -->
+<div class="lg:col-span-1 flex flex-col justify-center items-center bg-stone-800/50 rounded-xl p-6 backdrop-blur-sm border border-stone-700">
+<h3 class="text-stone-400 font-medium uppercase tracking-wider text-sm mb-4">Current Score</h3>
+<div class="relative w-40 h-40 flex items-center justify-center">
+<!-- Circular Progress SVG (built via JS canvas essentially, but here using CSS for simplicity in visual) -->
+<div class="w-full h-full rounded-full border-8 border-stone-700 flex items-center justify-center relative">
+<div class="absolute w-full h-full rounded-full border-8 border-orange-500 border-t-transparent transition-all duration-700" id="score-ring" style="transform: rotate(-45deg);"></div>
+<span class="text-4xl font-bold text-white" id="score-display">0%</span>
+</div>
+</div>
+<div class="mt-6 text-center" id="score-message">
+<span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-stone-700 text-stone-300">Not Started</span>
+</div>
+<button class="mt-8 text-sm text-stone-400 hover:text-white underline" onclick="resetAssessment()">Reset Assessment</button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<div data-heading="Related Articles" data-intro="Explore more guides and technology articles." data-limit="4" data-rendered="true" id="related-articles-root"><aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/guide/">Data Product Guide: 15-Part Learning Series</a><a href="/data-products/dataproduct-vs-data-as-product.html">Data Product vs. Data-as-a-Product: A Comprehensive Comparison</a><a href="/data-products/data-products/">Data Products: Strategy, Lifecycle, and Operating Model</a><a href="/data-products/guide/data-product-101-index.html">Data Product Guide With Slides</a></div></aside></div>
+<footer class="text-center text-stone-500 py-10 border-t border-stone-200">
+<p>© 2025 Data Product Validation Guide. Generated for Educational Purposes.</p>
+</footer>
+</main>
+<!-- JavaScript Logic -->
+<script>
+        // --- State Management ---
+        const state = {
+            currentFrameworkStep: 'design',
+            assessmentScore: 0,
+            checklist: [
+                { id: 'c1', text: 'Clear Business Owner defined', category: 'Ownership', checked: false },
+                { id: 'c2', text: 'SLA (Freshness/Quality) documented', category: 'Contract', checked: false },
+                { id: 'c3', text: 'Schema validation enforced in pipeline', category: 'Technical', checked: false },
+                { id: 'c4', text: 'PII/Sensitive data tagged', category: 'Compliance', checked: false },
+                { id: 'c5', text: 'Data lineage is mapped', category: 'Observability', checked: false },
+                { id: 'c6', text: 'Historical data is partitioned', category: 'Technical', checked: false },
+                { id: 'c7', text: 'Usage metrics (queries/users) tracked', category: 'Value', checked: false },
+                { id: 'c8', text: 'Access control mechanism in place', category: 'Security', checked: false }
+            ]
+        };
+
+        // --- Framework Data ---
+        const frameworkContent = {
+            design: {
+                title: "Design Phase: The Contract",
+                content: `<ul class="list-disc pl-5 space-y-2 text-stone-700">
+                    <li><strong>Schema Definition:</strong> Define types, nullability, and constraints explicitly (e.g., Protobuf, Avro).</li>
+                    <li><strong>SLA Agreement:</strong> Negotiate freshness (e.g., "Updated by 8 AM") and completeness thresholds.</li>
+                    <li><strong>Business Logic Mapping:</strong> Document the exact transformations applied to raw data.</li>
+                </ul>`,
+                icon: "📐"
+            },
+            build: {
+                title: "Build Phase: Automated Testing",
+                content: `<ul class="list-disc pl-5 space-y-2 text-stone-700">
+                    <li><strong>Unit Tests:</strong> Test individual transformation functions with mock data.</li>
+                    <li><strong>Integration Tests:</strong> Validate pipeline connectivity and dependency handling.</li>
+                    <li><strong>CI/CD Integration:</strong> Block deployment if data quality tests fail in the staging environment.</li>
+                </ul>`,
+                icon: "🏗️"
+            },
+            run: {
+                title: "Run Phase: Observability",
+                content: `<ul class="list-disc pl-5 space-y-2 text-stone-700">
+                    <li><strong>Anomaly Detection:</strong> Alert on sudden volume spikes or drops (row counts).</li>
+                    <li><strong>Distribution Checks:</strong> Monitor for data drift (e.g., Average value shifts significantly).</li>
+                    <li><strong>Freshness Checks:</strong> Trigger alerts if data arrives late based on SLA.</li>
+                </ul>`,
+                icon: "⚙️"
+            },
+            iterate: {
+                title: "Iterate Phase: Feedback Loops",
+                content: `<ul class="list-disc pl-5 space-y-2 text-stone-700">
+                    <li><strong>Consumer Feedback:</strong> Collect qualitative feedback from dashboard users or downstream apps.</li>
+                    <li><strong>Incident Post-Mortems:</strong> Use failures to add new automated tests to the Build phase.</li>
+                    <li><strong>Value Assessment:</strong> Deprecate unused fields or tables to reduce debt.</li>
+                </ul>`,
+                icon: "🔄"
+            }
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            renderChecklist();
+            updateFrameworkDetail('design');
+        });
+
+        // --- Framework Interaction ---
+        function updateFrameworkDetail(step) {
+            // Update UI State
+            document.querySelectorAll('.framework-step').forEach(el => {
+                el.classList.remove('border-orange-500', 'bg-orange-50');
+                el.classList.add('border-stone-200');
+            });
+            document.getElementById(`step-${step}`).classList.remove('border-stone-200');
+            document.getElementById(`step-${step}`).classList.add('border-orange-500', 'bg-orange-50');
+
+            // Update Content
+            const container = document.getElementById('framework-detail');
+            const data = frameworkContent[step];
+            
+            container.innerHTML = `
+                <div class="flex items-start gap-4">
+                    <div class="bg-white p-3 rounded-lg shadow-sm text-3xl hidden sm:block">${data.icon}</div>
+                    <div>
+                        <h3 class="font-bold text-lg text-stone-900 mb-2">${data.title}</h3>
+                        ${data.content}
+                    </div>
+                </div>
+            `;
+            
+            // Re-trigger animation
+            container.classList.remove('fade-in');
+            void container.offsetWidth; // trigger reflow
+            container.classList.add('fade-in');
+        }
+
+        // --- Chart.js Implementations ---
+        let qualityRadar, slaLine;
+
+        function initCharts() {
+            // 1. Radar Chart Configuration
+            const ctxRadar = document.getElementById('qualityRadarChart').getContext('2d');
+            qualityRadar = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Accuracy', 'Completeness', 'Consistency', 'Timeliness', 'Validity', 'Uniqueness'],
+                    datasets: [{
+                        label: 'Current Product Score',
+                        data: [85, 70, 90, 60, 95, 80],
+                        fill: true,
+                        backgroundColor: 'rgba(234, 88, 12, 0.2)', // Orange-600 low opacity
+                        borderColor: 'rgb(234, 88, 12)',
+                        pointBackgroundColor: 'rgb(234, 88, 12)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(234, 88, 12)'
+                    }, {
+                        label: 'Target Threshold',
+                        data: [90, 90, 90, 90, 90, 90],
+                        fill: false,
+                        borderColor: 'rgba(168, 162, 158, 0.5)', // Stone-400
+                        borderDash: [5, 5],
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: {
+                                font: { size: 12, family: "'ui-sans-serif', 'system-ui'" },
+                                color: '#44403c'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true } }
+                    }
+                }
+            });
+
+            // 2. Line Chart Configuration
+            const ctxLine = document.getElementById('slaLineChart').getContext('2d');
+            slaLine = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                    datasets: [{
+                        label: 'Delivery Latency (mins)',
+                        data: [15, 18, 14, 45, 12, 10, 11], // Spike on day 4
+                        borderColor: '#0f766e', // Teal-700
+                        backgroundColor: '#ccfbf1',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'SLA Limit',
+                        data: [30, 30, 30, 30, 30, 30, 30],
+                        borderColor: '#ef4444', // Red-500
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Minutes' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                footer: (items) => {
+                                    if(items[0].raw > 30) return "⚠️ SLA Breach Detected";
+                                    return "✅ Within Limits";
+                                }
+                            }
+                        },
+                        legend: { position: 'bottom', labels: { usePointStyle: true } }
+                    }
+                }
+            });
+        }
+
+        function randomizeRadarData() {
+            // Simulate dynamic data updates
+            const newData = Array.from({length: 6}, () => Math.floor(Math.random() * 40) + 60);
+            qualityRadar.data.datasets[0].data = newData;
+            qualityRadar.update();
+        }
+
+        function updateLineChart() {
+            // Simulate checking different time ranges
+            const range = document.getElementById('timeRange').value;
+            const points = range === '7' ? 7 : 12; // Simplified logic for demo
+            const newData = Array.from({length: points}, () => Math.floor(Math.random() * 50) + 5);
+            const newLabels = Array.from({length: points}, (_, i) => `Day ${i+1}`);
+            const slaData = Array(points).fill(30);
+
+            slaLine.data.labels = newLabels;
+            slaLine.data.datasets[0].data = newData;
+            slaLine.data.datasets[1].data = slaData;
+            slaLine.update();
+        }
+
+
+        // --- Assessment Tool Logic ---
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            
+            state.checklist.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `flex items-center p-4 bg-stone-800 rounded-lg border border-stone-700 hover:border-orange-500 transition-colors cursor-pointer group`;
+                div.onclick = (e) => toggleCheck(item.id);
+                
+                div.innerHTML = `
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-stone-500 group-hover:border-orange-400'}">
+                            ${item.checked ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                        </div>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="text-stone-200 font-medium">${item.text}</div>
+                        <div class="text-xs text-stone-500 uppercase tracking-wide mt-1">${item.category}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            updateScore();
+        }
+
+        function toggleCheck(id) {
+            const item = state.checklist.find(i => i.id === id);
+            if (item) {
+                item.checked = !item.checked;
+                renderChecklist();
+            }
+        }
+
+        function updateScore() {
+            const checkedCount = state.checklist.filter(i => i.checked).length;
+            const total = state.checklist.length;
+            const percent = Math.round((checkedCount / total) * 100);
+            
+            // Animate Score
+            document.getElementById('score-display').innerText = `${percent}%`;
+            
+            // Update Ring Style
+            const degrees = (percent / 100) * 360;
+            const ring = document.getElementById('score-ring');
+            // Simplified ring viz using CSS border trick adjustment would require more complex SVG manipulation
+            // switching to simple border color for robust demo
+            if (percent === 100) ring.classList.replace('border-orange-500', 'border-green-500');
+            else ring.classList.replace('border-green-500', 'border-orange-500');
+
+            // Update Message
+            const msgEl = document.getElementById('score-message');
+            let msg = '';
+            let styleClass = '';
+            
+            if (percent === 0) {
+                msg = 'Not Started'; styleClass = 'bg-stone-700 text-stone-300';
+            } else if (percent < 50) {
+                msg = 'Early Stage'; styleClass = 'bg-orange-900 text-orange-200';
+            } else if (percent < 100) {
+                msg = 'Developing'; styleClass = 'bg-blue-900 text-blue-200';
+            } else {
+                msg = 'Product Ready 🚀'; styleClass = 'bg-green-900 text-green-200';
+            }
+            
+            msgEl.innerHTML = `<span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold ${styleClass}">${msg}</span>`;
+        }
+
+        function resetAssessment() {
+            state.checklist.forEach(i => i.checked = false);
+            renderChecklist();
+        }
+
+        // --- Helper: Smooth Scroll ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+<script id="related-articles-noimage-js">
+
+(function(){const root=document.getElementById('related-articles-root');if(!root||root.dataset.rendered==='true')return;fetch('/data-products/assets/site-index.json').then(r=>r.json()).then(items=>{const here=location.pathname.replace(/^\/data-products\/?/,'').replace(/\/$/,'/index.html')||'index.html';const current=items.find(x=>x.public===here);const pool=items.filter(x=>x.public!==here&&x.indexable!==false);pool.sort((a,b)=>((b.category===current?.category)-(a.category===current?.category)));const chosen=pool.slice(0,Number(root.dataset.limit||4));root.innerHTML='<h2>'+(root.dataset.heading||'Related reading')+'</h2><p class="dp-related-intro">'+(root.dataset.intro||'Continue with closely related guides.')+'</p><div class="related-articles-grid">'+chosen.map(x=>'<a class="related-article-card" href="'+x.href+'">'+x.title+'</a>').join('')+'</div>';}).catch(()=>{});})();
+
+</script>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>

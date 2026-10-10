@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Predictive Monitoring for Stream Gages: Using AI/ML to estimate waterflow when sensors fail. Emergency response solution for flood risk assessment…" name="description"/>
+<meta content="Predictive Monitoring, Stream Gages, Waterflow Estimation, Machine Learning, Flood Risk, Emergency Response, Sensor Failure, SHEMI, Time Series Prediction" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<title>Predictive Monitoring Stream Gages | AI Waterflow Estimation</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1em;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #764ba2;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .slide-image {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .slide-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .problem-card {
+            background: linear-gradient(135deg, #fee 0%, #fdd 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #e74c3c;
+            transition: all 0.3s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(231, 76, 60, 0.15);
+        }
+
+        .problem-card h4 {
+            color: #c0392b;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .problem-card p {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .solution-card {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            transition: all 0.3s ease;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(39, 174, 96, 0.15);
+        }
+
+        .solution-card h4 {
+            color: #155724;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .solution-card p {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .detail-section {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .detail-section h5 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.15em;
+        }
+
+        .detail-section p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .impact-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .impact-box h5 {
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+
+        .impact-box p {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .column-box {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            border-top: 4px solid #667eea;
+        }
+
+        .column-box h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .column-box ul {
+            list-style-position: inside;
+            color: #666;
+        }
+
+        .column-box li {
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .section-intro {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-intro p {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .highlight-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .model-step {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+
+        .step-content h5 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .step-content p {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .result-box h5 {
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+
+        .result-box p {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .cta-box h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .cta-box p {
+            font-size: 1.05em;
+            line-height: 1.6;
+        }
+
+        .data-exploration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .pattern-card {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            border-top: 4px solid #667eea;
+        }
+
+        .pattern-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .pattern-card h5 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .pattern-card p {
+            color: #555;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .problem-grid,
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .model-step {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .step-number {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="Predictive Monitoring for Stream Gages: Using AI/ML to estimate waterflow when sensors fail. Emergency response solution for flood risk assessment…" name="ai-summary"/><meta content="Use Cases &amp; Industry" name="topic"/><link href="https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Predictive Monitoring Stream Gages | AI Waterflow Estimation" property="og:title"/><meta content="Predictive Monitoring for Stream Gages: Using AI/ML to estimate waterflow when sensors fail. Emergency response solution for flood risk assessment…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html" property="og:url"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide1.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Predictive Monitoring Stream Gages | AI Waterflow Estimation" name="twitter:title"/><meta content="Predictive Monitoring for Stream Gages: Using AI/ML to estimate waterflow when sensors fail. Emergency response solution for flood risk assessment…" name="twitter:description"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide1.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html#article","url":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html#webpage"},"headline":"Predictive Monitoring Stream Gages | AI Waterflow Estimation","description":"Predictive Monitoring for Stream Gages: Using AI/ML to estimate waterflow when sensors fail. Emergency response solution for flood risk assessment…","image":"https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide1.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Use Cases & Industry"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html#webpage","url":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html","name":"Predictive Monitoring Stream Gages | AI Waterflow Estimation","description":"Predictive Monitoring for Stream Gages: Using AI/ML to estimate waterflow when sensors fail. Emergency response solution for flood risk assessment…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Use Cases & Industry","item":"https://prashant.dhingra.website/data-products/use-cases/"},{"@type":"ListItem","position":3,"name":"Predictive Monitoring Stream Gages | AI Waterflow Estimation","item":"https://prashant.dhingra.website/data-products/predictive-maintenance/predictive-monitoring-stream-gages.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<header>
+<h1>Predictive Monitoring for Stream Gages</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Use Cases &amp; Industry</a></p>
+<p>Using AI/ML to Estimate Waterflow When Sensors Fail</p>
+<p style="font-size: 0.95em; margin-top: 10px; opacity: 0.9;">Saving Lives and Reducing Infrastructure Costs</p>
+</header>
+<div class="container">
+<!-- Section 1: The Problem -->
+<div class="section">
+<h2>The Emergency Response Challenge</h2>
+<div class="slide-image">
+<img alt="Emergency Response Team Waterflow Monitoring" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide1.png"/>
+</div>
+<div class="section-intro">
+<p>Accurate, real-time waterflow data is crucial for emergency response teams to assess flood risk during storms and floods, but the current infrastructure for collecting this vital information is hindered by operational and financial obstacles.</p>
+</div>
+<h3>The Current Infrastructure Problem</h3>
+<div class="problem-grid">
+<div class="problem-card">
+<h4>💰 Massive Infrastructure Investment</h4>
+<p>The US government has allocated $20 billion for the installation of stream gages nationwide. Each gage has an estimated cost of $50,000, and there are annual operational expenses of $200 million to sustain the network.</p>
+</div>
+<div class="problem-card">
+<h4>⚠️ Frequent Sensor Failures</h4>
+<p>Gauges frequently malfunction, especially during floods and storms when they are most necessary. The sensors are often damaged or destroyed by floating trees and debris in the river.</p>
+</div>
+<div class="problem-card">
+<h4>🚨 Data When It Matters Most</h4>
+<p>During flood and storm emergencies, emergency response teams require immediate access to waterflow data to identify at-risk areas. Unfortunately, gages are prone to failure or damage during these critical moments.</p>
+</div>
+<div class="problem-card">
+<h4>❌ Why Traditional Approaches Fail</h4>
+<p>Gages are not suitable for predictive maintenance as they can fail unexpectedly in harsh conditions. The complex relationships between weather, snow, temperature, and dam operations make forecasting waterflow directly very challenging.</p>
+</div>
+</div>
+<div class="highlight-box">
+<h4>The Core Insight</h4>
+<p>The issue lies not in predicting the failure of gauges or forecasting waterflow in isolation. Rather, it involves staying aware of waterflow levels even in the event of sensor malfunctions. The solution is to employ machine learning to approximate waterflow at non-functional gauges using data from nearby operational gauges.</p>
+</div>
+</div>
+<!-- Section 2: The Solution -->
+<div class="section">
+<h2>The ML Solution: Waterflow Estimation</h2>
+<div class="slide-image">
+<img alt="Stream Flow Estimation using ML" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide2.png"/>
+</div>
+<div class="section-intro">
+<p>We utilize machine learning to rely on connections between neighboring gages instead of forecasting gage failures or exact waterflow. By analyzing data from related gages in the vicinity, we can accurately estimate waterflow when a gage malfunctions.</p>
+</div>
+<h3>The ML Approach</h3>
+<div class="two-column">
+<div class="column-box">
+<h4>Traditional Stream Flow Monitoring</h4>
+<ul>
+<li>Stream gage collects waterflow data every 15 minutes</li>
+<li>Data made available to government agencies in real-time</li>
+<li>But gages break frequently, especially during floods and storms</li>
+<li>Critical data becomes unavailable at the worst possible time</li>
+</ul>
+</div>
+<div class="column-box">
+<h4>ML-Powered Waterflow Estimation</h4>
+<ul>
+<li>Create clusters of gages with similar waterflow patterns</li>
+<li>Identify correlations between gages within clusters</li>
+<li>If a gauge malfunctions, utilize cluster correlations to approximate its waterflow</li>
+<li>Achieve &gt;90% accuracy::emergency teams get reliable data when needed most</li>
+</ul>
+</div>
+</div>
+<h3>Key Advantages</h3>
+<div class="solution-grid">
+<div class="solution-card">
+<h4>✓ Unprecedented Accuracy</h4>
+<p>Government agencies can still acquire highly accurate waterflow information, with a success rate of over 90%, even in cases where gages malfunction, ensuring the dependable data essential for making emergency response decisions.</p>
+</div>
+<div class="solution-card">
+<h4>✓ Significant Cost Savings</h4>
+<p>Organizations can significantly reduce costs on emergency repairs and operational expenses by ensuring system visibility without depending solely on flawless sensor availability.</p>
+</div>
+<div class="solution-card">
+<h4>✓ Safer Emergency Response</h4>
+<p>Emergency responders can use their knowledge to assess flood risk even in the absence of functioning sensors. When conditions are hazardous, there is no need for teams to endanger lives by replacing faulty gauges.</p>
+</div>
+<div class="solution-card">
+<h4>✓ Practical Deployment</h4>
+<p>The solution doesn't necessitate the replacement or upkeep of all gages. It operates effectively with existing gages by making intelligent estimations to prevent failures.</p>
+</div>
+</div>
+<div class="impact-box">
+<h5>Real-World Impact</h5>
+<p>In flood-prone regions like Alaska, where gages often fail during winter and storm seasons, teams can now avoid risking lives by using a reliable ML system to estimate waterflow. This enables emergency response decisions to be made even when gages are not functioning.</p>
+</div>
+</div>
+<!-- Section 3: Data Exploration -->
+<div class="section">
+<h2>Understanding Data Patterns for ML Success</h2>
+<div class="slide-image">
+<img alt="Data Exploration Patterns" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide3.png"/>
+</div>
+<div class="section-intro">
+<p>Creating a successful ML model hinges on recognizing the patterns present in your data. Straightforward patterns call for basic models, while intricate patterns call for more advanced techniques.</p>
+</div>
+<h3>Three Pattern Complexity Levels</h3>
+<div class="data-exploration-grid">
+<div class="pattern-card">
+<div class="pattern-number">1</div>
+<h5>Obvious Patterns</h5>
+<p><strong>Data Characteristics:</strong> Clear, distinct patterns are visible</p>
+<p><strong>Requirements:</strong> Need less data, fewer features, simple models</p>
+<p><strong>Expected Outcome:</strong> Highly accurate results with straightforward approaches</p>
+<p><strong>Example:</strong> Strong seasonal waterflow patterns with clear peaks and valleys</p>
+</div>
+<div class="pattern-card">
+<div class="pattern-number">2</div>
+<h5>Less Obvious Patterns</h5>
+<p><strong>Data Characteristics:</strong> Patterns exist but are subtle or multi-layered</p>
+<p><strong>Requirements:</strong> Need more historical data, additional features, complex models</p>
+<p><strong>Expected Outcome:</strong> Good accuracy with sophisticated modeling approaches</p>
+<p><strong>Example:</strong> Waterflow influenced by multiple correlated factors (weather, temperature, reservoir levels)</p>
+</div>
+<div class="pattern-card">
+<div class="pattern-number">3</div>
+<h5>Even Less Obvious Patterns</h5>
+<p><strong>Data Characteristics:</strong> Patterns are highly complex or non-linear</p>
+<p><strong>Requirements:</strong> Different algorithms, many features, complex or deep learning models</p>
+<p><strong>Expected Outcome:</strong> Moderate accuracy::inherent complexity limits predictability</p>
+<p><strong>Example:</strong> Extreme events, unusual weather combinations with unprecedented impacts</p>
+</div>
+</div>
+<div class="highlight-box">
+<h4>Key Data Exploration Insight</h4>
+<p><strong>The complexity of your patterns determines your approach.</strong> Begin by exploring your data before assuming that deep learning or intricate models are necessary. Simple, interpretable models can often uncover obvious patterns, while more complex ones may be needed for intricate patterns, but may have their limits in predictability. Make sure to understand your data thoroughly before selecting a model.</p>
+</div>
+</div>
+<!-- Section 4: Model Architecture -->
+<div class="section">
+<h2>ML Model Architecture for Waterflow Prediction</h2>
+<div class="slide-image">
+<img alt="ML Model Architecture" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide4.png"/>
+</div>
+<div class="section-intro">
+<p>The ML model structure includes four key stages: collecting data and performing correlation analysis, training the model, managing flooding events, and making real-time predictions. This methodical process guarantees precision and dependability in critical situations.</p>
+</div>
+<h3>Four-Phase Model Architecture</h3>
+<div class="model-step">
+<div class="step-number">1</div>
+<div class="step-content">
+<h5>Phase 1: Correlation Analysis &amp; Clustering</h5>
+<p><strong>Compute once per year:</strong> Examine stream data from NWIS to cluster gages with similar time series patterns, pinpointing gages with matching surge or decline trends in waterflow. Identify regions lacking clustering (possible coverage gaps).</p>
+<p><strong>Output:</strong> Gage clusters with strong correlations ready for modeling</p>
+</div>
+</div>
+<div class="model-step">
+<div class="step-number">2</div>
+<div class="step-content">
+<h5>Phase 2: ML Training with SHEM</h5>
+<p><strong>Compute once per year:</strong> Develop machine learning models for each gage utilizing SHEM (Streamgage Hydrologic Estimate Using Machine Learning) to differentiate between easily predictable gages with strong correlations and more challenging gages with weak correlations in remote areas. Create reliability models based on past data and validate them across various datasets.</p>
+<p><strong>Output:</strong> Trained models with confidence scores for each gage</p>
+</div>
+</div>
+<div class="model-step">
+<div class="step-number">3</div>
+<div class="step-content">
+<h5>Phase 3: Dynamic Model Application</h5>
+<p><strong>Real-time execution:</strong> If a stream gage malfunctions, locate operational gages within the same group. If necessary, update the model in real-time with new data to ensure forecasts adjust to present circumstances instead of just past trends.</p>
+<p><strong>Output:</strong> Adaptive models responsive to current conditions</p>
+</div>
+</div>
+<div class="model-step">
+<div class="step-number">4</div>
+<div class="step-content">
+<h5>Phase 4: Real-Time Prediction &amp; Insights</h5>
+<p><strong>On-demand execution:</strong> Forecast waterflow for malfunctioning gauges by utilizing operational gauges within the group. Obtain key findings on necessary enhancements or new components to enhance precision and coverage. Enhance the system continuously by evaluating prediction effectiveness.</p>
+<p><strong>Output:</strong> Real-time waterflow estimates for emergency response teams</p>
+</div>
+</div>
+<div class="detail-section">
+<h5>Model Architecture Advantages</h5>
+<ul class="feature-list">
+<li><strong>Correlation-Based:</strong> Utilizes geographical and hydrological relationships instead of attempting to forecast exact water flow volumes.</li>
+<li><strong>Clustering:</strong> Groups similar gages for more accurate predictions within homogeneous regions</li>
+<li><strong>Adaptive:</strong> Retrains dynamically when needed to account for changing conditions</li>
+<li><strong>Scalable:</strong> One model per gage, enabling parallel training and prediction</li>
+<li><strong>Transparent:</strong> Identifies easy vs. difficult to predict gages, guiding improvement efforts</li>
+</ul>
+</div>
+</div>
+<!-- Section 5: Results -->
+<div class="section">
+<h2>Model Results &amp; Performance</h2>
+<div class="slide-image">
+<img alt="Model Results" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/digital-twin/predictive-monitoring/images/Slide1000/Slide5.png"/>
+</div>
+<div class="section-intro">
+<p>The ML model shows different accuracy levels for different gages, with identifiable patterns that help explain why some locations are more predictable than others. Recognizing these patterns is key to enhancing the model further.</p>
+</div>
+<h3>Three Categories of Results</h3>
+<div class="two-column">
+<div class="result-box">
+<h5>Category 1: Accurate Predictions</h5>
+<p><strong>Performance:</strong> Excellent correlation between predicted and actual waterflow</p>
+<p><strong>Explanation:</strong> Strong geographic/hydrologic correlations with nearby gages enable accurate estimation</p>
+<p><strong>Characteristics:</strong> Gages with multiple similar neighbors in the cluster</p>
+<p><strong>Use Case:</strong> Safe to use for emergency response decisions</p>
+</div>
+<div class="result-box">
+<h5>Category 2: Good with Limitations</h5>
+<p><strong>Performance:</strong> Accurate predictions for gradual changes, struggles with sharp declines</p>
+<p><strong>Explanation:</strong> Models capture general trends but miss rapid state changes</p>
+<p><strong>Characteristics:</strong> Normal conditions well-modeled, extreme events less accurate</p>
+<p><strong>Use Case:</strong> Use with caution during extreme weather; supplement with additional features</p>
+</div>
+</div>
+<div class="result-box" style="margin-top: 30px;">
+<h5>Category 3: Needs Improvement</h5>
+<p><strong>Performance:</strong> Moderate accuracy overall</p>
+<p><strong>Explanation:</strong> Insufficient training data, low correlations with nearby gages, or uncommon local conditions</p>
+<p><strong>Improvement Path:</strong> Candidate for deep learning approaches or additional feature engineering</p>
+<p><strong>Action Items:</strong> Gather additional historical data and uncover more predictive features such as weather, elevation, and vegetation.</p>
+</div>
+<h3>Key Insights from Results</h3>
+<div class="detail-section">
+<h5>What the Results Tell Us</h5>
+<ul class="feature-list">
+<li><strong>Clustering Works:</strong> Gages with strong geographic/hydrologic correlations yield accurate predictions</li>
+<li><strong>Pattern Complexity Varies:</strong> Certain locations display clear patterns that can be effectively modeled using simple methods, while others exhibit more intricate patterns that require sophisticated approaches.</li>
+<li><strong>Extreme Events Challenge:</strong> Models perform adequately under usual conditions but encounter challenges when faced with sudden, significant changes.</li>
+<li><strong>Geographic Factors Matter:</strong> Isolated gages or unique hydrologic conditions reduce predictability</li>
+<li><strong>Feature Engineering Opportunity:</strong> Incorporating external data such as weather, temperature, and reservoir levels may enhance forecasts for challenging gauges.</li>
+</ul>
+</div>
+<div class="impact-box">
+<h5>Practical Impact on Emergency Response</h5>
+<p>Although the system may not be completely accurate on all gages, it still offers decision support for emergency teams. The system's high accuracy rate on predictable gages is beneficial for numerous critical locations. In instances where gages are difficult to predict, the system alerts teams to potential risks and uncertainties, allowing them to take necessary precautions. When paired with manual inspection, the machine learning estimates greatly enhance situational awareness during floods and storms.</p>
+</div>
+</div>
+<!-- Section 6: Implementation Framework -->
+<div class="section">
+<h2>Implementation Framework for Predictive Monitoring</h2>
+<div class="section-intro">
+<p>Developing a predictive monitoring system involves a methodical process that integrates technical advancements, operational integration, and ongoing enhancements.</p>
+</div>
+<h3>Implementation Phases</h3>
+<div class="model-step">
+<div class="step-number">1</div>
+<div class="step-content">
+<h5>Data Exploration &amp; Pattern Analysis</h5>
+<p>Gain insights from your data by examining historical waterflow patterns at each gage, identifying clusters of gages with similar patterns, and evaluating pattern complexity to determine the suitability of simple or complex models.</p>
+</div>
+</div>
+<div class="model-step">
+<div class="step-number">2</div>
+<div class="step-content">
+<h5>Clustering &amp; Correlation Analysis</h5>
+<p>Apply time series similarity metrics for gage cluster identification, calculate correlations among gages in each cluster, and pinpoint areas of weak or absent clustering. Document the predictability of individual gages as either easy or challenging.</p>
+</div>
+</div>
+<div class="model-step">
+<div class="step-number">3</div>
+<div class="step-content">
+<h5>Model Selection &amp; Training</h5>
+<p>Begin with basic regression or time series models for simple gages that are easy to predict. Utilize more advanced models only when necessary due to the complexity of the data. Update models yearly using the complete historical dataset and test them on separate data to assess their real-world effectiveness.</p>
+</div>
+</div>
+<div class="model-step">
+<div class="step-number">4</div>
+<div class="step-content">
+<h5>Operational Integration</h5>
+<p>Utilize emergency response systems to incorporate real-time waterflow estimates in the event of gage failure. Show confidence scores to assist teams in gauging reliability and establish alerts for when critical gages are not accessible. Conduct training for emergency response teams on utilizing these estimates.</p>
+</div>
+</div>
+<div class="model-step">
+<div class="step-number">5</div>
+<div class="step-content">
+<h5>Continuous Improvement</h5>
+<p>Track the accuracy of predictions in real-world scenarios, pinpointing cases where errors occur systematically. Gather additional data to potentially enhance accuracy, continuously improving models. Extend analysis to challenging locations by collecting targeted data and refining features.</p>
+</div>
+</div>
+<h3>Success Factors</h3>
+<div class="highlight-box">
+<h4>Keys to Implementation Success</h4>
+<p><strong>Start with Data Understanding:</strong> Don't assume you need complex models. Explore your data first.</p>
+<p><strong>Leverage Correlations:</strong> Geographic and hydrologic correlations are more predictable than absolute values.</p>
+<p><strong>Identify Easy vs Hard:</strong> Segment gages by predictability. Use simpler approaches where they work.</p>
+<p><strong>Build Iteratively:</strong> Begin by addressing 80% of locations, enhance to 90%, and then tackle the more challenging remaining cases.</p>
+<p><strong>Integrate Operationally:</strong> The top model is only beneficial when utilized by emergency responders.</p>
+</div>
+</div>
+<!-- Section 7: Business Value -->
+<div class="section">
+<h2>Business Value &amp; Return on Investment</h2>
+<div class="section-intro">
+<p>Anticipatory monitoring for stream gauges provides significant benefits in financial, operational, and human aspects.</p>
+</div>
+<h3>Value Components</h3>
+<div class="two-column">
+<div class="column-box">
+<h4>Financial Savings</h4>
+<ul>
+<li>Reduce emergency gage replacement costs</li>
+<li>Lower operational maintenance expenses</li>
+<li>Avoid expensive expedited repairs during floods</li>
+<li>Optimize sensor deployment::don't install where ML can cover</li>
+</ul>
+</div>
+<div class="column-box">
+<h4>Operational Benefits</h4>
+<ul>
+<li>Maintain system visibility during failures</li>
+<li>Reduce time needed to diagnose failures</li>
+<li>Enable scheduled maintenance rather than emergency repairs</li>
+<li>Reduce operational complexity at peak stress times</li>
+</ul>
+</div>
+</div>
+<div class="two-column">
+<div class="column-box">
+<h4>Safety Benefits</h4>
+<ul>
+<li>Eliminate risk of personnel replacing sensors during floods</li>
+<li>Enable informed emergency response decisions</li>
+<li>Reduce false negatives in flood risk assessment</li>
+<li>Improve early warning systems</li>
+</ul>
+</div>
+<div class="column-box">
+<h4>Strategic Benefits</h4>
+<ul>
+<li>Demonstrate innovation in public safety</li>
+<li>Build organizational AI/ML capabilities</li>
+<li>Create reusable patterns for other monitoring systems</li>
+<li>Strengthen stakeholder confidence in data quality</li>
+</ul>
+</div>
+</div>
+<div class="impact-box">
+<h5>Quantified Impact</h5>
+<p>In a theoretical system containing 1000 gauges, approximately 10-15% encounter yearly failures, equating to around 100-150 gauges. Emergency replacement expenses amount to approximately $5-7.5 million annually, with each replacement costing around $50,000. The cost of developing a machine learning system for this scenario is estimated at around $2-3</p>
+</div>
+</div>
+<!-- Section 8: Summary -->
+<div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+<h2 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">Making Predictive Monitoring Work for Your Organization</h2>
+<p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
+<strong>Predictive monitoring demonstrates how ML solves real operational problems.</strong> The real challenge lies in staying alert to your surroundings even when sensors are not perfect. By using correlations between neighboring sensors, you can make accurate estimates of missing data.
+            </p>
+<p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
+<strong>The key to success is pragmatism.</strong> Begin by exploring the data to identify patterns, whether they are clear or subtle. Create basic models when possible, opting for more complex methods only when necessary. Collaborate with operations to ensure that predictions are effectively implemented.
+            </p>
+<p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
+<strong>The value is substantial and multifaceted.</strong> Cut expenses by preventing last-minute repairs. Enhance safety by avoiding risky sensor swaps. Boost emergency readiness with dependable data in crucial moments. And most importantly: protect lives by providing decision-makers with critical information.
+            </p>
+<p style="color: white; font-size: 1.05em; line-height: 1.8;">
+<strong>Predictive monitoring isn't theoretical::it's practical, deployable, and impactful today.</strong> No matter if you are overseeing water systems, power grids, infrastructure networks, or any distributed monitoring system, these principles remain relevant. The key is to utilize machine learning to predict missing sensor data based on related data points, stay informed even during failures, and provide value when necessary.
+            </p>
+</div>
+</div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/predictive-maintenance/switch-gear-predictive-maintenance.html">Interactive Report: Switchgear Predictive Maintenance</a><a href="/data-products/predictive-maintenance/ai-predictive-maintenance-datacenter.html">AI Predictive Maintenance for Data Center Equipment | RUL Prediction</a><a href="/data-products/ai/supply-chain/slide-4.html">AI in Procurement and Supplier Management</a><a href="/data-products/experience/intelligence-layer.html">AI and machine learning in digital experience enhance web experience intelligence layers.</a></div></aside><footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" data-related-json="folder-pages.json" data-related-keywords="data product ai genai" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>DSAR AI Agent: Strategic Architecture Report</title>
+<style id="related-articles-noimage-css">
+
+#related-articles-root{margin:2rem auto;max-width:1100px;padding:1rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}#related-articles-root h2{margin:0 0 .25rem;font-size:1.45rem}#related-articles-root .dp-related-intro{color:#5d6678;margin:0 0 1rem}.related-articles-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.related-article-card{display:block;text-decoration:none;color:#172033;background:#fff;border:1px solid #dfe4ec;border-radius:12px;padding:.9rem;line-height:1.35;font-weight:700}.related-article-card:hover{border-color:#bdb6ff;background:#f2f0ff}@media(max-width:800px){.related-articles-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.related-articles-grid{grid-template-columns:1fr}}
+
+</style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<!-- Google Fonts (Inter for UI) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Chosen Palette: Warm Neutrals (Stone) with Terracotta/Orange Accents for a grounded, legal-tech feel. -->
+<!-- Application Structure Plan:
+        The app is structured as a Strategic Decision Dashboard.
+        1. Executive Summary: Immediate context on the current bottleneck and the goal (Automation).
+        2. Architecture Lab: The core interactive section where users compare the three requested approaches (Raw LLM, RAG, Legal-Trained). This allows stakeholders to "feel" the trade-offs.
+        3. Risk & Compliance: A dedicated view for the legal team to understand safety mechanisms.
+        4. Implementation Roadmap: The path forward.
+        Rationale: This structure moves from the "Why" (problem) to the "How" (comparison) to the "Safety" (critical for legal apps).
+    -->
+<!-- Visualization & Content Choices:
+        1. Context Flow (HTML/CSS): Visualizes the manual vs. AI pipeline. Goal: Inform/Contrast. Interaction: None.
+        2. Model Trade-off Radar (Chart.js): Compares Raw LLM vs. RAG vs. Precedent RAG. Goal: Compare. Interaction: Buttons to switch models. Justification: Radar charts are excellent for multi-variate capability scoring.
+        3. Risk Heatmap (Plotly): Visualizes high-risk areas per model. Goal: Relationships/Risk Analysis. Interaction: Hover for details. Justification: Heatmaps quickly highlight "red zones" for legal review.
+        4. Cost Analysis (Chart.js): Bar chart for cost per request. Goal: Inform/Justify ROI. Interaction: None.
+    -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* Stone-100 */
+            color: #44403c; /* Stone-700 */
+        }
+
+        /* Custom Chart Container Styling as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px; /* Constrain width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px; /* Hard cap */
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Custom Utilities */
+        .nav-active {
+            border-bottom: 2px solid #f97316; /* Orange-500 */
+            color: #c2410c; /* Orange-700 */
+            font-weight: 600;
+        }
+
+        .scenario-btn-active {
+            background-color: #f97316;
+            color: white;
+            border-color: #f97316;
+        }
+
+        /* Hide/Show logic */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .metric-card {
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Current Data Subject Access Request (DSAR) fulfillment is a bottleneck. It involves high-cost legal experts manually reviewing databases to distinguish between PII (Personally…" name="description"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="Current Data Subject Access Request (DSAR) fulfillment is a bottleneck. It involves high-cost legal experts manually reviewing databases to distinguish between PII (Personally…" name="ai-summary"/><meta content="AI Agents" name="topic"/><link href="https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="DSAR AI Agent: Strategic Architecture Report" property="og:title"/><meta content="Current Data Subject Access Request (DSAR) fulfillment is a bottleneck. It involves high-cost legal experts manually reviewing databases to distinguish between PII (Personally…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="DSAR AI Agent: Strategic Architecture Report" name="twitter:title"/><meta content="Current Data Subject Access Request (DSAR) fulfillment is a bottleneck. It involves high-cost legal experts manually reviewing databases to distinguish between PII (Personally…" name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html#article","url":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html#webpage"},"headline":"DSAR AI Agent: Strategic Architecture Report","description":"Current Data Subject Access Request (DSAR) fulfillment is a bottleneck. It involves high-cost legal experts manually reviewing databases to distinguish between PII (Personally…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"AI Agents"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html#webpage","url":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html","name":"DSAR AI Agent: Strategic Architecture Report","description":"Current Data Subject Access Request (DSAR) fulfillment is a bottleneck. It involves high-cost legal experts manually reviewing databases to distinguish between PII (Personally…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"AI Agents","item":"https://prashant.dhingra.website/data-products/ai-agents/"},{"@type":"ListItem","position":3,"name":"DSAR AI Agent: Strategic Architecture Report","item":"https://prashant.dhingra.website/data-products/ai-agents/use-cases/dsar-ai-agent.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="min-h-screen flex flex-col"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<!-- Header -->
+<header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center">
+<span class="text-3xl mr-3">⚖️</span>
+<div>
+<h1 class="text-xl font-bold text-stone-800">DSAR Automation Agent</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">AI Agents</a></p>
+<p class="text-xs text-stone-500 uppercase tracking-wide">Privacy &amp; Legal Engineering Task Force</p>
+</div>
+</div>
+<div class="hidden md:flex space-x-8">
+<button class="nav-btn nav-active py-5 px-1 text-sm font-medium hover:text-orange-600 transition-colors" id="tab-overview" onclick="switchTab('overview')">Executive Summary</button>
+<button class="nav-btn py-5 px-1 text-sm font-medium hover:text-orange-600 transition-colors text-stone-500" id="tab-architecture" onclick="switchTab('architecture')">Model Architecture</button>
+<button class="nav-btn py-5 px-1 text-sm font-medium hover:text-orange-600 transition-colors text-stone-500" id="tab-risk" onclick="switchTab('risk')">Risk &amp; Compliance</button>
+</div>
+<!-- Mobile Menu Button Placeholder (Simplification) -->
+<button class="md:hidden text-stone-500">☰</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+<!-- TAB 1: EXECUTIVE SUMMARY -->
+<section class="tab-content active" id="view-overview">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Intro Text -->
+<div class="lg:col-span-2 space-y-6">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200">
+<h2 class="text-lg font-semibold text-stone-800 mb-4 border-l-4 border-orange-500 pl-3">Project Scope &amp; Objective</h2>
+<p class="text-stone-600 mb-4 leading-relaxed">
+                            Current Data Subject Access Request (DSAR) fulfillment is a bottleneck. It involves high-cost legal experts manually reviewing databases to distinguish between PII (Personally Identifiable Information) that <strong>must be deleted</strong> versus data that <strong>must be retained</strong> for legal compliance (e.g., tax records, fraud logs).
+                        </p>
+<p class="text-stone-600 leading-relaxed">
+                            This research proposes an AI Agent architecture to automate the triage process. We analyzed three tiers of sophistication:
+                            <span class="inline-block bg-stone-100 px-2 py-1 rounded text-xs font-bold ml-1">1. Raw LLM</span>
+<span class="inline-block bg-stone-100 px-2 py-1 rounded text-xs font-bold ml-1">2. Guidance RAG</span>
+<span class="inline-block bg-stone-100 px-2 py-1 rounded text-xs font-bold ml-1">3. Legal Precedent Agent</span>.
+                        </p>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="bg-white p-5 rounded-lg shadow-sm border border-stone-200 metric-card">
+<div class="text-stone-400 text-sm font-medium mb-1">Current Cycle Time</div>
+<div class="text-2xl font-bold text-stone-800">14 Days</div>
+<div class="text-orange-500 text-xs mt-1">Manual Review</div>
+</div>
+<div class="bg-white p-5 rounded-lg shadow-sm border border-stone-200 metric-card">
+<div class="text-stone-400 text-sm font-medium mb-1">Target Cycle Time</div>
+<div class="text-2xl font-bold text-stone-800">&lt; 24 Hours</div>
+<div class="text-green-600 text-xs mt-1">AI Augmented</div>
+</div>
+<div class="bg-white p-5 rounded-lg shadow-sm border border-stone-200 metric-card">
+<div class="text-stone-400 text-sm font-medium mb-1">Est. Cost Reduction</div>
+<div class="text-2xl font-bold text-stone-800">68%</div>
+<div class="text-stone-500 text-xs mt-1">Per Request</div>
+</div>
+</div>
+</div>
+<!-- Process Visualization -->
+<div class="lg:col-span-1">
+<div class="bg-stone-800 text-white p-6 rounded-lg shadow-lg h-full">
+<h3 class="font-bold text-lg mb-6">Workflow Transformation</h3>
+<div class="relative space-y-8 pl-4 border-l-2 border-stone-600">
+<!-- Step 1 -->
+<div class="relative">
+<div class="absolute -left-[25px] bg-orange-500 w-4 h-4 rounded-full border-2 border-stone-800"></div>
+<h4 class="font-bold text-orange-400 text-sm">Ingestion</h4>
+<p class="text-xs text-stone-300 mt-1">User submits deletion request via portal.</p>
+</div>
+<!-- Step 2 -->
+<div class="relative">
+<div class="absolute -left-[25px] bg-stone-600 w-4 h-4 rounded-full border-2 border-stone-800"></div>
+<h4 class="font-bold text-white text-sm">AI Triage Agent <span class="text-orange-400 text-xs">(New)</span></h4>
+<div class="bg-stone-700 p-2 mt-2 rounded text-xs text-stone-300">
+<ul class="list-disc list-inside space-y-1">
+<li>Retrieve Policy (RAG)</li>
+<li>Check Prior Decisions</li>
+<li>Classify Fields</li>
+</ul>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="relative">
+<div class="absolute -left-[25px] bg-stone-600 w-4 h-4 rounded-full border-2 border-stone-800"></div>
+<h4 class="font-bold text-white text-sm">Human Audit</h4>
+<p class="text-xs text-stone-300 mt-1">Legal only reviews "Low Confidence" flags.</p>
+</div>
+<!-- Step 4 -->
+<div class="relative">
+<div class="absolute -left-[25px] bg-green-500 w-4 h-4 rounded-full border-2 border-stone-800"></div>
+<h4 class="font-bold text-green-400 text-sm">Execution</h4>
+<p class="text-xs text-stone-300 mt-1">Automated deletion of approved fields.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Cost Chart -->
+<div class="mt-8 bg-white p-6 rounded-lg shadow-sm border border-stone-200">
+<div class="mb-4">
+<h3 class="text-lg font-bold text-stone-800">Projected Cost Efficiency</h3>
+<p class="text-sm text-stone-500">Comparison of legal counsel billable hours vs. AI infrastructure costs per 100 requests.</p>
+</div>
+<div class="chart-container">
+<canvas id="costChart"></canvas>
+</div>
+</div>
+</section>
+<!-- TAB 2: ARCHITECTURE COMPARISON -->
+<section class="tab-content" id="view-architecture">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Controls Side (Left) -->
+<div class="lg:col-span-4 space-y-4">
+<div class="bg-white p-5 rounded-lg shadow-sm border border-stone-200">
+<h3 class="font-bold text-stone-800 mb-2">Select Architecture</h3>
+<p class="text-sm text-stone-500 mb-4">Click to simulate performance metrics.</p>
+<div class="space-y-2">
+<button class="scenario-btn w-full text-left px-4 py-3 rounded-md border border-stone-200 hover:border-orange-300 transition-all" id="btn-raw" onclick="updateRadar('raw')">
+<div class="flex justify-between items-center">
+<span class="font-bold">1. Raw LLM</span>
+<span class="text-xs bg-stone-100 px-2 py-1 rounded text-stone-600">Baseline</span>
+</div>
+<p class="text-xs text-stone-500 mt-1">Standard GPT-4/Claude without context.</p>
+</button>
+<button class="scenario-btn w-full text-left px-4 py-3 rounded-md border border-stone-200 hover:border-orange-300 transition-all" id="btn-rag" onclick="updateRadar('rag')">
+<div class="flex justify-between items-center">
+<span class="font-bold">2. Policy RAG</span>
+<span class="text-xs bg-blue-50 px-2 py-1 rounded text-blue-600">Standard</span>
+</div>
+<p class="text-xs text-stone-500 mt-1">Retrieval of specific company guidance PDF/Docs.</p>
+</button>
+<button class="scenario-btn w-full text-left px-4 py-3 rounded-md border border-stone-200 hover:border-orange-300 transition-all shadow-md scenario-btn-active" id="btn-agent" onclick="updateRadar('agent')">
+<div class="flex justify-between items-center">
+<span class="font-bold">3. Legal Precedent Agent</span>
+<span class="text-xs bg-green-50 px-2 py-1 rounded text-green-600">Recommended</span>
+</div>
+<p class="text-xs text-stone-500 mt-1">RAG + Vector store of prior Legal Team approvals.</p>
+</button>
+</div>
+</div>
+<!-- Dynamic Description -->
+<div class="bg-stone-100 p-5 rounded-lg border border-stone-200">
+<h4 class="font-bold text-stone-800 mb-2" id="arch-title">Legal Precedent Agent</h4>
+<p class="text-sm text-stone-600 mb-3" id="arch-desc">
+                            This architecture retrieves context from two vector stores: the static Company Privacy Policy and a dynamic database of historical DSAR decisions made by the legal team. This serves as "Few-Shot" prompting, drastically reducing hallucinations by mimicking verified legal logic.
+                        </p>
+<div class="flex flex-wrap gap-2">
+<span class="text-xs border border-stone-300 px-2 py-1 rounded">High Accuracy</span>
+<span class="text-xs border border-stone-300 px-2 py-1 rounded">Audit Trail</span>
+</div>
+</div>
+</div>
+<!-- Visualization Side (Right) -->
+<div class="lg:col-span-8">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200 h-full flex flex-col items-center justify-center">
+<h3 class="text-lg font-bold text-stone-800 mb-2 w-full text-left">Capability Scoring</h3>
+<p class="text-sm text-stone-500 mb-6 w-full text-left">Comparing the selected architecture against 5 critical success factors.</p>
+<div class="chart-container">
+<canvas id="radarChart"></canvas>
+</div>
+<div class="mt-4 grid grid-cols-3 gap-4 w-full text-center text-xs text-stone-500">
+<div>
+<span class="block font-bold text-stone-700">Auditability</span>
+                                Ability to explain *why* a field was retained.
+                            </div>
+<div>
+<span class="block font-bold text-stone-700">Privacy Safety</span>
+                                Risk of accidentally leaking PII in reasoning.
+                            </div>
+<div>
+<span class="block font-bold text-stone-700">Nuance Handling</span>
+                                Understanding "Legal Hold" vs "Marketing Data".
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- TAB 3: RISK & COMPLIANCE -->
+<section class="tab-content" id="view-risk">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200 mb-8">
+<h2 class="text-lg font-semibold text-stone-800 mb-2 border-l-4 border-red-500 pl-3">Failure Mode Analysis</h2>
+<p class="text-stone-600 mb-6 max-w-3xl">
+                    For DSAR automation, the cost of error is asymmetric. Deleting data required by law results in regulatory fines. Keeping data requested for deletion results in GDPR/CCPA violations. The <strong>Legal Precedent Agent</strong> minimizes these risks by anchoring decisions in past human judgments.
+                </p>
+<!-- Plotly Heatmap Container -->
+<div class="w-full overflow-hidden">
+<div class="w-full h-[450px]" id="riskHeatmap"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-orange-50 p-6 rounded-lg border border-orange-100">
+<h3 class="font-bold text-orange-800 mb-3">⚠️ Primary Risks Identified</h3>
+<ul class="space-y-3 text-sm text-stone-700">
+<li class="flex items-start">
+<span class="mr-2">1.</span>
+<span><strong>Hallucinated Legal Obligation:</strong> Raw LLMs may invent a law to justify retaining user data (e.g., citing a non-existent tax code).</span>
+</li>
+<li class="flex items-start">
+<span class="mr-2">2.</span>
+<span><strong>Context Loss:</strong> Without specific company guidance, an LLM cannot know that "User ID 555" is linked to an active litigation hold.</span>
+</li>
+</ul>
+</div>
+<div class="bg-green-50 p-6 rounded-lg border border-green-100">
+<h3 class="font-bold text-green-800 mb-3">🛡️ Mitigation Strategy (Precedent Agent)</h3>
+<ul class="space-y-3 text-sm text-stone-700">
+<li class="flex items-start">
+<span class="mr-2">✓</span>
+<span><strong>RAG Grounding:</strong> Every decision must cite a specific paragraph from the internal "Data Retention Policy" document.</span>
+</li>
+<li class="flex items-start">
+<span class="mr-2">✓</span>
+<span><strong>Human-in-the-Loop Threshold:</strong> Any request with a confidence score &lt; 85% is automatically routed to human legal counsel.</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<div data-heading="Related Articles" data-intro="Explore more guides and technology articles." data-limit="4" data-rendered="true" id="related-articles-root"><aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/ai-agents/use-cases/dsar-with-rag.html">Automating Data Subject Rights | Dsar with RAG</a><a href="/data-products/ai-agents/use-cases/DSAR-RAG-finetuning.html">Automating Data Subject Rights | DSAR RAG Finetuning</a><a href="/data-products/ai-agents/use-cases/dsar.html">Automating Data Subject Rights</a><a href="/data-products/ai-agents/use-cases/agent-for-pi-compliance.html">AI Agent for PII/Sensitive Data Governance</a></div></aside></div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- JavaScript Logic -->
+<script>
+        // --- Data Models ---
+        
+        // Scenario Data for Radar Chart
+        const scenarioData = {
+            raw: {
+                label: 'Raw LLM',
+                data: [40, 95, 30, 20, 60], // Accuracy, Speed, Compliance, Auditability, Cost Eff.
+                title: 'Raw LLM (Baseline)',
+                desc: 'Utilizing a foundational model (e.g., GPT-4) directly. While fast and cheap to implement, it lacks specific knowledge of company retention schedules and prone to legal hallucinations. Not recommended for production.'
+            },
+            rag: {
+                label: 'Policy RAG',
+                data: [75, 85, 80, 70, 75],
+                title: 'Standard RAG',
+                desc: 'Retrieval-Augmented Generation using the company\'s official Data Handling Guidelines. The model retrieves relevant policy sections before deciding. Significant improvement in compliance, but struggles with edge cases not explicitly written in policy.'
+            },
+            agent: {
+                label: 'Legal Precedent Agent',
+                data: [95, 75, 95, 90, 65],
+                title: 'Legal Precedent Agent (Recommended)',
+                desc: 'Advanced architecture. Uses RAG for policy PLUS a vector database of 5,000+ past DSAR decisions made by human legal teams. The AI mimics the *reasoning patterns* of valid decisions. Highest accuracy and safety.'
+            }
+        };
+
+        // --- Chart Initialization ---
+
+        let radarChartInstance = null;
+        let costChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initRadarChart();
+            initCostChart();
+            initHeatmap();
+        });
+
+        // 1. Radar Chart Logic
+        function initRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Decision Accuracy', 'Processing Speed', 'Regulatory Compliance', 'Audit Trail Quality', 'Cost Efficiency'],
+                    datasets: [{
+                        label: scenarioData.agent.label,
+                        data: scenarioData.agent.data,
+                        fill: true,
+                        backgroundColor: 'rgba(249, 115, 22, 0.2)', // Orange-500
+                        borderColor: 'rgba(249, 115, 22, 1)',
+                        pointBackgroundColor: 'rgba(249, 115, 22, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(249, 115, 22, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e7e5e4' }, // Stone-200
+                            grid: { color: '#e7e5e4' },
+                            pointLabels: {
+                                font: { size: 12, family: 'Inter' },
+                                color: '#44403c' // Stone-700
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false } // Hide numbers for cleaner look
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.formattedValue + '/100 Score';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRadar(key) {
+            // Update UI
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('scenario-btn-active', 'shadow-md');
+                btn.classList.add('border-stone-200');
+            });
+            const activeBtn = document.getElementById(`btn-${key}`);
+            activeBtn.classList.add('scenario-btn-active', 'shadow-md');
+            activeBtn.classList.remove('border-stone-200');
+
+            // Update Text
+            const data = scenarioData[key];
+            document.getElementById('arch-title').innerText = data.title;
+            document.getElementById('arch-desc').innerText = data.desc;
+
+            // Update Chart
+            radarChartInstance.data.datasets[0].data = data.data;
+            radarChartInstance.data.datasets[0].label = data.label;
+            
+            // Color logic for emphasis
+            if (key === 'raw') {
+                radarChartInstance.data.datasets[0].backgroundColor = 'rgba(120, 113, 108, 0.2)'; // Stone
+                radarChartInstance.data.datasets[0].borderColor = 'rgba(120, 113, 108, 1)';
+            } else if (key === 'rag') {
+                radarChartInstance.data.datasets[0].backgroundColor = 'rgba(59, 130, 246, 0.2)'; // Blue
+                radarChartInstance.data.datasets[0].borderColor = 'rgba(59, 130, 246, 1)';
+            } else {
+                radarChartInstance.data.datasets[0].backgroundColor = 'rgba(249, 115, 22, 0.2)'; // Orange
+                radarChartInstance.data.datasets[0].borderColor = 'rgba(249, 115, 22, 1)';
+            }
+            
+            radarChartInstance.update();
+        }
+
+        // 2. Cost Bar Chart
+        function initCostChart() {
+            const ctx = document.getElementById('costChart').getContext('2d');
+            costChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Manual Legal Review', 'Raw LLM', 'RAG Agent (Proposed)'],
+                    datasets: [{
+                        label: 'Cost per 100 Requests ($)',
+                        data: [15000, 500, 2200], // Simulated Data
+                        backgroundColor: [
+                            '#78716c', // Stone-500
+                            '#d6d3d1', // Stone-300
+                            '#f97316'  // Orange-500
+                        ],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.formattedValue;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { display: false },
+                            ticks: { callback: function(value) { return '$' + value; } }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Plotly Heatmap (Risk Analysis)
+        function initHeatmap() {
+            const xValues = ['Raw LLM', 'Policy RAG', 'Precedent Agent'];
+            const yValues = ['Data Leakage', 'Over-Retention', 'Hallucination', 'Regulatory Fine Risk'];
+            
+            // Z values (Risk Score 1-10, where 10 is high risk)
+            const zValues = [
+                [8, 3, 2], // Data Leakage
+                [5, 4, 3], // Over-Retention
+                [9, 4, 1], // Hallucination
+                [9, 5, 2]  // Fine Risk
+            ];
+
+            const colorscaleValue = [
+                [0, '#ecfccb'], // Low risk (lime-100)
+                [0.5, '#fed7aa'], // Med risk (orange-200)
+                [1, '#ef4444']   // High risk (red-500)
+            ];
+
+            const data = [{
+                x: xValues,
+                y: yValues,
+                z: zValues,
+                type: 'heatmap',
+                colorscale: colorscaleValue,
+                showscale: true,
+                hovertemplate: '<b>%{y}</b><br>Architecture: %{x}<br>Risk Score: %{z}/10<extra></extra>'
+            }];
+
+            const layout = {
+                font: { family: 'Inter' },
+                margin: { t: 30, l: 150, r: 30, b: 50 },
+                xaxis: { title: 'Architecture Choice' },
+                yaxis: { title: '' }, // Self-explanatory
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)'
+            };
+
+            Plotly.newPlot('riskHeatmap', data, layout, {displayModeBar: false, responsive: true});
+        }
+
+        // --- Tab Navigation Logic ---
+        function switchTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Show selected
+            document.getElementById(`view-${tabId}`).classList.add('active');
+
+            // Update buttons
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('nav-active', 'text-orange-700');
+                el.classList.add('text-stone-500');
+            });
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.add('nav-active');
+            activeBtn.classList.remove('text-stone-500');
+
+            // Force Chart resize if needed (sometimes canvas needs a nudge when unhidden)
+            if(tabId === 'architecture' && radarChartInstance) {
+                setTimeout(() => radarChartInstance.resize(), 50);
+            }
+            if(tabId === 'overview' && costChartInstance) {
+                setTimeout(() => costChartInstance.resize(), 50);
+            }
+            if(tabId === 'risk') {
+                 setTimeout(() => Plotly.Plots.resize('riskHeatmap'), 50);
+            }
+        }
+
+    </script>
+<script id="related-articles-noimage-js">
+
+(function(){const root=document.getElementById('related-articles-root');if(!root||root.dataset.rendered==='true')return;fetch('/data-products/assets/site-index.json').then(r=>r.json()).then(items=>{const here=location.pathname.replace(/^\/data-products\/?/,'').replace(/\/$/,'/index.html')||'index.html';const current=items.find(x=>x.public===here);const pool=items.filter(x=>x.public!==here&&x.indexable!==false);pool.sort((a,b)=>((b.category===current?.category)-(a.category===current?.category)));const chosen=pool.slice(0,Number(root.dataset.limit||4));root.innerHTML='<h2>'+(root.dataset.heading||'Related reading')+'</h2><p class="dp-related-intro">'+(root.dataset.intro||'Continue with closely related guides.')+'</p><div class="related-articles-grid">'+chosen.map(x=>'<a class="related-article-card" href="'+x.href+'">'+x.title+'</a>').join('')+'</div>';}).catch(()=>{});})();
+
+</script>
+<footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>

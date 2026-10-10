@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>EKIP: Evaluation &amp; Drift - Intelligent Data Selection, Precise Slicing, Gold Sets, and Knobs for Execution | DataKnobs</title>
+<meta content="How EKIP helps AI teams move past a single accuracy number: intelligent selection of text data points (transcripts, documents), per-subset and edge-case accuracy via…" name="description"/>
+<meta content="DataKnobs, EKIP, knobs, data selection, active learning, information geometry, sliced accuracy, edge cases, gold set, evaluation set, fine-tuning data, model drift, distribution shift, embeddings" name="keywords"/>
+<style>
+    :root {
+      --slate-950: #020617; --slate-900: #0f172a; --slate-800: #1e293b; --slate-700: #334155; --slate-600: #475569; --slate-500: #64748b; --slate-300: #cbd5e1; --slate-200: #e2e8f0; --slate-100: #f1f5f9; --slate-50: #f8fafc;
+      --violet-900: #4c1d95; --violet-800: #5b21b6; --violet-700: #6d28d9; --violet-600: #7c3aed; --violet-100: #ede9fe; --violet-50: #f5f3ff; --indigo-600: #4f46e5; --emerald-600: #059669; --amber-600: #d97706; --rose-600: #e11d48; --shadow: 0 24px 70px rgba(15, 23, 42, 0.09);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--slate-900); background: #fff; }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+    .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.9); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(226,232,240,.9); }
+    .nav-inner { height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 950; letter-spacing: -.04em; }
+    .brand-mark { width: 42px; height: 42px; border-radius: 15px; background: linear-gradient(135deg, var(--violet-700), var(--indigo-600)); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 34px rgba(109, 40, 217, .25); }
+    .nav-links { display: flex; align-items: center; gap: 24px; color: var(--slate-600); font-size: 14px; font-weight: 750; }
+    .nav-links a:hover { color: var(--violet-700); }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 20px; border-radius: 999px; background: var(--violet-700); color: #fff; font-size: 14px; font-weight: 850; box-shadow: 0 14px 34px rgba(109, 40, 217, .18); transition: .18s ease; }
+    .button:hover { transform: translateY(-1px); background: var(--violet-800); }
+    .button.secondary { background: #fff; color: var(--slate-900); border: 1px solid var(--slate-200); box-shadow: none; }
+
+    .hero { position: relative; overflow: hidden; background: radial-gradient(circle at 18% 18%, rgba(124, 58, 237, .22), transparent 32%), radial-gradient(circle at 82% 8%, rgba(79, 70, 229, .18), transparent 34%), linear-gradient(135deg, #0f172a 0%, #1e1b4b 52%, #312e81 100%); color: #fff; }
+    .hero::after { content: ""; position: absolute; inset: auto -10% -18% -10%; height: 240px; background: #fff; transform: rotate(-3deg); transform-origin: left top; }
+    .hero-inner { position: relative; z-index: 1; padding: 92px 0 150px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 52px; align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.1); color: #ddd6fe; border-radius: 999px; padding: 8px 14px; font-size: 12px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 20px; }
+    h1 { font-size: clamp(36px, 5vw, 60px); line-height: .99; letter-spacing: -.06em; margin: 0; max-width: 820px; }
+    .hero-lead { margin: 24px 0 0; max-width: 730px; color: #dbeafe; font-size: 19px; line-height: 1.7; }
+    .hero-actions { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 14px; }
+    .hero-card { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); border-radius: 34px; padding: 26px; backdrop-filter: blur(14px); box-shadow: 0 24px 80px rgba(0,0,0,.18); }
+    .hero-card h4 { margin: 0 0 16px; font-size: 13px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; color: #c4b5fd; }
+    .slice-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .slice-line:last-child { border-bottom: none; }
+    .slice-line .name { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+    .slice-line .name small { display: block; color: #94a3b8; font-weight: 500; font-size: 11.5px; }
+    .slice-line .val { font-size: 22px; font-weight: 950; letter-spacing: -.03em; }
+    .val.good { color: #34d399; } .val.warn { color: #fbbf24; } .val.bad { color: #fb7185; } .val.none { color: #94a3b8; }
+
+    section { padding: 88px 0; }
+    .section-light { background: linear-gradient(180deg, #fff, var(--slate-50)); }
+    .section-violet { background: linear-gradient(135deg, var(--violet-50), #fff 50%, #eef2ff); border-top: 1px solid var(--slate-200); border-bottom: 1px solid var(--slate-200); }
+    .section-dark { background: linear-gradient(135deg, var(--slate-950), #1e1b4b); color: #fff; }
+    .section-eyebrow { color: var(--violet-700); font-size: 12px; font-weight: 950; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 14px; }
+    .section-dark .section-eyebrow { color: #c4b5fd; }
+    h2 { margin: 0; font-size: clamp(30px, 3.8vw, 46px); line-height: 1.05; letter-spacing: -.05em; max-width: 940px; }
+    .section-lead { max-width: 860px; margin: 18px 0 0; color: var(--slate-600); font-size: 18px; line-height: 1.75; }
+    .section-dark .section-lead { color: #cbd5e1; }
+
+    .blind-grid { margin-top: 38px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .blind-card { background: #fff; border: 1px solid var(--slate-200); border-radius: 24px; padding: 26px; box-shadow: 0 14px 44px rgba(15,23,42,.05); }
+    .blind-card .kicker { font-size: 11.5px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--rose-600); }
+    .blind-card h3 { margin: 8px 0 10px; font-size: 19px; letter-spacing: -.03em; }
+    .blind-card p { margin: 0; color: var(--slate-600); font-size: 14.5px; line-height: 1.62; }
+
+    .figure { margin-top: 40px; background: #fff; border: 1px solid var(--slate-200); border-radius: 28px; padding: 28px; box-shadow: var(--shadow); }
+    .figure svg { width: 100%; height: auto; display: block; }
+    .figure-cap { margin: 16px 4px 0; color: var(--slate-500); font-size: 13.5px; line-height: 1.55; }
+    .section-dark .figure { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); }
+    .section-dark .figure-cap { color: #94a3b8; }
+
+    .steps { margin-top: 38px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .step-card { background: #fff; border: 1px solid var(--slate-200); border-radius: 24px; padding: 24px; box-shadow: 0 14px 44px rgba(15,23,42,.05); }
+    .step-num { width: 34px; height: 34px; border-radius: 11px; background: var(--violet-700); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 950; margin-bottom: 16px; }
+    .step-card h3 { margin: 0 0 8px; font-size: 17.5px; letter-spacing: -.025em; }
+    .step-card p { margin: 0; color: var(--slate-600); font-size: 14px; line-height: 1.6; }
+
+    /* sliced accuracy table */
+    .slice-table { margin-top: 40px; width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border: 1px solid var(--slate-200); border-radius: 24px; overflow: hidden; box-shadow: var(--shadow); }
+    .slice-table th, .slice-table td { padding: 15px 22px; font-size: 14.5px; text-align: right; }
+    .slice-table th:first-child, .slice-table td:first-child { text-align: left; }
+    .slice-table thead th { background: var(--slate-50); color: var(--slate-500); font-size: 11.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .slice-table tbody tr + tr td { border-top: 1px solid var(--slate-100); }
+    .slice-table td:first-child { font-weight: 800; letter-spacing: -.01em; }
+    .slice-table td:first-child small { display: block; font-weight: 500; color: var(--slate-500); font-size: 12.5px; }
+    .slice-table tr.head td { background: var(--violet-50); }
+    .badge { display: inline-block; font-size: 11.5px; font-weight: 850; border-radius: 999px; padding: 4px 10px; }
+    .b-strong { color: var(--emerald-600); background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .b-weak { color: var(--rose-600); background: #fff1f2; border: 1px solid #fecdd3; }
+    .b-drift { color: var(--amber-600); background: #fffbeb; border: 1px solid #fde68a; }
+
+    /* knob control panel */
+    .knob-groups { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .knob-panel { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 26px; padding: 26px; }
+    .knob-panel .ghead { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .knob-panel .gdot { width: 12px; height: 12px; border-radius: 4px; }
+    .knob-panel h3 { margin: 0; font-size: 19px; letter-spacing: -.03em; color: #fff; }
+    .knob-panel .gsub { color: #94a3b8; font-size: 13px; margin: 0 0 18px; line-height: 1.5; }
+    .knob { margin-bottom: 16px; }
+    .knob:last-child { margin-bottom: 0; }
+    .knob-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 7px; }
+    .knob-name { font-size: 13.5px; font-weight: 800; color: #e2e8f0; }
+    .knob-val { font-size: 11.5px; font-weight: 800; color: #c4b5fd; background: rgba(196,181,253,.12); border-radius: 999px; padding: 2px 9px; }
+    .knob-track { height: 8px; border-radius: 999px; background: rgba(255,255,255,.10); position: relative; overflow: hidden; }
+    .knob-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: linear-gradient(90deg, var(--violet-600), var(--indigo-600)); }
+    .knob-fill.g { background: linear-gradient(90deg, #059669, #34d399); }
+    .knob-fill.a { background: linear-gradient(90deg, #d97706, #fbbf24); }
+    .knob-desc { color: #94a3b8; font-size: 12px; line-height: 1.45; margin-top: 6px; }
+
+    /* loop figure reused */
+    .insight { margin-top: 28px; background: var(--violet-50); border: 1px solid var(--violet-100); border-left: 5px solid var(--violet-600); border-radius: 18px; padding: 22px 24px; }
+    .insight p { margin: 0; color: var(--slate-700); font-size: 15.5px; line-height: 1.7; }
+    .insight strong { color: var(--violet-800); }
+
+    .cta { background: linear-gradient(135deg, var(--violet-700), var(--indigo-600)); color: #fff; border-radius: 36px; padding: 48px; display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: center; box-shadow: 0 28px 90px rgba(109,40,217,.22); }
+    .cta h2 { color: #fff; max-width: 860px; }
+    .cta p { color: #ede9fe; font-size: 17px; line-height: 1.7; max-width: 760px; margin: 16px 0 0; }
+    .cta-box { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.16); border-radius: 26px; padding: 24px; }
+    .cta-box strong { font-size: 20px; display: block; margin-bottom: 8px; }
+    .cta-box p { font-size: 14px; margin: 0 0 18px; color: #ede9fe; }
+
+    footer { background: var(--slate-950); color: var(--slate-300); padding: 40px 0; font-size: 14px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+
+    @media (max-width: 1060px) { .hero-inner, .cta { grid-template-columns: 1fr; } .steps { grid-template-columns: repeat(2, 1fr); } .blind-grid, .knob-groups { grid-template-columns: 1fr; } .nav-links { display: none; } }
+    @media (max-width: 700px) { .container { padding: 0 18px; } section { padding: 60px 0; } .steps { grid-template-columns: 1fr; } .slice-table th, .slice-table td { padding: 12px 14px; font-size: 13px; } }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/><meta content="How EKIP helps AI teams move past a single accuracy number: intelligent selection of text data points (transcripts, documents), per-subset and edge-case accuracy via…" name="ai-summary"/><meta content="Data Product Levers" name="topic"/><link href="https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="EKIP: Evaluation &amp; Drift - Intelligent Data Selection, Precise Slicing, Gold Sets, and Knobs for Execution | DataKnobs" property="og:title"/><meta content="How EKIP helps AI teams move past a single accuracy number: intelligent selection of text data points (transcripts, documents), per-subset and edge-case accuracy via…" property="og:description"/><meta content="https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="EKIP: Evaluation &amp; Drift - Intelligent Data Selection, Precise Slicing, Gold Sets, and Knobs for Execution | DataKnobs" name="twitter:title"/><meta content="How EKIP helps AI teams move past a single accuracy number: intelligent selection of text data points (transcripts, documents), per-subset and edge-case accuracy via…" name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html#article","url":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html#webpage"},"headline":"EKIP: Evaluation & Drift - Intelligent Data Selection, Precise Slicing, Gold Sets, and Knobs for Execution | DataKnobs","description":"How EKIP helps AI teams move past a single accuracy number: intelligent selection of text data points (transcripts, documents), per-subset and edge-case accuracy via…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Data Product Levers"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html#webpage","url":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html","name":"EKIP: Evaluation & Drift - Intelligent Data Selection, Precise Slicing, Gold Sets, and Knobs for Execution | DataKnobs","description":"How EKIP helps AI teams move past a single accuracy number: intelligent selection of text data points (transcripts, documents), per-subset and edge-case accuracy via…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Data Product Levers","item":"https://prashant.dhingra.website/data-products/data-products/"},{"@type":"ListItem","position":3,"name":"EKIP: Evaluation & Drift - Intelligent Data Selection, Precise Slicing, Gold Sets, and Knobs for Execution | DataKnobs","item":"https://prashant.dhingra.website/data-products/data-product-levers/how-knobs-help-in-managing-drift.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<header class="nav"><div class="container nav-inner"><a class="brand" href="#"><span class="brand-mark">DK</span><span>DataKnobs</span></a><nav aria-label="Main navigation" class="nav-links"><a href="#problem">The blind spots</a><a href="#engine">Selection engine</a><a href="#slices">Sliced accuracy</a><a href="#knobs">The knobs</a><a href="#loop">Drift loop</a></nav><a class="button" href="#knobs">See the knobs</a></div></header>
+<main>
+<!-- HERO -->
+<section class="hero"><div class="container hero-inner">
+<div>
+<div class="eyebrow">Selection · Slicing · Gold sets · Drift</div>
+<h1>One simple accuracy number is the most straightforward method to deploy a model that is already shifting.</h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Data Product Levers</a></p>
+<p class="hero-lead">AI teams sample, label, and report one number. EKIP transforms this into a discipline, selecting data points with valuable information, evaluating accuracy gaps, creating dynamic gold and fine-tuning sets, and managing data drift proactively to prevent customer impact.</p>
+<div class="hero-actions"><a class="button" href="#engine">The selection engine</a><a class="button secondary" href="#knobs">The knob catalog</a></div>
+</div>
+<div class="hero-card">
+<h4>One model · "92% accurate"</h4>
+<div class="slice-line"><div class="name">Overall<small>random sample, 1,000 labeled</small></div><div class="val good">92%</div></div>
+<div class="slice-line"><div class="name">Spanish · billing<small>38 labeled</small></div><div class="val bad">78%</div></div>
+<div class="slice-line"><div class="name">Long transcripts &gt; 10 min<small>64 labeled</small></div><div class="val warn">71%</div></div>
+<div class="slice-line"><div class="name">New-product complaints<small>6 labeled · emerging</small></div><div class="val none">  ?</div></div>
+</div>
+</div></section>
+<!-- PROBLEM -->
+<section class="section-light" id="problem"><div class="container">
+<div class="section-eyebrow">Why the number lies</div>
+<h2>One example, one treasure trove, one mean   three blind spots that all culminate in deviation.</h2>
+<p class="section-lead">The typical loop of sampling, labeling, and calculating accuracy has three flaws that result in decreased real-world performance despite the dashboard appearing green.</p>
+<div class="blind-grid">
+<div class="blind-card"><div class="kicker">Blind spot 1</div><h3>Random misses the tail</h3><p>A typical sample is heavily influenced by common scenarios, with rare cases, unusual languages, and unique document formats where models often struggle being underrepresented, leading to their accuracy not being thoroughly tested.</p></div>
+<div class="blind-card"><div class="kicker">Blind spot 2</div><h3>The average hides the slices</h3><p>Overall, the model performs at 92%, with 96% accuracy on the easy majority and 71% on a crucial segment. It is important to note that stakeholders may interpret this as the model being 92% accurate across the board.</p></div>
+<div class="blind-card"><div class="kicker">Blind spot 3</div><h3>A frozen gold set ages</h3><p>Input patterns change - with new topics, phrasing, products, and customers. A gold standard created last quarter no longer reflects current traffic, maintaining the appearance of stability even as it slowly deteriorates. This is known as drift.</p></div>
+</div>
+</div></section>
+<!-- SELECTION ENGINE + FOUR MOVES -->
+<section class="section-violet" id="engine"><div class="container">
+<div class="section-eyebrow">Capability 1 · Intelligent selection</div>
+<h2>Select the points that contain valuable information, rather than those that are commonplace.</h2>
+<p class="section-lead">Each transcript or document is represented as a point within an embedding space. EKIP strategically selects points across this space, ensuring coverage, oversampling sparse areas, and prioritizing uncertainty and novelty over the familiar dense center.</p>
+<div class="figure">
+<svg aria-label="Random sampling versus EKIP selection across an embedding space" role="img" viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient cx="50%" cy="50%" id="cloud" r="50%"><stop offset="0" stop-color="rgba(124,58,237,.10)"></stop><stop offset="1" stop-color="rgba(124,58,237,0)"></stop></radialGradient>
+</defs>
+<g font-family="Inter, sans-serif">
+<!-- LEFT: random -->
+<text fill="#0f172a" font-size="16" font-weight="900" x="40" y="40">Random sample</text>
+<text fill="#64748b" font-size="12.5" x="40" y="62">clusters in the dense head · edge cases unseen</text>
+<rect fill="#fff" height="300" rx="22" stroke="#e2e8f0" width="420" x="40" y="78"></rect>
+<ellipse cx="170" cy="170" fill="url(#cloud)" rx="95" ry="80"></ellipse>
+<!-- dense head points -->
+<g fill="#cbd5e1">
+<circle cx="140" cy="150" r="5"></circle><circle cx="165" cy="135" r="5"></circle><circle cx="185" cy="160" r="5"></circle><circle cx="150" cy="185" r="5"></circle><circle cx="200" cy="180" r="5"></circle><circle cx="120" cy="170" r="5"></circle><circle cx="175" cy="195" r="5"></circle><circle cx="210" cy="150" r="5"></circle><circle cx="135" cy="200" r="5"></circle><circle cx="190" cy="140" r="5"></circle><circle cx="160" cy="170" r="5"></circle><circle cx="225" cy="175" r="5"></circle>
+<!-- mid cluster -->
+<circle cx="300" cy="240" r="5"></circle><circle cx="320" cy="225" r="5"></circle><circle cx="285" cy="260" r="5"></circle><circle cx="335" cy="255" r="5"></circle>
+<!-- sparse edge -->
+<circle cx="390" cy="120" r="5"></circle><circle cx="410" cy="320" r="5"></circle><circle cx="360" cy="340" r="5"></circle>
+</g>
+<!-- random picks (highlight) -->
+<g fill="#7c3aed" stroke="#fff" stroke-width="2">
+<circle cx="165" cy="135" r="7"></circle><circle cx="150" cy="185" r="7"></circle><circle cx="200" cy="180" r="7"></circle><circle cx="175" cy="195" r="7"></circle><circle cx="160" cy="170" r="7"></circle><circle cx="300" cy="240" r="7"></circle>
+</g>
+<text fill="#e11d48" font-size="11.5" font-weight="800" x="375" y="360">edges missed</text>
+<!-- RIGHT: EKIP -->
+<text fill="#0f172a" font-size="16" font-weight="900" x="540" y="40">EKIP selection</text>
+<text fill="#64748b" font-size="12.5" x="540" y="62">spans the space · samples sparse + novel regions</text>
+<rect fill="#fff" height="300" rx="22" stroke="#e2e8f0" width="420" x="540" y="78"></rect>
+<ellipse cx="670" cy="170" fill="url(#cloud)" rx="95" ry="80"></ellipse>
+<g fill="#cbd5e1">
+<circle cx="640" cy="150" r="5"></circle><circle cx="665" cy="135" r="5"></circle><circle cx="685" cy="160" r="5"></circle><circle cx="650" cy="185" r="5"></circle><circle cx="700" cy="180" r="5"></circle><circle cx="620" cy="170" r="5"></circle><circle cx="675" cy="195" r="5"></circle><circle cx="710" cy="150" r="5"></circle><circle cx="635" cy="200" r="5"></circle><circle cx="690" cy="140" r="5"></circle><circle cx="660" cy="170" r="5"></circle><circle cx="725" cy="175" r="5"></circle>
+<circle cx="800" cy="240" r="5"></circle><circle cx="820" cy="225" r="5"></circle><circle cx="785" cy="260" r="5"></circle><circle cx="835" cy="255" r="5"></circle>
+<circle cx="890" cy="120" r="5"></circle><circle cx="910" cy="320" r="5"></circle><circle cx="860" cy="340" r="5"></circle>
+</g>
+<!-- EKIP picks: spread + edges -->
+<g fill="#7c3aed" stroke="#fff" stroke-width="2">
+<circle cx="665" cy="135" r="7"></circle><circle cx="700" cy="180" r="7"></circle><circle cx="800" cy="240" r="7"></circle><circle cx="835" cy="255" r="7"></circle>
+</g>
+<g fill="#059669" stroke="#fff" stroke-width="2">
+<circle cx="890" cy="120" r="7.5"></circle><circle cx="910" cy="320" r="7.5"></circle><circle cx="860" cy="340" r="7.5"></circle>
+</g>
+<text fill="#059669" font-size="11.5" font-weight="800" x="852" y="372">edge cases caught</text>
+</g>
+</svg>
+<p class="figure-cap">Both methods use the same set of documents, but allocate their labeling budget in different ways. Random selection focuses on dense points and avoids sparse areas, while EKIP selection prioritizes spreading coverage and targeting uncertain points to improve model accuracy.</p>
+</div>
+<div class="steps">
+<div class="step-card"><div class="step-num">1</div><h3>Select the points</h3><p>Variability, compactness, unpredictability, dissent, and originality in embedding space - limited set, rich label data.</p></div>
+<div class="step-card"><div class="step-num">2</div><h3>Measure by slice</h3><p>Calculate accuracy for each attribute and geometric region, including confidence intervals. Identify any weak or unmeasured slices instead of averaging them out.</p></div>
+<div class="step-card"><div class="step-num">3</div><h3>Grow the gold set</h3><p>Transform categorized, officially recognized points into a regularly updated gold standard set that evolves with the emergence of new areas - a dynamic benchmark, not a stagnant one.</p></div>
+<div class="step-card"><div class="step-num">4</div><h3>Target fine-tuning</h3><p>Create a fine-tuning dataset using weak and drifting examples, including synthesized edge cases, to ensure that the training process addresses the issues identified during evaluation.</p></div>
+</div>
+</div></section>
+<!-- SLICED ACCURACY -->
+<section class="section-light" id="slices"><div class="container">
+<div class="section-eyebrow">Capability 2 · Accuracy by subset &amp; edge case</div>
+<h2>Information geometry accurately maps the exact location of the '92%' breakdown.</h2>
+<p class="section-lead">Segment by specified attributes (language, channel, length, document type, segment, time) as well as by unforeseen regions within the embedding space that were not previously defined by the team. The summary extracted from the main source:</p>
+<table class="slice-table">
+<thead><tr><th>Slice</th><th>Labeled n</th><th>Accuracy</th><th>Read</th></tr></thead>
+<tbody>
+<tr class="head"><td>Overall<small>the headline number</small></td><td>1,000</td><td><b>92%</b></td><td><span class="badge b-strong">reassuring</span></td></tr>
+<tr><td>English · billing<small>dense head</small></td><td>420</td><td>96%</td><td><span class="badge b-strong">strong</span></td></tr>
+<tr><td>Spanish · billing<small>under-sampled</small></td><td>38</td><td>78%</td><td><span class="badge b-weak">weak</span></td></tr>
+<tr><td>Long transcripts &gt; 10 min<small>boundary region</small></td><td>64</td><td>71%</td><td><span class="badge b-weak">weak</span></td></tr>
+<tr><td>New-product complaints<small>emerging cluster</small></td><td>6</td><td> </td><td><span class="badge b-drift">unmeasured · drift</span></td></tr>
+</tbody>
+</table>
+<div class="insight">
+<p><strong>The two findings the average buried:</strong> significant strength (ability to quickly analyze complex data sets and provide actionable insights). <strong>drift frontier</strong>   A developing cluster containing just six labeled points is increasing in production, yet the model has yet to undergo proper evaluation or training. This scenario is exactly when the customer encounters an issue before anyone realizes it. Additionally, each slice must reach a minimum sample size for its data to be considered reliable; achieving '100% on 3 examples' is not sufficient.</p>
+</div>
+</div></section>
+<!-- KNOBS -->
+<section class="section-dark" id="knobs"><div class="container">
+<div class="section-eyebrow">The control surface</div>
+<h2>The knobs that choose data, generate data, and control the loop.</h2>
+<p class="section-lead">Selection and creation are not isolated actions; they are adjustable controls that a team customizes for each situation and readjusts as needed. There are three groups of knobs, displayed with example settings.</p>
+<div class="knob-groups">
+<div class="knob-panel">
+<div class="ghead"><span class="gdot" style="background:#7c3aed;"></span><h3>Selection knobs</h3></div>
+<p class="gsub">Which existing points to pull for labeling, evaluation, or training.</p>
+<div class="knob"><div class="knob-top"><span class="knob-name">Coverage radius</span><span class="knob-val">wide</span></div><div class="knob-track"><div class="knob-fill" style="width:78%"></div></div><p class="knob-desc">How widely picks spread across the embedding space.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Density target</span><span class="knob-val">boost sparse</span></div><div class="knob-track"><div class="knob-fill" style="width:70%"></div></div><p class="knob-desc">How challenging is it to oversample low-density frontier regions compared to high-density areas?</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Uncertainty cutoff</span><span class="knob-val">low-conf</span></div><div class="knob-track"><div class="knob-fill" style="width:64%"></div></div><p class="knob-desc">Extract points where the model exhibits low confidence levels, particularly close to the model's decision boundary.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Novelty distance</span><span class="knob-val">far from gold</span></div><div class="knob-track"><div class="knob-fill" style="width:82%"></div></div><p class="knob-desc">Move points away from the existing gold/training set to the drift frontier.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Attribute quotas</span><span class="knob-val">on</span></div><div class="knob-track"><div class="knob-fill" style="width:55%"></div></div><p class="knob-desc">Minimums per language, channel, document type, length, segment.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Recency weight</span><span class="knob-val">recent-tilt</span></div><div class="knob-track"><div class="knob-fill" style="width:60%"></div></div><p class="knob-desc">Favor recent traffic so emerging patterns surface early.</p></div>
+</div>
+<div class="knob-panel">
+<div class="ghead"><span class="gdot" style="background:#34d399;"></span><h3>Creation knobs</h3></div>
+<p class="gsub">How can we create additional points in areas with limited existing data?</p>
+<div class="knob"><div class="knob-top"><span class="knob-name">Augmentation strength</span><span class="knob-val">moderate</span></div><div class="knob-track"><div class="knob-fill g" style="width:50%"></div></div><p class="knob-desc">Paraphrase / perturbation intensity applied to real examples.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Synthetic ratio</span><span class="knob-val">30% synth</span></div><div class="knob-track"><div class="knob-fill g" style="width:30%"></div></div><p class="knob-desc">Share of generated data mixed with real in the corpus.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Target region</span><span class="knob-val">weak slices</span></div><div class="knob-track"><div class="knob-fill g" style="width:74%"></div></div><p class="knob-desc">Which sparse / underperforming region to generate into.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Difficulty level</span><span class="knob-val">adversarial</span></div><div class="knob-track"><div class="knob-fill g" style="width:68%"></div></div><p class="knob-desc">How hard and boundary-pushing the generated edge cases are.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Attribute conditioning</span><span class="knob-val">ES · long</span></div><div class="knob-track"><div class="knob-fill g" style="width:58%"></div></div><p class="knob-desc">Generate for a specific language, segment, or document type.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Label source</span><span class="knob-val">model→human</span></div><div class="knob-track"><div class="knob-fill g" style="width:62%"></div></div><p class="knob-desc">Model proposes, expert adjudicates   vs human-from-scratch.</p></div>
+</div>
+<div class="knob-panel">
+<div class="ghead"><span class="gdot" style="background:#fbbf24;"></span><h3>Control knobs</h3></div>
+<p class="gsub">How the loop measures, budgets, and governs itself.</p>
+<div class="knob"><div class="knob-top"><span class="knob-name">Slice granularity</span><span class="knob-val">fine</span></div><div class="knob-track"><div class="knob-fill a" style="width:72%"></div></div><p class="knob-desc">How finely to cut subsets when computing accuracy.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Minimum-n per slice</span><span class="knob-val">≥ 30</span></div><div class="knob-track"><div class="knob-fill a" style="width:48%"></div></div><p class="knob-desc">Sufficiency floor before a slice's number is trusted.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Risk weighting</span><span class="knob-val">impact &gt; freq</span></div><div class="knob-track"><div class="knob-fill a" style="width:66%"></div></div><p class="knob-desc">Prioritize slices based on their impact on business rather than just frequency.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Budget split</span><span class="knob-val">eval / FT</span></div><div class="knob-track"><div class="knob-fill a" style="width:55%"></div></div><p class="knob-desc">Allocation across evaluation, gold-refresh, and fine-tuning.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Drift sensitivity</span><span class="knob-val">high</span></div><div class="knob-track"><div class="knob-fill a" style="width:76%"></div></div><p class="knob-desc">How much distribution shift triggers re-evaluation and refresh.</p></div>
+<div class="knob"><div class="knob-top"><span class="knob-name">Automation threshold</span><span class="knob-val">per slice</span></div><div class="knob-track"><div class="knob-fill a" style="width:64%"></div></div><p class="knob-desc">Accuracy floor for auto-decide vs routing a slice to humans.</p></div>
+</div>
+</div>
+</div></section>
+<!-- DRIFT LOOP -->
+<section class="section-violet" id="loop"><div class="container">
+<div class="section-eyebrow">Why it stays accurate</div>
+<h2>The gold and finely-tuned collections reside, ensuring that drift is captured rather than stumbled upon by the customer.</h2>
+<p class="section-lead">The knobs are always in motion. A drift monitor carefully observes the distribution of the production embeddings, pulling in new points and refreshing the gold set when a region grows or shifts, and queuing targeted fine-tuning to ensure changes are made before they impact users.</p>
+<div class="figure">
+<svg aria-label="Continuous drift-aware selection and refresh loop" role="img" viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="lg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#7c3aed"></stop><stop offset="1" stop-color="#4f46e5"></stop></linearGradient>
+<marker id="la" markerHeight="10" markerWidth="10" orient="auto" refX="7" refY="3"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"></path></marker>
+</defs>
+<g font-family="Inter, sans-serif" text-anchor="middle">
+<rect fill="url(#lg)" height="90" rx="18" width="150" x="20" y="40"></rect>
+<text fill="#fff" font-size="14.5" font-weight="800" x="95" y="80">Watch traffic</text>
+<text fill="#ddd6fe" font-size="11" x="95" y="100">embedding drift monitor</text>
+<rect fill="rgba(124,58,237,.08)" height="90" rx="18" stroke="#c4b5fd" width="150" x="210" y="40"></rect>
+<text fill="#0f172a" font-size="14.5" font-weight="800" x="285" y="80">Select points</text>
+<text fill="#64748b" font-size="11" x="285" y="100">novel · sparse · uncertain</text>
+<rect fill="rgba(124,58,237,.08)" height="90" rx="18" stroke="#c4b5fd" width="150" x="400" y="40"></rect>
+<text fill="#0f172a" font-size="14.5" font-weight="800" x="475" y="80">Measure slices</text>
+<text fill="#64748b" font-size="11" x="475" y="100">per region + CI</text>
+<rect fill="rgba(124,58,237,.08)" height="90" rx="18" stroke="#c4b5fd" width="150" x="590" y="40"></rect>
+<text fill="#0f172a" font-size="14.5" font-weight="800" x="665" y="80">Refresh gold</text>
+<text fill="#64748b" font-size="11" x="665" y="100">+ build fine-tune set</text>
+<rect fill="url(#lg)" height="90" rx="18" width="180" x="780" y="40"></rect>
+<text fill="#fff" font-size="14.5" font-weight="800" x="870" y="80">Retrain / re-gate</text>
+<text fill="#ddd6fe" font-size="11" x="870" y="100">before users feel it</text>
+<g fill="none" stroke="#7c3aed" stroke-width="2.5">
+<line marker-end="url(#la)" x1="170" x2="206" y1="85" y2="85"></line>
+<line marker-end="url(#la)" x1="360" x2="396" y1="85" y2="85"></line>
+<line marker-end="url(#la)" x1="550" x2="586" y1="85" y2="85"></line>
+<line marker-end="url(#la)" x1="740" x2="776" y1="85" y2="85"></line>
+<path d="M870 130 C 870 220, 300 235, 95 134" marker-end="url(#la)" stroke="#059669" stroke-dasharray="7 6"></path>
+</g>
+<text fill="#059669" font-size="12" font-weight="800" x="480" y="240">continuous   every cycle re-syncs the benchmark to reality</text>
+</g>
+</svg>
+<p class="figure-cap">The selection and creation knobs used in the initial evaluation are also responsible for maintaining its relevance. Instead of causing unexpected support tickets, drift now serves as a trigger for the loop.</p>
+</div>
+</div></section>
+<!-- CTA -->
+<section><div class="container"><div class="cta">
+<div>
+<div class="section-eyebrow" style="color:#ddd6fe;">Positioning</div>
+<h2>Stop reporting accuracy. Start controlling it.</h2>
+<p>At its core, DataKnobs embodies data points that are meticulously evaluated, created, and governed by adjustable knobs. These knobs are carefully turned and re-tuned as the world evolves, resulting in an accurate evaluation and a model that remains aligned with its benchmark.</p>
+</div>
+<div class="cta-box">
+<strong>Next best action</strong>
+<p>Pass one model through the engine: smart sample, accuracy map slices, drift frontier, and starter knob configuration for the gold and fine-tuning datasets.</p>
+<a class="button secondary" href="#knobs" style="width:100%;">Review the knob catalog</a>
+</div>
+</div></div></section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<aside aria-labelledby="dp-related-heading" class="dp-related-reading"><h2 id="dp-related-heading">Related reading</h2><p>Continue with closely related architecture, implementation, and operating guidance.</p><div class="dp-related-links"><a href="/data-products/data-product-levers/ekip-for-call-center-ai.html">EKIP for Call-Audit AI Readiness - Frontier Intelligence for Evaluation, RAG &amp; Fine-Tuning by DataKnobs</a><a href="/data-products/data-product-levers/enterprise-knobs-platform.html">Enterprise Knob Intelligence Platform (EKIP) harnesses the power of Information Geometry for Enterprise AI, brought to you by DataKnobs.</a><a href="/data-products/data-product-levers/how-data-products-enable-flywheel.html">Data Products are the essential components for driving Enterprise Intelligence growth through the Data Flywheel | DataKnobs</a><a href="/data-products/data-product-levers/enterprise-ai-information-geometry.html">Information Geometry for Enterprise AI: The Mathematical Backbone of EKIP | DataKnobs</a></div></aside><footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" data-related-json="folder-pages.json" data-related-keywords="data product ai genai" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Graph Databases: The Engine of Data P | aph Database As Data Product</title>
+<style id="related-articles-noimage-css">
+
+#related-articles-root{margin:2rem auto;max-width:1100px;padding:1rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}#related-articles-root h2{margin:0 0 .25rem;font-size:1.45rem}#related-articles-root .dp-related-intro{color:#5d6678;margin:0 0 1rem}.related-articles-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.related-article-card{display:block;text-decoration:none;color:#172033;background:#fff;border:1px solid #dfe4ec;border-radius:12px;padding:.9rem;line-height:1.35;font-weight:700}.related-article-card:hover{border-color:#bdb6ff;background:#f2f0ff}@media(max-width:800px){.related-articles-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.related-articles-grid{grid-template-columns:1fr}}
+
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+
+        /* Chart Container Utilities */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Interactive Element Styles */
+        .step-circle {
+            transition: all 0.3s ease;
+        }
+        .step-circle.active {
+            transform: scale(1.1);
+            border-width: 3px;
+            border-color: #ea580c; /* Orange-600 */
+        }
+        
+        .nav-btn {
+            transition: all 0.2s;
+        }
+        .nav-btn.active {
+            background-color: #e7e5e4; /* Stone-200 */
+            font-weight: 600;
+            border-bottom: 3px solid #ea580c;
+        }
+
+        /* Canvas Interactive Cursor */
+        #graphCanvas {
+            cursor: crosshair;
+        }
+    </style>
+<!-- Chosen Palette: Warm Neutrals (Stone) with Burnt Orange Accents -->
+<!-- Application Structure Plan: 
+         1. Hero: Introduces the core thesis.
+         2. Concept Comparator: Interactive toggle to contrast SQL vs Graph mental models.
+         3. Methodology Stepper: 4-step interactive guide on building the product.
+         4. Product Explorer (Canvas): The core 'Wow' factor. A custom canvas graph allowing users to 'inspect' nodes as data products.
+         5. Metrics Dashboard: Chart.js visualization of the ROI.
+         Flow is linear but allows jumping via sticky nav. -->
+<!-- Visualization & Content Choices:
+         - Network Graph: Custom HTML5 Canvas implementation. Rationale: Complete control, strictly adheres to 'No SVG' rule, lightweight.
+         - Performance Metrics: Chart.js Bar and Radar charts. Rationale: Standard, responsive, easy to compare quantitative data.
+         - Icons: Unicode and CSS shapes. Rationale: No external SVG/Raster dependencies. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!-- Google tag (gtag.js) --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><meta content='Traditional relational models silence the context between data points. Graph databases restore this context, enabling a "Data Product" architecture that is discoverable…' name="description"/><meta content="Prashant Dhingra" name="author"/><meta content="Data Products SEO-GEO Enhancer 2026" name="generator"/><meta content="noindex, follow" name="robots"/><meta content='Traditional relational models silence the context between data points. Graph databases restore this context, enabling a "Data Product" architecture that is discoverable…' name="ai-summary"/><meta content="Architecture &amp; Databases" name="topic"/><link href="https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html" rel="canonical"/><meta content="article" property="og:type"/><meta content="Data Products &amp; Enterprise AI" property="og:site_name"/><meta content="Graph Databases: The Engine of Data P | aph Database As Data Product" property="og:title"/><meta content='Traditional relational models silence the context between data points. Graph databases restore this context, enabling a "Data Product" architecture that is discoverable…' property="og:description"/><meta content="https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html" property="og:url"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="Graph Databases: The Engine of Data P | aph Database As Data Product" name="twitter:title"/><meta content='Traditional relational models silence the context between data points. Graph databases restore this context, enabling a "Data Product" architecture that is discoverable…' name="twitter:description"/><meta content="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" name="twitter:image"/><style id="data-products-site-css">
+
+:root{--dp-ink:#172033;--dp-muted:#5d6678;--dp-line:#dfe4ec;--dp-bg:#f7f8fb;--dp-card:#fff;--dp-accent:#5b4ee5;--dp-accent-2:#0f766e;--dp-soft:#eeecff;--dp-radius:18px;--dp-shadow:0 14px 38px rgba(29,36,63,.09)}
+*{box-sizing:border-box}.dp-site{margin:0;background:var(--dp-bg);color:var(--dp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}.dp-site img{max-width:100%;height:auto}.dp-site a{color:inherit}.dp-skip{position:absolute;left:-9999px;top:0}.dp-skip:focus{left:1rem;top:1rem;z-index:9999;background:#fff;padding:.75rem 1rem;border-radius:.6rem;box-shadow:var(--dp-shadow)}.dp-global-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem max(1rem,calc((100vw - 1180px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid var(--dp-line);backdrop-filter:blur(12px)}.dp-brand{text-decoration:none;font-weight:800;letter-spacing:-.02em}.dp-brand span{font-weight:500;color:var(--dp-muted);font-size:.78rem;display:block}.dp-nav-links{display:flex;gap:.2rem;flex-wrap:wrap}.dp-nav-links a{text-decoration:none;color:var(--dp-muted);padding:.55rem .72rem;border-radius:.6rem;font-size:.9rem;font-weight:650}.dp-nav-links a:hover,.dp-nav-links a:focus-visible{background:var(--dp-soft);color:var(--dp-accent)}.dp-shell{max-width:1180px;margin:0 auto;padding:1.25rem 1.25rem 4rem}.dp-breadcrumb{display:flex;flex-wrap:wrap;gap:.5rem;color:var(--dp-muted);font-size:.86rem;margin:.4rem 0 1.6rem}.dp-breadcrumb a{text-decoration:none}.dp-breadcrumb a:hover{text-decoration:underline}.dp-hero{background:linear-gradient(135deg,#171b3c,#322874 58%,#155e75);color:#fff;border-radius:28px;padding:clamp(2rem,6vw,5rem);box-shadow:var(--dp-shadow);overflow:hidden;position:relative}.dp-hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-90px;top:-150px;background:rgba(255,255,255,.1)}.dp-kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.76rem;color:#c9c5ff;margin:0 0 .9rem}.dp-hero h1{font-size:clamp(2.15rem,5.5vw,4.8rem);line-height:1.04;letter-spacing:-.045em;margin:0;max-width:920px}.dp-lead{font-size:clamp(1.02rem,2vw,1.32rem);max-width:800px;color:#e7e8ff;margin:1.35rem 0 0}.dp-section{margin-top:3.3rem}.dp-section-head{max-width:820px;margin-bottom:1.35rem}.dp-section-head h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 .55rem}.dp-section-head p{color:var(--dp-muted);margin:0;font-size:1.02rem}.dp-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.dp-card{background:var(--dp-card);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;box-shadow:0 5px 18px rgba(30,38,70,.05);min-width:0}.dp-card:hover{transform:translateY(-2px);box-shadow:var(--dp-shadow);border-color:#c9c3ff}.dp-card,.dp-card:hover{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.dp-card-link{text-decoration:none;display:flex;flex-direction:column;height:100%}.dp-card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#edf0f6}.dp-card-body{padding:1.15rem;display:flex;flex-direction:column;flex:1}.dp-card-label{font-size:.73rem!important;text-transform:uppercase;letter-spacing:.08em;color:var(--dp-accent)!important;font-weight:800;margin:0 0 .45rem!important}.dp-card h3{font-size:1.08rem;line-height:1.25;letter-spacing:-.015em;margin:0 0 .55rem}.dp-card p{color:var(--dp-muted);font-size:.9rem;line-height:1.5;margin:0 0 .95rem}.dp-card span{margin-top:auto;font-weight:750;color:var(--dp-accent);font-size:.9rem}.dp-card-compact img{display:none}.dp-panel{background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:1.35rem;box-shadow:0 5px 18px rgba(30,38,70,.05)}.dp-panel h3{margin-top:0}.dp-callout{background:linear-gradient(135deg,#f1efff,#e7f8f5);border:1px solid #d5d0ff;border-radius:var(--dp-radius);padding:1.4rem}.dp-callout h2,.dp-callout h3{margin-top:0}.dp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dp-three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.dp-list{display:grid;gap:.8rem;padding:0;list-style:none}.dp-list li{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-list a{text-decoration:none;font-weight:750}.dp-list p{margin:.3rem 0 0;color:var(--dp-muted)}.dp-filterbar{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.25rem 0}.dp-filterbar input,.dp-filterbar select{min-height:46px;border:1px solid #cdd3df;border-radius:.75rem;padding:.7rem .9rem;background:#fff;color:var(--dp-ink);font:inherit}.dp-filterbar input{flex:1;min-width:230px}.dp-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--dp-line);border-radius:var(--dp-radius)}.dp-table{width:100%;border-collapse:collapse;min-width:680px}.dp-table th,.dp-table td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--dp-line);vertical-align:top}.dp-table th{background:#f0f2f7;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}.dp-table tr:last-child td{border-bottom:0}.dp-code{background:#141827;color:#eef1ff;border-radius:14px;padding:1rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}.dp-copy{border:0;border-radius:.65rem;background:var(--dp-accent);color:#fff;padding:.62rem .8rem;font-weight:700;cursor:pointer}.dp-copy:hover{filter:brightness(.93)}.dp-definition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.dp-definition{background:#fff;border:1px solid var(--dp-line);border-radius:14px;padding:1rem}.dp-definition dt{font-weight:800;font-size:1.02rem}.dp-definition dd{margin:.35rem 0 0;color:var(--dp-muted)}.dp-related-reading{max-width:1180px;margin:2rem auto;padding:1.2rem;border:1px solid var(--dp-line);border-radius:18px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--dp-ink)}.dp-related-reading h2{font-size:1.35rem;margin:0 0 .35rem}.dp-related-reading>p{color:var(--dp-muted);margin:.1rem 0 1rem}.dp-related-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}.dp-related-links a{display:block;text-decoration:none;padding:.85rem;border:1px solid var(--dp-line);border-radius:12px;font-weight:750;line-height:1.35}.dp-related-links a:hover{border-color:#beb7ff;background:var(--dp-soft)}.dp-static-intro{max-width:1100px;margin:1rem auto;padding:1.1rem 1.2rem;border:1px solid var(--dp-line);border-radius:14px;background:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-static-intro h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:0 0 .4rem;color:var(--dp-ink)}.dp-static-intro p{margin:0;color:var(--dp-muted)}.dp-legacy-topbar{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#171b3c;color:#fff;padding:.6rem 1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font-size:.88rem}.dp-legacy-topbar a{color:#fff;text-decoration:none;font-weight:700}.dp-legacy-topbar a:hover{text-decoration:underline}.dp-global-footer{background:#12162d;color:#e9eaff;padding:2.2rem max(1rem,calc((100vw - 1180px)/2));display:grid;grid-template-columns:2fr 1fr;gap:1.3rem;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.dp-global-footer p{color:#bfc4dc;margin:.35rem 0}.dp-global-footer nav{display:grid;gap:.4rem}.dp-global-footer a{color:#fff;text-decoration:none}.dp-copyright{grid-column:1/-1;font-size:.82rem;border-top:1px solid rgba(255,255,255,.14);padding-top:1rem}.dp-hidden{display:none!important}.dp-site :focus-visible,.dp-related-reading :focus-visible,.dp-legacy-topbar :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+@media(max-width:900px){.dp-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-related-links{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-nav-links a{display:none}.dp-nav-links a:last-child{display:block}.dp-three-col{grid-template-columns:1fr}.dp-global-footer{grid-template-columns:1fr}.dp-copyright{grid-column:auto}}
+@media(max-width:600px){.dp-shell{padding:.9rem .85rem 3rem}.dp-hero{border-radius:20px;padding:2rem 1.25rem}.dp-card-grid,.dp-two-col,.dp-definition-grid,.dp-related-links{grid-template-columns:1fr}.dp-global-nav{padding:.65rem .85rem}.dp-brand span{display:none}.dp-related-reading{margin:1rem .75rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style><script id="dp-structured-data" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html#article","url":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html","mainEntityOfPage":{"@id":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html#webpage"},"headline":"Graph Databases: The Engine of Data P | aph Database As Data Product","description":"Traditional relational models silence the context between data points. Graph databases restore this context, enabling a \"Data Product\" architecture that is discoverable…","image":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png","author":{"@type":"Person","name":"Prashant Dhingra","url":"https://prashant.dhingra.website/"},"publisher":{"@type":"Organization","name":"DataKnobs","logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"}},"about":{"@type":"Thing","name":"Architecture & Databases"}},{"@type":"WebPage","@id":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html#webpage","url":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html","name":"Graph Databases: The Engine of Data P | aph Database As Data Product","description":"Traditional relational models silence the context between data points. Graph databases restore this context, enabling a \"Data Product\" architecture that is discoverable…","isPartOf":{"@id":"https://prashant.dhingra.website/data-products/#website"},"breadcrumb":{"@id":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Data Products & Enterprise AI","item":"https://prashant.dhingra.website/data-products/"},{"@type":"ListItem","position":2,"name":"Architecture & Databases","item":"https://prashant.dhingra.website/data-products/architecture/"},{"@type":"ListItem","position":3,"name":"Graph Databases: The Engine of Data P | aph Database As Data Product","item":"https://prashant.dhingra.website/data-products/graph-db/graph-database-as-data-product.html"}]}]}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5L5DNWT237"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5L5DNWT237');</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="bg-stone-50 text-stone-800 font-sans leading-relaxed"><div aria-label="Data products site navigation" class="dp-legacy-topbar" role="navigation"><a href="/data-products/">Data Products home</a><a href="/data-products/data-products/">Foundations</a><a href="/data-products/ai-agents/">AI Agents</a><a href="/data-products/genai/">GenAI &amp; LLMs</a><a href="/data-products/architecture/">Architecture</a><a href="/data-products/all-articles/">All articles</a></div>
+<!-- Navigation -->
+<nav class="sticky top-0 z-50 bg-stone-50/95 backdrop-blur border-b border-stone-200 shadow-sm">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16">
+<div class="flex items-center">
+<div class="flex-shrink-0 flex items-center gap-2">
+<span class="text-2xl text-orange-600">●-●</span>
+<h1 class="font-bold text-xl tracking-tight text-stone-900">Graph<span class="font-light">DataProduct</span></h1><p class="dp-article-context">By <a href="/data-products/about.html">Prashant Dhingra</a> <span aria-hidden="true">|</span> <a href="/data-products/all-articles/">Architecture &amp; Databases</a></p>
+</div>
+</div>
+<div class="hidden md:flex space-x-8 items-center">
+<button class="nav-btn active px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900" onclick="scrollToSection('hero')">Concept</button>
+<button class="nav-btn px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900" onclick="scrollToSection('methodology')">Methodology</button>
+<button class="nav-btn px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900" onclick="scrollToSection('explorer')">Explorer</button>
+<button class="nav-btn px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900" onclick="scrollToSection('metrics')">Impact</button>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-24">
+<!-- Section 1: Hero & Concept Definition -->
+<section class="space-y-12" id="hero">
+<div class="text-center max-w-3xl mx-auto space-y-6">
+<h2 class="text-4xl md:text-5xl font-extrabold text-stone-900 tracking-tight">
+                    Treating Data as a Product, <br/>
+<span class="text-orange-600">Powered by Connections.</span>
+</h2>
+<p class="text-lg text-stone-600">
+                    Traditional relational models silence the context between data points. 
+                    Graph databases restore this context, enabling a "Data Product" architecture 
+                    that is discoverable, interoperable, and deeply connected.
+                </p>
+</div>
+<!-- Interactive Comparison: Relational vs Graph -->
+<div class="bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden">
+<div class="bg-stone-100 px-6 py-4 border-b border-stone-200 flex justify-between items-center flex-wrap gap-4">
+<h3 class="font-semibold text-lg">The Structural Shift</h3>
+<div class="flex bg-stone-200 rounded-lg p-1">
+<button class="px-4 py-1.5 rounded-md text-sm font-medium bg-white shadow-sm text-stone-900 transition-all" id="btn-relational" onclick="toggleView('relational')">Relational View</button>
+<button class="px-4 py-1.5 rounded-md text-sm font-medium text-stone-600 hover:text-stone-900 transition-all" id="btn-graph" onclick="toggleView('graph')">Graph View</button>
+</div>
+</div>
+<div class="p-8 grid md:grid-cols-2 gap-8 items-center">
+<div class="space-y-4" id="comparison-text">
+<h4 class="text-xl font-bold text-stone-800">The Siloed Table Problem</h4>
+<p class="text-stone-600">
+                            In the relational model, "Customer," "Order," and "Product" live in rigid, separate tables. 
+                            To see the full picture (the "Product"), you must perform expensive JOIN operations. 
+                            The <strong>Data Product</strong> is fragmented at rest.
+                        </p>
+<ul class="space-y-2 text-sm text-stone-500">
+<li class="flex items-center gap-2"><span class="text-red-500">✕</span> Rigid Schema dependency</li>
+<li class="flex items-center gap-2"><span class="text-red-500">✕</span> Complex JOIN queries for insights</li>
+<li class="flex items-center gap-2"><span class="text-red-500">✕</span> Context is lost in aggregation</li>
+</ul>
+</div>
+<div class="h-64 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-center relative overflow-hidden" id="visual-stage">
+<!-- Content injected via JS -->
+<div class="text-center p-4">
+<div class="grid grid-cols-3 gap-2 opacity-50 mb-2">
+<div class="h-8 bg-stone-300 rounded"></div><div class="h-8 bg-stone-300 rounded"></div><div class="h-8 bg-stone-300 rounded"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 opacity-80">
+<div class="h-8 bg-stone-400 rounded"></div><div class="h-8 bg-stone-400 rounded"></div><div class="h-8 bg-stone-400 rounded"></div>
+</div>
+<p class="mt-4 text-xs font-mono text-stone-500">SELECT * FROM Tables...</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Methodology (The How) -->
+<section class="scroll-mt-24" id="methodology">
+<div class="mb-8">
+<h3 class="text-2xl font-bold text-stone-900 mb-2">Building the Graph Data Product</h3>
+<p class="text-stone-600 max-w-2xl">
+                    Transforming raw data into a graph-based product involves a four-stage pipeline. 
+                    Click through the stages to understand the architectural flow.
+                </p>
+</div>
+<div class="grid lg:grid-cols-12 gap-8">
+<!-- Stepper Controls -->
+<div class="lg:col-span-4 space-y-4">
+<div class="step-circle group flex items-center gap-4 p-4 rounded-xl cursor-pointer hover:bg-stone-100 border-l-4 border-orange-600 bg-stone-50" id="step-1" onclick="setStep(1)">
+<div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-bold">1</div>
+<div>
+<h4 class="font-bold text-stone-800">Ingest &amp; Map</h4>
+<p class="text-sm text-stone-500">Raw sources to Nodes/Edges</p>
+</div>
+</div>
+<div class="step-circle group flex items-center gap-4 p-4 rounded-xl cursor-pointer hover:bg-stone-100 border-l-4 border-transparent" id="step-2" onclick="setStep(2)">
+<div class="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold group-hover:bg-stone-300">2</div>
+<div>
+<h4 class="font-bold text-stone-800">Semantic Modeling</h4>
+<p class="text-sm text-stone-500">Apply Ontologies &amp; Type Definitions</p>
+</div>
+</div>
+<div class="step-circle group flex items-center gap-4 p-4 rounded-xl cursor-pointer hover:bg-stone-100 border-l-4 border-transparent" id="step-3" onclick="setStep(3)">
+<div class="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold group-hover:bg-stone-300">3</div>
+<div>
+<h4 class="font-bold text-stone-800">Compute &amp; Enrich</h4>
+<p class="text-sm text-stone-500">Centrality scores &amp; Community detection</p>
+</div>
+</div>
+<div class="step-circle group flex items-center gap-4 p-4 rounded-xl cursor-pointer hover:bg-stone-100 border-l-4 border-transparent" id="step-4" onclick="setStep(4)">
+<div class="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold group-hover:bg-stone-300">4</div>
+<div>
+<h4 class="font-bold text-stone-800">API Access Layer</h4>
+<p class="text-sm text-stone-500">GraphQL / Data Mesh Port</p>
+</div>
+</div>
+</div>
+<!-- Step Content Display -->
+<div class="lg:col-span-8 bg-stone-900 text-stone-100 rounded-2xl p-8 flex flex-col justify-center relative shadow-2xl">
+<div class="absolute top-4 right-4 text-stone-500 font-mono text-xs">ARCH_VIEW_01</div>
+<div id="step-content">
+<h4 class="text-2xl font-bold text-orange-400 mb-4">Stage 1: Ingest &amp; Map</h4>
+<p class="text-stone-300 mb-6 leading-relaxed">
+                            Data is lifted from source systems (SQL, Logs, CSV). Unlike ETL which flattens data, 
+                            Graph Ingestion focuses on identifying <strong>Entities (Nodes)</strong> and 
+                            <strong>Relationships (Edges)</strong> immediately.
+                        </p>
+<div class="bg-stone-800 p-4 rounded-lg font-mono text-sm border-l-2 border-orange-500">
+<span class="text-purple-400">LOAD CSV FROM</span> "file:///users.csv" <span class="text-purple-400">AS</span> row<br/>
+<span class="text-purple-400">CREATE</span> (:Person {id: row.id, name: row.name})<br/>
+<span class="text-gray-500"># Relationships preserved instantly</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: The Data Product Explorer (Canvas Visualization) -->
+<section class="scroll-mt-24" id="explorer">
+<div class="flex flex-col md:flex-row justify-between items-end mb-6">
+<div class="max-w-xl">
+<span class="text-orange-600 font-bold tracking-wider text-sm uppercase">Interactive Simulation</span>
+<h3 class="text-3xl font-bold text-stone-900 mt-1">Graph Product Explorer</h3>
+<p class="text-stone-600 mt-2">
+                        Select a domain below to generate a live knowledge graph. 
+                        <strong>Click any node</strong> to view its "Product Metadata"   demonstrating how graphs make data self-describing and discoverable.
+                    </p>
+</div>
+<div class="mt-4 md:mt-0">
+<select class="bg-white border border-stone-300 text-stone-700 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 shadow-sm" id="use-case-selector" onchange="loadGraphScenario()">
+<option value="customer360">Customer 360 View</option>
+<option value="fraud">Fraud Detection Ring</option>
+<option value="supply">Supply Chain Traceability</option>
+</select>
+</div>
+</div>
+<div class="grid lg:grid-cols-3 gap-6 h-[600px] lg:h-[500px]">
+<!-- Main Canvas Area -->
+<div class="lg:col-span-2 bg-white rounded-xl shadow-md border border-stone-200 relative overflow-hidden flex flex-col">
+<div class="absolute top-3 left-3 z-10 bg-white/80 backdrop-blur px-2 py-1 rounded text-xs font-mono text-stone-500 border border-stone-200">
+                        Interactive Canvas • Click Nodes
+                    </div>
+<canvas class="w-full h-full block bg-stone-50" id="graphCanvas"></canvas>
+</div>
+<!-- Side Panel: Metadata Card -->
+<div class="lg:col-span-1 bg-white rounded-xl shadow-md border border-stone-200 p-6 flex flex-col">
+<h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4 border-b border-stone-100 pb-2">Data Product Details</h4>
+<div class="flex-grow" id="node-details">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-12 h-12 rounded-full bg-stone-200 flex items-center justify-center text-xl" id="detail-icon">?</div>
+<div>
+<h5 class="font-bold text-stone-800 text-lg" id="detail-title">Select a Node</h5>
+<span class="text-xs bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full" id="detail-type">Waiting...</span>
+</div>
+</div>
+<div class="space-y-4">
+<div>
+<label class="text-xs text-stone-500 block mb-1">Description</label>
+<p class="text-sm text-stone-700 leading-snug" id="detail-desc">
+                                    Click on a node in the graph to inspect its metadata, quality score, and ownership. This metadata layer is what turns a database row into a "Product".
+                                </p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-stone-50 p-3 rounded border border-stone-100">
+<label class="text-xs text-stone-400 block">Data Quality</label>
+<div class="font-bold text-stone-800 text-lg" id="detail-quality">-</div>
+</div>
+<div class="bg-stone-50 p-3 rounded border border-stone-100">
+<label class="text-xs text-stone-400 block">SLA</label>
+<div class="font-bold text-stone-800 text-lg" id="detail-sla">-</div>
+</div>
+</div>
+<div>
+<label class="text-xs text-stone-500 block mb-1">Data Owner</label>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">OP</div>
+<span class="text-sm font-medium text-stone-700" id="detail-owner">Operations Team</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-stone-100">
+<button class="w-full py-2 bg-stone-800 hover:bg-stone-900 text-white text-sm font-medium rounded-lg transition-colors" onclick="simulateAPICall()">
+                            Simulate API Consumption
+                        </button>
+<p class="text-center text-xs text-green-600 mt-2 h-4 transition-opacity opacity-0" id="api-feedback">Request sent to GraphQL Endpoint...</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Metrics (Chart.js) -->
+<section class="scroll-mt-24" id="metrics">
+<div class="mb-8">
+<h3 class="text-2xl font-bold text-stone-900">The ROI of Connectivity</h3>
+<p class="text-stone-600">Why shift to Graph Data Products? The metrics speak to speed and agility.</p>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<!-- Bar Chart: Query Performance -->
+<div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+<h4 class="font-bold text-stone-800 mb-4 text-center">Query Complexity vs. Depth</h4>
+<div class="chart-container">
+<canvas id="performanceChart"></canvas>
+</div>
+<p class="text-xs text-center text-stone-400 mt-2">Time (ms) to retrieve friend-of-friend data (Log Scale)</p>
+</div>
+<!-- Radar Chart: Data Product Attributes -->
+<div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+<h4 class="font-bold text-stone-800 mb-4 text-center">Data Product Maturity Score</h4>
+<div class="chart-container">
+<canvas id="attributeChart"></canvas>
+</div>
+<p class="text-xs text-center text-stone-400 mt-2">Comparison of architecture capabilities</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<div data-heading="Related Articles" data-intro="Explore more guides and technology articles." data-limit="4" id="related-articles-root"></div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- JavaScript Logic -->
+<script>
+        // --- Navigation Logic ---
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active state
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+        }
+
+        // --- Section 1: Concept Toggle Logic ---
+        function toggleView(type) {
+            const btnRel = document.getElementById('btn-relational');
+            const btnGraph = document.getElementById('btn-graph');
+            const text = document.getElementById('comparison-text');
+            const visual = document.getElementById('visual-stage');
+
+            if (type === 'relational') {
+                btnRel.classList.remove('text-stone-600', 'hover:text-stone-900');
+                btnRel.classList.add('bg-white', 'shadow-sm', 'text-stone-900');
+                btnGraph.classList.add('text-stone-600', 'hover:text-stone-900');
+                btnGraph.classList.remove('bg-white', 'shadow-sm', 'text-stone-900');
+
+                text.innerHTML = `
+                    <h4 class="text-xl font-bold text-stone-800">The Siloed Table Problem</h4>
+                    <p class="text-stone-600">
+                        In the relational model, "Customer," "Order," and "Product" live in rigid, separate tables. 
+                        To see the full picture (the "Product"), you must perform expensive JOIN operations. 
+                        The <strong>Data Product</strong> is fragmented at rest.
+                    </p>
+                    <ul class="space-y-2 text-sm text-stone-500">
+                        <li class="flex items-center gap-2"><span class="text-red-500">✕</span> Rigid Schema dependency</li>
+                        <li class="flex items-center gap-2"><span class="text-red-500">✕</span> Complex JOIN queries for insights</li>
+                        <li class="flex items-center gap-2"><span class="text-red-500">✕</span> Context is lost in aggregation</li>
+                    </ul>`;
+                
+                visual.innerHTML = `
+                    <div class="text-center p-4 w-full">
+                        <div class="flex justify-center gap-2 mb-2">
+                           <div class="border border-stone-300 bg-white p-2 rounded w-20 text-[10px] shadow-sm">User Table</div>
+                           <div class="border border-stone-300 bg-white p-2 rounded w-20 text-[10px] shadow-sm">Order Table</div>
+                        </div>
+                         <div class="grid grid-cols-3 gap-1 opacity-50 mb-2 max-w-xs mx-auto">
+                            <div class="h-6 bg-stone-300 rounded"></div><div class="h-6 bg-stone-300 rounded"></div><div class="h-6 bg-stone-300 rounded"></div>
+                            <div class="h-6 bg-stone-300 rounded"></div><div class="h-6 bg-stone-300 rounded"></div><div class="h-6 bg-stone-300 rounded"></div>
+                        </div>
+                        <div class="flex items-center justify-center my-2 text-stone-400 text-xs">
+                             <span>|| JOIN ||</span>
+                        </div>
+                        <div class="h-8 bg-stone-200 rounded w-3/4 mx-auto flex items-center justify-center text-xs text-stone-500 border border-stone-300">Merged Result</div>
+                    </div>`;
+
+            } else {
+                btnGraph.classList.remove('text-stone-600', 'hover:text-stone-900');
+                btnGraph.classList.add('bg-white', 'shadow-sm', 'text-stone-900');
+                btnRel.classList.add('text-stone-600', 'hover:text-stone-900');
+                btnRel.classList.remove('bg-white', 'shadow-sm', 'text-stone-900');
+
+                text.innerHTML = `
+                    <h4 class="text-xl font-bold text-stone-800">The Connected Graph Advantage</h4>
+                    <p class="text-stone-600">
+                        In a Graph, data is stored <em>as</em> relationships. A "Customer" node is directly linked to an "Order" node. 
+                        No JOINs required. The <strong>Data Product</strong> is pre-assembled and rich with context.
+                    </p>
+                    <ul class="space-y-2 text-sm text-stone-500">
+                        <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Schema flexibility</li>
+                        <li class="flex items-center gap-2"><span class="text-green-600">✓</span> O(1) Traversal speeds</li>
+                        <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Visual & Intuitive modeling</li>
+                    </ul>`;
+
+                visual.innerHTML = `
+                    <div class="relative w-full h-full flex items-center justify-center">
+                        <div class="absolute w-24 h-0.5 bg-stone-400 rotate-45 transform origin-left top-1/2 left-1/3"></div>
+                        <div class="absolute w-24 h-0.5 bg-stone-400 -rotate-45 transform origin-left top-1/2 left-1/3"></div>
+                        
+                        <div class="z-10 w-12 h-12 rounded-full bg-orange-500 border-4 border-white shadow-lg flex items-center justify-center text-white font-bold absolute left-1/4 top-1/2 -translate-y-1/2">User</div>
+                        <div class="z-10 w-10 h-10 rounded-full bg-stone-600 border-4 border-white shadow-lg flex items-center justify-center text-white text-xs absolute right-1/4 top-1/4">Order</div>
+                        <div class="z-10 w-10 h-10 rounded-full bg-stone-600 border-4 border-white shadow-lg flex items-center justify-center text-white text-xs absolute right-1/4 bottom-1/4">Log</div>
+                    </div>`;
+            }
+        }
+
+        // --- Section 2: Methodology Stepper ---
+        const steps = [
+            {
+                title: "Stage 1: Ingest & Map",
+                text: "Data is lifted from source systems (SQL, Logs, CSV). Unlike ETL which flattens data, Graph Ingestion focuses on identifying <strong>Entities (Nodes)</strong> and <strong>Relationships (Edges)</strong> immediately.",
+                code: `<span class="text-purple-400">LOAD CSV FROM</span> "file:///users.csv" <span class="text-purple-400">AS</span> row<br><span class="text-purple-400">CREATE</span> (:Person {id: row.id, name: row.name})<br><span class="text-gray-500"># Relationships preserved instantly</span>`
+            },
+            {
+                title: "Stage 2: Semantic Modeling",
+                text: "We apply an Ontology (a schema for meaning). We define that a 'Person' <em>PURCHASED</em> a 'Product'. This semantic layer ensures the data describes itself, a key requirement for Data Products.",
+                code: `<span class="text-purple-400">CALL</span> n10s.onto.import.fetch(<br>&nbsp;&nbsp;"https://schema.org/Product", "JSON-LD"<br>)<br><span class="text-gray-500"># Mapping standard definitions</span>`
+            },
+            {
+                title: "Stage 3: Compute & Enrich",
+                text: "The graph isn't just storage; it's a compute engine. We run algorithms (PageRank, Louvain) to find influencers or fraud rings, adding these scores back to the nodes as new properties.",
+                code: `<span class="text-purple-400">CALL</span> gds.pageRank.stream('myGraph')<br><span class="text-purple-400">YIELD</span> nodeId, score<br><span class="text-purple-400">SET</span> n.influence = score<br><span class="text-gray-500"># Enriching product value</span>`
+            },
+            {
+                title: "Stage 4: API Access Layer",
+                text: "The enriched graph is exposed via GraphQL. Consumers don't write complex graph query language (Cypher/Gremlin); they simply ask for objects and their connections via a typed API.",
+                code: `<span class="text-blue-400">type</span> User {<br>&nbsp;&nbsp;name: String<br>&nbsp;&nbsp;recommendations: [Product]<br>}<br><span class="text-gray-500"># Self-service consumption</span>`
+            }
+        ];
+
+        function setStep(num) {
+            // UI Update
+            document.querySelectorAll('.step-circle').forEach(el => {
+                el.classList.remove('active', 'border-orange-600', 'bg-stone-50');
+                el.classList.add('border-transparent');
+                el.querySelector('div').classList.remove('bg-orange-100', 'text-orange-700');
+                el.querySelector('div').classList.add('bg-stone-200', 'text-stone-600');
+            });
+            
+            const activeStep = document.getElementById(`step-${num}`);
+            activeStep.classList.add('active', 'border-orange-600', 'bg-stone-50');
+            activeStep.classList.remove('border-transparent');
+            activeStep.querySelector('div').classList.remove('bg-stone-200', 'text-stone-600');
+            activeStep.querySelector('div').classList.add('bg-orange-100', 'text-orange-700');
+
+            // Content Update
+            const data = steps[num-1];
+            const contentDiv = document.getElementById('step-content');
+            
+            // Simple fade effect
+            contentDiv.style.opacity = 0;
+            setTimeout(() => {
+                contentDiv.innerHTML = `
+                    <h4 class="text-2xl font-bold text-orange-400 mb-4">${data.title}</h4>
+                    <p class="text-stone-300 mb-6 leading-relaxed">${data.text}</p>
+                    <div class="bg-stone-800 p-4 rounded-lg font-mono text-sm border-l-2 border-orange-500">
+                        ${data.code}
+                    </div>
+                `;
+                contentDiv.style.opacity = 1;
+            }, 200);
+        }
+
+        // --- Section 3: Custom Canvas Graph Visualization ---
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let nodes = [];
+        let links = [];
+        let animationFrame;
+        let hoverNode = null;
+
+        // Data Scenarios
+        const scenarios = {
+            customer360: {
+                nodes: [
+                    { id: 1, x: 0.5, y: 0.5, r: 25, color: '#f97316', label: 'Customer', type: 'Entity', quality: '98%', sla: 'Gold', owner: 'Sales Ops', desc: 'Central aggregate of customer profile, linked to all interactions.' },
+                    { id: 2, x: 0.3, y: 0.3, r: 15, color: '#57534e', label: 'Order #1', type: 'Transaction', quality: '100%', sla: 'Silver', owner: 'Commerce', desc: 'Historical transaction data enriched with payment status.' },
+                    { id: 3, x: 0.7, y: 0.3, r: 15, color: '#57534e', label: 'Order #2', type: 'Transaction', quality: '100%', sla: 'Silver', owner: 'Commerce', desc: 'Historical transaction data enriched with payment status.' },
+                    { id: 4, x: 0.2, y: 0.6, r: 15, color: '#0ea5e9', label: 'Support', type: 'Event', quality: '92%', sla: 'Bronze', owner: 'CX Team', desc: 'Ticket history and sentiment analysis score.' },
+                    { id: 5, x: 0.8, y: 0.6, r: 15, color: '#0ea5e9', label: 'Web Visit', type: 'Event', quality: '85%', sla: 'Bronze', owner: 'Digital', desc: 'Clickstream aggregation for this session.' }
+                ],
+                links: [
+                    { source: 1, target: 2 }, { source: 1, target: 3 }, { source: 1, target: 4 }, { source: 1, target: 5 }, { source: 2, target: 3 }
+                ]
+            },
+            fraud: {
+                nodes: [
+                    { id: 1, x: 0.5, y: 0.5, r: 20, color: '#ef4444', label: 'Account A', type: 'Risky Entity', quality: 'High', sla: 'Real-time', owner: 'Fraud Ops', desc: 'Account flagged for high velocity transactions.' },
+                    { id: 2, x: 0.4, y: 0.3, r: 15, color: '#57534e', label: 'Device 1', type: 'Device', quality: 'Med', sla: 'N/A', owner: 'IT Sec', desc: 'Device fingerprint shared across multiple accounts.' },
+                    { id: 3, x: 0.6, y: 0.3, r: 15, color: '#ef4444', label: 'Account B', type: 'Risky Entity', quality: 'High', sla: 'Real-time', owner: 'Fraud Ops', desc: 'Secondary account linked via Device ID.' },
+                    { id: 4, x: 0.5, y: 0.2, r: 10, color: '#57534e', label: 'IP Addr', type: 'Network', quality: 'Low', sla: 'N/A', owner: 'IT Sec', desc: 'Shared IP address used by botnet.' }
+                ],
+                links: [
+                    { source: 1, target: 2 }, { source: 3, target: 2 }, { source: 2, target: 4 }
+                ]
+            },
+            supply: {
+                nodes: [
+                    { id: 1, x: 0.2, y: 0.5, r: 15, color: '#22c55e', label: 'Farm', type: 'Supplier', quality: 'Cert', sla: 'Monthly', owner: 'Procurement', desc: 'Origin source, certified organic.' },
+                    { id: 2, x: 0.4, y: 0.5, r: 15, color: '#57534e', label: 'Factory', type: 'Processor', quality: 'High', sla: 'Daily', owner: 'Ops', desc: 'Processing facility with batch tracking.' },
+                    { id: 3, x: 0.6, y: 0.5, r: 15, color: '#57534e', label: 'Distrib', type: 'Logistics', quality: 'Med', sla: 'Real-time', owner: 'Logistics', desc: 'Regional distribution center.' },
+                    { id: 4, x: 0.8, y: 0.5, r: 20, color: '#f97316', label: 'Store', type: 'Retail', quality: 'High', sla: 'Daily', owner: 'Sales', desc: 'End point of sale location.' }
+                ],
+                links: [
+                    { source: 1, target: 2 }, { source: 2, target: 3 }, { source: 3, target: 4 }
+                ]
+            }
+        };
+
+        function resizeCanvas() {
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            width = canvas.width;
+            height = canvas.height;
+            draw();
+        }
+
+        function loadGraphScenario() {
+            const select = document.getElementById('use-case-selector');
+            const scenario = scenarios[select.value];
+            
+            // Deep copy to reset positions if we were doing simulation, 
+            // but here we just map relative positions to canvas size
+            nodes = scenario.nodes.map(n => ({...n, xVal: n.x, yVal: n.y})); // Store original relative
+            links = scenario.links.map(l => ({...l}));
+
+            // Reset Details Panel
+            document.getElementById('detail-title').innerText = "Select a Node";
+            document.getElementById('detail-desc').innerText = "Click on a node in the graph to inspect its metadata.";
+            document.getElementById('detail-type').innerText = "Waiting...";
+            document.getElementById('detail-quality').innerText = "-";
+            document.getElementById('detail-sla').innerText = "-";
+            document.getElementById('detail-owner').innerText = "-";
+            document.getElementById('detail-icon').innerText = "?";
+            document.getElementById('detail-icon').className = "w-12 h-12 rounded-full bg-stone-200 flex items-center justify-center text-xl";
+
+            draw();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw Links
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#d6d3d1';
+            links.forEach(link => {
+                const source = nodes.find(n => n.id === link.source);
+                const target = nodes.find(n => n.id === link.target);
+                if (source && target) {
+                    ctx.beginPath();
+                    ctx.moveTo(source.xVal * width, source.yVal * height);
+                    ctx.lineTo(target.xVal * width, target.yVal * height);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw Nodes
+            nodes.forEach(node => {
+                const x = node.xVal * width;
+                const y = node.yVal * height;
+                
+                // Shadow
+                ctx.beginPath();
+                ctx.arc(x, y, node.r, 0, Math.PI * 2);
+                ctx.fillStyle = node.color;
+                ctx.shadowColor = "rgba(0,0,0,0.2)";
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Border if hovered
+                if (hoverNode && hoverNode.id === node.id) {
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = '#1c1917';
+                    ctx.stroke();
+                }
+
+                // Text Label
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 10px sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(node.label.substring(0, 8), x, y);
+            });
+        }
+
+        // Canvas Interaction
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            let found = null;
+            nodes.forEach(node => {
+                const nx = node.xVal * width;
+                const ny = node.yVal * height;
+                const dist = Math.sqrt((mouseX - nx) ** 2 + (mouseY - ny) ** 2);
+                if (dist < node.r) found = node;
+            });
+
+            if (found !== hoverNode) {
+                hoverNode = found;
+                draw();
+                canvas.style.cursor = found ? 'pointer' : 'crosshair';
+            }
+        });
+
+        canvas.addEventListener('click', () => {
+            if (hoverNode) {
+                // Update Details Panel
+                document.getElementById('detail-title').innerText = hoverNode.label;
+                document.getElementById('detail-type').innerText = hoverNode.type;
+                document.getElementById('detail-desc').innerText = hoverNode.desc;
+                document.getElementById('detail-quality').innerText = hoverNode.quality;
+                document.getElementById('detail-sla').innerText = hoverNode.sla;
+                document.getElementById('detail-owner').innerText = hoverNode.owner;
+                
+                // Update Icon Color
+                const icon = document.getElementById('detail-icon');
+                icon.style.backgroundColor = hoverNode.color + '40'; // 40 is alpha hex
+                icon.style.color = hoverNode.color;
+                icon.innerText = hoverNode.label.charAt(0);
+            }
+        });
+
+        function simulateAPICall() {
+            const feedback = document.getElementById('api-feedback');
+            feedback.style.opacity = '1';
+            setTimeout(() => {
+                feedback.innerText = "Response: { data: { " + document.getElementById('detail-title').innerText + " } }";
+                setTimeout(() => {
+                    feedback.style.opacity = '0';
+                    setTimeout(() => feedback.innerText = "Request sent to GraphQL Endpoint...", 300);
+                }, 2000);
+            }, 800);
+        }
+
+        // --- Section 4: Chart.js Initialization ---
+        function initCharts() {
+            // Bar Chart: Performance
+            const ctxPerf = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctxPerf, {
+                type: 'bar',
+                data: {
+                    labels: ['Depth 1 (Friend)', 'Depth 2 (Friend of Friend)', 'Depth 3', 'Depth 4'],
+                    datasets: [
+                        {
+                            label: 'Relational (SQL JOINs)',
+                            data: [10, 80, 1500, 25000], // Exponential growth
+                            backgroundColor: '#e7e5e4'
+                        },
+                        {
+                            label: 'Graph (Index-Free Adjacency)',
+                            data: [5, 5, 6, 8], // Linear/Constant
+                            backgroundColor: '#ea580c'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { type: 'logarithmic', title: {display:true, text: 'Execution Time (ms)'} }
+                    }
+                }
+            });
+
+            // Radar Chart: Data Attributes
+            const ctxAttr = document.getElementById('attributeChart').getContext('2d');
+            new Chart(ctxAttr, {
+                type: 'radar',
+                data: {
+                    labels: ['Discoverability', 'Context', 'Speed', 'Flexibility', 'Governance'],
+                    datasets: [{
+                        label: 'Graph Data Product',
+                        data: [90, 100, 95, 85, 80],
+                        fill: true,
+                        backgroundColor: 'rgba(234, 88, 12, 0.2)',
+                        borderColor: '#ea580c',
+                        pointBackgroundColor: '#ea580c'
+                    }, {
+                        label: 'Traditional Table',
+                        data: [60, 40, 70, 50, 85],
+                        fill: true,
+                        backgroundColor: 'rgba(87, 83, 78, 0.2)',
+                        borderColor: '#57534e',
+                        pointBackgroundColor: '#57534e'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: { line: { tension: 0.3 } }
+                }
+            });
+        }
+
+        // --- Initialization ---
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            loadGraphScenario();
+            initCharts();
+            // Default step 1
+            setStep(1);
+        });
+
+    </script>
+<script id="related-articles-noimage-js">
+
+(function(){const root=document.getElementById('related-articles-root');if(!root||root.dataset.rendered==='true')return;fetch('/data-products/assets/site-index.json').then(r=>r.json()).then(items=>{const here=location.pathname.replace(/^\/data-products\/?/,'').replace(/\/$/,'/index.html')||'index.html';const current=items.find(x=>x.public===here);const pool=items.filter(x=>x.public!==here&&x.indexable!==false);pool.sort((a,b)=>((b.category===current?.category)-(a.category===current?.category)));const chosen=pool.slice(0,Number(root.dataset.limit||4));root.innerHTML='<h2>'+(root.dataset.heading||'Related reading')+'</h2><p class="dp-related-intro">'+(root.dataset.intro||'Continue with closely related guides.')+'</p><div class="related-articles-grid">'+chosen.map(x=>'<a class="related-article-card" href="'+x.href+'">'+x.title+'</a>').join('')+'</div>';}).catch(()=>{});})();
+
+</script>
+<footer class="dp-global-footer">
+<div><strong>Data Products &amp; Enterprise AI</strong><p>Frameworks, visual guides, architecture comparisons, and implementation patterns.</p></div>
+<nav aria-label="Footer"><a href="/data-products/all-articles/">All articles</a><a href="/data-products/learning-paths/">Learning paths</a><a href="/data-products/glossary/">Glossary</a><a href="/data-products/about.html">About</a></nav>
+<p class="dp-copyright">© 2026 Prashant Dhingra. Published at prashant.dhingra.website.</p>
+</footer></body></html>
