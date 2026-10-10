@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Global Geographies of Dussehra: 20 Landmark Celebrations</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Chart Container & Theme Styles -->
+    <style>
+        /* Chosen Palette: Warm Sand & Festival Terracotta 
+           Background: #FAF7F2, Card BG: #FFFFFF, Primary Text: #2C2A29, 
+           Terracotta Accent: #C85A32, Gold Accent: #D99B26, Forest Accent: #2D5A4C 
+        */
+        body {
+            background-color: #FAF7F2;
+            color: #2C2A29;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+
+        /* Custom Scrollbar for Modal and Lists */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1ECE4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C9B8;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C85A32;
+        }
+
+        .tab-btn.active {
+            border-bottom: 3px solid #C85A32;
+            color: #C85A32;
+            font-weight: 700;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(44, 42, 41, 0.6);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Warm Sand & Festival Terracotta (Background: #FAF7F2, Cards: #FFFFFF, Primary Text: #2C2A29, Terracotta Accent: #C85A32, Gold Accent: #D99B26, Forest Accent: #2D5A4C) -->
+
+    <!-- Application Structure Plan: 
+         1. Header & Executive Metrics: High-level overview of global distribution, core paradigms, duration extremes, and UNESCO heritage counts.
+         2. View Tabs Navigation:
+            - "Celebration Explorer": Interactive card grid with multi-parameter filtering (Region, Paradigm, UNESCO, Effigy type) and instant keyword search.
+            - "Analytics & Comparative Charts": Chart.js visualizations covering festival durations, theological paradigm proportions, historical eras, and regional counts.
+            - "Thematic Matrix & Taxonomy": Cross-referencing framework exploring the 3 primary theological paradigms (Vaishnavite, Shakta, Indigenous) and historical evolution from Royal Legitimacy to Indentured Resilience and Diasporic Multiculturalism.
+         3. Detail Modal: Full rich textual breakdown of each of the 20 sites with original narrative context, ritual mechanics, and historical background.
+         WHY THIS STRUCTURE: The report merges structured metrics (durations, locations, origins) with rich qualitative historical narratives. This structure allows users to seamlessly switch between comparative quantitative analysis and deep narrative exploration without losing context.
+    -->
+
+    <!-- Visualization & Content Choices:
+         - Duration Comparison -> Horizontal Bar Chart (Chart.js) -> Canvas -> Interactively highlights massive variation from Bastar (75 days) to Sugar Land (1 day).
+         - Theological Paradigm Breakdown -> Donut Chart (Chart.js) -> Canvas -> Visually shows the distribution across Vaishnavite, Shakta, and Indigenous/Non-Epic traditions.
+         - Geographic & Era Spread -> Stacked / Grouped Bar Chart (Chart.js) -> Canvas -> Maps historical evolution across South Asia, Girmitiya diaspora, and modern Western hubs.
+         - Comparative Matrix -> Structured HTML/CSS Table with dynamic filtering -> Vanilla JS -> Enables quick scanning of all 20 celebrations by focal divinity, ritual, duration, and function.
+         - Confirming: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Section -->
+    <header class="bg-white border-b border-stone-200 shadow-sm sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🔱</span>
+                    <h1 class="text-2xl font-bold text-stone-900 tracking-tight">Global Geographies of Dussehra</h1>
+                </div>
+                <p class="text-xs sm:text-sm text-stone-600 mt-1">An Interactive Exploration of 20 Landmark Celebrations and Cultural Traditions Worldwide</p>
+            </div>
+            
+            <!-- Key Metrics Bar -->
+            <div class="grid grid-cols-4 gap-2 text-center bg-stone-50 p-2 rounded-lg border border-stone-200 text-xs sm:text-sm">
+                <div class="px-2">
+                    <span class="block font-bold text-stone-800 text-base" id="stat-total">20</span>
+                    <span class="text-stone-500 text-[10px] uppercase tracking-wider">Sites</span>
+                </div>
+                <div class="px-2 border-l border-stone-200">
+                    <span class="block font-bold text-amber-700 text-base">3</span>
+                    <span class="text-stone-500 text-[10px] uppercase tracking-wider">Paradigms</span>
+                </div>
+                <div class="px-2 border-l border-stone-200">
+                    <span class="block font-bold text-emerald-800 text-base">1 - 75</span>
+                    <span class="text-stone-500 text-[10px] uppercase tracking-wider">Days Span</span>
+                </div>
+                <div class="px-2 border-l border-stone-200">
+                    <span class="block font-bold text-amber-800 text-base">3</span>
+                    <span class="text-stone-500 text-[10px] uppercase tracking-wider">UNESCO</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8 border-t border-stone-100 text-sm font-medium text-stone-600 mt-2">
+            <button class="tab-btn py-3 active focus:outline-none flex items-center gap-1.5" id="tab-explorer" onclick="switchTab('explorer')">
+                <span>✦</span> Celebration Explorer
+            </button>
+            <button class="tab-btn py-3 focus:outline-none flex items-center gap-1.5" id="tab-analytics" onclick="switchTab('analytics')">
+                <span>📊</span> Analytics &amp; Data
+            </button>
+            <button class="tab-btn py-3 focus:outline-none flex items-center gap-1.5" id="tab-matrix" onclick="switchTab('matrix')">
+                <span>🏛️</span> Taxonomy &amp; Matrix
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: EXPLORER VIEW -->
+        <section class="space-y-6" id="view-explorer">
+            
+            <!-- Introductory Context -->
+            <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-4 text-stone-700 text-sm leading-relaxed">
+                <p>
+                    <strong>Welcome to the Interactive Dussehra Explorer.</strong> Dussehra (synonymous with <em>Vijayadashami</em> or <em>Dasha-hara</em>) ranges from royal pageants in South India to 75-day tribal covenants in Chhattisgarh, environmental promenade theaters in Uttar Pradesh, and indentured heritage preservation across the Americas and Pacific. Use the filters below to browse across regions, theological traditions, and historical origins. Click any card to launch the complete research narrative.
+                </p>
+            </div>
+
+            <!-- Interactive Filters Bar -->
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-4 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Search Input -->
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Search Keywords</label>
+                        <input class="w-full px-3 py-2 text-sm bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-600" id="search-input" oninput="applyFilters()" placeholder="City, divinity, ritual, country..." type="text"/>
+                    </div>
+
+                    <!-- Region Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Geographic Region</label>
+                        <select class="w-full px-3 py-2 text-sm bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-600" id="filter-region" onchange="applyFilters()">
+                            <option value="ALL">All Regions (Global &amp; Subcontinent)</option>
+                            <option value="Southern India">Southern India</option>
+                            <option value="Northern India">Northern India</option>
+                            <option value="Eastern &amp; Central India">Eastern &amp; Central India</option>
+                            <option value="Himalayan Region">Himalayan Region (Himachal/Uttarakhand/Nepal)</option>
+                            <option value="International Diaspora">International &amp; Diaspora</option>
+                        </select>
+                    </div>
+
+                    <!-- Paradigm Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Theological Paradigm</label>
+                        <select class="w-full px-3 py-2 text-sm bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-600" id="filter-paradigm" onchange="applyFilters()">
+                            <option value="ALL">All Paradigms</option>
+                            <option value="Vaishnavite / Heroic">Vaishnavite / Heroic (Rama)</option>
+                            <option value="Shakta / Cosmic Feminine">Shakta / Cosmic Feminine (Durga/Kali)</option>
+                            <option value="Indigenous / Non-Epic">Indigenous / Non-Epic / Devta Assembly</option>
+                        </select>
+                    </div>
+
+                    <!-- Special Features Toggle -->
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Special Attributes</label>
+                        <select class="w-full px-3 py-2 text-sm bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-600" id="filter-attribute" onchange="applyFilters()">
+                            <option value="ALL">All Attributes</option>
+                            <option value="UNESCO">UNESCO Intangible Cultural Heritage</option>
+                            <option value="NO_EFFIGY">No Effigy Burning</option>
+                            <option value="EFFIGY">Effigy Immolation Featured</option>
+                            <option value="ROYAL">Royal / State Heritage</option>
+                            <option value="GIRMITIYA">Girmitiya Indentured Roots</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Active Filter Count Indicator -->
+                <div class="flex items-center justify-between pt-2 border-t border-stone-100 text-xs text-stone-500">
+                    <span>Showing <strong class="text-stone-800" id="visible-count">20</strong> of 20 Celebrations</span>
+                    <button class="text-amber-800 hover:underline font-medium" onclick="resetFilters()">Reset All Filters</button>
+                </div>
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="celebrations-grid">
+                <!-- Cards dynamically populated via JS -->
+            </div>
+        </section>
+
+
+        <!-- TAB 2: ANALYTICS & DATA VIEW -->
+        <section class="hidden space-y-6" id="view-analytics">
+            
+            <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-4 text-stone-700 text-sm leading-relaxed">
+                <p>
+                    <strong>Data Insights &amp; Quantitative Analysis.</strong> This dashboard compares the structural dimensions of the 20 landmark Dussehra traditions—visualizing festival durations, theological paradigm balances, historical origins, and regional concentrations.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: Duration Comparison -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+                    <div class="mb-3">
+                        <h3 class="font-bold text-stone-800 text-base">Festival Duration Comparison</h3>
+                        <p class="text-xs text-stone-500">Number of continuous calendar days dedicated to rituals and public festivities</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-duration"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-600 mt-3 pt-2 border-t border-stone-100">
+                        <em>Insight:</em> Bastar Dussehra (75 days) and Ramnagar Ramlila (31 days) represent deep temporal devotions, whereas Western diaspora celebrations condense rituals into intensive 1-day stadium melas.
+                    </p>
+                </div>
+
+                <!-- Chart 2: Paradigm Breakdown -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+                    <div class="mb-3">
+                        <h3 class="font-bold text-stone-800 text-base">Theological Paradigm Distribution</h3>
+                        <p class="text-xs text-stone-500">Categorization by core divine archetype and liturgical focus</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-paradigm"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-600 mt-3 pt-2 border-t border-stone-100">
+                        <em>Insight:</em> While Northern India and the Caribbean Girmitiya diaspora are predominantly Vaishnavite (Rama), South/East India and Nepal lean strongly Shakta (Durga/Kali), alongside unique tribal traditions.
+                    </p>
+                </div>
+
+                <!-- Chart 3: Era Breakdown -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+                    <div class="mb-3">
+                        <h3 class="font-bold text-stone-800 text-base">Historical Epoch &amp; Origins</h3>
+                        <p class="text-xs text-stone-500">Distribution across historical eras of establishment</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-era"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-600 mt-3 pt-2 border-t border-stone-100">
+                        <em>Insight:</em> Celebrations reflect distinct historical waves: ancient temple rites, 14th-18th century royal statecraft, 19th-century indentured Girmitiya migrations, and late 20th-century Western diaspora hubs.
+                    </p>
+                </div>
+
+                <!-- Chart 4: Regional Distribution -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+                    <div class="mb-3">
+                        <h3 class="font-bold text-stone-800 text-base">Geographic Dispersion</h3>
+                        <p class="text-xs text-stone-500">Count of landmark sites by geographical territory</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-region"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-600 mt-3 pt-2 border-t border-stone-100">
+                        <em>Insight:</em> Exactly 40% (8 of 20) of the surveyed landmark Dussehra traditions flourish outside mainland India, illustrating global cultural transmission across oceans and continents.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- TAB 3: TAXONOMY & MATRIX VIEW -->
+        <section class="hidden space-y-6" id="view-matrix">
+            
+            <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-4 text-stone-700 text-sm leading-relaxed">
+                <p>
+                    <strong>Thematic Taxonomy &amp; Comparative Matrix.</strong> Dussehra cannot be reduced to a single mythological storyline. Examine the cross-cutting matrix below detailing focal divinities, core rituals, duration, historical origins, and core socio-political functions.
+                </p>
+            </div>
+
+            <!-- Theological Paradigms Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="p-1.5 bg-amber-100 text-amber-900 rounded-md font-bold text-xs">PARADIGM 1</span>
+                        <h4 class="font-bold text-stone-800 text-sm">Vaishnavite / Heroic</h4>
+                    </div>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        <strong>Focal Archetype:</strong> Lord Rama (*Ramcharitmanas*)<br/>
+                        <strong>Core Theme:</strong> Ethical sovereignty (*Maryada Purushottam*), triumph of righteousness over pride/ego (*Ravana*).<br/>
+                        <strong>Primary Geography:</strong> North/West India, Gangetic Plain, Caribbean &amp; Pacific Girmitiya diaspora.
+                    </p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-rose-200 shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="p-1.5 bg-rose-100 text-rose-900 rounded-md font-bold text-xs">PARADIGM 2</span>
+                        <h4 class="font-bold text-stone-800 text-sm">Shakta / Cosmic Feminine</h4>
+                    </div>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        <strong>Focal Archetype:</strong> Durga / Chamundeshwari / Kali / Mutharamman<br/>
+                        <strong>Core Theme:</strong> Primordial female energy annihilating Mahishasura; subduing ego; homecomings.<br/>
+                        <strong>Primary Geography:</strong> Bengal, South India (Karnataka, Tamil Nadu), Nepal, Mauritius.
+                    </p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="p-1.5 bg-emerald-100 text-emerald-900 rounded-md font-bold text-xs">PARADIGM 3</span>
+                        <h4 class="font-bold text-stone-800 text-sm">Indigenous / Non-Epic</h4>
+                    </div>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        <strong>Focal Archetype:</strong> Devi Danteshwari, Local Devtas, Nature Covenants<br/>
+                        <strong>Core Theme:</strong> Inter-valley divine assemblies, tribal clan integration, ecological pacts, no effigy burnings.<br/>
+                        <strong>Primary Geography:</strong> Bastar tribal belt, Kullu mountain valley.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Complete Data Matrix Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="p-4 border-b border-stone-200 bg-stone-50 flex items-center justify-between">
+                    <h3 class="font-bold text-stone-800 text-sm">Master Comparative Matrix (20 Sites)</h3>
+                    <span class="text-xs text-stone-500">Click any row to open full narrative text</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-stone-100 text-stone-700 font-semibold border-b border-stone-200">
+                                <th class="p-3">Location</th>
+                                <th class="p-3">Focal Divinity</th>
+                                <th class="p-3">Core Ritual / Spectacle</th>
+                                <th class="p-3">Duration</th>
+                                <th class="p-3">Historical Epoch</th>
+                                <th class="p-3">Primary Cultural Function</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-200 text-stone-700" id="matrix-table-body">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+
+    <!-- DETAIL MODAL -->
+    <div class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4" id="detail-modal">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-stone-200">
+            <!-- Modal Header -->
+            <div class="p-5 bg-stone-900 text-white flex items-start justify-between relative">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-600 text-white" id="modal-region-badge">Region</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-stone-700 text-stone-200" id="modal-paradigm-badge">Paradigm</span>
+                    </div>
+                    <h2 class="text-xl font-bold tracking-tight" id="modal-title">Celebration Name</h2>
+                    <p class="text-xs text-stone-300 mt-0.5" id="modal-location">Location, Country</p>
+                </div>
+                <button class="text-stone-400 hover:text-white p-1 text-xl font-bold focus:outline-none" onclick="closeModal()">×</button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 space-y-5 overflow-y-auto flex-grow text-stone-700 text-sm leading-relaxed">
+                <!-- Metadata Quick Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-stone-50 p-3 rounded-lg border border-stone-200 text-xs">
+                    <div>
+                        <span class="block text-stone-400 uppercase text-[10px] font-bold">Duration</span>
+                        <span class="font-bold text-stone-800" id="modal-duration">10 days</span>
+                    </div>
+                    <div>
+                        <span class="block text-stone-400 uppercase text-[10px] font-bold">Historical Era</span>
+                        <span class="font-bold text-stone-800" id="modal-epoch">14th Century</span>
+                    </div>
+                    <div>
+                        <span class="block text-stone-400 uppercase text-[10px] font-bold">Focal Divinity</span>
+                        <span class="font-bold text-stone-800" id="modal-divinity">Chamundeshwari</span>
+                    </div>
+                    <div>
+                        <span class="block text-stone-400 uppercase text-[10px] font-bold">UNESCO Status</span>
+                        <span class="font-bold text-stone-800" id="modal-unesco">No</span>
+                    </div>
+                </div>
+
+                <!-- Ritual & Function Summary -->
+                <div class="space-y-2">
+                    <h4 class="font-bold text-stone-900 border-b border-stone-200 pb-1 text-xs uppercase tracking-wider text-amber-800">Core Ritual &amp; Spectacle</h4>
+                    <p class="bg-amber-50/50 p-3 rounded-md border border-amber-100/60 font-medium text-stone-800" id="modal-ritual"></p>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-bold text-stone-900 border-b border-stone-200 pb-1 text-xs uppercase tracking-wider text-amber-800">Primary Cultural Function</h4>
+                    <p class="text-stone-700" id="modal-function"></p>
+                </div>
+
+                <!-- Deep Dive Qualitative Breakdown -->
+                <div class="space-y-2 pt-2">
+                    <h4 class="font-bold text-stone-900 border-b border-stone-200 pb-1 text-xs uppercase tracking-wider text-amber-800">In-Depth Historical &amp; Ritual Mechanics</h4>
+                    <div class="space-y-3 text-stone-700 text-xs sm:text-sm leading-relaxed" id="modal-details">
+                        <!-- Full report text dynamically injected -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-stone-50 border-t border-stone-200 flex justify-end">
+                <button class="px-4 py-2 bg-stone-800 hover:bg-stone-900 text-white font-medium text-xs rounded-lg shadow-sm transition" onclick="closeModal()">Close Explorer View</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT DATA & INTERACTION LOGIC -->
+    <script>
+        // DATA STORE FOR 20 DUSSEHRA CELEBRATIONS
+        const dussehraData = [
+            {
+                id: "mysuru",
+                name: "Mysuru Dasara",
+                location: "Mysuru, Karnataka, India",
+                region: "Southern India",
+                paradigm: "Shakta / Cosmic Feminine",
+                divinity: "Chamundeshwari",
+                ritual: "Jumboo Savari (Golden howdah elephant procession)",
+                duration: 10,
+                durationDisplay: "10 days",
+                epoch: "14th–17th Century",
+                epochGroup: "Medieval / Royal Era",
+                function: "Statehood celebration and royal legitimization",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: true,
+                girmitiya: false,
+                summary: "South Indian royal pageantry featuring the golden howdah elephant march and Amba Vilas Palace illuminations.",
+                details: "Mysuru Dasara represents the zenith of South Indian royal pageantry, serving as the official state festival (Nada Habba) of Karnataka. Tracing its genealogy to the 14th-century Mahanavami festivals of the Vijayanagara Empire, it was inaugurated in Srirangapatna in 1610 by Raja Wadiyar I. The festival centers on Goddess Chamundeshwari, who annihilated Mahishasura atop Chamundi Hills. On Vijayadashami, the Jumboo Savari procession features a lead elephant carrying a 750kg golden howdah housing the goddess, escorted by cavalry and bands from Amba Vilas Palace to Bannimantap. Private royal rituals include Ayudha Puja and Banni tree veneration."
+            },
+            {
+                id: "kullu",
+                name: "Kullu Dussehra",
+                location: "Kullu, Himachal Pradesh, India",
+                region: "Himalayan Region",
+                paradigm: "Indigenous / Non-Epic",
+                divinity: "Lord Raghunath & 200+ Devtas",
+                ritual: "Assembly of Himalayan palanquin deities; no effigy burning",
+                duration: 7,
+                durationDisplay: "7 days",
+                epoch: "c. 1660",
+                epochGroup: "Medieval / Royal Era",
+                function: "Inter-valley sacred governance and divine fealty",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: true,
+                girmitiya: false,
+                summary: "Mountain divine assembly where over 200 village devtas arrive on palanquins; begins on Vijayadashami without effigies.",
+                details: "Celebrated in the Beas River valley, Kullu Dussehra begins ON Vijayadashami and runs for seven days in Dhalpur Maidan. Dating to 1660 under Raja Jagat Singh—who installed Lord Raghunath to seek absolution—it burns no effigies. Instead, 200+ local village deities (devtas) arrive on wooden palanquins (rathas). The festival opens with hauling Raghunath's chariot led by Goddess Hadimba of Manali, serving as a mountain divine parliament for inter-village arbitration and ecological cohesion, ending with Lankadahan (burning dry bushes by the Beas river)."
+            },
+            {
+                id: "bastar",
+                name: "Bastar Dussehra",
+                location: "Jagdalpur, Chhattisgarh, India",
+                region: "Eastern & Central India",
+                paradigm: "Indigenous / Non-Epic",
+                divinity: "Devi Danteshwari & Maoli",
+                ritual: "Phool Rath & Vijay Rath circumambulation; Kachan Gadi",
+                duration: 75,
+                durationDisplay: "75 days",
+                epoch: "15th Century",
+                epochGroup: "Medieval / Royal Era",
+                function: "Tribal integration and agrarian covenant renewal",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: true,
+                girmitiya: false,
+                summary: "The world's longest festival, lasting 75 days; bypasses the Ramayana entirely to honor indigenous tribal deities.",
+                details: "Spanning 75 days, Bastar Dussehra in Jagdalpur is the world's longest continuous festival. Originating in the 15th century under Kakatiya King Purushottam Deo (bestowed the title Rath-pati in Puri), it has no connection to Ramayana and burns no effigies. It venerates Goddess Danteshwari and indigenous clan deities across Gond, Halba, Muria, and Dhurwa tribes. Every tribal group holds hereditary tasks: Paat Jatra (wood sanctification), Kachan Gadi (maiden on thorn swing), Jogi Bithai (penance pit), and pulling the 8-wheeled Vijay Rath."
+            },
+            {
+                id: "ramnagar",
+                name: "Ramnagar Ramlila",
+                location: "Varanasi, Uttar Pradesh, India",
+                region: "Northern India",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama (Ramcharitmanas)",
+                ritual: "Environmental promenade theater over 31 sq miles",
+                duration: 31,
+                durationDisplay: "31 days",
+                epoch: "Early 19th Century",
+                epochGroup: "Colonial / 19th C Era",
+                function: "UNESCO living heritage of sacred performance",
+                unesco: true,
+                effigy: "EFFIGY",
+                royal: true,
+                girmitiya: false,
+                summary: "World-famous UNESCO heritage 31-day promenade drama mapping an entire town into the geography of the Ramayana.",
+                details: "Established in the early 19th century by Kashi Naresh Maharaja Udit Narayan Singh across the Ganga from Varanasi, this performance spans 31 days using Tulsidas's Ramcharitmanas. The entire town of Ramnagar serves as the stage, with permanent stone sites representing Ayodhya, Janakpur, and Lanka. Eschewing microphones and electric lights, it is lit by brass torches (mashals) while Brahmin chanters (Ramayanis) recite the epic. Spectators move along with the Kashi Naresh on elephant back."
+            },
+            {
+                id: "kolkata",
+                name: "Kolkata Durga Puja & Bijoya",
+                location: "Kolkata, West Bengal, India",
+                region: "Eastern & Central India",
+                paradigm: "Shakta / Cosmic Feminine",
+                divinity: "Mahishasuramardini Durga",
+                ritual: "Sindoor Khela; River Visarjan; Shubho Bijoya",
+                duration: 10,
+                durationDisplay: "5–10 days",
+                epoch: "16th–18th Century",
+                epochGroup: "Medieval / Royal Era",
+                function: "UNESCO cultural heritage and social cohesion",
+                unesco: true,
+                effigy: "NO_EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "UNESCO-inscribed festival concluding on Bijoya Dashami with vermilion rituals (Sindoor Khela) and grand river immersions.",
+                details: "In Bengal, Dussehra is observed as Bijoya Dashami, celebrating Goddess Durga's victory over Mahishasura and her return to Mount Kailash. The day begins with Darpan Visarjan (mirror reflection ritual) and Sindoor Khela, where married women apply vermilion to the goddess and each other. Massive street processions with dhak drums carry clay idols to the Hooghly River for immersion (Visarjan), followed by Shubho Bijoya family visits, blessings, and sweet exchanges."
+            },
+            {
+                id: "kota",
+                name: "Kota Dussehra Mela",
+                location: "Kota, Rajasthan, India",
+                region: "Northern India",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "75+ ft effigy immolation; royal Darikhana procession",
+                duration: 25,
+                durationDisplay: "25 days",
+                epoch: "1723",
+                epochGroup: "Medieval / Royal Era",
+                function: "Rajput martial ethos and agrarian trade hub",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: true,
+                girmitiya: false,
+                summary: "25-day fair featuring towering 75ft pyrotechnic effigies and historic Rajput martial processions.",
+                details: "Inaugurated in 1723 by Maharao Durjanshal Singh Hada and expanded in the late 19th century into a major fair, Kota Dussehra combines royal Rajput tradition with a major rural economic fair. It is famous for giant 75-to-80-foot effigies of Ravana, Kumbhakarna, and Meghnad. On Vijayadashami, the Darikhana royal procession moves from the City Palace to the grounds, where effigies are ignited by flaming arrows following folk performances like Kacchi Ghodi and Sikh Gatka."
+            },
+            {
+                id: "kulasekharapatnam",
+                name: "Kulasekharapatnam Kulasai Dasara",
+                location: "Thoothukudi, Tamil Nadu, India",
+                region: "Southern India",
+                paradigm: "Shakta / Cosmic Feminine",
+                divinity: "Mutharamman (Shiva-Kali)",
+                ritual: "Costumed penance (veshams); Beach Soorasamharam",
+                duration: 12,
+                durationDisplay: "12 days",
+                epoch: "Ancient / Pandya Era",
+                epochGroup: "Ancient / Classical Era",
+                function: "Subversion of ego and coastal ritual purge",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "Ecstatic coastal festival drawing 1.5 million pilgrims wearing trance disguises (veshams) on the shores of the Bay of Bengal.",
+                details: "Centered at the Arulmigu Mutharamman Temple where Shiva and Kali are enshrined together, this celebration draws over 1.5 million pilgrims who observe a 41-day penance vow. Devotees take on disguises (veshams) as Kali, kings, or beggars, begging for alms across towns to eradicate personal ego. The climax occurs at midnight on the beach during Soorasamharam, where an actor portraying Kali engages in a dramatic battle with Mahishasura before sea immersion."
+            },
+            {
+                id: "madikeri",
+                name: "Madikeri Dasara",
+                location: "Kodagu, Karnataka, India",
+                region: "Southern India",
+                paradigm: "Shakta / Cosmic Feminine",
+                divinity: "Four Mariamman Goddesses",
+                ritual: "Karaga dances; Dasha Mantapa hydraulic mechanical floats",
+                duration: 10,
+                durationDisplay: "10 days",
+                epoch: "Late 18th Century",
+                epochGroup: "Colonial / 19th C Era",
+                function: "Highland epidemic expulsion and mechanical art",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: true,
+                girmitiya: false,
+                summary: "Coorg mountain festival featuring all-night parades of elaborate hydraulic mechanical floats (Dasha Mantapa).",
+                details: "Tracing back over two centuries to the Haleri kings of Coorg to ward off a historic epidemic, Madikeri Dasara centers on four Mariamman shrines. It begins with Karaga night dances where priests balance floral water pots on their heads. On Vijayadashami night, the Dasha Mantapa procession features 10 major temple teams mounting multi-trailer mechanical hydraulic tableaux depicting puranic battles that parade through the misty mountain town from midnight to dawn."
+            },
+            {
+                id: "mangalore",
+                name: "Mangalore Dasara",
+                location: "Mangalore, Karnataka, India",
+                region: "Southern India",
+                paradigm: "Shakta / Cosmic Feminine",
+                divinity: "Navadurga, Sharada, Shiva",
+                ritual: "Pili Nalike (Tulu tiger dance); nocturnal carnivals",
+                duration: 10,
+                durationDisplay: "10 days",
+                epoch: "1912",
+                epochGroup: "Modern / 20th C Era",
+                function: "Anti-caste social reform and Tulu cultural pride",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "Famous for high-energy Tulu tiger dancers (Pili Nalike) and social reform roots founded by Narayana Guru.",
+                details: "Centering on Kudroli Shri Gokarnanatheshwara Temple—established in 1912 by social reformer Narayana Guru to provide an inclusive worship space for marginalized communities—Mangalore Dasara is a major Tulu cultural event. It features Pili Nalike (tiger dances) where painted dancers perform acrobatic flips to tashe drums. A grand nocturnal procession on Vijayadashami carries life-sized Navadurga and Sharada murtis across 7km before water immersion."
+            },
+            {
+                id: "telangana",
+                name: "Telangana Dasara (Pedda Panduga)",
+                location: "Telangana (Statewide), India",
+                region: "Southern India",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Pandavas & Durga",
+                ritual: "Jammi Chettu worship; Bangaram leaf exchange; Alai Balai",
+                duration: 10,
+                durationDisplay: "10 days",
+                epoch: "Ancient / Kakatiya Era",
+                epochGroup: "Ancient / Classical Era",
+                function: "Kinship renewal and regional state identity",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "Deccan festival connected with floral Bathukamma, leaf exchanges (Bangaram), and sighting the lucky Palapitta bird.",
+                details: "Known as Pedda Panduga ('The Big Festival'), this celebration follows the 9-day floral Bathukamma festival. On Vijayadashami, families worship the sacred Jammi Chettu tree (honoring the Pandavas retrieving weapons during exile) and exchange its green leaves as symbolic gold ('Bangaram') while seeking forgiveness. Sighting the Palapitta (Indian Roller bird) is sought for good luck. Urban centers host Alai Balai gatherings to foster inter-caste fraternity."
+            },
+            {
+                id: "almora",
+                name: "Almora Dussehra",
+                location: "Almora, Uttarakhand, India",
+                region: "Himalayan Region",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "Complete lineage immolation (15 distinct effigies)",
+                duration: 10,
+                durationDisplay: "10 days",
+                epoch: "1936",
+                epochGroup: "Modern / 20th C Era",
+                function: "Community opera rivalry and total clan purge",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "Competitive Kumaoni hill tradition where 15 distinct effigies of Ravana's entire demonic lineage are constructed and burned.",
+                details: "Rooted in the 150-year-old Kumaoni musical Ramlila, Almora's effigy tradition crystallized in 1936. Rather than burning only Ravana, different city neighborhoods (mohallas) competitively build up to 15 massive effigies representing Ravana's entire family network (including Ahiravan, Kumbhinasi, Surpanakha). These paper-and-bamboo figures are paraded through narrow mountain streets before converging at the stadium for systematic immolation."
+            },
+            {
+                id: "delhi",
+                name: "Delhi Ramlila Grounds",
+                location: "New Delhi, India",
+                region: "Northern India",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "State-level effigy combustion at historical maidans",
+                duration: 12,
+                durationDisplay: "10–12 days",
+                epoch: "19th Century",
+                epochGroup: "Colonial / 19th C Era",
+                function: "National civil religion and political unity",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "National political stage where India's Prime Minister and President attend massive effigy burnings in Old Delhi.",
+                details: "Staged across historic venues like Ramlila Maidan and the Red Fort grounds, Delhi's Ramlilas trace back to Mughal-era merchant patronage. Modern productions feature multi-story sets, pyrotechnics, and celebrity actors. On Dussehra evening, national political leaders (President, PM) fire burning arrows into multi-story effigies of Ravana, Kumbhakarna, and Meghnad before massive crowds, broadcast live nationwide."
+            },
+            {
+                id: "nepal",
+                name: "Dashain (Bijaya Dashami)",
+                location: "Kathmandu & Nationwide, Nepal",
+                region: "Himalayan Region",
+                paradigm: "Shakta / Cosmic Feminine",
+                divinity: "Taleju Bhawani / Durga",
+                ritual: "Phulpati march; Linge Ping swings; Tika and Jamara",
+                duration: 15,
+                durationDisplay: "15 days",
+                epoch: "Ancient Malla / Shah Era",
+                epochGroup: "Ancient / Classical Era",
+                function: "National sovereign renewal and generational kinship",
+                unesco: false,
+                effigy: "NO_EFFIGY",
+                royal: true,
+                girmitiya: false,
+                summary: "Nepal's paramount 15-day national festival centered on barley shoots (Jamara), family Tika blessings, and bamboo swings.",
+                details: "Bada Dashain is Nepal's primary national festival uniting all ethnic groups. It starts with Ghatasthapana (planting barley seeds for pale-yellow Jamara shoots). The 7th day features Phulpati carried from Gorkha to Kathmandu's Hanuman Dhoka palace. On Bijaya Dashami, family elders place crimson Tika (rice, vermilion, curd) and Jamara behind the ears of younger relatives with blessings. High bamboo swings (Linge Ping) are built across fields nationwide."
+            },
+            {
+                id: "trinidad",
+                name: "Felicity & Chaguanas Ramleela",
+                location: "Felicity, Chaguanas, Trinidad & Tobago",
+                region: "International Diaspora",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "Open-air savannah theater; chowtal; effigy blaze",
+                duration: 11,
+                durationDisplay: "10–11 days",
+                epoch: "1870s–1880s",
+                epochGroup: "Colonial / 19th C Era",
+                function: "Subaltern persistence against indentureship",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: true,
+                summary: "Oldest open-air theater tradition in the Western Hemisphere, preserved by 19th-century indentured sugar laborers.",
+                details: "Introduced by indentured Girmitiya workers between 1845 and 1917, Trinidad's Ramleela in Felicity is the oldest open-air folk theater in the Western Hemisphere. Staged across community savannahs over 10-11 days, amateur village actors perform silent pantomime while elders chant Awadhi Ramcharitmanas to dholak drums and chowtal singing. The event closes with burning a 30-to-40-foot effigy of Ravana."
+            },
+            {
+                id: "guyana",
+                name: "Georgetown & Berbice Dussehra",
+                location: "Georgetown & Berbice, Guyana",
+                region: "International Diaspora",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "Open-field folk drama; flaming arrow Ravan Dahan",
+                duration: 10,
+                durationDisplay: "9–10 days",
+                epoch: "19th Century",
+                epochGroup: "Colonial / 19th C Era",
+                function: "Indo-Caribbean memory and moral resilience",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: true,
+                summary: "Indo-Guyanese tradition where Rama's exile provided psychological resilience against colonial plantation hardships.",
+                details: "Organized by bodies like Guyana Hindu Dharmic Sabha across Georgetown and sugar belt villages in Berbice, open-field Ramlilas have been performed since 19th-century indentureship. Rama's exile in wild forests served as a direct spiritual metaphor for workers crossing the Kala Pani (ocean) to sugar plantations. Celebrations conclude on Dussehra with flaming arrow effigy burnings and sirni sweet distribution."
+            },
+            {
+                id: "london",
+                name: "Trafalgar Sq & Leicester Golden Mile",
+                location: "London & Leicester, United Kingdom",
+                region: "International Diaspora",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama & Universal Light",
+                ritual: "Trafalgar Square & Golden Mile civic illuminations",
+                duration: 3,
+                durationDisplay: "1–3 days",
+                epoch: "Late 20th Century",
+                epochGroup: "Modern / 20th C Era",
+                function: "State-endorsed multiculturalism and visibility",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "Major British civic festivals bringing over 30,000 people to central London and Leicester's Golden Mile.",
+                details: "In the UK, Dussehra has evolved into major municipal multicultural celebrations. In London's Trafalgar Square (organized with the Mayor of London), 30,000+ attend Garba dancing, Tasha Dhol drumming, and Ramayana theater. In Leicester's Golden Mile (Belgrave Road), community melas end in Abbey Park with massive Ravana effigy immolations and fireworks."
+            },
+            {
+                id: "sugarland",
+                name: "Sugar Land Dussehra Festival",
+                location: "Sugar Land (Houston), Texas, USA",
+                region: "International Diaspora",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "Minor League stadium parade; English Ramleela",
+                duration: 1,
+                durationDisplay: "1 day",
+                epoch: "2012",
+                epochGroup: "Modern / 20th C Era",
+                function: "Diasporic transmission and civic integration",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "Stadium festival drawing 10,000 attendees to Constellation Field featuring an English-language Ramleela and floats.",
+                details: "Organized by the Shri Sita Ram Foundation at Constellation Field baseball stadium, this event draws 10,000 attendees. It features a perimeter parade with 35+ floats representing various Indian states, an English-language stage adaptation of the Ramayana for youth, and a multi-story Ravana effigy shot with fire on the field amidst fireworks."
+            },
+            {
+                id: "edison",
+                name: "Edison Dussehra Mela",
+                location: "Edison, New Jersey, USA",
+                region: "International Diaspora",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "Suburban park mela; 40-foot effigy immolation",
+                duration: 2,
+                durationDisplay: "1–2 days",
+                epoch: "Late 20th Century",
+                epochGroup: "Modern / 20th C Era",
+                function: "Regional diaspora congregation and commerce",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: false,
+                summary: "Massive tri-state suburban gathering in New Jersey featuring food melas and 40ft effigy burnings.",
+                details: "Serving as the cultural anchor for South Asians in the NY tri-state area, the Edison festival in Lake Papaianni Park attracts tens of thousands. It recreates a North Indian mela atmosphere with food stalls, Garba circles, and stage drama, culminating at dusk in the burning of a 40-to-50-foot pyrotechnic Ravana effigy."
+            },
+            {
+                id: "mauritius",
+                name: "Port Louis & Coastal Celebrations",
+                location: "Port Louis & Coastline, Mauritius",
+                region: "International Diaspora",
+                paradigm: "Shakta / Cosmic Feminine",
+                divinity: "Rama & Durga",
+                ritual: "Coastal idol immersions; temple mandali dramas",
+                duration: 10,
+                durationDisplay: "10 days",
+                epoch: "1830s onward",
+                epochGroup: "Colonial / 19th C Era",
+                function: "Constitutionalized ancestral heritage affirmation",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: true,
+                summary: "National holiday integration in the Indian Ocean where coastal geography shapes Durga immersions and Ramlilas.",
+                details: "In Mauritius—where 2/3 of the population descends from 19th-century Indian indentured workers—Dussehra holds recognized national status. Community Ramayana Mandalis stage Awadhi drama performances, while Vijayadashami features public beach immersions of Durga idols at Flic-en-Flac and Grand Baie alongside inland wicker Ravana effigy burnings, attended by national heads of state."
+            },
+            {
+                id: "fiji",
+                name: "Suva & Western Division Mandalis",
+                location: "Suva, Lautoka, Ba, Fiji",
+                region: "International Diaspora",
+                paradigm: "Vaishnavite / Heroic",
+                divinity: "Rama",
+                ritual: "Plantation Ramayana Mandali readings; rural plays",
+                duration: 10,
+                durationDisplay: "9–10 days",
+                epoch: "1879–1916",
+                epochGroup: "Colonial / 19th C Era",
+                function: "Girmitiya historical resistance and sacred solidarity",
+                unesco: false,
+                effigy: "EFFIGY",
+                royal: false,
+                girmitiya: true,
+                summary: "Pacific island tradition forged in plantation barracks through grass-roots Ramayana Mandalis.",
+                details: "Originating among 60,000 Girmitiya plantation laborers in Fiji who unified around the Ramcharitmanas, Dussehra is celebrated across Viti Levu sugar districts. Grass-roots Ramayana Mandalis chant in community halls using harmonium and dholak, staging village open-air plays with bamboo and reed effigies of Ravana as an enduring symbol of resistance against oppression."
+            }
+        ];
+
+        // CHART INSTANCES
+        let chartDuration, chartParadigm, chartEra, chartRegion;
+
+        // APPLICATION INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            renderExplorerCards(dussehraData);
+            renderMatrixTable(dussehraData);
+            initCharts();
+        });
+
+        // TAB SWITCHING LOGIC
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+
+            // Trigger chart update if switching to analytics
+            if (tabId === 'analytics') {
+                setTimeout(() => {
+                    chartDuration.resize();
+                    chartParadigm.resize();
+                    chartEra.resize();
+                    chartRegion.resize();
+                }, 50);
+            }
+        }
+
+        // RENDER EXPLORER CARDS
+        function renderExplorerCards(data) {
+            const container = document.getElementById('celebrations-grid');
+            document.getElementById('visible-count').innerText = data.length;
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-white rounded-xl border border-stone-200">
+                        <span class="text-3xl block mb-2">🔍</span>
+                        <h3 class="font-bold text-stone-700">No celebrations match your filters</h3>
+                        <p class="text-xs text-stone-500 mt-1">Try adjusting your search terms or clearing region/paradigm dropdowns.</p>
+                        <button onclick="resetFilters()" class="mt-3 px-3 py-1.5 bg-amber-800 text-white text-xs font-medium rounded-md">Reset Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = data.map(item => `
+                <div onclick="openModal('${item.id}')" class="bg-white rounded-xl border border-stone-200 p-5 shadow-sm hover:shadow-md hover:border-amber-600/40 transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <!-- Header Badges -->
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
+                                item.region === 'International Diaspora' ? 'bg-indigo-100 text-indigo-800' :
+                                item.region === 'Southern India' ? 'bg-amber-100 text-amber-900' :
+                                item.region === 'Himalayan Region' ? 'bg-emerald-100 text-emerald-900' : 'bg-stone-100 text-stone-800'
+                            }">
+                                ${item.region}
+                            </span>
+                            <span class="text-xs font-bold text-stone-500">${item.durationDisplay}</span>
+                        </div>
+
+                        <h3 class="font-bold text-stone-900 text-base group-hover:text-amber-800 transition flex items-center justify-between">
+                            ${item.name}
+                            ${item.unesco ? '<span title="UNESCO Heritage" class="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">UNESCO</span>' : ''}
+                        </h3>
+                        <p class="text-xs text-stone-500 mb-3">${item.location}</p>
+
+                        <p class="text-xs text-stone-600 line-clamp-3 mb-4 leading-relaxed">${item.summary}</p>
+                    </div>
+
+                    <div class="pt-3 border-t border-stone-100 flex items-center justify-between text-xs">
+                        <span class="text-stone-500 font-medium truncate max-w-[180px]">🔱 ${item.divinity}</span>
+                        <span class="text-amber-800 font-bold group-hover:translate-x-0.5 transition">Explore &rarr;</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // RENDER MATRIX TABLE
+        function renderMatrixTable(data) {
+            const tbody = document.getElementById('matrix-table-body');
+            tbody.innerHTML = data.map(item => `
+                <tr onclick="openModal('${item.id}')" class="hover:bg-amber-50/50 cursor-pointer transition">
+                    <td class="p-3 font-bold text-stone-900">${item.name}<br><span class="text-[10px] text-stone-500 font-normal">${item.location}</span></td>
+                    <td class="p-3">${item.divinity}</td>
+                    <td class="p-3 max-w-xs truncate">${item.ritual}</td>
+                    <td class="p-3 font-semibold text-amber-900">${item.durationDisplay}</td>
+                    <td class="p-3 text-stone-600">${item.epoch}</td>
+                    <td class="p-3 max-w-xs truncate text-stone-600">${item.function}</td>
+                </tr>
+            `).join('');
+        }
+
+        // FILTER LOGIC
+        function applyFilters() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const region = document.getElementById('filter-region').value;
+            const paradigm = document.getElementById('filter-paradigm').value;
+            const attribute = document.getElementById('filter-attribute').value;
+
+            const filtered = dussehraData.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(search) ||
+                                      item.location.toLowerCase().includes(search) ||
+                                      item.divinity.toLowerCase().includes(search) ||
+                                      item.ritual.toLowerCase().includes(search) ||
+                                      item.summary.toLowerCase().includes(search);
+
+                const matchesRegion = (region === 'ALL') || (item.region === region);
+                const matchesParadigm = (paradigm === 'ALL') || (item.paradigm === paradigm);
+
+                let matchesAttr = true;
+                if (attribute === 'UNESCO') matchesAttr = item.unesco;
+                if (attribute === 'NO_EFFIGY') matchesAttr = (item.effigy === 'NO_EFFIGY');
+                if (attribute === 'EFFIGY') matchesAttr = (item.effigy === 'EFFIGY');
+                if (attribute === 'ROYAL') matchesAttr = item.royal;
+                if (attribute === 'GIRMITIYA') matchesAttr = item.girmitiya;
+
+                return matchesSearch && matchesRegion && matchesParadigm && matchesAttr;
+            });
+
+            renderExplorerCards(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-region').value = 'ALL';
+            document.getElementById('filter-paradigm').value = 'ALL';
+            document.getElementById('filter-attribute').value = 'ALL';
+            applyFilters();
+        }
+
+        // MODAL LOGIC
+        function openModal(id) {
+            const item = dussehraData.find(x => x.id === id);
+            if (!item) return;
+
+            document.getElementById('modal-title').innerText = item.name;
+            document.getElementById('modal-location').innerText = item.location;
+            document.getElementById('modal-region-badge').innerText = item.region;
+            document.getElementById('modal-paradigm-badge').innerText = item.paradigm;
+
+            document.getElementById('modal-duration').innerText = item.durationDisplay;
+            document.getElementById('modal-epoch').innerText = item.epoch;
+            document.getElementById('modal-divinity').innerText = item.divinity;
+            document.getElementById('modal-unesco').innerText = item.unesco ? "Yes (UNESCO Inscribed)" : "No";
+
+            document.getElementById('modal-ritual').innerText = item.ritual;
+            document.getElementById('modal-function').innerText = item.function;
+            document.getElementById('modal-details').innerHTML = `<p>${item.details}</p>`;
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // INITIALIZE CHART.JS VISUALIZATIONS
+        function initCharts() {
+            Chart.defaults.font.family = "system-ui, -apple-system, sans-serif";
+            Chart.defaults.color = "#57534e";
+
+            // Chart 1: Duration
+            const sortedDuration = [...dussehraData].sort((a,b) => b.duration - a.duration);
+            const ctxDuration = document.getElementById('chart-duration').getContext('2d');
+            chartDuration = new Chart(ctxDuration, {
+                type: 'bar',
+                data: {
+                    labels: sortedDuration.map(d => d.name.length > 16 ? d.name.substring(0, 14) + '...' : d.name),
+                    datasets: [{
+                        label: 'Duration (Days)',
+                        data: sortedDuration.map(d => d.duration),
+                        backgroundColor: '#C85A32',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return ` ${context.raw} continuous days`; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Days' }, grid: { color: '#f5f5f4' } },
+                        y: { ticks: { font: { size: 10 } }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 2: Paradigm
+            const paradigmCounts = {
+                'Vaishnavite / Heroic': 0,
+                'Shakta / Cosmic Feminine': 0,
+                'Indigenous / Non-Epic': 0
+            };
+            dussehraData.forEach(d => paradigmCounts[d.paradigm]++);
+
+            const ctxParadigm = document.getElementById('chart-paradigm').getContext('2d');
+            chartParadigm = new Chart(ctxParadigm, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(paradigmCounts),
+                    datasets: [{
+                        data: Object.values(paradigmCounts),
+                        backgroundColor: ['#D99B26', '#C85A32', '#2D5A4C'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // Chart 3: Historical Epoch
+            const eraCounts = {};
+            dussehraData.forEach(d => {
+                eraCounts[d.epochGroup] = (eraCounts[d.epochGroup] || 0) + 1;
+            });
+
+            const ctxEra = document.getElementById('chart-era').getContext('2d');
+            chartEra = new Chart(ctxEra, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(eraCounts),
+                    datasets: [{
+                        label: 'Number of Celebrations Established',
+                        data: Object.values(eraCounts),
+                        backgroundColor: '#2D5A4C',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { stepSize: 1 }, grid: { color: '#f5f5f4' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 4: Region Distribution
+            const regionCounts = {};
+            dussehraData.forEach(d => {
+                regionCounts[d.region] = (regionCounts[d.region] || 0) + 1;
+            });
+
+            const ctxRegion = document.getElementById('chart-region').getContext('2d');
+            chartRegion = new Chart(ctxRegion, {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(regionCounts),
+                    datasets: [{
+                        data: Object.values(regionCounts),
+                        backgroundColor: ['rgba(200, 90, 50, 0.75)', 'rgba(217, 155, 38, 0.75)', 'rgba(45, 90, 76, 0.75)', 'rgba(99, 102, 241, 0.75)', 'rgba(120, 113, 108, 0.75)']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body></html>

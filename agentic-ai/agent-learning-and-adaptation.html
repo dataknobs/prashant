@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Agent Learning &amp; Adaptation: From Feedback to RL</title>
+  <meta content="A practical guide to agent learning: feedback loops, fine-tuning, preference optimization, reinforcement learning, online learning, and evolution." name="description"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="website" property="og:type"/>
+  <meta content="Agent Learning &amp; Adaptation: From Feedback to RL" property="og:title"/>
+  <meta content="Learn when to improve an agent through prompts, memory, fine-tuning, preference optimization, reinforcement learning, or self-improvement loops." property="og:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" property="og:image"/>
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Agent Learning &amp; Adaptation: From Feedback to RL" name="twitter:title"/>
+  <meta content="A practical guide to system-loop and weights-loop improvement for AI agents." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" name="twitter:image"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Agent Learning & Adaptation: From Feedback to RL",
+    "description": "A practical guide to agent learning and adaptation, including feedback loops, fine-tuning, preference optimization, reinforcement learning, online learning, and agent evolution.",
+    "primaryImageOfPage": {
+      "@type": "ImageObject",
+      "url": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png"
+    },
+    "about": [
+      "AI agents",
+      "fine-tuning",
+      "preference optimization",
+      "reinforcement learning",
+      "online learning"
+    ]
+  }
+  </script>
+  <style>
+    :root{
+      --navy:#0b2149;
+      --navy-2:#122e60;
+      --teal:#0f9f93;
+      --teal-2:#0a8178;
+      --ink:#10213d;
+      --muted:#66758d;
+      --pale:#f2f6fb;
+      --line:#dce5ef;
+      --white:#fff;
+      --gold:#cf841e;
+      --rose:#bb4d72;
+      --shadow:0 12px 32px rgba(15,34,69,.10);
+      --radius:20px;
+      --max:1180px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);background:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
+    img{display:block;max-width:100%;height:auto}
+    a{color:inherit}
+    :focus-visible{outline:3px solid #44d7cb;outline-offset:3px}
+    .wrap{width:min(var(--max),calc(100% - 36px));margin-inline:auto}
+    .eyebrow{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;font-weight:800;color:var(--teal)}
+    h1,h2,h3{font-family:Georgia,"Times New Roman",serif;color:var(--navy);line-height:1.12;margin-top:0}
+    h1{font-size:clamp(2.6rem,6vw,5.7rem);margin-bottom:20px}
+    h2{font-size:clamp(2rem,4vw,3.55rem);margin-bottom:18px}
+    h3{font-size:1.35rem;margin-bottom:10px}
+    p{margin:0 0 1rem}
+    .hero{background:linear-gradient(135deg,var(--navy) 0%,#0b1b3d 58%,#102b59 100%);color:#e9f1fa;padding:74px 0 66px;position:relative;overflow:hidden}
+    .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:rgba(23,166,153,.12);pointer-events:none}
+    .hero:before{width:380px;height:380px;right:-100px;top:-150px}
+    .hero:after{width:240px;height:240px;left:-100px;bottom:-140px}
+    .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative;z-index:1}
+    .hero h1{color:#fff}
+    .hero .lede{font-size:1.18rem;max-width:680px;color:#d8e5f3}
+    .pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+    .pill{padding:9px 13px;border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.06);border-radius:999px;font-size:.9rem;color:#e8f7f4}
+    .hero-slide{background:#fff;padding:10px;border-radius:18px;box-shadow:0 18px 45px rgba(0,0,0,.22)}
+    .hero-slide img{border-radius:12px;aspect-ratio:4/3;object-fit:contain}
+    .hero-kicker{color:#51d7ca;font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.76rem}
+    .nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .nav-inner{display:flex;gap:8px;overflow-x:auto;padding:11px 0;scrollbar-width:none}
+    .nav-inner::-webkit-scrollbar{display:none}
+    .nav a{text-decoration:none;white-space:nowrap;border-radius:999px;padding:8px 12px;font-size:.87rem;font-weight:700;color:#41516b}
+    .nav a:hover{background:var(--pale);color:var(--navy)}
+    section{padding:84px 0}
+    section.alt{background:#f7f9fc}
+    .section-head{max-width:820px;margin-bottom:34px}
+    .section-head .summary{font-size:1.1rem;color:#4f5e76}
+    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+    .card.dark{background:var(--navy);color:#ecf4fb;border-color:var(--navy)}
+    .card.dark h3{color:#fff}
+    .card.teal{background:var(--teal);color:#fff;border-color:var(--teal)}
+    .card.teal h3{color:#fff}
+    .card .mini{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--teal);margin-bottom:9px}
+    .card.dark .mini,.card.teal .mini{color:#7df0e5}
+    .bullets{margin:12px 0 0;padding-left:1.1rem}
+    .bullets li{margin:.45rem 0}
+    .callout{margin-top:22px;background:#eaf1f7;border-radius:16px;padding:18px 22px;border-left:5px solid var(--teal);font-weight:650;color:#23344f}
+    .comparison{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .metric{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
+    .metric:last-child{border-bottom:0}
+    .metric strong{color:var(--navy)}
+    .signal{display:flex;flex-direction:column;gap:8px}
+    .signal small{color:var(--muted);font-style:italic}
+    .stage-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:stretch}
+    .stage{border-radius:18px;padding:22px 16px;text-align:center;border:1px solid var(--line);background:#fff;min-height:145px;display:flex;flex-direction:column;justify-content:center}
+    .stage:nth-child(even){background:var(--teal);color:#fff;border-color:var(--teal)}
+    .stage:nth-child(3){background:var(--navy);color:#fff;border-color:var(--navy)}
+    .stage b{font-family:Georgia,"Times New Roman",serif;font-size:1.15rem}
+    .stage small{margin-top:8px;color:inherit;opacity:.8}
+    .decision-list{display:grid;gap:12px}
+    .decision{display:grid;grid-template-columns:1fr 1.15fr;gap:14px;align-items:center;padding:15px 17px;border-radius:14px;background:#173364;color:#fff}
+    .decision .answer{background:var(--teal);border-radius:10px;padding:10px 12px;text-align:center;font-weight:800}
+    .slides{background:var(--navy);color:#dbe8f6}
+    .slides h2{color:#fff}
+    .slides .section-head .summary{color:#bed0e5}
+    .slide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+    .slide-card{margin:0;background:#fff;border-radius:18px;padding:9px;box-shadow:0 15px 38px rgba(0,0,0,.18)}
+    .slide-card button{display:block;width:100%;border:0;padding:0;background:none;cursor:zoom-in;border-radius:12px;overflow:hidden}
+    .slide-card img{width:100%;aspect-ratio:4/3;object-fit:contain;background:#fff}
+    .slide-card figcaption{padding:10px 8px 6px;color:#4d5d74;font-size:.9rem;font-weight:700}
+    .footer{padding:34px 0;background:#081832;color:#aac0d8;text-align:center;font-size:.9rem}
+    .lightbox{position:fixed;inset:0;background:rgba(3,12,28,.94);display:none;align-items:center;justify-content:center;z-index:50;padding:24px}
+    .lightbox.open{display:flex}
+    .lightbox img{max-width:min(96vw,1200px);max-height:92vh;border-radius:12px;background:#fff}
+    .lightbox-close{position:absolute;top:18px;right:22px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.4rem;cursor:pointer}
+    @media (max-width:900px){
+      .hero-grid,.grid-2,.comparison{grid-template-columns:1fr}
+      .grid-3{grid-template-columns:1fr}
+      .stage-row{grid-template-columns:1fr 1fr}
+      .slide-grid{grid-template-columns:1fr}
+      .hero{padding-top:54px}
+      section{padding:66px 0}
+    }
+    @media (max-width:580px){
+      .wrap{width:min(100% - 24px,var(--max))}
+      h1{font-size:2.6rem}
+      h2{font-size:2rem}
+      .stage-row{grid-template-columns:1fr}
+      .decision{grid-template-columns:1fr}
+      .card{padding:21px}
+      .hero-slide{padding:7px}
+    }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body>
+  <header class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="hero-kicker">ADLC · Practice Area 16</div>
+        <h1>Agent Learning &amp; Adaptation</h1>
+        <p class="lede">How an agent gets better over time: from feedback loops that need no training at all, through fine-tuning, preference optimization and reinforcement learning, to systems that can improve themselves.</p>
+        <div aria-label="Topics covered" class="pill-row">
+          <span class="pill">Feedback loops</span><span class="pill">Fine-tuning</span><span class="pill">Preference optimization</span><span class="pill">Reinforcement learning</span><span class="pill">Online learning</span><span class="pill">Agent evolution</span>
+        </div>
+      </div>
+      <figure class="hero-slide">
+        <img alt="Agent Learning and Adaptation overview slide" fetchpriority="high" height="750" sizes="(max-width:900px) 92vw, 44vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-1.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-1.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-1.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png 1000w" width="1000"/>
+      </figure>
+    </div>
+  </header>
+
+  <nav aria-label="Page sections" class="nav">
+    <div class="wrap nav-inner">
+      <a href="#two-loops">Two loops</a><a href="#feedback">Feedback</a><a href="#fine-tuning">Fine-tuning</a><a href="#preference">Preference</a><a href="#rl">RL</a><a href="#post-training">Post-training</a><a href="#online">Online</a><a href="#evolution">Evolution</a><a href="#decision">Decision guide</a><a href="#slides">Slides</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="two-loops">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Overview</div>
+          <h2>Two loops: the system and the weights</h2>
+          <p class="summary">An agent can improve without a single gradient update. The first decision is whether the problem belongs in the fast, reversible system loop or in the slower, more expensive weights loop.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <div class="mini">Hours · cheap · reversible</div>
+            <h3>The system loop</h3>
+            <ul class="bullets">
+              <li>Improve prompts, context, retrieval and tools.</li>
+              <li>Use memory and few-shot examples from real runs.</li>
+              <li>Close feedback loops without changing model weights.</li>
+              <li>This is where the source deck says most real improvement comes from.</li>
+            </ul>
+          </article>
+          <article class="card dark">
+            <div class="mini">Weeks · costly · hard to undo</div>
+            <h3>The weights loop</h3>
+            <ul class="bullets">
+              <li>Fine-tuning, preference optimization and reinforcement learning.</li>
+              <li>Requires curated data, compute, evaluation and rollback planning.</li>
+              <li>Can buy behavior that prompting cannot reach — along with new failure modes.</li>
+              <li>Best justified after the system loop has genuinely plateaued.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="callout">Improve the system before you touch the weights. Training is a commitment; a prompt change is an experiment.</div>
+      </div>
+    </section>
+
+    <section class="alt" id="feedback">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Lever 1</div>
+          <h2>Feedback loops</h2>
+          <p class="summary">Every downstream learning method is only as good as the signal feeding it. Feedback is the raw material — and most of it is already flowing through production systems.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card signal"><div class="mini">Cheap but sparse</div><h3>Explicit</h3><p>Thumbs, ratings, corrections and human approvals.</p></article>
+          <article class="card signal"><div class="mini">Abundant but noisy</div><h3>Implicit</h3><p>Edits, retries, abandonment, escalation and task completion.</p></article>
+          <article class="card dark signal"><div class="mini">The gold standard</div><h3>Verifiable</h3><p>Tests pass, a compiler runs, math checks out, or a transaction settles.</p></article>
+        </div>
+        <div class="grid-2" style="margin-top:22px">
+          <article class="card">
+            <h3>Turn signal into data</h3>
+            <ul class="bullets">
+              <li>Attach feedback to the trace so you know what produced it.</li>
+              <li>Categorize failures; the taxonomy becomes the improvement backlog.</li>
+              <li>Turn every correction into an eval case before training on it.</li>
+              <li>Capture the reason behind rejection, not only the rejection itself.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Where loops go wrong</h3>
+            <ul class="bullets">
+              <li>Survivorship bias: only the users who complain are heard.</li>
+              <li>Training on the agent's own outputs narrows the distribution.</li>
+              <li>Teams optimize the metric they can measure instead of the outcome that matters.</li>
+              <li>Without a verifier there is no reliable ground truth, and errors compound.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="fine-tuning">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Lever 2</div>
+          <h2>Fine-tuning</h2>
+          <p class="summary">Supervised fine-tuning teaches format, style and domain conventions by showing the model curated examples. In the source, it is described as the cold start — not the finish line.</p>
+        </div>
+        <div class="comparison">
+          <article class="card">
+            <h3>What it fixes</h3>
+            <ul class="bullets">
+              <li>Output formats that prompting fails to enforce reliably.</li>
+              <li>Domain vocabulary, tone and house conventions.</li>
+              <li>Tool-call syntax on curated trajectories.</li>
+              <li>Long repeated instructions that can be distilled into the weights.</li>
+              <li>Distilling a large model's behavior into a smaller one.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>What it doesn't</h3>
+            <ul class="bullets">
+              <li>Add fresh knowledge — retrieval is the mechanism for that.</li>
+              <li>Automatically raise the reasoning ceiling.</li>
+              <li>Fix a bad task definition or broken tool.</li>
+              <li>Survive every base-model upgrade without rework.</li>
+              <li>Guarantee better truthfulness when the data is thin.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="callout"><strong>Parameter-efficient by default.</strong> The deck recommends LoRA and other adapter-style approaches before full fine-tuning: cheaper, faster, swappable by task, and still guarded by an eval suite.</div>
+      </div>
+    </section>
+
+    <section class="alt" id="preference">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Lever 3</div>
+          <h2>Preference optimization</h2>
+          <p class="summary">When there is no single correct answer, teach the model which answer is better. The source contrasts classic RLHF with direct preference optimization (DPO).</p>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <div class="mini">Classic RLHF</div>
+            <h3>Three stages</h3>
+            <div class="metric"><span>SFT</span><strong>Cold start</strong></div>
+            <div class="metric"><span>Reward model</span><strong>Learn preferences</strong></div>
+            <div class="metric"><span>RL (PPO)</span><strong>Optimize against reward</strong></div>
+          </article>
+          <article class="card dark">
+            <div class="mini">DPO</div>
+            <h3>Direct optimization</h3>
+            <ul class="bullets">
+              <li>Train on chosen vs. rejected responses to the same prompt.</li>
+              <li>Raise likelihood of the chosen response and lower the rejected one.</li>
+              <li>Stay anchored near a reference model to reduce drift.</li>
+              <li>No separate reward model and no RL loop, making the process simpler.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="callout">Preference optimization shapes alignment and taste. The deck explicitly treats it as a different problem from adding capability.</div>
+      </div>
+    </section>
+
+    <section id="rl">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Lever 4</div>
+          <h2>Reinforcement learning</h2>
+          <p class="summary">The deck presents RL as the mechanism for pushing past supervised-training plateaus, especially when the environment can verify success directly.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card dark">
+            <div class="mini">RLVR</div>
+            <h3>Verifiable rewards</h3>
+            <p>Skip subjective human rankings when the environment can score the answer. Run the tests, check the math, compile the code, or verify the transaction, then reward success.</p>
+          </article>
+          <article class="card">
+            <div class="mini">GRPO</div>
+            <h3>Group-relative optimization</h3>
+            <ul class="bullets">
+              <li>Sample a group of responses to one prompt and score them relative to each other.</li>
+              <li>Avoid a separate value critic.</li>
+              <li>Use less memory than PPO-style four-model setups, according to the source deck.</li>
+              <li>Pair with verifiable rewards where objective checking is available.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="grid-2" style="margin-top:22px">
+          <article class="card"><h3>Failure modes</h3><ul class="bullets"><li>Reward hacking: the model games the metric instead of solving the task.</li><li>Entropy, diversity and advantage collapse.</li><li>Drift away from the intended behavior if constraints are weak.</li></ul></article>
+          <article class="card"><h3>Agent-specific challenge</h3><p>Long-horizon agents may take many tool calls and thousands of tokens before anyone can score the run. The source therefore highlights frameworks that decouple rollout from gradient updates.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="post-training">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Synthesis</div>
+          <h2>The 2026 post-training stack</h2>
+          <p class="summary">The three weight-loop levers are presented as a pipeline. Each stage addresses a limitation left by the one before it.</p>
+        </div>
+        <div aria-label="Post-training stages" class="stage-row">
+          <div class="stage"><b>Pretrained base model</b><small>Raw capability</small></div>
+          <div class="stage"><b>SFT</b><small>Format, tool syntax, cold start</small></div>
+          <div class="stage"><b>Preference optimization</b><small>Alignment and taste · DPO / SimPO</small></div>
+          <div class="stage"><b>RL with verifiable rewards</b><small>Reasoning and generalization · GRPO / DAPO</small></div>
+        </div>
+        <div class="grid-2" style="margin-top:24px">
+          <article class="card"><h3>Why order matters</h3><ul class="bullets"><li>SFT gets the model started but can plateau.</li><li>Preference optimization shapes alignment more than raw capability.</li><li>RL pushes beyond the ceiling, but needs a stable starting point.</li><li>Skipping a stage can amplify the deficiencies of the previous one.</li></ul></article>
+          <article class="card"><h3>What changed from classic RLHF</h3><ul class="bullets"><li>Critic-free and group-relative methods reduce complexity.</li><li>Verifiers replace reward models when ground truth is available.</li><li>Post-training is increasingly modular rather than one monolithic recipe.</li></ul></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="online">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Lever 5</div>
+          <h2>Online learning</h2>
+          <p class="summary">The source argues that continuously updating model weights from live production traffic is usually too risky. In practice, teams update the system around the model.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <h3>Why live weight updates fail</h3>
+            <ul class="bullets">
+              <li>Catastrophic forgetting can erase old competence.</li>
+              <li>The model trains on its own outputs and narrows the distribution.</li>
+              <li>Poisoned or adversarial input can become permanent behavior.</li>
+              <li>Updates become hard to reproduce and difficult to roll back.</li>
+              <li>Safety and alignment properties can silently regress.</li>
+            </ul>
+          </article>
+          <article class="card dark">
+            <h3>What “online” means in practice</h3>
+            <ul class="bullets">
+              <li>Update memory while keeping weights fixed.</li>
+              <li>Refresh retrieval indexes with new knowledge.</li>
+              <li>Change prompts, routing and configuration behind flags.</li>
+              <li>Retrain periodically, offline, on accumulated curated data.</li>
+              <li>Gate every update with evals, canaries and a reversible path.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="callout">An agent that “learns from every conversation” is usually writing to memory, not weights. The source frames that as a feature: memory is inspectable, correctable and user-scoped.</div>
+      </div>
+    </section>
+
+    <section class="alt" id="evolution">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Lever 6</div>
+          <h2>Agent evolution</h2>
+          <p class="summary">The frontier is a closed loop in which an agent identifies weaknesses, generates tasks that target them, attempts the tasks, verifies the result, and trains on what worked.</p>
+        </div>
+        <div class="stage-row">
+          <div class="stage"><b>Identify a weakness</b></div>
+          <div class="stage"><b>Generate targeted tasks</b></div>
+          <div class="stage"><b>Attempt and verify</b></div>
+          <div class="stage"><b>Train on what worked</b></div>
+        </div>
+        <div class="grid-2" style="margin-top:24px">
+          <article class="card"><h3>What is already real</h3><ul class="bullets"><li>Self-play and self-generated curricula tuned to current ability.</li><li>Self-verification and reflection emerging from RL.</li><li>Evolution of prompts, tools and workflows — not only weights.</li><li>Search over agent designs scored by an eval suite.</li></ul></article>
+          <article class="card dark"><h3>Verification is the bottleneck</h3><ul class="bullets"><li>Self-improvement works best where outcomes can be checked.</li><li>Without a verifier the loop amplifies the agent's own errors.</li><li>A confident wrong answer can become tomorrow's training data.</li><li>Keep a human at the boundary and keep the evals independent.</li></ul></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="decision">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Putting it together</div>
+          <h2>Which learning mechanism, when?</h2>
+          <p class="summary">The deck closes with a practical routing guide: choose the cheapest, most reversible mechanism that actually matches the problem.</p>
+        </div>
+        <div class="decision-list">
+          <div class="decision"><div><strong>If:</strong> the agent lacks facts, not skill</div><div class="answer">Retrieval — never training</div></div>
+          <div class="decision"><div><strong>If:</strong> it ignores formatting rules</div><div class="answer">Fine-tune (LoRA) on curated examples</div></div>
+          <div class="decision"><div><strong>If:</strong> outputs are correct but badly judged</div><div class="answer">Preference optimization (DPO)</div></div>
+          <div class="decision"><div><strong>If:</strong> answers are checkable and performance plateaus</div><div class="answer">RL with verifiable rewards (GRPO)</div></div>
+          <div class="decision"><div><strong>If:</strong> it should remember this user</div><div class="answer">Memory — not a gradient update</div></div>
+          <div class="decision"><div><strong>If:</strong> you want it to improve itself</div><div class="answer">Only behind a trustworthy verifier</div></div>
+          <div class="decision"><div><strong>If:</strong> you have not tried prompting properly</div><div class="answer">Fix the system loop first</div></div>
+        </div>
+        <div class="callout">Learning is cheap where you can verify and expensive where you cannot. Build the verifier first; everything else follows from it.</div>
+      </div>
+    </section>
+
+    <section class="slides" id="slides">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Original deck</div>
+          <h2>All 10 slides</h2>
+          <p class="summary">Each image uses responsive variants from the Slide600, Slide700, Slide900 and Slide1000 folders. Select any slide to enlarge it.</p>
+        </div>
+        <div class="slide-grid">
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 1: Agent Learning &amp; Adaptation" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" type="button">
+              <img alt="Slide 1: Agent Learning &amp; Adaptation" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-1.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-1.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-1.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 1 · Agent Learning &amp; Adaptation</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 2: Two Loops: The System and the Weights" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-2.png" type="button">
+              <img alt="Slide 2: Two Loops: The System and the Weights" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-2.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-2.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-2.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-2.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-2.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 2 · Two Loops: The System and the Weights</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 3: Feedback Loops" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-3.png" type="button">
+              <img alt="Slide 3: Feedback Loops" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-3.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-3.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-3.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-3.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-3.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 3 · Feedback Loops</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 4: Fine-Tuning" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-4.png" type="button">
+              <img alt="Slide 4: Fine-Tuning" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-4.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-4.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-4.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-4.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-4.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 4 · Fine-Tuning</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 5: Preference Optimization" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-5.png" type="button">
+              <img alt="Slide 5: Preference Optimization" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-5.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-5.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-5.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-5.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-5.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 5 · Preference Optimization</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 6: Reinforcement Learning" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-6.png" type="button">
+              <img alt="Slide 6: Reinforcement Learning" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-6.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-6.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-6.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-6.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-6.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 6 · Reinforcement Learning</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 7: The 2026 Post-Training Stack" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-7.png" type="button">
+              <img alt="Slide 7: The 2026 Post-Training Stack" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-7.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-7.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-7.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-7.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-7.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 7 · The 2026 Post-Training Stack</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 8: Online Learning" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-8.png" type="button">
+              <img alt="Slide 8: Online Learning" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-8.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-8.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-8.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-8.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-8.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 8 · Online Learning</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 9: Agent Evolution" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-9.png" type="button">
+              <img alt="Slide 9: Agent Evolution" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-9.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-9.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-9.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-9.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-9.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 9 · Agent Evolution</figcaption>
+          </figure>
+          <figure class="slide-card">
+            <button aria-label="Enlarge slide 10: Which Learning Mechanism, When" data-slide="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-10.png" type="button">
+              <img alt="Slide 10: Which Learning Mechanism, When" height="750" loading="lazy" sizes="(max-width:900px) 92vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-10.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-10.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-10.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-10.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-10.png 1000w" width="1000"/>
+            </button>
+            <figcaption>Slide 10 · Which Learning Mechanism, When</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/context-engineering-and-multi-agent-llm.html">Context Engineering And Multi Agent Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/criteria-is-use-case-agentic.html">Criteria Is Use Case Agentic</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/enterprise-ai-agent-risks-responsibility.html">Enterprise Ai Agent Risks Responsibility</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evaluating-ai-agent-and-data-generation.html">Evaluating Ai Agent And Data Generation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evolution-of-ai-agent-rag.html">Evolution Of Ai Agent Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/measuring-agentic-ai-effectiveness.html">Measuring Agentic Ai Effectiveness</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/pillars-of-agentic-ai.html">Pillars Of Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rise-of-agentic-ai-info.html">Rise Of Agentic Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rpa-genai-agentic-ai.html">Rpa Genai Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/super-agent.html">Super Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/when-to-use-ai-agent.html">When To Use Ai Agent</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knowledge Collection - Technology and Others</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra Website. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+  <div aria-label="Slide preview" aria-modal="true" class="lightbox" id="lightbox" role="dialog">
+    <button aria-label="Close slide preview" class="lightbox-close" type="button">×</button>
+    <img alt="Enlarged slide" height="750" id="lightbox-image" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="1000"/>
+  </div>
+
+  <script>
+    (function(){
+      const box = document.getElementById('lightbox');
+      const image = document.getElementById('lightbox-image');
+      const close = box.querySelector('.lightbox-close');
+      let previousFocus = null;
+      document.querySelectorAll('[data-slide]').forEach(function(button){
+        button.addEventListener('click', function(){
+          previousFocus = document.activeElement;
+          image.src = button.getAttribute('data-slide');
+          box.classList.add('open');
+          document.body.style.overflow = 'hidden';
+          close.focus();
+        });
+      });
+      function closeBox(){
+        box.classList.remove('open');
+        document.body.style.overflow = '';
+        image.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+        if(previousFocus) previousFocus.focus();
+      }
+      close.addEventListener('click', closeBox);
+      box.addEventListener('click', function(e){ if(e.target === box) closeBox(); });
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && box.classList.contains('open')) closeBox(); });
+    })();
+  </script>
+
+
+</body></html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Agent Development &amp; Prompt Engineering</title>
+  <meta content="A practical guide to agent prompt engineering: system prompts, instructions, constraints, personas, prompt versioning, testing, and Prompt-Ops." name="description"/>
+  <meta content="agent development, prompt engineering, system prompts, agent instructions, behavioral constraints, persona design, prompt versioning, prompt testing, Prompt-Ops" name="keywords"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="#0b2246" name="theme-color"/>
+  <meta content="article" property="og:type"/>
+  <meta content="Agent Development &amp; Prompt Engineering" property="og:title"/>
+  <meta content="From prompt craft to Prompt-Ops: design, constrain, version, test, deploy, monitor, and improve agent prompts as production infrastructure." property="og:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" property="og:image"/>
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Agent Development &amp; Prompt Engineering" name="twitter:title"/>
+  <meta content="System prompts, agent instructions, behavioral constraints, personas, prompt versioning, testing, and the Prompt-Ops lifecycle." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" name="twitter:image"/>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"Agent Development & Prompt Engineering",
+    "description":"A practical guide to system prompt design, agent instructions, behavioral constraints, persona design, prompt versioning, prompt testing, and Prompt-Ops.",
+    "image":"https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png"
+  }
+  </script>
+  <style>
+    :root{--navy:#0b2246;--navy2:#15345f;--teal:#119c91;--teal2:#087d75;--pale:#eef3f8;--line:#d9e2ec;--ink:#14233a;--muted:#64748b;--white:#fff;--amber:#d58a21;--max:1180px;--shadow:0 18px 45px rgba(11,34,70,.10)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);line-height:1.65;background:#fff}img{max-width:100%;height:auto}a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin-inline:auto}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;background:#fff;padding:10px 14px;z-index:1000}.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.top .wrap{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);font-weight:900}.brandmark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--navy),var(--teal));display:grid;place-items:center;color:#fff}.nav{display:flex;gap:18px;font-size:14px;font-weight:750}.nav a{text-decoration:none;color:#41546c}.nav a:hover,.nav a:focus-visible{color:var(--teal2)}:focus-visible{outline:3px solid rgba(17,156,145,.3);outline-offset:3px}
+    .hero{padding:82px 0 58px;background:radial-gradient(circle at 10% 15%,rgba(17,156,145,.15),transparent 30%),radial-gradient(circle at 92% 5%,rgba(11,34,70,.08),transparent 31%),linear-gradient(#fbfdff,#fff)}.hero-grid{display:grid;grid-template-columns:1.03fr .97fr;gap:44px;align-items:center}.eyebrow{display:inline-block;padding:7px 12px;border-radius:999px;background:#e7f7f5;color:var(--teal2);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(42px,6vw,72px);line-height:1.02;letter-spacing:-.045em;color:var(--navy);margin:17px 0 20px}.lead{font-size:clamp(18px,2vw,22px);color:#51627a;margin:0 0 25px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{padding:7px 11px;border-radius:999px;background:#eef4f8;color:#34506c;font-size:12px;font-weight:800}.hero-card{margin:0;background:#fff;border:1px solid #e2e9f0;border-radius:24px;padding:16px;box-shadow:var(--shadow)}.hero-card img{display:block;width:100%;aspect-ratio:1000/563;object-fit:contain;border-radius:15px;background:#fff}.hero-card figcaption{margin:10px 3px 0;color:var(--muted);font-size:13px}
+    .section{padding:76px 0}.alt{background:#f4f7fa;border-block:1px solid #e8eef4}.dark{background:var(--navy);color:#eaf2fb}.head{max-width:880px;margin-bottom:30px}.kicker{color:var(--teal2);font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}.dark .kicker{color:#66d5cd}h2{font-size:clamp(31px,4.2vw,48px);line-height:1.08;color:var(--navy);letter-spacing:-.03em;margin:0 0 12px}.dark h2{color:#fff}.head p{margin:0;color:var(--muted);font-size:18px}.dark .head p{color:#bdcce0}h3{color:var(--navy);font-size:22px;line-height:1.25;margin:0 0 9px}
+    .overview{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.overview-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:0 8px 26px rgba(11,34,70,.04)}.num{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--teal);color:#fff;font-weight:900;margin-bottom:14px}.overview-card p{margin:0;color:#5a6d83;font-size:14px}.overview-card.ops{border-color:#bddfdc;background:#f7fcfb}.ops .num{background:var(--navy)}.note{margin-top:18px;padding:16px 18px;border-radius:14px;background:var(--navy);color:#e8f0fa}.note strong{color:#67d4cc}
+    .topic{display:grid;grid-template-columns:1fr 1.03fr;gap:26px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 10px 30px rgba(11,34,70,.055);margin-bottom:28px;scroll-margin-top:90px}.topic.reverse .copy{order:2}.topic.reverse .visual{order:1}.tag{display:inline-block;background:#e8f7f5;color:var(--teal2);padding:5px 9px;border-radius:8px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}.copy p{color:#566981;margin:0 0 12px}.copy ul{padding-left:20px;margin:10px 0 0}.copy li{margin:7px 0;color:#40536b}.visual{border:1px solid #e2e9f0;border-radius:17px;overflow:hidden;background:#fff}.visual img{display:block;width:100%;aspect-ratio:1000/563;object-fit:contain}.mini-example{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.ex{border-radius:14px;padding:15px;background:#f0f4f8;border:1px solid var(--line)}.ex.good{background:var(--navy);color:#fff;border-color:var(--navy)}.ex strong{display:block;color:var(--amber);margin-bottom:6px}.ex.good strong{color:#62d5cc}.ex p{margin:0;font-style:italic;font-size:14px;color:inherit}
+    .persona{background:var(--navy);color:#eaf2fb;border-radius:18px;padding:18px;margin-top:16px}.persona strong{color:#fff}.persona-grid{display:grid;grid-template-columns:90px 1fr;gap:8px 14px;margin-top:12px;font-size:14px}.persona-grid span:nth-child(odd){color:#63d4cc;font-weight:900;text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+    .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.flow .step{position:relative;min-height:108px;display:grid;place-items:center;text-align:center;border-radius:15px;padding:15px;background:var(--navy);color:#fff;font-weight:900}.flow .step:nth-child(even){background:var(--teal)}.flow .step:not(:last-child):after{content:"›";position:absolute;right:-11px;color:var(--teal);font-size:27px}.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.panel{background:#f4f7fa;border:1px solid var(--line);border-radius:16px;padding:19px}.panel h3{font-size:16px;color:var(--teal2);text-transform:uppercase;letter-spacing:.04em}.panel ul{padding-left:19px;margin:8px 0 0}.panel li{margin:6px 0;color:#465970}.tool-line{margin-top:14px;padding:13px 15px;border-radius:12px;background:var(--navy);color:#dce7f4;font-size:14px}.tool-line strong{color:#63d4cc}
+    .eval-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin:18px 0}.eval-step{position:relative;min-height:100px;border-radius:14px;background:var(--navy);color:#fff;display:grid;place-items:center;text-align:center;padding:12px;font-weight:900}.eval-step:nth-child(even){background:var(--teal)}.eval-step:not(:last-child):after{content:"›";position:absolute;right:-10px;color:var(--teal);font-size:26px}
+    .lifecycle{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-top:24px}.life{position:relative;border-radius:16px;background:#163764;border:1px solid rgba(255,255,255,.08);padding:20px 10px;text-align:center;color:#fff;font-weight:900}.life:not(:last-child):after{content:"›";position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:#5fd4cb;font-size:24px}.loop{max-width:690px;margin:18px auto 0;background:var(--teal);padding:10px 14px;border-radius:10px;text-align:center;font-weight:850;color:#fff}.dark-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}.dark-card{background:#15325e;border-radius:16px;padding:20px;color:#d8e4f3}.dark-card strong{color:#65d5cc;display:block;text-transform:uppercase;font-size:12px;letter-spacing:.06em;margin-bottom:7px}
+    .slides-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:20px}.slide-nav{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 13px}.slide-nav a{flex:0 0 auto;text-decoration:none;padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#3f536f;font-size:13px;font-weight:800}.slides{display:grid;gap:30px}.slide{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 10px 30px rgba(11,34,70,.07);scroll-margin-top:90px}.slide header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 5px 11px}.slide header h3{font-size:18px;margin:0}.view{font-size:12px;color:var(--muted)}.slide-link{display:block;border-radius:14px;overflow:hidden;background:#f7f9fb;cursor:zoom-in}.slide-link img{display:block;width:100%;aspect-ratio:1000/563;object-fit:contain;background:#fff}
+    footer{background:#071a37;color:#dce8f8;padding:42px 0}.foot{display:flex;justify-content:space-between;gap:24px;align-items:center}.foot strong{color:#fff}.foot p{margin:4px 0 0;color:#9eb1ca;font-size:14px}
+    dialog{width:min(96vw,1300px);max-height:94vh;border:0;border-radius:18px;padding:12px;background:#fff;box-shadow:0 30px 100px rgba(0,0,0,.35)}dialog::backdrop{background:rgba(1,12,32,.82);backdrop-filter:blur(4px)}dialog img{display:block;max-width:100%;max-height:84vh;margin:auto}.close{display:block;margin-left:auto;border:0;border-radius:9px;background:#eef2f6;color:var(--navy);padding:8px 12px;font-weight:850;cursor:pointer}
+    @media(max-width:980px){.hero-grid,.topic{grid-template-columns:1fr}.topic.reverse .copy,.topic.reverse .visual{order:initial}.overview{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr 1fr}.flow .step:nth-child(2):after{display:none}.eval-flow{grid-template-columns:1fr 1fr 1fr}.eval-step:nth-child(3):after{display:none}.lifecycle{grid-template-columns:repeat(3,1fr)}.life:nth-child(3):after{display:none}}
+    @media(max-width:680px){.nav{display:none}.hero{padding-top:54px}.overview,.two,.mini-example,.dark-grid{grid-template-columns:1fr}.flow,.eval-flow,.lifecycle{grid-template-columns:1fr}.flow .step:after,.eval-step:after,.life:after{display:none!important}.persona-grid{grid-template-columns:74px 1fr}.slides-head,.foot{display:block}.slide header{align-items:flex-start}.section{padding:58px 0}.wrap{width:min(100% - 24px,var(--max))}h1{font-size:42px}}
+  </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="wrap">
+    <a aria-label="Agent Development and Prompt Engineering home" class="brand" href="#top"><span class="brandmark">AI</span><span>Agent Development</span></a>
+    <nav aria-label="Page navigation" class="nav"><a href="#craft">Prompt craft</a><a href="#ops">Prompt-Ops</a><a href="#lifecycle">Lifecycle</a><a href="#slides">Slides</a></nav>
+  </div>
+</header>
+<main id="main">
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">ADLC · Practice Area 08</span>
+        <h1>Agent Development &amp; Prompt Engineering</h1>
+        <p class="lead">Prompt engineering is both a writing discipline and an operational discipline: define who the agent is, what it should do, the boundaries it must respect, and then manage those prompts like production code.</p>
+        <div aria-label="Topics" class="chips"><span class="chip">System prompt design</span><span class="chip">Agent instructions</span><span class="chip">Behavioral constraints</span><span class="chip">Persona design</span><span class="chip">Prompt versioning</span><span class="chip">Prompt testing</span></div>
+      </div>
+      <figure class="hero-card">
+        <img alt="Agent Development and Prompt Engineering title slide" fetchpriority="high" height="563" sizes="(max-width:980px) 100vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-1.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-1.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-1.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png 1000w" width="1000"/>
+        <figcaption>Prompt craft sets behavior; Prompt-Ops keeps that behavior controlled over time.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section alt" id="craft">
+    <div class="wrap">
+      <div class="head"><div class="kicker">Overview</div><h2>From prompt craft to Prompt-Ops</h2><p>The deck divides the practice into six levers. The first four shape the prompt itself; the last two turn prompts into versioned, tested infrastructure.</p></div>
+      <div class="overview">
+        <article class="overview-card"><div class="num">1</div><h3>System Prompt Design</h3><p>Set the agent's role, stable context, ground rules, capabilities, tools, and output format.</p></article>
+        <article class="overview-card"><div class="num">2</div><h3>Agent Instructions</h3><p>Tell the agent precisely what to do, how to do it, and what successful completion means.</p></article>
+        <article class="overview-card"><div class="num">3</div><h3>Behavioral Constraints</h3><p>Define the lines the agent must not cross and back prompt rules with code-level enforcement.</p></article>
+        <article class="overview-card"><div class="num">4</div><h3>Persona Design</h3><p>Shape a consistent voice and character without allowing persona to replace real constraints.</p></article>
+        <article class="overview-card ops"><div class="num">5</div><h3>Prompt Versioning</h3><p>Track immutable versions, diffs, promotions, audit history, and fast rollback.</p></article>
+        <article class="overview-card ops"><div class="num">6</div><h3>Prompt Testing</h3><p>Run each prompt version against a dataset, score outputs, compare with a baseline, then ship or iterate.</p></article>
+      </div>
+      <div class="note"><strong>Treat prompts like code.</strong> Small wording changes can shift behavior, so review diffs, test every change, and make rollback routine.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <article class="topic" id="system-prompt">
+        <div class="copy"><span class="tag">Craft</span><h2>System Prompt Design</h2><p>The system prompt is the agent's charter: stable, top-level context that frames every response.</p><ul><li>Define role and identity, domain context, capabilities and tools.</li><li>State rules and guardrails clearly, then specify output format.</li><li>Keep dynamic data downstream and keep the system prompt lean.</li><li>Use structure the model can parse, such as clear sections or XML tags where appropriate.</li></ul></div>
+        <div class="visual"><img alt="System Prompt Design slide showing prompt anatomy and design principles" height="563" loading="lazy" sizes="(max-width:980px) 100vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-3.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-3.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-3.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-3.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-3.png 1000w" width="1000"/></div>
+      </article>
+
+      <article class="topic reverse" id="instructions">
+        <div class="copy"><span class="tag">Craft</span><h2>Agent Instructions</h2><p>Ambiguous instructions force the model to fill gaps with guesses. Good instructions reduce that space for interpretation.</p><ul><li>Be specific and unambiguous; prefer positive framing.</li><li>Specify fields, length, structure, ordering, and success criteria.</li><li>For complex work, break the task into ordered steps.</li><li>Use examples where they clarify the expected behavior.</li></ul><div class="mini-example"><div class="ex"><strong>Vague</strong><p>“Summarize this document.”</p></div><div class="ex good"><strong>Specific</strong><p>“Summarize in exactly 3 bullets, each under 15 words, focused on financial risks. Output as a markdown list.”</p></div></div></div>
+        <div class="visual"><img alt="Agent Instructions slide comparing vague and specific prompts" height="563" loading="lazy" sizes="(max-width:980px) 100vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-4.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-4.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-4.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-4.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-4.png 1000w" width="1000"/></div>
+      </article>
+
+      <article class="topic" id="constraints">
+        <div class="copy"><span class="tag">Craft</span><h2>Behavioral Constraints</h2><p>Constraints define the boundaries the agent must not cross, regardless of what a user asks.</p><ul><li>Constrain scope, safety, sensitive data, actions, tone, and escalation.</li><li>Prompt-level rules alone are not enough; layer validation and guardrail models.</li><li>Put irreversible or costly action controls in code, not only in prompt text.</li><li>Red-team constraints and treat a bypass as a defect.</li></ul></div>
+        <div class="visual"><img alt="Behavioral Constraints slide describing agent guardrails" height="563" loading="lazy" sizes="(max-width:980px) 100vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-5.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-5.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-5.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-5.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-5.png 1000w" width="1000"/></div>
+      </article>
+
+      <article class="topic reverse" id="persona">
+        <div class="copy"><span class="tag">Craft</span><h2>Persona Design</h2><p>Persona is the voice and character users experience. It can improve consistency and brand fit, but it should never substitute for actual policy or controls.</p><ul><li>Specify name and role, tone and voice, style, values, and boundaries.</li><li>Avoid over-acting a character when it reduces clarity or accuracy.</li><li>Use a reusable persona card so the specification stays consistent.</li></ul><div class="persona"><strong>Example persona card</strong><div class="persona-grid"><span>Name</span><span>Aria</span><span>Role</span><span>Customer-support guide</span><span>Tone</span><span>Warm, calm, concise</span><span>Style</span><span>Plain language, no jargon</span><span>Never</span><span>Promises refunds or invents policy</span></div></div></div>
+        <div class="visual"><img alt="Persona Design slide with a reusable persona card" height="563" loading="lazy" sizes="(max-width:980px) 100vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-6.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-6.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-6.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-6.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-6.png 1000w" width="1000"/></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section alt" id="ops">
+    <div class="wrap">
+      <div class="head"><div class="kicker">Prompt-Ops</div><h2>Make prompts versioned, testable infrastructure</h2><p>Prompt craft determines the behavior you want. Prompt-Ops makes that behavior reproducible, promotable, observable, and reversible.</p></div>
+      <article class="topic" id="versioning">
+        <div class="copy"><span class="tag">Prompt-Ops</span><h2>Prompt Versioning</h2><p>A prompt version captures more than words. It should reproduce the conditions that produced the behavior.</p><div aria-label="Prompt versioning flow" class="flow"><div class="step">Author &amp; edit</div><div class="step">Commit immutable version</div><div class="step">Staging eval gate</div><div class="step">Production</div></div><ul><li>Capture prompt text together with model, parameters, tools, and metadata.</li><li>Use immutable IDs and clear diffs so behavior is reproducible and debuggable.</li><li>Promote through environments with quality gates and make rollback immediate.</li></ul><div class="tool-line"><strong>Tools named in the deck:</strong> LangSmith · Langfuse · PromptLayer · Braintrust · Promptfoo · Maxim AI</div></div>
+        <div class="visual"><img alt="Prompt Versioning slide showing author, commit, staging, and production flow" height="563" loading="lazy" sizes="(max-width:980px) 100vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-7.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-7.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-7.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-7.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-7.png 1000w" width="1000"/></div>
+      </article>
+
+      <article class="topic reverse" id="testing">
+        <div class="copy"><span class="tag">Prompt-Ops</span><h2>Prompt Testing</h2><p>Agent outputs are non-deterministic, so testing is based on datasets, scorers, baselines, and regression checks rather than exact-string assertions.</p><div aria-label="Prompt testing flow" class="eval-flow"><div class="eval-step">Dataset cases</div><div class="eval-step">Run variants</div><div class="eval-step">Score outputs</div><div class="eval-step">Compare to baseline</div><div class="eval-step">Ship or iterate</div></div><div class="two"><div class="panel"><h3>What makes a good eval</h3><ul><li>Typical queries, edge cases, and adversarial inputs.</li><li>Deterministic checks for structure plus model-based scoring for quality.</li><li>A baseline that new versions must beat.</li><li>Regression testing so a fix does not quietly break something else.</li></ul></div><div class="panel"><h3>Close the loop</h3><ul><li>Score samples of production traffic with the same logic.</li><li>Turn low-scoring cases into new eval cases.</li><li>Grow coverage so known failures do not resurface.</li><li>Prefer grounded scorers over subjective impressions.</li></ul></div></div></div>
+        <div class="visual"><img alt="Prompt Testing slide showing dataset, variants, scoring, baseline, and release flow" height="563" loading="lazy" sizes="(max-width:980px) 100vw, 48vw" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-8.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-8.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-8.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-8.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-8.png 1000w" width="1000"/></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section dark" id="lifecycle">
+    <div class="wrap">
+      <div class="head"><div class="kicker">Putting it together</div><h2>The Prompt-Ops Lifecycle</h2><p>Author, test, version, deploy, monitor, and improve. Production signals feed the next round of authoring.</p></div>
+      <div aria-label="Prompt-Ops lifecycle" class="lifecycle"><div class="life">Author</div><div class="life">Test</div><div class="life">Version</div><div class="life">Deploy</div><div class="life">Monitor</div><div class="life">Improve</div></div>
+      <div class="loop">↻ Every production signal feeds the next round of authoring</div>
+      <div class="dark-grid"><div class="dark-card"><strong>Craft sets the ceiling</strong>A clear system prompt, precise instructions, firm constraints, and a consistent persona determine how good the agent can be.</div><div class="dark-card"><strong>Ops keeps it there</strong>Versioning and testing keep quality from silently regressing as prompts, models, and data change.</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="slides">
+    <div class="wrap">
+      <div class="slides-head"><div class="head" style="margin:0"><div class="kicker">Original deck</div><h2>All 9 slides</h2><p>Each slide uses responsive image variants from Slide600, Slide700, Slide900, and Slide1000.</p></div></div>
+      <nav aria-label="Slide navigation" class="slide-nav">
+        <a href="#slide-1">1</a><a href="#slide-2">2</a><a href="#slide-3">3</a><a href="#slide-4">4</a><a href="#slide-5">5</a><a href="#slide-6">6</a><a href="#slide-7">7</a><a href="#slide-8">8</a><a href="#slide-9">9</a>
+      </nav>
+      <div class="slides">
+        <article class="slide" id="slide-1">
+          <header><h3>1. Agent Development &amp; Prompt Engineering</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 1 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png">
+            <img alt="Agent Development &amp; Prompt Engineering slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-1.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-1.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-1.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-2">
+          <header><h3>2. From Prompt Craft to Prompt-Ops</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 2 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-2.png">
+            <img alt="From Prompt Craft to Prompt-Ops slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-2.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-2.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-2.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-2.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-2.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-3">
+          <header><h3>3. System Prompt Design</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 3 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-3.png">
+            <img alt="System Prompt Design slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-3.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-3.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-3.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-3.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-3.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-4">
+          <header><h3>4. Agent Instructions</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 4 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-4.png">
+            <img alt="Agent Instructions slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-4.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-4.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-4.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-4.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-4.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-5">
+          <header><h3>5. Behavioral Constraints</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 5 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-5.png">
+            <img alt="Behavioral Constraints slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-5.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-5.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-5.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-5.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-5.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-6">
+          <header><h3>6. Persona Design</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 6 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-6.png">
+            <img alt="Persona Design slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-6.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-6.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-6.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-6.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-6.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-7">
+          <header><h3>7. Prompt Versioning</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 7 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-7.png">
+            <img alt="Prompt Versioning slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-7.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-7.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-7.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-7.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-7.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-8">
+          <header><h3>8. Prompt Testing</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 8 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-8.png">
+            <img alt="Prompt Testing slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-8.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-8.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-8.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-8.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-8.png 1000w" width="1000"/>
+          </a>
+        </article>
+        <article class="slide" id="slide-9">
+          <header><h3>9. The Prompt-Ops Lifecycle</h3><span class="view">Click image to enlarge</span></header>
+          <a aria-label="Open slide 9 full size" class="slide-link" data-lightbox="" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-9.png">
+            <img alt="The Prompt-Ops Lifecycle slide" height="563" loading="lazy" sizes="(max-width:1180px) 100vw, 1180px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-9.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-9.png 600w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-9.png 700w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-9.png 900w, https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-9.png 1000w" width="1000"/>
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/context-engineering-and-multi-agent-llm.html">Context Engineering And Multi Agent Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/criteria-is-use-case-agentic.html">Criteria Is Use Case Agentic</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/enterprise-ai-agent-risks-responsibility.html">Enterprise Ai Agent Risks Responsibility</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evaluating-ai-agent-and-data-generation.html">Evaluating Ai Agent And Data Generation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evolution-of-ai-agent-rag.html">Evolution Of Ai Agent Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/measuring-agentic-ai-effectiveness.html">Measuring Agentic Ai Effectiveness</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/pillars-of-agentic-ai.html">Pillars Of Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rise-of-agentic-ai-info.html">Rise Of Agentic Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rpa-genai-agentic-ai.html">Rpa Genai Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/super-agent.html">Super Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/when-to-use-ai-agent.html">When To Use Ai Agent</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knowledge Collection - Technology and Others</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra Website. All rights reserved.</p>
+</div>
+</div>
+</footer>
+<dialog id="viewer"><button aria-label="Close image viewer" class="close" type="button">Close</button><img alt="Enlarged slide" height="563" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" width="1000"/></dialog>
+<script>
+  (()=>{const d=document.getElementById('viewer'),img=d.querySelector('img'),close=d.querySelector('.close');document.querySelectorAll('[data-lightbox]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();img.src=a.href;img.alt=a.querySelector('img').alt;d.showModal();}));close.addEventListener('click',()=>d.close());d.addEventListener('click',e=>{if(e.target===d)d.close();});})();
+</script>
+
+
+</body></html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Agent AI Framework | Strategy, Architecture, Scale &amp; Governance</title>
+  <meta content="A practical Agent AI framework for moving from strategy and use-case selection through architecture, pilot, production, governance, replication, and multi-agent systems." name="description"/>
+  <meta content="Agent AI framework, agentic AI adoption, AI agents, multi-agent systems, AI governance, AI architecture, enterprise AI, AI pilot, production AI" name="keywords"/>
+  <meta content="index,follow" name="robots"/>
+  <meta content="#062b69" name="theme-color"/>
+  <style>
+    :root{
+      --navy:#062b69;
+      --navy-2:#0c3c7c;
+      --teal:#00635f;
+      --cyan:#57b7cc;
+      --cyan-soft:#dff4f8;
+      --orange:#f36d3d;
+      --orange-soft:#fff0e8;
+      --green:#82d13f;
+      --purple:#5e4bc4;
+      --ink:#10233f;
+      --muted:#5d6b7f;
+      --line:#dce4ed;
+      --panel:#f6f9fc;
+      --white:#fff;
+      --shadow:0 18px 50px rgba(12,42,86,.12);
+      --radius:22px;
+      --max:1180px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff;line-height:1.65}
+    a{color:inherit}
+    img{max-width:100%;height:auto}
+    .wrap{width:min(var(--max),calc(100% - 36px));margin-inline:auto}
+    .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(220,228,237,.9)}
+    .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:68px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;color:var(--navy)}
+    .brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--cyan));display:grid;place-items:center;color:#fff;font-size:13px;letter-spacing:.04em}
+    .nav{display:flex;align-items:center;gap:18px;font-size:14px;font-weight:650}
+    .nav a{text-decoration:none;color:#334761}
+    .nav a:hover{color:var(--navy)}
+    .hero{position:relative;overflow:hidden;background:
+      radial-gradient(circle at 12% 12%,rgba(87,183,204,.20),transparent 28%),
+      radial-gradient(circle at 88% 5%,rgba(243,109,61,.14),transparent 26%),
+      linear-gradient(180deg,#fbfdff 0%,#fff 100%);padding:86px 0 54px}
+    .hero:after{content:"";position:absolute;right:-120px;bottom:-180px;width:520px;height:520px;border-radius:50%;border:70px solid rgba(6,43,105,.035)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#eef7fa;color:var(--teal);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    h1{font-size:clamp(42px,7vw,76px);line-height:1.02;margin:18px 0 20px;color:var(--navy);letter-spacing:-.045em}
+    .lead{font-size:clamp(18px,2vw,23px);line-height:1.55;color:#4f6177;max-width:780px;margin:0 0 30px}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:12px;text-decoration:none;font-weight:800;font-size:14px;border:1px solid transparent}
+    .btn-primary{background:var(--navy);color:#fff;box-shadow:0 10px 25px rgba(6,43,105,.18)}
+    .btn-secondary{background:#fff;border-color:var(--line);color:var(--navy)}
+    .hero-card{background:#fff;border:1px solid #e4ebf2;border-radius:26px;padding:20px;box-shadow:var(--shadow)}
+    .hero-card img{display:block;width:100%;border-radius:16px;background:#f4f7fa}
+    .hero-card p{margin:12px 3px 0;color:var(--muted);font-size:13px}
+    .section{padding:78px 0}
+    .section.alt{background:var(--panel);border-block:1px solid #edf1f5}
+    .section-head{max-width:800px;margin-bottom:34px}
+    .kicker{color:var(--orange);font-size:13px;text-transform:uppercase;letter-spacing:.10em;font-weight:850;margin-bottom:8px}
+    h2{font-size:clamp(32px,4.4vw,50px);line-height:1.1;color:var(--navy);margin:0 0 14px;letter-spacing:-.03em}
+    h3{font-size:23px;line-height:1.25;color:var(--navy);margin:0 0 10px}
+    .section-head p{font-size:18px;color:var(--muted);margin:0}
+    .roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .step{position:relative;min-height:180px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;overflow:hidden}
+    .step:before{content:"";position:absolute;inset:0 auto 0 0;width:6px;background:var(--step-color,var(--cyan))}
+    .num{font-size:38px;line-height:1;font-weight:900;color:var(--step-color,var(--cyan));letter-spacing:-.04em}
+    .step h3{font-size:17px;margin:10px 0 8px}
+    .step p{font-size:14px;color:var(--muted);margin:0}
+    .step.wide{grid-column:span 4;min-height:auto;display:grid;grid-template-columns:120px 1fr;align-items:center}
+    .step.wide .num{font-size:46px}
+    .phase-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    .phase{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 8px 26px rgba(11,47,91,.04)}
+    .phase .label{display:inline-block;margin-bottom:12px;padding:5px 9px;border-radius:8px;background:var(--cyan-soft);color:var(--teal);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+    .phase ul{padding-left:20px;margin:14px 0 0}
+    .phase li{margin:7px 0;color:#42546b}
+    .architecture{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:22px}
+    .layer{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px 13px;text-align:center}
+    .layer strong{display:block;color:var(--navy);font-size:14px;margin-bottom:4px}
+    .layer span{font-size:12px;color:var(--muted)}
+    .approach{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+    .approach-col{padding:0 20px 24px;border-right:1px solid var(--line)}
+    .approach-col:last-child{border-right:0}
+    .approach-title{margin:0 -20px 18px;padding:15px 14px;text-align:center;color:#fff;font-weight:850;font-size:17px;background:var(--acol)}
+    .approach-col ul{margin:0;padding-left:18px}
+    .approach-col li{margin:10px 0;font-size:14px;color:#405068}
+    .slide-nav{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 14px;scrollbar-width:thin}
+    .slide-nav a{flex:0 0 auto;text-decoration:none;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:750;color:#3f536f}
+    .slide-nav a:hover{border-color:#a8bdd0;color:var(--navy)}
+    .slides{display:grid;gap:34px}
+    .slide-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 10px 32px rgba(10,43,83,.08);scroll-margin-top:96px}
+    .slide-card header{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:4px 6px 12px}
+    .slide-card h3{margin:0;font-size:18px}
+    .slide-card .view{font-size:12px;color:var(--muted)}
+    .slide-link{display:block;border-radius:15px;overflow:hidden;background:#f3f6f9;cursor:zoom-in}
+    .slide-link img{display:block;width:100%;aspect-ratio:1000/563;object-fit:contain;background:#fff}
+    .note{margin-top:20px;padding:16px 18px;border-left:4px solid var(--orange);background:var(--orange-soft);border-radius:0 12px 12px 0;color:#5d4a42;font-size:14px}
+    .footer{background:#061c45;color:#dce8f8;padding:46px 0;margin-top:20px}
+    .footer-grid{display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}
+    .footer strong{font-size:18px;color:#fff}
+    .footer p{margin:5px 0 0;color:#9fb2ca;font-size:14px}
+    .footer a{color:#fff}
+    dialog{width:min(96vw,1300px);max-height:94vh;border:0;border-radius:18px;padding:12px;background:#fff;box-shadow:0 30px 100px rgba(0,0,0,.35)}
+    dialog::backdrop{background:rgba(1,12,32,.78);backdrop-filter:blur(5px)}
+    dialog img{display:block;max-width:100%;max-height:84vh;margin:auto}
+    .close{display:block;margin-left:auto;border:0;background:#eef2f6;color:#152c4c;border-radius:10px;padding:7px 11px;font-weight:800;cursor:pointer}
+    @media (max-width:980px){
+      .hero-grid{grid-template-columns:1fr}.roadmap{grid-template-columns:repeat(2,1fr)}.step.wide{grid-column:span 2}
+      .architecture{grid-template-columns:repeat(2,1fr)}.architecture .layer:last-child{grid-column:span 2}
+      .approach{grid-template-columns:1fr 1fr}.approach-col{border-bottom:1px solid var(--line)}.approach-col:nth-child(2n){border-right:0}.approach-col:last-child{grid-column:span 2;border-bottom:0}
+    }
+    @media (max-width:720px){
+      .wrap{width:min(var(--max),calc(100% - 24px))}.topbar .wrap{min-height:60px}.nav{display:none}.hero{padding:58px 0 38px}
+      h1{font-size:44px}.section{padding:58px 0}.roadmap,.phase-grid{grid-template-columns:1fr}.step.wide{grid-column:auto;grid-template-columns:64px 1fr}.step.wide .num{font-size:36px}
+      .architecture{grid-template-columns:1fr}.architecture .layer:last-child{grid-column:auto}
+      .approach{grid-template-columns:1fr}.approach-col,.approach-col:nth-child(2n){border-right:0;border-bottom:1px solid var(--line)}.approach-col:last-child{grid-column:auto;border-bottom:0}
+      .footer-grid{grid-template-columns:1fr}
+    }
+    @media print{
+      .topbar,.hero-actions,.slide-nav,.view,.footer{display:none!important}.hero,.section{padding:24px 0}.slide-card{break-inside:avoid;box-shadow:none}.slide-card img{max-height:7.2in}.wrap{width:94%}
+    }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="#top"><span class="brand-mark">AI</span><span>Agent AI Framework</span></a>
+      <nav aria-label="Page navigation" class="nav">
+        <a href="#roadmap">Roadmap</a>
+        <a href="#framework">Framework</a>
+        <a href="#approach">Approach</a>
+        <a href="#slides">14 Slides</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="eyebrow">Enterprise Agentic AI</span>
+          <h1>Agent AI Framework</h1>
+          <p class="lead">A practical roadmap to move from AI-agent strategy to reusable architecture, production deployment, governance, replication, and ultimately an ecosystem of cooperating agents.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#roadmap">Explore the roadmap</a>
+            <a class="btn btn-secondary" href="#slides">View all 14 slides</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <picture>
+            <source media="(max-width:640px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-1.png"/>
+            <source media="(max-width:840px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-1.png"/>
+            <source media="(max-width:1100px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-1.png"/>
+            <img alt="Agent AI Framework overview slide" fetchpriority="high" height="563" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-1.png" width="1000"/>
+          </picture>
+          <p>The slide deck provides the visual backbone; the article below expands the roadmap into an implementation-oriented guide.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="roadmap">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Roadmap</div>
+          <h2>From intent to institutional capability</h2>
+          <p>The framework treats Agent AI as a lifecycle. Start with business intent, prove value in a focused pilot, then standardize, govern, and reuse the capability across the enterprise.</p>
+        </div>
+        <div class="roadmap">
+          <article class="step" style="--step-color:#00635f"><div class="num">01</div><h3>Adoption Framework</h3><p>Define the operating model, stage gates, ownership, and decision criteria for agent adoption.</p></article>
+          <article class="step" style="--step-color:#57b7cc"><div class="num">02</div><h3>Strategy &amp; Vision</h3><p>Clarify why Agent AI matters, which outcomes it should improve, and the acceptable risk profile.</p></article>
+          <article class="step" style="--step-color:#a7cad3"><div class="num">03</div><h3>Use Case Identification</h3><p>Prioritize workflows by value, feasibility, data readiness, and operational risk.</p></article>
+          <article class="step" style="--step-color:#f37a42"><div class="num">04</div><h3>Architecture &amp; Infra</h3><p>Design reusable layers for reasoning, memory, tools, knowledge, interfaces, and governance.</p></article>
+          <article class="step" style="--step-color:#e34a24"><div class="num">05</div><h3>Build Pilot</h3><p>Prove one use case with measurable KPIs, tight scope, feedback, and human oversight.</p></article>
+          <article class="step" style="--step-color:#0a2c70"><div class="num">06</div><h3>Productionize &amp; Scale</h3><p>Harden reliability, security, observability, deployment, testing, and cost controls.</p></article>
+          <article class="step" style="--step-color:#00635f"><div class="num">07</div><h3>Monitor &amp; Govern</h3><p>Continuously evaluate quality, safety, drift, tool behavior, access, and business outcomes.</p></article>
+          <article class="step" style="--step-color:#57b7cc"><div class="num">08</div><h3>Replicate</h3><p>Reuse the same agent platform across adjacent workflows through configuration and modules.</p></article>
+          <article class="step wide" style="--step-color:#e34a24"><div class="num">09</div><div><h3>Move from a single AI to cooperating minds</h3><p>When a workflow becomes too broad for one agent, decompose it into specialized agents with explicit roles, shared context, and orchestration.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="framework">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Implementation Framework</div>
+          <h2>What each stage needs to answer</h2>
+          <p>A strong agent program is not only a model choice. It connects business value, software architecture, operations, security, and governance from the beginning.</p>
+        </div>
+        <div class="phase-grid">
+          <article class="phase"><span class="label">Strategy &amp; Vision</span><h3>Define outcomes before autonomy</h3><ul><li>Set target business outcomes such as cycle-time reduction, accuracy, customer experience, or compliance.</li><li>Agree on success metrics and boundaries for autonomous action.</li><li>Identify sponsors, process owners, data owners, and accountable operators.</li></ul></article>
+          <article class="phase"><span class="label">Use Cases</span><h3>Start where value is visible</h3><ul><li>Score candidate workflows by value, feasibility, risk, and data readiness.</li><li>Prefer a contained process with observable inputs, outputs, and measurable KPIs.</li><li>Define fallback behavior when the agent is uncertain or a tool fails.</li></ul></article>
+          <article class="phase"><span class="label">Architecture</span><h3>Build a modular foundation</h3><ul><li>Separate reasoning from domain logic, tools, knowledge, memory, and policy enforcement.</li><li>Use explicit interfaces for APIs, databases, document stores, and human approvals.</li><li>Design telemetry and auditability into the platform instead of adding them later.</li></ul></article>
+          <article class="phase"><span class="label">Pilot</span><h3>Prove behavior, not only a demo</h3><ul><li>Keep the scope narrow and maintain human-in-the-loop controls for consequential actions.</li><li>Log tool calls, decisions, errors, latency, and cost.</li><li>Test against representative scenarios, edge cases, and failure modes.</li></ul></article>
+          <article class="phase"><span class="label">Production</span><h3>Turn a pilot into a service</h3><ul><li>Standardize deployment, secrets, access controls, testing, and rollback.</li><li>Build reliability patterns for retries, timeouts, idempotency, and tool failures.</li><li>Track unit economics as well as quality and task success.</li></ul></article>
+          <article class="phase"><span class="label">Governance</span><h3>Operate within explicit guardrails</h3><ul><li>Apply least privilege to tools, data, and downstream actions.</li><li>Maintain traceability for prompts, context, retrieved knowledge, tool calls, and outputs.</li><li>Use human checkpoints where risk, policy, or uncertainty requires escalation.</li></ul></article>
+          <article class="phase"><span class="label">Replication</span><h3>Reuse the platform, vary the domain</h3><ul><li>Package common memory, logging, authentication, prompt, and monitoring components.</li><li>Parameterize domain-specific policies, tools, taxonomies, and knowledge sources.</li><li>Favor configuration-over-code when the underlying behavior is shared.</li></ul></article>
+          <article class="phase"><span class="label">Multi-Agent</span><h3>Decompose complex work into roles</h3><ul><li>Use specialist agents for extraction, analysis, planning, execution, and advisory tasks.</li><li>Introduce an orchestrator only when task boundaries, handoffs, and state are clear.</li><li>Control shared context carefully to avoid duplication, drift, and conflicting actions.</li></ul></article>
+        </div>
+
+        <div aria-label="Core architecture layers" class="architecture">
+          <div class="layer"><strong>Context &amp; Memory</strong><span>State, history, user and task context</span></div>
+          <div class="layer"><strong>Reasoning</strong><span>Planning, decisions, model orchestration</span></div>
+          <div class="layer"><strong>Tools &amp; Integrations</strong><span>APIs, data stores, apps, workflows</span></div>
+          <div class="layer"><strong>Experience</strong><span>Chat, workflow UI, dashboards, APIs</span></div>
+          <div class="layer"><strong>Governance</strong><span>Security, policy, monitoring, audit</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="approach">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Slide 14</div>
+          <h2>Dataknobs approach</h2>
+          <p>The final slide emphasizes a progression from standardization to institutionalization: establish a reusable core, modularize domain behavior, orchestrate specialized agents, automate delivery, and build a durable operating model.</p>
+        </div>
+        <div class="approach">
+          <div class="approach-col" style="--acol:#438bd9"><div class="approach-title">Standardize</div><ul><li>Define a common agent architecture template.</li><li>Create reusable authentication, logging, monitoring, and prompt components.</li><li>Build shared governance, compliance, and security policies.</li></ul></div>
+          <div class="approach-col" style="--acol:#53b8e5"><div class="approach-title">Modularize</div><ul><li>Isolate business logic by domain.</li><li>Plug domain modules into the core framework.</li><li>Use a configuration-over-code model for faster deployment.</li></ul></div>
+          <div class="approach-col" style="--acol:#82d13f"><div class="approach-title">Orchestration</div><ul><li>Enable specialized agents to collaborate.</li><li>Add routing or orchestration for sequential tasks.</li><li>Leverage shared memory and context across agents.</li></ul></div>
+          <div class="approach-col" style="--acol:#5e4bc4"><div class="approach-title">Automate</div><ul><li>Containerize agents for repeatable deployment.</li><li>Automate testing and rollout pipelines.</li><li>Centralize monitoring for behavior, drift, and ROI.</li></ul></div>
+          <div class="approach-col" style="--acol:#3bb9cc"><div class="approach-title">Institutionalize</div><ul><li>Capture feedback across agents for continuous improvement.</li><li>Maintain a shared knowledge base.</li><li>Establish a center of excellence for governance and reuse.</li></ul></div>
+        </div>
+        <div class="note">The webpage deliberately keeps the 14 original slides as first-class content rather than redrawing them. That preserves the source material while the surrounding article adds navigation, responsive loading, accessibility, and implementation context.</div>
+      </div>
+    </section>
+
+    <section class="section" id="slides">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Source Deck</div>
+          <h2>All 14 slides</h2>
+          <p>Each image uses responsive variants from the `Slide600`, `Slide700`, `Slide900`, and `Slide1000` folders. Click any slide to open a larger view.</p>
+        </div>
+        <nav aria-label="Slide shortcuts" class="slide-nav">
+          <a href="#slide-1">1</a><a href="#slide-2">2</a><a href="#slide-3">3</a><a href="#slide-4">4</a><a href="#slide-5">5</a><a href="#slide-6">6</a><a href="#slide-7">7</a><a href="#slide-8">8</a><a href="#slide-9">9</a><a href="#slide-10">10</a><a href="#slide-11">11</a><a href="#slide-12">12</a><a href="#slide-13">13</a><a href="#slide-14">14</a>
+        </nav>
+        <div class="slides">
+          <article class="slide-card" id="slide-1">
+            <header><h3>Slide 1 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="1" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-1.png">
+              <img alt="Agent AI Framework slide 1 of 14" decoding="async" height="563" loading="eager" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-1.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-1.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-1.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-1.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-1.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-2">
+            <header><h3>Slide 2 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="2" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-2.png">
+              <img alt="Agent AI Framework slide 2 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-2.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-2.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-2.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-2.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-2.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-3">
+            <header><h3>Slide 3 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="3" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-3.png">
+              <img alt="Agent AI Framework slide 3 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-3.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-3.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-3.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-3.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-3.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-4">
+            <header><h3>Slide 4 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="4" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-4.png">
+              <img alt="Agent AI Framework slide 4 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-4.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-4.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-4.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-4.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-4.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-5">
+            <header><h3>Slide 5 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="5" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-5.png">
+              <img alt="Agent AI Framework slide 5 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-5.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-5.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-5.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-5.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-5.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-6">
+            <header><h3>Slide 6 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="6" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-6.png">
+              <img alt="Agent AI Framework slide 6 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-6.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-6.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-6.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-6.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-6.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-7">
+            <header><h3>Slide 7 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="7" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-7.png">
+              <img alt="Agent AI Framework slide 7 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-7.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-7.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-7.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-7.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-7.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-8">
+            <header><h3>Slide 8 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="8" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-8.png">
+              <img alt="Agent AI Framework slide 8 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-8.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-8.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-8.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-8.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-8.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-9">
+            <header><h3>Slide 9 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="9" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-9.png">
+              <img alt="Agent AI Framework slide 9 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-9.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-9.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-9.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-9.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-9.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-10">
+            <header><h3>Slide 10 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="10" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-10.png">
+              <img alt="Agent AI Framework slide 10 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-10.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-10.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-10.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-10.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-10.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-11">
+            <header><h3>Slide 11 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="11" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-11.png">
+              <img alt="Agent AI Framework slide 11 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-11.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-11.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-11.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-11.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-11.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-12">
+            <header><h3>Slide 12 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="12" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-12.png">
+              <img alt="Agent AI Framework slide 12 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-12.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-12.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-12.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-12.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-12.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-13">
+            <header><h3>Slide 13 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="13" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-13.png">
+              <img alt="Agent AI Framework slide 13 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-13.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-13.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-13.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-13.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-13.png 1000w" width="1000"/>
+            </a>
+          </article>
+          <article class="slide-card" id="slide-14">
+            <header><h3>Slide 14 of 14</h3><span class="view">Click to enlarge</span></header>
+            <a class="slide-link" data-slide="14" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-14.png">
+              <img alt="Agent AI Framework slide 14 of 14" decoding="async" height="563" loading="lazy" sizes="(max-width: 720px) calc(100vw - 52px), (max-width: 1220px) calc(100vw - 80px), 1120px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-14.png" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide600/slide-14.png 600w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide700/slide-14.png 700w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide900/slide-14.png 900w,
+                        https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai-course/framework-agent-ai/images/Slide1000/slide-14.png 1000w" width="1000"/>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/context-engineering-and-multi-agent-llm.html">Context Engineering And Multi Agent Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/criteria-is-use-case-agentic.html">Criteria Is Use Case Agentic</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/enterprise-ai-agent-risks-responsibility.html">Enterprise Ai Agent Risks Responsibility</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evaluating-ai-agent-and-data-generation.html">Evaluating Ai Agent And Data Generation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evolution-of-ai-agent-rag.html">Evolution Of Ai Agent Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/measuring-agentic-ai-effectiveness.html">Measuring Agentic Ai Effectiveness</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/pillars-of-agentic-ai.html">Pillars Of Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rise-of-agentic-ai-info.html">Rise Of Agentic Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rpa-genai-agentic-ai.html">Rpa Genai Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/super-agent.html">Super Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/when-to-use-ai-agent.html">When To Use Ai Agent</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knowledge Collection - Technology and Others</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra Website. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+  <dialog aria-label="Slide preview" id="lightbox">
+    <button aria-label="Close preview" class="close" type="button">Close</button>
+    <img alt="Expanded slide preview" id="lightbox-image" src=""/>
+  </dialog>
+
+  <script>
+    const dialog = document.getElementById('lightbox');
+    const dialogImage = document.getElementById('lightbox-image');
+    document.querySelectorAll('.slide-link').forEach(link => {
+      link.addEventListener('click', event => {
+        if (!dialog || typeof dialog.showModal !== 'function') return;
+        event.preventDefault();
+        dialogImage.src = link.href;
+        dialogImage.alt = `Expanded Agent AI Framework slide ${link.dataset.slide}`;
+        dialog.showModal();
+      });
+    });
+    document.querySelector('.close')?.addEventListener('click', () => dialog.close());
+    dialog?.addEventListener('click', event => {
+      const box = dialog.getBoundingClientRect();
+      const inside = event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom;
+      if (!inside) dialog.close();
+    });
+  </script>
+
+
+</body></html>
