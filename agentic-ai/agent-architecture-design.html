@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Agent Architecture Design: A Practical Guide</title>
+  <meta content="A practical guide to AI agent architecture: single vs. multi-agent, planner-executor, supervisor-worker, event-driven systems, orchestration, and protocols." name="description"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="#0a2147" name="theme-color"/>
+  <meta content="article" property="og:type"/>
+  <meta content="Agent Architecture Design: A Practical Guide" property="og:title"/>
+  <meta content="How to choose and structure AI agent systems using six architecture decisions, trade-offs, frameworks, and communication protocols." property="og:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-1.png" property="og:image"/>
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Agent Architecture Design: A Practical Guide" name="twitter:title"/>
+  <meta content="A practical framework for choosing single-agent, multi-agent, planner-executor, event-driven, orchestration, and communication patterns." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-1.png" name="twitter:image"/>
+  <style>
+    :root{
+      --navy:#0a2147;--navy2:#102d5d;--teal:#129b91;--teal2:#1bb7ad;--ink:#17243c;
+      --muted:#627085;--line:#dbe3ec;--soft:#eef3f7;--soft2:#f7f9fb;--white:#fff;--amber:#c58b37;
+      --shadow:0 12px 32px rgba(10,33,71,.10);--radius:18px;--max:1180px;
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--white);line-height:1.68}
+    img{max-width:100%;height:auto;display:block}a{color:var(--teal);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:var(--navy)}
+    .skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:16px;z-index:999;background:#fff;padding:10px 14px;border-radius:10px;box-shadow:var(--shadow)}
+    .wrap{width:min(var(--max),calc(100% - 36px));margin-inline:auto}.hero{background:linear-gradient(135deg,var(--navy) 0%,#0f3469 68%,#0f6b71 100%);color:#fff;padding:28px 0 62px;overflow:hidden}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:48px}.brand{font-weight:800;letter-spacing:.04em}.brand span{color:#52d6cc}.topnav{display:flex;gap:20px;flex-wrap:wrap}.topnav a{color:#d7e6f8;text-decoration:none;font-size:.94rem}.topnav a:hover{color:white}
+    .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:46px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.14em;font-weight:800;font-size:.78rem;color:#6ee1d7;margin-bottom:16px}
+    h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.15;color:var(--navy);margin:0 0 16px}h1{font-size:clamp(2.7rem,6vw,5.6rem);color:#fff;letter-spacing:-.045em}h2{font-size:clamp(2rem,4vw,3.4rem);letter-spacing:-.025em}h3{font-size:1.45rem}.hero p{font-size:1.15rem;color:#dfe9f5;max-width:760px;margin:0 0 28px}.hero-pills{display:flex;gap:10px;flex-wrap:wrap}.pill{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);border-radius:999px;padding:8px 12px;font-size:.86rem;color:#edf7ff}
+    .hero-card{background:rgba(255,255,255,.96);border-radius:22px;padding:14px;box-shadow:0 22px 55px rgba(0,0,0,.23);transform:rotate(1deg)}.hero-card img{border-radius:13px;width:100%;aspect-ratio:4/3;object-fit:cover}
+    .section{padding:78px 0}.section.alt{background:var(--soft2)}.section-head{max-width:860px;margin-bottom:34px}.kicker{text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:var(--teal);font-size:.78rem;margin-bottom:8px}.lead{font-size:1.12rem;color:#4e5c70}
+    .toc{margin-top:-28px;position:relative;z-index:2}.toc-inner{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px 24px;display:flex;flex-wrap:wrap;gap:10px}.toc a{padding:8px 11px;background:var(--soft);border-radius:999px;text-decoration:none;color:var(--navy);font-size:.9rem;font-weight:700}
+    .decision-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.decision-card{border:1px solid var(--line);background:white;border-radius:var(--radius);padding:24px;box-shadow:0 6px 18px rgba(10,33,71,.04)}.num{width:42px;height:42px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:16px}.decision-card p{color:var(--muted);margin:0}
+    .content-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:38px;align-items:start}.visual{background:#fff;border:1px solid var(--line);padding:12px;border-radius:18px;box-shadow:var(--shadow)}.visual img{width:100%;border-radius:10px;aspect-ratio:4/3;object-fit:cover}.caption{font-size:.82rem;color:var(--muted);margin-top:9px}
+    .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}.box{border:1px solid var(--line);border-radius:16px;padding:22px;background:#fff}.box.dark{background:var(--navy);color:#fff;border-color:var(--navy)}.box.dark h3{color:white}.box h3{margin-bottom:8px}.box ul{margin:12px 0 0;padding-left:20px}.label{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}.box.dark .label{color:#66d7ce}.watch{color:#9c6722}
+    .rule{border-left:5px solid var(--teal);background:var(--soft);padding:18px 20px;border-radius:0 14px 14px 0;margin-top:20px;font-weight:700;color:var(--navy)}
+    .flow{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:22px 0}.flow .step{background:var(--navy);color:#fff;padding:16px 18px;border-radius:12px;font-weight:800}.flow .step.teal{background:var(--teal)}.flow .step.light{background:var(--soft);color:var(--navy);border:1px solid var(--line)}.arrow{font-weight:900;color:var(--teal);font-size:1.3rem}
+    .matrix{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:16px}.matrix th,.matrix td{text-align:left;padding:15px 16px;border-bottom:1px solid var(--line);vertical-align:top}.matrix th{background:var(--navy);color:#fff}.matrix tr:last-child td{border-bottom:0}.matrix tr:nth-child(even) td{background:#f7fafc}.yes{color:#0d8b77;font-weight:800}.warn{color:#aa6f16;font-weight:800}
+    .protocols{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.protocol{border:1px solid var(--line);border-radius:16px;padding:22px;background:white}.protocol strong{font-family:Georgia,"Times New Roman",serif;color:var(--navy);font-size:1.25rem}.protocol small{display:block;color:var(--teal);font-weight:700;margin-top:4px}.protocol p{margin-bottom:0;color:var(--muted)}
+    .chooser{display:grid;gap:12px}.choice{display:grid;grid-template-columns:1fr 42px 1.1fr;align-items:center;gap:12px;background:#112c59;color:#fff;padding:15px 18px;border-radius:14px}.choice .if{color:#8fe1d9;font-weight:800}.choice .then{background:var(--teal);padding:12px 14px;border-radius:10px;text-align:center;font-weight:800}.choice .chev{text-align:center;color:#57d6cc;font-size:1.5rem}
+    .takeaways{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.take{background:white;border:1px solid var(--line);border-radius:16px;padding:22px}.take b{display:block;color:var(--navy);margin-bottom:8px}.take p{margin:0;color:var(--muted)}
+    .faq{display:grid;gap:12px}.faq details{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:white}.faq summary{cursor:pointer;font-weight:800;color:var(--navy)}.faq p{color:var(--muted);margin-bottom:0}
+    footer{background:#071a39;color:#b9c8d9;padding:34px 0;margin-top:20px}footer strong{color:white}.small{font-size:.88rem}
+    @media (max-width:900px){.hero-grid,.content-grid{grid-template-columns:1fr}.decision-grid,.takeaways{grid-template-columns:1fr 1fr}.protocols{grid-template-columns:1fr}.hero-card{transform:none}.topnav{display:none}}
+    @media (max-width:640px){.section{padding:56px 0}.decision-grid,.compare,.takeaways{grid-template-columns:1fr}.choice{grid-template-columns:1fr}.choice .chev{transform:rotate(90deg)}.topbar{margin-bottom:34px}.hero{padding-bottom:46px}.matrix{display:block;overflow-x:auto}.toc-inner{padding:16px}}
+    :focus-visible{outline:3px solid #f0aa45;outline-offset:3px}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"Agent Architecture Design: A Practical Guide",
+    "description":"A practical guide to six design decisions that shape AI agent systems, including agent count, control flow, orchestration and communication protocols.",
+    "image":"https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-1.png"
+  }
+  </script>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">AGENT <span>ARCHITECTURE</span></div>
+      <nav aria-label="Primary" class="topnav">
+        <a href="#decisions">Six decisions</a><a href="#patterns">Patterns</a><a href="#frameworks">Frameworks</a><a href="#protocols">Protocols</a><a href="#choose">Choose</a>
+      </nav>
+    </div>
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">ADLC · Practice Area 02</div>
+        <h1>Agent Architecture Design</h1>
+        <p>How to structure AI agents: how many agents to use, how control flows between them, how work is planned and delegated, how runtime state is managed, and how agents communicate with tools and with one another.</p>
+        <div class="hero-pills"><span class="pill">Single vs. multi-agent</span><span class="pill">Planner–executor</span><span class="pill">Supervisor–worker</span><span class="pill">Event-driven</span><span class="pill">MCP &amp; A2A</span></div>
+      </div>
+      <figure class="hero-card">
+        <img alt="Agent Architecture Design presentation cover" fetchpriority="high" height="900" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-1.png" width="1200"/>
+      </figure>
+    </div>
+  </div>
+</header>
+
+<div class="toc"><div class="wrap"><nav aria-label="Article sections" class="toc-inner">
+  <a href="#decisions">Overview</a><a href="#single-multi">Single vs. multi-agent</a><a href="#planner">Planner–executor</a><a href="#supervisor">Supervisor–worker</a><a href="#events">Event-driven</a><a href="#frameworks">Orchestration</a><a href="#protocols">Protocols</a><a href="#choose">Selection guide</a>
+</nav></div></div>
+
+<main id="main">
+<section class="section" id="decisions">
+  <div class="wrap">
+    <div class="section-head"><div class="kicker">Overview</div><h2>Six decisions shape the system</h2><p class="lead">Agent architecture is not simply a choice of framework. The design starts with six structural decisions: agent count, separation of planning from action, delegation topology, event model, orchestration runtime, and communication protocol.</p></div>
+    <div class="decision-grid">
+      <article class="decision-card"><div class="num">1</div><h3>Single vs. Multi-Agent</h3><p>Choose between one shared reasoning loop and several specialized agents coordinating on a common goal.</p></article>
+      <article class="decision-card"><div class="num">2</div><h3>Planner–Executor</h3><p>Separate deciding what to do from actually doing it, with the option to re-plan when conditions change.</p></article>
+      <article class="decision-card"><div class="num">3</div><h3>Supervisor–Worker</h3><p>Use a coordinator to route work to expert workers, validate outputs, retry failures, and aggregate results.</p></article>
+      <article class="decision-card"><div class="num">4</div><h3>Event-Driven Agents</h3><p>React asynchronously to requests, webhooks, schedules, and other events rather than following a fixed synchronous script.</p></article>
+      <article class="decision-card"><div class="num">5</div><h3>Orchestration Frameworks</h3><p>Choose the runtime that manages state, memory, routing, handoffs, retries, observability, and human intervention.</p></article>
+      <article class="decision-card"><div class="num">6</div><h3>Communication Protocols</h3><p>Standardize agent-to-tool communication and cross-agent delegation through open interfaces such as MCP and A2A.</p></article>
+    </div>
+    <figure class="visual" style="margin-top:28px"><img alt="Six decisions that shape an agent system" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-2.png" width="1200"/><figcaption class="caption">The source deck summarizes the architecture space as six core decisions.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section alt" id="single-multi">
+  <div class="wrap content-grid">
+    <div>
+      <div class="kicker">Decision 1</div><h2>Start with one agent; earn the right to add more</h2>
+      <p class="lead">A single-agent design keeps one model, one context, and one reasoning loop around its tools. A multi-agent design splits work across specialists. More agents can increase parallelism and specialization, but they also introduce coordination cost and additional failure modes.</p>
+      <div class="compare">
+        <article class="box"><div class="label">Single-agent strengths</div><h3>Simple and observable</h3><ul><li>Easier to build, debug, and trace.</li><li>No synchronization overhead across agents.</li><li>Lower token cost and usually lower latency.</li><li>More predictable behavior for bounded workflows.</li></ul><div class="label watch" style="margin-top:18px">Watch out</div><p>Context can become bloated as tools and task breadth grow, and one loop may struggle with highly parallel or specialized work.</p></article>
+        <article class="box dark"><div class="label">Multi-agent strengths</div><h3>Specialized and parallel</h3><ul><li>Clear separation of concerns.</li><li>Independent subtasks can run in parallel.</li><li>Different roles can use different models or prompts.</li><li>Scales to broad, heterogeneous problem spaces.</li></ul><div class="label" style="margin-top:18px">Watch out</div><p>Routing, synchronization, retries, tracing, and cross-agent context transfer all become architecture problems.</p></article>
+      </div>
+      <div class="rule">Rule of thumb: start single-agent. Move to multi-agent only when the work is genuinely parallel, needs distinct expertise, or cannot fit cleanly inside one context.</div>
+    </div>
+    <figure class="visual"><img alt="Comparison of single-agent and multi-agent systems" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-3.png" width="1200"/><figcaption class="caption">Single-agent simplicity versus multi-agent specialization and coordination overhead.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="planner">
+  <div class="wrap content-grid">
+    <div>
+      <div class="kicker">Decision 2</div><h2>Planner–executor separates strategy from action</h2>
+      <p class="lead">For long tasks, letting an agent jump directly from goal to action can cause drift. Planner–executor architectures introduce an explicit planning phase before execution and allow the system to revise the plan when tool results, failures, or new information invalidate assumptions.</p>
+      <div aria-label="Planner executor flow" class="flow"><span class="step">Goal</span><span class="arrow">›</span><span class="step teal">Planner</span><span class="arrow">›</span><span class="step light">Plan</span><span class="arrow">›</span><span class="step teal">Executor + tools</span><span class="arrow">›</span><span class="step">Result</span></div>
+      <h3>How the pattern works</h3><p>The planner decomposes the objective into an ordered task list. The executor runs each step and calls tools as required. Progress is checked against the plan, and failures or new evidence can trigger a re-plan. This deliberately decouples strategic reasoning from operational tool use.</p>
+      <h3>Variants in the source deck</h3><p><strong>Plan-and-Execute</strong> creates the plan first and executes it sequentially. <strong>ReWOO</strong> plans tool calls up front to reduce model round-trips. <strong>LLMCompiler</strong> represents work as a task graph so independent steps can run in parallel.</p>
+    </div>
+    <figure class="visual"><img alt="Planner executor architecture with re-plan loop" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-4.png" width="1200"/><figcaption class="caption">The planner produces steps; the executor performs them; a feedback loop re-plans on failure or new information.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section alt" id="supervisor">
+  <div class="wrap content-grid">
+    <div>
+      <div class="kicker">Decision 3</div><h2>Supervisor–worker creates a clear control hierarchy</h2>
+      <p class="lead">A supervisor owns the overall goal, delegates subtasks to specialized workers, validates results, and aggregates the final answer. It is a natural pattern when multiple roles are useful but the system still needs one point of accountability.</p>
+      <div class="compare">
+        <article class="box"><div class="label">Strengths</div><ul><li>Clear control and accountability.</li><li>Workers can remain narrow and expert.</li><li>Workers are easy to add, replace, or nest.</li><li>The supervisor can route, retry, and validate.</li></ul></article>
+        <article class="box"><div class="label watch">Failure modes</div><ul><li>The supervisor can become a bottleneck.</li><li>It can become a single point of failure.</li><li>Poor routing quality caps overall system quality.</li><li>Too much context can accumulate at the top.</li></ul></article>
+      </div>
+      <p>Hierarchies can also be recursive: a worker can itself become a supervisor for a smaller sub-team. That makes the pattern extensible, but each additional layer increases observability and coordination requirements.</p>
+    </div>
+    <figure class="visual"><img alt="Supervisor worker architecture with research, code and analysis workers" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-5.png" width="1200"/><figcaption class="caption">The deck illustrates one supervisor routing to research, code, and analysis workers.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="events">
+  <div class="wrap content-grid">
+    <div>
+      <div class="kicker">Decision 4</div><h2>Event-driven agents fit asynchronous and long-running work</h2>
+      <p class="lead">An event-driven system replaces a fixed request-response script with publish/subscribe behavior. Requests, API webhooks, schedules, and timers generate events; independent agents subscribe and react asynchronously.</p>
+      <h3>Why it changes the architecture</h3><p>Event-driven designs loosen coupling between components. Producers do not need to know exactly which agent will consume an event, and new subscribers can be introduced without changing the producer. This makes horizontal scaling and parallel handling easier.</p>
+      <h3>Best-fit workloads</h3><ul><li>Real-time alerts, monitoring, support, and reactive systems.</li><li>Long-running or human-in-the-loop workflows that wait on external events.</li><li>High-throughput pipelines with parallel, independent handlers.</li></ul>
+      <div class="rule">The trade-off is operational: distributed event flow is harder to trace, ordering and eventual consistency must be designed intentionally, and retry/dead-letter handling becomes essential.</div>
+    </div>
+    <figure class="visual"><img alt="Event-driven agent architecture using an event bus" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-6.png" width="1200"/><figcaption class="caption">User requests, webhooks, and schedules publish to an event bus that fans out to triage, enrichment, and notification agents.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section alt" id="frameworks">
+  <div class="wrap">
+    <div class="section-head"><div class="kicker">Decision 5</div><h2>Orchestration frameworks operationalize the design</h2><p class="lead">The framework is the runtime layer that turns the chosen architecture into a managed system. The deck groups orchestration into four styles: graph-based, role-based, handoff-based, and hierarchical.</p></div>
+    <div style="overflow-x:auto"><table class="matrix">
+      <thead><tr><th>Style</th><th>How it works</th><th>Examples named in the deck</th><th>Best fit</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Graph-based</strong></td><td>Nodes, conditional edges, explicit state transitions, and checkpointing.</td><td>LangGraph; Microsoft Agent Framework</td><td>Auditable production control flow and durable state.</td></tr>
+        <tr><td><strong>Role-based</strong></td><td>A crew of role-oriented agents receives tasks and collaborates.</td><td>CrewAI; Agno</td><td>Fast prototyping around clear role boundaries.</td></tr>
+        <tr><td><strong>Handoff-based</strong></td><td>Agents explicitly transfer control and context to another agent.</td><td>OpenAI Agents SDK</td><td>Conversational or workflow routing where one agent owns the turn at a time.</td></tr>
+        <tr><td><strong>Hierarchical</strong></td><td>A parent delegates down a tree of sub-agents.</td><td>Google ADK; Claude Agent SDK</td><td>Large systems with layered delegation and nested specialization.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="takeaways" style="margin-top:22px"><div class="take"><b>State &amp; memory</b><p>Persist task state and working context across steps.</p></div><div class="take"><b>Control flow &amp; routing</b><p>Decide which node, worker, or agent runs next.</p></div><div class="take"><b>Handoffs</b><p>Transfer task ownership and context safely.</p></div><div class="take"><b>Retries &amp; recovery</b><p>Recover from tool, model, and downstream failures.</p></div><div class="take"><b>Tracing &amp; observability</b><p>Expose execution paths, timing, state, and failures.</p></div><div class="take"><b>Human-in-the-loop</b><p>Pause, review, approve, correct, or resume work.</p></div></div>
+    <figure class="visual" style="margin-top:28px"><img alt="Four agent orchestration framework styles" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-7.png" width="1200"/><figcaption class="caption">Graph-based, role-based, handoff-based, and hierarchical orchestration styles from the source presentation.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="protocols">
+  <div class="wrap content-grid">
+    <div>
+      <div class="kicker">Decision 6</div><h2>Protocols separate vertical tool access from horizontal agent collaboration</h2>
+      <p class="lead">The deck frames agent communication in two directions: <strong>down</strong> to tools, data, and APIs, and <strong>across</strong> to other agents. Open protocols aim to standardize those boundaries.</p>
+      <div class="protocols">
+        <article class="protocol"><strong>MCP</strong><small>Model Context Protocol</small><p>Vertical connectivity between an agent and tools, data, or APIs using a client-server interface.</p></article>
+        <article class="protocol"><strong>A2A</strong><small>Agent-to-Agent</small><p>Horizontal communication for discovery, authentication, and delegation across agents and stacks.</p></article>
+        <article class="protocol"><strong>ACP</strong><small>Agent Communication Protocol</small><p>A lightweight, REST-oriented approach to agent messaging, described in the deck as converging toward the A2A direction.</p></article>
+        <article class="protocol"><strong>ANP</strong><small>Agent Network Protocol</small><p>An emerging decentralized-identity approach aimed at open agent networks and marketplaces.</p></article>
+      </div>
+    </div>
+    <figure class="visual"><img alt="Agent communication protocols showing MCP vertical and A2A horizontal links" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-8.png" width="1200"/><figcaption class="caption">The presentation distinguishes MCP-style vertical tool access from A2A-style horizontal agent collaboration.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section alt" id="choose">
+  <div class="wrap">
+    <div class="section-head"><div class="kicker">Putting it together</div><h2>Choosing your architecture</h2><p class="lead">The final design should follow the workload rather than a desire to use more agents. The source deck gives a direct decision map.</p></div>
+    <div class="chooser">
+      <div class="choice"><div><span class="if">IF</span> a simple, well-scoped task</div><div class="chev">›</div><div class="then">Single-agent with tools</div></div>
+      <div class="choice"><div><span class="if">IF</span> long, multi-step tasks that drift</div><div class="chev">›</div><div class="then">Planner–executor with a re-plan loop</div></div>
+      <div class="choice"><div><span class="if">IF</span> distinct expertise or parallel subtasks</div><div class="chev">›</div><div class="then">Supervisor–worker multi-agent</div></div>
+      <div class="choice"><div><span class="if">IF</span> real-time, reactive, or long-waiting work</div><div class="chev">›</div><div class="then">Event-driven agents on a bus</div></div>
+      <div class="choice"><div><span class="if">IF</span> production control, state, and audit trails</div><div class="chev">›</div><div class="then">Graph-based orchestration</div></div>
+      <div class="choice"><div><span class="if">IF</span> connecting to tools or other agents</div><div class="chev">›</div><div class="then">MCP for tools · A2A for agents</div></div>
+    </div>
+    <figure class="visual" style="margin-top:28px"><img alt="Decision guide for choosing an agent architecture" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1200/agent-architecture-design-9.png" width="1200"/><figcaption class="caption">The deck’s closing architecture-selection guide maps workload characteristics to recommended patterns.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><div class="kicker">Design principles</div><h2>What to optimize for in production</h2><p class="lead">Across all six decisions, the architecture should minimize unnecessary coordination while making state, control, recovery, and accountability explicit.</p></div>
+    <div class="takeaways"><div class="take"><b>Minimize moving parts</b><p>Use the smallest architecture that can meet the workload. Extra agents are not free abstractions.</p></div><div class="take"><b>Make control visible</b><p>Know who owns the goal, who can delegate, and where the execution state lives.</p></div><div class="take"><b>Design failure paths</b><p>Retries, re-planning, dead-letter handling, validation, and escalation should be architectural concerns.</p></div><div class="take"><b>Keep boundaries explicit</b><p>Differentiate tool invocation, agent handoff, asynchronous events, and shared state.</p></div><div class="take"><b>Instrument the runtime</b><p>Multi-step and multi-agent systems need tracing to reconstruct what happened and why.</p></div><div class="take"><b>Scale by need</b><p>Add parallelism, specialization, and hierarchy only when the workload justifies them.</p></div></div>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="section-head"><div class="kicker">FAQ</div><h2>Common architecture questions</h2></div>
+    <div class="faq">
+      <details><summary>Should every complex AI workflow use multiple agents?</summary><p>No. The source deck explicitly recommends starting with a single agent and moving to multiple agents only when work is genuinely parallel, requires distinct expertise, or exceeds what one context can manage cleanly.</p></details>
+      <details><summary>When is planner–executor useful?</summary><p>It is useful for long, multi-step tasks where direct action tends to drift. The re-plan loop is important when failures or new information can invalidate the original plan.</p></details>
+      <details><summary>What is the main risk of supervisor–worker systems?</summary><p>The supervisor can become both a bottleneck and a single point of failure, and the quality of its routing decisions constrains the quality of the overall system.</p></details>
+      <details><summary>Why use event-driven agents?</summary><p>They suit reactive, asynchronous, long-running, or high-throughput workloads where agents should respond to events independently rather than block in a fixed script.</p></details>
+      <details><summary>What does an orchestration framework provide?</summary><p>The deck highlights state and memory, control flow and routing, handoffs, retries and error recovery, tracing and observability, and human-in-the-loop support.</p></details>
+      <details><summary>How do MCP and A2A differ in this model?</summary><p>MCP is presented as the vertical interface between agents and tools/data, while A2A is the horizontal interface for communication and delegation between agents.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-compliance-and-risk.html">Agent Compliance And Risk</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-development-and-prompt-engineering.html">Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-learning-and-adaptation.html">Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-capabilities-2026.html">Agentic Ai Capabilities 2026</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/context-engineering-and-multi-agent-llm.html">Context Engineering And Multi Agent Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/criteria-is-use-case-agentic.html">Criteria Is Use Case Agentic</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/enterprise-ai-agent-risks-responsibility.html">Enterprise Ai Agent Risks Responsibility</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evaluating-ai-agent-and-data-generation.html">Evaluating Ai Agent And Data Generation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evolution-of-ai-agent-rag.html">Evolution Of Ai Agent Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/framework-agent-ai.html">Framework Agent Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/measuring-agentic-ai-effectiveness.html">Measuring Agentic Ai Effectiveness</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/pillars-of-agentic-ai.html">Pillars Of Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rise-of-agentic-ai-info.html">Rise Of Agentic Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rpa-genai-agentic-ai.html">Rpa Genai Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/super-agent.html">Super Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/when-to-use-ai-agent.html">When To Use Ai Agent</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Website and Blog</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra Data Knobs. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+
+</body></html>

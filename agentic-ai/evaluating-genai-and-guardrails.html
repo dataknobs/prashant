@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Evaluating Generative AI and Guardrails | DataKnobs</title>
+<meta content="How to evaluate generative AI and agents: metrics, golden sets, calibrated LLM judges, online testing, layered guardrails, red-teaming and monitoring." name="description"/>
+<meta content="generative AI evaluation, LLM evaluation metrics, golden dataset, LLM as a judge, agent evaluation, AI guardrails, prompt injection defense, red teaming LLM, AI monitoring" name="keywords"/>
+<meta content="Prashant Dhingra" name="author"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<link href="https://www.dataknobs.com/generativeai/generative-ai-101/evaluating-genai-and-guardrails.html" rel="canonical"/>
+<meta content="Evaluating Generative AI and Guardrails | DataKnobs" property="og:title"/>
+<meta content="A practical guide to measuring generative AI quality and keeping it safe: evaluation metrics and golden sets, LLM judges, agent evaluation, a layered guardrail architecture and red-teaming." property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://www.dataknobs.com/generativeai/generative-ai-101/evaluating-genai-and-guardrails.html" property="og:url"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/slide1200/Slide1.png" property="og:image"/>
+<meta content="Generative AI 101 slide deck title slide" property="og:image:alt"/>
+<meta content="2026-11-17" property="article:modified_time"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Evaluating Generative AI and Guardrails | DataKnobs" name="twitter:title"/>
+<meta content="A practical guide to measuring generative AI quality and keeping it safe: evaluation metrics and golden sets, LLM judges, agent evaluation, a layered guardrail architecture and red-teaming." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/slide1200/Slide1.png" name="twitter:image"/>
+<meta content="Guide to evaluating generative AI and agents and designing guardrails: why GenAI evaluation differs from ML, a metrics table (groundedness, relevance, task success, tool-call accuracy, safety violations, latency, cost per task, satisfaction), building a golden set, calibrating LLM-as-judge, agent trajectory evaluation, online A/B testing, a five-layer guardrail architecture, a fifteen-item guardrail practice table, red-teaming and production monitoring." name="ai-summary"/>
+<meta content="Human-directed content drafted with AI assistance; time-sensitive facts dated November 17, 2026 with sources listed on the page." name="ai-content-declaration"/>
+<meta content="LLM evaluation; AI guardrails; AI safety engineering" name="topic"/>
+<meta content="how to evaluate LLM applications, LLM evaluation metrics, what is LLM as a judge, how to evaluate AI agents, what are AI guardrails, how to red team an LLM" name="generative-engine-optimization"/>
+<meta content="Evaluating Generative AI and Designing Guardrails That Hold" name="citation_title"/>
+<meta content="Dhingra, Prashant" name="citation_author"/>
+<meta content="DataKnobs" name="citation_publisher"/>
+<meta content="https://www.dataknobs.com/generativeai/generative-ai-101/evaluating-genai-and-guardrails.html" name="citation_public_url"/>
+
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+<!-- Use the "-with-dk-sections" variant whenever the rebuild uses .hero-bg
+     or .dk-safe-footer (i.e. on every rebuild that follows this skill). -->
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production-with-dk-sections.css" rel="stylesheet"/>
+
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-JF94J1W5MC');
+</script>
+<!-- Google Tag Manager -->
+<script>
+    (function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+            'gtm.start':
+                new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');
+</script>
+<!-- End Google Tag Manager -->
+
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<style id="tw-utilities">*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.relative{position:relative}.sticky{position:sticky}.top-0{top:0}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-6{margin-bottom:1.5rem}.mt-2{margin-top:.5rem}.mt-6{margin-top:1.5rem}.flex{display:flex}.inline-flex{display:inline-flex}.hidden{display:none}.h-12{height:3rem}.h-6{height:1.5rem}.w-6{width:1.5rem}.w-auto{width:auto}.w-fit{width:-moz-fit-content;width:fit-content}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.max-w-7xl{max-width:80rem}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-8{gap:2rem}.overflow-hidden{overflow:hidden}.rounded-full{border-radius:9999px}.rounded-xl{border-radius:.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240/var(--tw-border-opacity,1))}.border-slate-200\/80{border-color:rgba(226,232,240,.8)}.border-white\/20{border-color:hsla(0,0%,100%,.2)}.bg-violet-600{--tw-bg-opacity:1;background-color:rgb(124 58 237/var(--tw-bg-opacity,1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255/var(--tw-bg-opacity,1))}.bg-white\/10{background-color:hsla(0,0%,100%,.1)}.bg-white\/90{background-color:hsla(0,0%,100%,.9)}.p-2{padding:.5rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2\.5{padding-top:.625rem;padding-bottom:.625rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-4{padding-bottom:1rem}.pt-4,.py-4{padding-top:1rem}.text-center{text-align:center}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.font-medium{font-weight:500}.font-semibold{font-weight:600}.leading-8{line-height:2rem}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-.025em}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105/var(--tw-text-opacity,1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85/var(--tw-text-opacity,1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59/var(--tw-text-opacity,1))}.text-violet-100{--tw-text-opacity:1;color:rgb(237 233 254/var(--tw-text-opacity,1))}.text-violet-50\/90{color:rgba(245,243,255,.9)}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-sm{--tw-shadow:0 1px 2px 0 rgba(0,0,0,.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur{--tw-backdrop-blur:blur(8px)}.backdrop-blur,.backdrop-blur-xl{-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-xl{--tw-backdrop-blur:blur(24px)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252/var(--tw-bg-opacity,1))}.hover\:bg-violet-700:hover{--tw-bg-opacity:1;background-color:rgb(109 40 217/var(--tw-bg-opacity,1))}.hover\:text-violet-700:hover{--tw-text-opacity:1;color:rgb(109 40 217/var(--tw-text-opacity,1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.focus\:ring-violet-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(139 92 246/var(--tw-ring-opacity,1))}@media (min-width:640px){.sm\:h-14{height:3.5rem}}@media (min-width:768px){.md\:flex{display:flex}.md\:hidden{display:none}.md\:text-5xl{font-size:3rem;line-height:1}.md\:text-xl{font-size:1.25rem;line-height:1.75rem}}@media (min-width:1024px){.lg\:px-8{padding-left:2rem;padding-right:2rem}.lg\:py-20{padding-top:5rem;padding-bottom:5rem}}</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://www.dataknobs.com/generativeai/generative-ai-101/evaluating-genai-and-guardrails.html#article",
+      "headline": "Evaluating Generative AI and Designing Guardrails That Hold",
+      "description": "How to evaluate generative AI and agents: metrics, golden sets, calibrated LLM judges, online testing, layered guardrails, red-teaming and monitoring.",
+      "image": [
+        "https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/slide1200/Slide1.png"
+      ],
+      "author": {
+        "@type": "Person",
+        "name": "Prashant Dhingra"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "DataKnobs",
+        "url": "https://www.dataknobs.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg"
+        }
+      },
+      "mainEntityOfPage": "https://www.dataknobs.com/generativeai/generative-ai-101/evaluating-genai-and-guardrails.html",
+      "dateModified": "2026-11-17",
+      "inLanguage": "en",
+      "keywords": [
+        "generative AI evaluation",
+        "LLM evaluation metrics",
+        "golden dataset",
+        "LLM as a judge",
+        "agent evaluation",
+        "AI guardrails",
+        "prompt injection defense",
+        "red teaming LLM",
+        "AI monitoring"
+      ],
+      "isPartOf": {
+        "@type": "CreativeWorkSeries",
+        "name": "Generative AI 101",
+        "url": "https://www.dataknobs.com/generativeai/generative-ai-101-slides.html"
+      },
+      "position": 9
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "DataKnobs",
+          "item": "https://www.dataknobs.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Generative AI",
+          "item": "https://www.dataknobs.com/generativeai/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Generative AI 101",
+          "item": "https://www.dataknobs.com/generativeai/generative-ai-101-slides.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Evaluation and guardrails",
+          "item": "https://www.dataknobs.com/generativeai/generative-ai-101/evaluating-genai-and-guardrails.html"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do you evaluate an LLM application?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Define what good means for the task, build a golden set of realistic inputs with reference answers or rubrics, and score each version for groundedness, correctness, format, safety, latency and cost. Use calibrated automated grading plus human review, and gate every release on the results."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is LLM-as-a-judge?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LLM-as-a-judge uses a capable language model to score outputs against a rubric. It scales evaluation but must be calibrated against human ratings and checked for biases such as favoring longer answers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are AI guardrails?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AI guardrails are the controls around a model that keep it within policy: input validation, grounding to trusted sources, output filters, privacy protections, and limits and approvals on actions. They work best in layers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you evaluate an AI agent?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Score both the outcome, whether the task was completed correctly, and the trajectory, whether the steps and tool calls were sensible and within policy, in a sandbox that mirrors production. Track success rate, steps per task, tool error rate and cost per task."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+/* ---- Generative AI 101 page system (scoped to .gx; site chrome untouched) ---- */
+.gx {
+  --gx-ink: #1e1b4b;
+  --gx-text: #334155;
+  --gx-muted: #64748b;
+  --gx-violet: #6d28d9;
+  --gx-violet-soft: #f5f3ff;
+  --gx-amber: #b45309;
+  --gx-amber-bright: #f59e0b;
+  --gx-amber-soft: #fffbeb;
+  --gx-paper: #fbfaf8;
+  --gx-line: #e7e5e4;
+  --gx-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --gx-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--gx-paper);
+  color: var(--gx-text);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+}
+.gx-wrap { max-width: 1240px; margin: 0 auto; padding: 40px 24px 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
+@media (min-width: 1100px) { .gx-wrap { grid-template-columns: 220px minmax(0, 1fr); padding-top: 56px; } }
+.gx-body { min-width: 0; }
+.gx-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* sticky table of contents (desktop) */
+.gx-toc { display: none; }
+@media (min-width: 1100px) {
+  .gx-toc { display: block; position: sticky; top: 108px; align-self: start; max-height: calc(100vh - 128px); overflow-y: auto; }
+}
+.gx-toc-label, .gx-kicker, .gx-part-no, .gx-take-label, .gx-card-k {
+  font-family: var(--gx-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600;
+}
+.gx-toc-label { color: var(--gx-muted); margin: 0 0 12px; }
+.gx-toc ol { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--gx-line); }
+.gx-toc a { display: flex; gap: 10px; padding: 7px 0 7px 14px; margin-left: -1px; border-left: 2px solid transparent; color: var(--gx-muted); font-size: 14px; line-height: 1.35; text-decoration: none; transition: color .15s, border-color .15s; }
+.gx-toc a span { font-family: var(--gx-mono); font-size: 12px; color: #a8a29e; min-width: 18px; padding-top: 1px; }
+.gx-toc a:hover { color: var(--gx-ink); }
+.gx-toc a.is-active { color: var(--gx-violet); border-left-color: var(--gx-violet); font-weight: 600; }
+.gx-toc a.is-active span { color: var(--gx-amber); }
+
+/* mobile toc */
+.gx-toc-mobile { margin: 28px 0 0; border: 1px solid var(--gx-line); border-radius: 14px; background: #fff; padding: 4px 18px; }
+.gx-toc-mobile summary { cursor: pointer; font-weight: 600; color: var(--gx-ink); padding: 12px 0; }
+.gx-toc-mobile ol { list-style: none; margin: 0 0 12px; padding: 0; }
+.gx-toc-mobile a { display: block; padding: 6px 0; color: var(--gx-violet); text-decoration: none; font-size: 15px; }
+@media (min-width: 1100px) { .gx-toc-mobile { display: none; } }
+
+/* intro */
+.gx-byline { font-size: 14px; color: var(--gx-muted); margin: 0 0 18px; }
+.gx-byline strong { color: var(--gx-ink); }
+.gx-lede { font-size: 20px; line-height: 1.65; color: var(--gx-ink); margin: 0 0 28px; max-width: 820px; }
+.gx-takeaways { margin-top: 32px; background: var(--gx-ink); color: #e0e7ff; border-radius: 20px; padding: 28px 30px; position: relative; overflow: hidden; }
+.gx-takeaways::after { content: ""; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(245,158,11,.35), transparent 70%); }
+.gx-takeaways .gx-kicker { color: var(--gx-amber-bright); margin: 0 0 14px; }
+.gx-takeaways ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; position: relative; z-index: 1; }
+.gx-takeaways li { padding-left: 22px; position: relative; font-size: 16px; line-height: 1.6; }
+.gx-takeaways li::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 8px; background: var(--gx-amber-bright); border-radius: 2px; transform: rotate(45deg); }
+.gx-takeaways strong { color: #fff; }
+
+/* parts */
+.gx-part { padding-top: 72px; scroll-margin-top: 96px; }
+.gx-part h3, .gx-part [id] { scroll-margin-top: 104px; }
+.gx-part-head { border-top: 1px solid var(--gx-line); padding-top: 28px; margin-bottom: 8px; }
+.gx-part-no { color: var(--gx-amber); margin: 0 0 8px; }
+.gx-part h2 { font-family: var(--gx-display); font-weight: 600; color: var(--gx-ink); font-size: clamp(28px, 3.4vw, 40px); line-height: 1.15; letter-spacing: -.01em; margin: 0 0 14px; }
+.gx-part-lede { font-size: 18px; color: var(--gx-text); max-width: 800px; margin: 0; }
+.gx-part h3 { font-family: var(--gx-display); font-weight: 600; color: var(--gx-ink); font-size: 24px; line-height: 1.25; margin: 48px 0 18px; }
+
+/* prose */
+.gx-prose { max-width: 820px; }
+.gx-prose p { margin: 0 0 16px; }
+.gx-prose ul, .gx-prose ol { margin: 0 0 16px; padding-left: 22px; }
+.gx-prose ul { list-style: disc; }
+.gx-prose ol { list-style: decimal; }
+.gx-prose li { margin: 0 0 8px; }
+.gx-prose li::marker { color: var(--gx-amber); }
+.gx a:not(.gx-slide):not(.gx-btn) { color: var(--gx-violet); text-decoration: underline; text-decoration-color: rgba(109,40,217,.3); text-underline-offset: 3px; }
+.gx a:not(.gx-slide):not(.gx-btn):hover { text-decoration-color: currentColor; }
+.gx strong { color: var(--gx-ink); }
+.gx-takeaways strong { color: #fff; }
+
+/* slide strips */
+.gx-slides { display: grid; gap: 18px; margin: 20px 0 24px; grid-template-columns: repeat(1, minmax(0, 1fr)); }
+@media (min-width: 560px) { .gx-slides { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .gx-slides-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .gx-slides-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.gx-slide { display: flex; flex-direction: column; text-decoration: none; background: #fff; border: 1px solid var(--gx-line); border-radius: 14px; overflow: hidden; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.gx-slide:hover, .gx-slide:focus-visible { transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(30,27,75,.35); border-color: #c4b5fd; outline: none; }
+.gx-slide:focus-visible { box-shadow: 0 0 0 3px rgba(109,40,217,.45); }
+.gx-slide-frame { display: block; aspect-ratio: 16 / 9; background: #f1f5f9; border-bottom: 1px solid var(--gx-line); }
+.gx-slide-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.gx-slide-cap { display: block; padding: 10px 14px 12px; font-size: 13px; line-height: 1.45; color: var(--gx-muted); }
+.gx-slide:hover .gx-slide-cap { color: var(--gx-ink); }
+
+/* tables */
+.gx-table-wrap { overflow-x: auto; margin: 8px 0 24px; border: 1px solid var(--gx-line); border-radius: 14px; background: #fff; }
+.gx-table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.55; min-width: 560px; }
+.gx-table th, .gx-table td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid #f0eeec; }
+.gx-table thead th { background: var(--gx-violet-soft); color: var(--gx-ink); font-weight: 700; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; border-bottom: 1px solid #ddd6fe; }
+.gx-table tbody th { color: var(--gx-ink); font-weight: 600; width: 26%; }
+.gx-table tbody tr:last-child th, .gx-table tbody tr:last-child td { border-bottom: 0; }
+.gx-table tbody tr:hover { background: #fdfcfb; }
+.gx-table-vendors tbody th { width: 14%; }
+.gx-table-vendors td:last-child { width: 26%; color: var(--gx-muted); font-size: 14px; }
+
+/* adaptation ladder */
+.gx-ladder { list-style: none; margin: 24px 0 8px; padding: 0; display: grid; gap: 10px; counter-reset: none; }
+@media (min-width: 900px) { .gx-ladder { grid-template-columns: repeat(5, minmax(0, 1fr)); } .gx-ladder-compact { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.gx-ladder li { display: flex; gap: 12px; background: #fff; border: 1px solid var(--gx-line); border-radius: 14px; padding: 16px; font-size: 14px; line-height: 1.5; }
+@media (min-width: 900px) { .gx-ladder li { flex-direction: column; } .gx-ladder li:nth-child(2) { margin-top: 12px; } .gx-ladder li:nth-child(3) { margin-top: 24px; } .gx-ladder li:nth-child(4) { margin-top: 36px; } .gx-ladder li:nth-child(5) { margin-top: 48px; } }
+.gx-ladder li > span { flex: none; width: 30px; height: 30px; border-radius: 8px; background: var(--gx-amber-soft); color: var(--gx-amber); font-family: var(--gx-mono); font-weight: 700; display: grid; place-items: center; font-size: 14px; }
+.gx-ladder strong { display: block; color: var(--gx-ink); font-size: 15px; margin-bottom: 4px; }
+
+/* callouts */
+.gx-take { margin: 32px 0 0; max-width: 820px; background: var(--gx-violet-soft); border: 1px solid #ddd6fe; border-left: 4px solid var(--gx-violet); border-radius: 0 14px 14px 0; padding: 18px 22px; }
+.gx-take-label { color: var(--gx-violet); margin: 0 0 6px; }
+.gx-take p:last-child { margin: 0; }
+.gx-callout { max-width: 820px; margin: 8px 0 24px; background: var(--gx-amber-soft); border: 1px solid #fde68a; border-radius: 14px; padding: 20px 22px; }
+.gx-callout .gx-kicker { color: var(--gx-amber); margin: 0 0 10px; }
+.gx-callout ul { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+.gx-callout p:last-child { margin: 0; font-size: 15px; }
+
+/* timeline */
+.gx-timeline { list-style: none; margin: 28px 0 8px; padding: 0 0 0 4px; position: relative; max-width: 860px; }
+.gx-timeline::before { content: ""; position: absolute; left: 92px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--gx-violet), var(--gx-amber-bright)); border-radius: 2px; }
+.gx-timeline li { display: grid; grid-template-columns: 76px 1fr; gap: 34px; padding: 0 0 18px; position: relative; font-size: 15.5px; line-height: 1.55; }
+.gx-timeline li::before { content: ""; position: absolute; left: 83px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--gx-violet); }
+.gx-timeline li:nth-last-child(-n+4)::before { border-color: var(--gx-amber-bright); }
+.gx-timeline time { font-family: var(--gx-mono); font-size: 13px; font-weight: 600; color: var(--gx-ink); text-align: right; padding-top: 2px; }
+@media (max-width: 520px) {
+  .gx-timeline::before { left: 8px; } .gx-timeline li { grid-template-columns: 1fr; gap: 2px; padding-left: 30px; } .gx-timeline li::before { left: 0; } .gx-timeline time { text-align: left; }
+}
+
+/* DataKnobs cards + CTA */
+.gx-cards { display: grid; gap: 16px; margin: 8px 0 28px; }
+@media (min-width: 760px) { .gx-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.gx-card { background: #fff; border: 1px solid var(--gx-line); border-radius: 16px; padding: 20px; border-top: 4px solid var(--gx-violet); }
+.gx-card:nth-child(2) { border-top-color: var(--gx-ink); }
+.gx-card:nth-child(3) { border-top-color: var(--gx-amber-bright); }
+.gx-card-k { color: var(--gx-ink); margin: 0 0 8px; font-size: 14px; }
+.gx-card p:last-child { margin: 0; font-size: 15px; line-height: 1.55; }
+.gx-cta { display: grid; gap: 20px; align-items: center; background: linear-gradient(135deg, #312e81, #6d28d9); color: #ede9fe; border-radius: 20px; padding: 28px 30px; margin: 32px 0; }
+@media (min-width: 900px) { .gx-cta { grid-template-columns: 1fr auto; } }
+.gx-cta-title { font-family: var(--gx-display); font-size: 24px; font-weight: 600; color: #fff; margin: 0 0 6px; line-height: 1.25; }
+.gx-cta p { margin: 0; }
+.gx-cta-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.gx-btn { display: inline-block; padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; text-decoration: none; color: #fff; border: 1px solid rgba(255,255,255,.4); transition: background .15s; }
+.gx-btn:hover { background: rgba(255,255,255,.12); }
+.gx-btn-primary { background: var(--gx-amber-bright); border-color: var(--gx-amber-bright); color: #1e1b4b; }
+.gx-btn-primary:hover { background: #fbbf24; }
+.gx-related { background: #fff; border: 1px solid var(--gx-line); border-radius: 16px; padding: 22px 24px; }
+.gx-related .gx-kicker { color: var(--gx-muted); margin: 0 0 12px; }
+.gx-related ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px 24px; font-size: 15px; }
+@media (min-width: 760px) { .gx-related ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* FAQ */
+.gx-faq details { max-width: 820px; background: #fff; border: 1px solid var(--gx-line); border-radius: 14px; padding: 0 20px; margin: 0 0 10px; }
+.gx-faq summary { cursor: pointer; list-style: none; padding: 16px 28px 16px 0; font-weight: 600; color: var(--gx-ink); position: relative; }
+.gx-faq summary::-webkit-details-marker { display: none; }
+.gx-faq summary::after { content: "+"; position: absolute; right: 0; top: 12px; font-size: 22px; color: var(--gx-amber); font-weight: 400; }
+.gx-faq details[open] summary::after { content: "–"; }
+.gx-faq details p { margin: 0 0 18px; font-size: 16px; }
+
+/* sources */
+.gx-sources { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--gx-line); }
+.gx-sources h2 { font-family: var(--gx-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--gx-muted); margin: 0 0 12px; font-weight: 600; }
+.gx-sources ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px 24px; font-size: 14px; line-height: 1.5; }
+@media (min-width: 760px) { .gx-sources ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* lightbox */
+.gx-lightbox { border: 0; padding: 0; background: transparent; max-width: min(1200px, 94vw); width: 100%; overflow: visible; }
+.gx-lightbox::backdrop { background: rgba(15, 12, 41, .86); backdrop-filter: blur(4px); }
+.gx-lightbox img { width: 100%; height: auto; max-height: 78vh; object-fit: contain; background: #fff; border-radius: 12px; display: block; }
+.gx-lb-bar { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; align-items: center; padding: 14px 4px 0; color: #e0e7ff; font-size: 15px; }
+.gx-lb-bar p { margin: 0; }
+.gx-lightbox a#gx-lb-link { color: var(--gx-amber-bright); font-weight: 600; text-decoration: none; }
+.gx-lb-close { position: absolute; top: -46px; right: 0; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; font-size: 24px; line-height: 1; cursor: pointer; }
+.gx-lb-close:hover { background: rgba(255,255,255,.12); }
+
+@media (prefers-reduced-motion: reduce) { .gx * { transition: none !important; } }
+#top .gx-toc a, #top .gx-toc-mobile a { text-decoration: none; }
+@media (max-width: 640px) {
+  .gx-table-vendors { min-width: 0; }
+  .gx-table-vendors thead { display: none; }
+  .gx-table-vendors tr { display: block; padding: 14px 16px; border-bottom: 1px solid #f0eeec; }
+  .gx-table-vendors tbody th, .gx-table-vendors td { display: block; width: auto !important; padding: 0; border: 0; }
+  .gx-table-vendors tbody th { font-size: 16px; margin-bottom: 4px; }
+  .gx-table-vendors td:last-child { margin-top: 6px; font-size: 13px; }
+}
+
+/* ---- detailed guides: shared components ---- */
+.gx-slides-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+@media (min-width: 560px) { .gx-slides-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* guides grid */
+.gx-guides-wrap { scroll-margin-top: 96px; }
+.gx-guides { margin: 32px 0 0; }
+.gx-guides .gx-kicker { color: var(--gx-amber); margin: 0 0 14px; }
+.gx-guides ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(1, minmax(0, 1fr)); }
+@media (min-width: 640px) { .gx-guides ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .gx-guides ol { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+#top .gx-guide { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; height: 100%; background: #fff; border: 1px solid var(--gx-line); border-radius: 14px; padding: 14px 16px; text-decoration: none; transition: border-color .15s, transform .15s, box-shadow .15s; }
+#top .gx-guide:hover { border-color: #c4b5fd; transform: translateY(-2px); box-shadow: 0 10px 24px -14px rgba(30,27,75,.35); }
+#top .gx-guide.is-current { border-color: var(--gx-violet); background: var(--gx-violet-soft); }
+.gx-guide-no { grid-row: span 2; font-family: var(--gx-mono); font-weight: 700; font-size: 13px; color: var(--gx-amber); background: var(--gx-amber-soft); border-radius: 8px; width: 32px; height: 32px; display: grid; place-items: center; }
+.gx-guide-t { color: var(--gx-ink); font-weight: 600; font-size: 15px; line-height: 1.35; }
+.gx-guide-b { color: var(--gx-muted); font-size: 13px; line-height: 1.45; }
+
+/* per-part "detailed guide" links on the hub */
+.gx-more-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; }
+#top .gx-more { display: inline-flex; flex-direction: column; gap: 2px; padding: 12px 18px; border-radius: 12px; background: var(--gx-ink); color: #fff; text-decoration: none; font-weight: 600; font-size: 15px; line-height: 1.3; transition: background .15s; }
+#top .gx-more:hover { background: var(--gx-violet); }
+.gx-more span { font-family: var(--gx-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gx-amber-bright); font-weight: 600; }
+
+/* breadcrumb */
+.gx-crumbs ol { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 0; font-size: 13px; color: var(--gx-muted); }
+.gx-crumbs li + li::before { content: "›"; margin: 0 8px; color: #a8a29e; }
+#top .gx-crumbs a { color: var(--gx-muted); text-decoration: none; }
+#top .gx-crumbs a:hover { color: var(--gx-violet); }
+.gx-crumbs [aria-current] { color: var(--gx-ink); font-weight: 600; }
+#top .gx-toc-hub { display: inline-block; margin-top: 18px; font-size: 13px; color: var(--gx-violet); text-decoration: none; font-weight: 600; }
+
+/* sections on guide pages */
+.gx-sec { padding-top: 56px; scroll-margin-top: 96px; }
+.gx-sec h2 { font-family: var(--gx-display); font-weight: 600; color: var(--gx-ink); font-size: clamp(26px, 3vw, 34px); line-height: 1.2; letter-spacing: -.01em; margin: 0 0 16px; padding-top: 24px; border-top: 1px solid var(--gx-line); }
+.gx-sec h3 { font-family: var(--gx-display); font-weight: 600; color: var(--gx-ink); font-size: 21px; line-height: 1.3; margin: 32px 0 12px; }
+.gx-sub .gx-faq { padding-top: 56px; }
+
+/* code */
+.gx-code { max-width: 820px; margin: 8px 0 24px; background: #17153a; color: #e0e7ff; border-radius: 14px; padding: 18px 20px; overflow-x: auto; font-family: var(--gx-mono); font-size: 13.5px; line-height: 1.6; white-space: pre; }
+.gx-code .c { color: #a5b4fc; }
+.gx code { font-family: var(--gx-mono); font-size: .88em; background: #f1effa; color: var(--gx-ink); padding: 1px 6px; border-radius: 6px; }
+.gx-code code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+/* numbered steps */
+.gx-steps { list-style: none; margin: 8px 0 24px; padding: 0; max-width: 820px; counter-reset: gxstep; }
+.gx-steps > li { counter-increment: gxstep; position: relative; padding: 0 0 18px 52px; }
+.gx-steps > li::before { content: counter(gxstep, decimal-leading-zero); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 10px; background: var(--gx-ink); color: var(--gx-amber-bright); font-family: var(--gx-mono); font-weight: 700; font-size: 13px; display: grid; place-items: center; }
+.gx-steps > li:not(:last-child)::after { content: ""; position: absolute; left: 17px; top: 40px; bottom: 4px; width: 2px; background: var(--gx-line); }
+.gx-steps strong { display: block; color: var(--gx-ink); }
+
+/* checklist */
+.gx-check { list-style: none; margin: 8px 0 24px; padding: 0; max-width: 820px; display: grid; gap: 10px; }
+.gx-check li { position: relative; padding: 12px 16px 12px 44px; background: #fff; border: 1px solid var(--gx-line); border-radius: 12px; }
+.gx-check li::before { content: "✓"; position: absolute; left: 14px; top: 11px; width: 20px; height: 20px; border-radius: 6px; background: #ecfdf5; color: #047857; font-weight: 700; font-size: 13px; display: grid; place-items: center; }
+
+/* 2x2 quadrant */
+.gx-quad { display: grid; gap: 12px; margin: 12px 0 24px; max-width: 820px; grid-template-columns: repeat(1, minmax(0, 1fr)); }
+@media (min-width: 640px) { .gx-quad { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.gx-quad > div { border-radius: 14px; padding: 18px; border: 1px solid var(--gx-line); background: #fff; }
+.gx-quad > div:nth-child(1) { background: #ecfdf5; border-color: #a7f3d0; }
+.gx-quad > div:nth-child(2) { background: var(--gx-amber-soft); border-color: #fde68a; }
+.gx-quad > div:nth-child(3) { background: var(--gx-violet-soft); border-color: #ddd6fe; }
+.gx-quad > div:nth-child(4) { background: #fff1f2; border-color: #fecdd3; }
+.gx-quad p { margin: 0; font-size: 15px; line-height: 1.55; }
+.gx-quad .gx-kicker { margin: 0 0 6px; color: var(--gx-ink); }
+
+/* pager */
+.gx-pager { display: grid; gap: 12px; margin: 64px 0 0; grid-template-columns: repeat(1, minmax(0, 1fr)); }
+@media (min-width: 640px) { .gx-pager { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+#top .gx-pn { display: block; padding: 18px 20px; border-radius: 14px; border: 1px solid var(--gx-line); background: #fff; color: var(--gx-ink); font-weight: 600; font-size: 17px; text-decoration: none; transition: border-color .15s; }
+#top .gx-pn:hover { border-color: var(--gx-violet); }
+.gx-pn span { display: block; font-family: var(--gx-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gx-amber); margin-bottom: 4px; }
+.gx-pn-next { text-align: right; }
+.gx-sec h2, .gx-sec h3 { scroll-margin-top: 104px; }
+</style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body class="bg-white text-slate-800 antialiased">
+<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+  <div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+    <div class="flex items-center justify-between">
+      <a aria-label="DataKnobs Home" class="flex items-center gap-3" href="https://www.dataknobs.com/">
+        <img alt="DataKnobs AI data products platform logo" class="h-12 w-auto sm:h-14" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png"/>
+      </a>
+
+      <nav aria-label="Primary navigation" class="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#platform">Platform</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/pricing/">Pricing</a>
+        <a class="rounded-full bg-violet-600 px-5 py-2.5 text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
+          Search
+        </a>
+      </nav>
+
+      <button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open main menu" class="inline-flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 md:hidden" id="mobile-menu-button" type="button">
+        <svg class="h-6 w-6" fill="none" id="menu-open-icon" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <svg class="hidden h-6 w-6" fill="none" id="menu-close-icon" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+    </div>
+
+    <nav aria-label="Mobile navigation" class="hidden border-t border-slate-200 pt-4 md:hidden" id="mobile-menu">
+      <div class="flex flex-col gap-2 text-sm font-medium text-slate-700">
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#platform">Platform</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/pricing/">Pricing</a>
+        <a class="mt-2 rounded-full bg-violet-600 px-5 py-3 text-center text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
+          Search
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero-bg relative overflow-hidden text-white">
+  <div class="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20 text-center">
+    <div class="mb-6 inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-violet-100 backdrop-blur mx-auto">
+      Generative AI 101 · Guide 09 of 12
+    </div>
+    <h1 class="mx-auto max-w-4xl text-3xl md:text-5xl font-semibold leading-tight tracking-tight">
+      Evaluating Generative AI and Designing Guardrails That Hold
+    </h1>
+    <p class="mx-auto mt-6 max-w-3xl text-lg md:text-xl leading-8 text-violet-50/90">
+      How to know whether your GenAI system is good, and how to keep it on track in production.
+    </p>
+  </div>
+</section>
+
+<main class="gx gx-sub" id="top">
+<div class="gx-wrap">
+<aside aria-label="On this page" class="gx-toc">
+  <p class="gx-toc-label">Guide 09 of 12</p>
+  <ol><li><a href="#why-different"><span>01</span>Why it's different</a></li><li><a href="#metrics"><span>02</span>Metrics</a></li><li><a href="#golden-set"><span>03</span>Golden sets</a></li><li><a href="#llm-judge"><span>04</span>LLM as judge</a></li><li><a href="#agent-evals"><span>05</span>Evaluating agents</a></li><li><a href="#guardrails"><span>06</span>Guardrail architecture</a></li><li><a href="#red-teaming"><span>07</span>Red-teaming</a></li><li><a href="#faq"><span>08</span>FAQ</a></li></ol>
+  <a class="gx-toc-hub" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">← GenAI 101 overview</a>
+</aside>
+<div class="gx-body">
+<nav aria-label="Breadcrumb" class="gx-crumbs"><ol>
+  <li><a href="https://www.dataknobs.com/">DataKnobs</a></li>
+  <li><a href="https://www.dataknobs.com/generativeai/">Generative AI</a></li>
+  <li><a href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">Generative AI 101</a></li>
+  <li><span aria-current="page">Evaluation and guardrails</span></li>
+</ol></nav>
+<p class="gx-byline">By <strong>Prashant Dhingra</strong> · DataKnobs · Updated <time datetime="2026-11-17">November 17, 2026</time> · Part of <a href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html#govern">Generative AI 101</a></p>
+<p class="gx-lede">Traditional machine learning has a ground truth to score against. Generative AI often has many acceptable answers, and agents add actions on top. That makes <strong>evaluation the real product work</strong>: deciding what "good" means, measuring it continuously, and building <strong>guardrails</strong> that stop bad outputs and bad actions before they reach people or systems.</p>
+<div class="gx-takeaways"><p class="gx-kicker">Key takeaways</p><ul><li><strong>Define quality per task</strong> before choosing metrics. Groundedness, task success, safety, latency and cost are the usual core.</li><li><strong>A golden set is your most valuable asset.</strong> Rerun it on every prompt, model or retrieval change.</li><li><strong>LLM judges scale review,</strong> but only after you calibrate them against human ratings.</li><li><strong>Layer guardrails:</strong> input checks, grounding, output filters and action gates, each catching what the others miss.</li></ul></div>
+<details class="gx-toc-mobile"><summary>On this page</summary><ol><li><a href="#why-different">Why it's different</a></li><li><a href="#metrics">Metrics</a></li><li><a href="#golden-set">Golden sets</a></li><li><a href="#llm-judge">LLM as judge</a></li><li><a href="#agent-evals">Evaluating agents</a></li><li><a href="#guardrails">Guardrail architecture</a></li><li><a href="#red-teaming">Red-teaming</a></li><li><a href="#faq">FAQ</a></li></ol></details>
+<section class="gx-sec">
+  <h2 data-toc="Why it's different" id="why-different">Why evaluating generative AI is different</h2>
+  <div class="gx-slides gx-slides-3"><a class="gx-slide" data-caption="How to evaluate generative AI: decide what matters first" data-full="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/slide1200/Slide10.png" data-label="More slides on this topic →" href="https://www.dataknobs.com/generativeai/3-how-to-evaluate/"><span class="gx-slide-frame"><img alt="How to evaluate generative AI: decide what matters first" decoding="async" loading="eager" src="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/photos500/Slide10.png"/></span><span class="gx-slide-cap">How to evaluate generative AI: decide what matters first</span></a><a class="gx-slide" data-caption="Generative AI evaluation criteria: creativity, realism and diversity" data-full="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/slide1200/Slide11.png" data-label="More slides on this topic →" href="https://www.dataknobs.com/generativeai/3-how-to-evaluate/"><span class="gx-slide-frame"><img alt="Generative AI evaluation criteria: creativity, realism and diversity" decoding="async" loading="eager" src="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/photos500/Slide11.png"/></span><span class="gx-slide-cap">Generative AI evaluation criteria: creativity, realism and diversity</span></a><a class="gx-slide" data-caption="Why generative models are hard to benchmark compared with traditional ML" data-full="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/slide1200/Slide12.png" data-label="More slides on this topic →" href="https://www.dataknobs.com/generativeai/3-how-to-evaluate/"><span class="gx-slide-frame"><img alt="Why generative models are hard to benchmark compared with traditional ML" decoding="async" loading="eager" src="https://storage.googleapis.com/create-website/slides/generative-ai-101-v4/images/photos500/Slide12.png"/></span><span class="gx-slide-cap">Why generative models are hard to benchmark compared with traditional ML</span></a></div>
+  <div class="gx-prose">
+    <p>A spam classifier is right or wrong. A summary, an answer or an agent's plan can be good in many ways and bad in many more. Evaluation therefore starts with a decision: <strong>what matters for this task?</strong> Factual grounding, completeness, tone, format, safety, speed and cost all compete. For creative generation, realism, diversity and novelty matter too, and those are harder still to benchmark.</p>
+  </div>
+</section>
+
+<section class="gx-sec">
+  <h2 data-toc="Metrics" id="metrics">The metrics that matter</h2>
+  <div class="gx-table-wrap">
+    <table class="gx-table">
+      <thead><tr><th scope="col">Metric</th><th scope="col">What it measures</th><th scope="col">How to score it</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Groundedness / faithfulness</th><td>Claims supported by the provided sources</td><td>LLM judge with citations, human spot checks</td></tr>
+        <tr><th scope="row">Answer relevance and completeness</th><td>Addresses the question fully</td><td>Rubric scoring</td></tr>
+        <tr><th scope="row">Correctness</th><td>Matches a known answer where one exists</td><td>Exact match, programmatic checks</td></tr>
+        <tr><th scope="row">Format validity</th><td>Parses and fits the schema</td><td>Automated validation</td></tr>
+        <tr><th scope="row">Task success</th><td>The agent achieved the goal</td><td>End-state checks in a test environment</td></tr>
+        <tr><th scope="row">Tool-call accuracy</th><td>Right tool, right arguments, right order</td><td>Trace comparison against expected calls</td></tr>
+        <tr><th scope="row">Safety violation rate</th><td>Harmful, biased or leaked content</td><td>Classifiers plus red-team sets</td></tr>
+        <tr><th scope="row">Latency</th><td>p50 and p95 response or task time</td><td>Telemetry</td></tr>
+        <tr><th scope="row">Cost per task</th><td>Total model and tool spend per completed task</td><td>Telemetry</td></tr>
+        <tr><th scope="row">User satisfaction</th><td>Real-world usefulness</td><td>Ratings, edits, escalation rate</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="gx-sec">
+  <h2 data-toc="Golden sets" id="golden-set">Building a golden set</h2>
+  <ol class="gx-steps">
+    <li><strong>Collect real inputs</strong>Pull 50–300 representative requests from logs, pilots or subject-matter experts.</li>
+    <li><strong>Cover the edges</strong>Add hard cases, ambiguous requests, out-of-scope questions and known past failures.</li>
+    <li><strong>Write references or rubrics</strong>Give ideal answers where they exist; otherwise write scoring criteria experts agree on.</li>
+    <li><strong>Version it</strong>Store it with your code, and add every production failure you fix.</li>
+    <li><strong>Gate releases on it</strong>No prompt, model or retrieval change ships without a comparison run.</li>
+  </ol>
+</section>
+
+<section class="gx-sec">
+  <h2 data-toc="LLM as judge" id="llm-judge">Using an LLM as a judge</h2>
+  <div class="gx-prose">
+    <p>Human review doesn't scale to thousands of runs, so teams use a strong model to grade outputs against a rubric. It works well if you treat the judge itself as something to evaluate:</p>
+    <ul>
+      <li>Give the judge a specific rubric and the source material, and ask for a short justification with the score.</li>
+      <li>Compare judge scores with human ratings on a sample, and only trust the judge where they agree.</li>
+      <li>Watch for known biases: preference for longer answers, for its own model family, and for the first option shown.</li>
+      <li>Use pairwise comparisons (A vs B) when you're choosing between versions.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="gx-sec">
+  <h2 data-toc="Evaluating agents" id="agent-evals">Evaluating agents and running online tests</h2>
+  <div class="gx-prose">
+    <p>For agents, score the <strong>outcome</strong> (was the task done correctly?) and the <strong>trajectory</strong> (were the steps sensible, efficient and within policy?). Run agents in a sandbox that mirrors production, and check the end state of the systems they touched.</p>
+    <p>Offline tests catch regressions; online tests show real value. Use shadow deployments, A/B tests and user feedback, and feed production traces back into the golden set. Managed agent platforms now build this in: Amazon Bedrock AgentCore, for example, made batch evaluations, recommendations and A/B tests generally available in June 2026.</p>
+  </div>
+</section>
+
+<section class="gx-sec">
+  <h2 data-toc="Guardrail architecture" id="guardrails">A layered guardrail architecture</h2>
+  <div class="gx-slides gx-slides-3"><a class="gx-slide" data-caption="Guardrails for LLMs: steering outputs in the desired direction" data-full="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/llm/llm-guardrails/images/Slide400/Slide1.png" data-label="More slides on this topic →" href="https://www.dataknobs.com/generativeai/10-llms/guardrails/"><span class="gx-slide-frame"><img alt="Guardrails for LLMs: steering outputs in the desired direction" decoding="async" loading="lazy" src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/llm/llm-guardrails/images/Slide400/Slide1.png"/></span><span class="gx-slide-cap">Guardrails for LLMs: steering outputs in the desired direction</span></a><a class="gx-slide" data-caption="Challenges in implementing LLM guardrails" data-full="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/llm/llm-guardrails/images/Slide400/Slide2.png" data-label="More slides on this topic →" href="https://www.dataknobs.com/generativeai/10-llms/guardrails/"><span class="gx-slide-frame"><img alt="Challenges in implementing LLM guardrails" decoding="async" loading="lazy" src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/llm/llm-guardrails/images/Slide400/Slide2.png"/></span><span class="gx-slide-cap">Challenges in implementing LLM guardrails</span></a><a class="gx-slide" data-caption="Solutions and techniques for LLM guardrails" data-full="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/llm/llm-guardrails/images/Slide400/Slide3.png" data-label="More slides on this topic →" href="https://www.dataknobs.com/generativeai/10-llms/guardrails/"><span class="gx-slide-frame"><img alt="Solutions and techniques for LLM guardrails" decoding="async" loading="lazy" src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/llm/llm-guardrails/images/Slide400/Slide3.png"/></span><span class="gx-slide-cap">Solutions and techniques for LLM guardrails</span></a></div>
+  <div class="gx-prose"><p>Guardrails are the controls that steer outputs and actions in the right direction. No single filter is enough, so stack them:</p></div>
+  <ol class="gx-ladder">
+    <li><span>1</span><div><strong>Input</strong>Validate, scope and sanitize requests; detect jailbreaks and injected instructions.</div></li>
+    <li><span>2</span><div><strong>Grounding</strong>Retrieve trusted sources; require citations; allow "not found".</div></li>
+    <li><span>3</span><div><strong>Model</strong>A well-chosen model, a tested system prompt and safe defaults.</div></li>
+    <li><span>4</span><div><strong>Output</strong>Classifiers for safety, PII and policy; schema and fact checks.</div></li>
+    <li><span>5</span><div><strong>Action</strong>Least privilege, approval gates, budgets and full audit logs.</div></li>
+  </ol>
+  <div class="gx-table-wrap">
+    <table class="gx-table">
+      <thead><tr><th scope="col">Guardrail</th><th scope="col">Practices</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Use-case and policy scope</th><td>Define allowed and blocked intents, refusal rules and escalation paths.</td></tr>
+        <tr><th scope="row">Privacy and data minimization</th><td>Strip or mask PII, control retention, encrypt in transit and at rest.</td></tr>
+        <tr><th scope="row">Input validation and prompt hardening</th><td>Prompt templates, sanitized inputs, jailbreak detection.</td></tr>
+        <tr><th scope="row">Prompt-injection defenses</th><td>Treat retrieved and tool content as untrusted data, separate from instructions.</td></tr>
+        <tr><th scope="row">Grounding to trusted sources</th><td>RAG or knowledge graphs with citations and confidence signals.</td></tr>
+        <tr><th scope="row">Safety and content filters</th><td>Toxicity, self-harm, IP and PII leakage, malware classifiers.</td></tr>
+        <tr><th scope="row">Bias and fairness checks</th><td>Bias evaluations, data and prompt adjustments, documented mitigations.</td></tr>
+        <tr><th scope="row">Human-in-the-loop gates</th><td>Review for deployments, payments, trades and customer communications.</td></tr>
+        <tr><th scope="row">Tool and agent safety</th><td>Least-privilege keys, allow and deny lists, sandboxes, budgets.</td></tr>
+        <tr><th scope="row">Access control and auditability</th><td>RBAC, tenant isolation, agent identities, immutable audit trails.</td></tr>
+        <tr><th scope="row">Rate limiting and abuse prevention</th><td>Quotas, anomaly detection, circuit breakers, kill switches.</td></tr>
+        <tr><th scope="row">Evaluation and red-teaming</th><td>Task benchmarks, adversarial tests, pre-production safety bars.</td></tr>
+        <tr><th scope="row">Monitoring and drift detection</th><td>Quality, incidents, latency and cost tracking with alerts.</td></tr>
+        <tr><th scope="row">Change management</th><td>Versioned prompts, models and tools; shadow tests; rollback plans.</td></tr>
+        <tr><th scope="row">Compliance and provenance</th><td>Map to SOC 2, ISO, GDPR, CCPA; watermarking or provenance where required.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="gx-sec">
+  <h2 data-toc="Red-teaming" id="red-teaming">Red-teaming and monitoring</h2>
+  <ul class="gx-check">
+    <li><strong>Attack your own system</strong> before launch: jailbreaks, prompt injection through documents and web pages, data-exfiltration attempts, harmful requests and tool abuse.</li>
+    <li><strong>Turn every successful attack into a test case</strong> in your golden or safety set.</li>
+    <li><strong>Monitor in production:</strong> quality scores, safety flags, refusal and escalation rates, latency and cost, with alerts on regressions.</li>
+    <li><strong>Review samples by hand every week,</strong> even when the dashboards look green.</li>
+  </ul>
+</section>
+
+<section class="gx-sec gx-faq">
+  <h2 data-toc="FAQ" id="faq">Evaluation and guardrails: frequently asked questions</h2>
+  <details><summary>How do you evaluate an LLM application?</summary><p>Define what good means for the task, build a golden set of realistic inputs with reference answers or rubrics, and score each version for groundedness, correctness, format, safety, latency and cost. Use calibrated automated grading plus human review, and gate every release on the results.</p></details>
+  <details><summary>What is LLM-as-a-judge?</summary><p>LLM-as-a-judge uses a capable language model to score outputs against a rubric. It scales evaluation but must be calibrated against human ratings and checked for biases such as favoring longer answers.</p></details>
+  <details><summary>What are AI guardrails?</summary><p>AI guardrails are the controls around a model that keep it within policy: input validation, grounding to trusted sources, output filters, privacy protections, and limits and approvals on actions. They work best in layers.</p></details>
+  <details><summary>How do you evaluate an AI agent?</summary><p>Score both the outcome, whether the task was completed correctly, and the trajectory, whether the steps and tool calls were sensible and within policy, in a sandbox that mirrors production. Track success rate, steps per task, tool error rate and cost per task.</p></details>
+</section>
+<div class="gx-pager"><a class="gx-pn gx-pn-prev" href="https://www.dataknobs.com/generativeai/generative-ai-101/generative-ai-timeline.html"><span>← Previous guide</span>Generative AI timeline</a><a class="gx-pn gx-pn-next" href="https://www.dataknobs.com/generativeai/generative-ai-101/genai-risks-governance-security.html"><span>Next guide →</span>Risks, governance and security</a></div>
+<nav aria-label="Generative AI 101 detailed guides" class="gx-guides"><p class="gx-kicker">All Generative AI 101 guides</p><ol><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/agentic-ai-trends-2026.html"><span class="gx-guide-no">01</span><span class="gx-guide-t">Agentic AI trends 2026</span><span class="gx-guide-b">Action models, multi-agent systems, MCP and A2A, and cloud agent platforms.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/generative-ai-foundations.html"><span class="gx-guide-no">02</span><span class="gx-guide-t">Generative AI foundations</span><span class="gx-guide-b">GenAI vs predictive AI, how models learn, architectures, LLMs and foundation models.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/prompt-and-context-engineering.html"><span class="gx-guide-no">03</span><span class="gx-guide-t">Prompt and context engineering</span><span class="gx-guide-b">Prompt anatomy, techniques, context budgets, templates and testing.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/rag-and-vector-databases.html"><span class="gx-guide-no">04</span><span class="gx-guide-t">RAG and vector databases</span><span class="gx-guide-b">The full retrieval pipeline, chunking, hybrid search, re-ranking and evaluation.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/function-calling-mcp-and-agents.html"><span class="gx-guide-no">05</span><span class="gx-guide-t">Function calling, MCP and agents</span><span class="gx-guide-b">Tool design, the Model Context Protocol, the agent loop and tool safety.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/fine-tuning-llms.html"><span class="gx-guide-no">06</span><span class="gx-guide-t">Fine-tuning LLMs</span><span class="gx-guide-b">When to fine-tune, methods from LoRA to preference tuning, data prep and upkeep.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/llm-and-vendor-landscape-2026.html"><span class="gx-guide-no">07</span><span class="gx-guide-t">LLM and vendor landscape 2026</span><span class="gx-guide-b">Who offers what, open vs closed, comparison criteria and running a bake-off.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/generative-ai-timeline.html"><span class="gx-guide-no">08</span><span class="gx-guide-t">Generative AI timeline</span><span class="gx-guide-b">Four eras from GANs and transformers to reasoning models and agent standards.</span></a></li><li><a aria-current="page" class="gx-guide is-current" href="https://www.dataknobs.com/generativeai/generative-ai-101/evaluating-genai-and-guardrails.html"><span class="gx-guide-no">09</span><span class="gx-guide-t">Evaluation and guardrails</span><span class="gx-guide-b">Metrics, golden sets, LLM judges, agent evals and a layered guardrail design.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/genai-risks-governance-security.html"><span class="gx-guide-no">10</span><span class="gx-guide-t">Risks, governance and security</span><span class="gx-guide-b">Risk register, operating model, EU AI Act dates and the GenAI attack surface.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/genai-adoption-program-budget.html"><span class="gx-guide-no">11</span><span class="gx-guide-t">Adoption, programs and budget</span><span class="gx-guide-b">Use-case selection, program stages, cost drivers and budgeting for CIOs.</span></a></li><li><a class="gx-guide" href="https://www.dataknobs.com/generativeai/generative-ai-101/genai-industry-use-cases-digital-humans.html"><span class="gx-guide-no">12</span><span class="gx-guide-t">Industry use cases and digital humans</span><span class="gx-guide-b">Security, payments, mortgage, mobile, search, and digital humans vs robots.</span></a></li></ol></nav>
+<section aria-labelledby="h-sources" class="gx-sources"><h2 id="h-sources">Sources</h2><ul><li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-new-optimization-capabilities" rel="noopener">AWS: AgentCore optimization capabilities (Jun 2026)</a></li></ul></section>
+</div>
+</div>
+<dialog aria-label="Slide preview" class="gx-lightbox" id="gx-lightbox">
+  <button aria-label="Close slide preview" class="gx-lb-close" type="button">×</button>
+  <img alt="" id="gx-lb-img" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="/>
+  <div class="gx-lb-bar"><p id="gx-lb-cap"></p><a href="#" id="gx-lb-link">Go deeper →</a></div>
+</dialog>
+</main>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/">Home</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/">Ai agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/">Build data as products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/cats/">Cats</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/data-centric-tutorial/">Data centric tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/experience-summary/">Experience summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/gen-ai-adoption/">Gen ai adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/genai-cost-risks/">Genai cost risks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/llm-presentation/">Llm presentation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/why-generative-engine-optimization/">Why generative engine optimization</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html">Build-reusable-not-oneoff-signal</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html">Cdo-turn-data-into-products-not-just-pipelines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html">Cio-turn-legacy-systems-into-data-product-engines</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html">Close-loop-with-business-feedback</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html">Cpo-design-products-thatleanr-and-compound-value</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html">Cto-data-products-are-new-microservices</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html">Data-products-learnings</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html">Dataproduct-or-data-as-product</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html">Define-start-with-decisions-not-data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html">Development-life-cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html">E2e-lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html">Experiment-framework-for-data-product-consumption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html">Mistakes-and-lesssons-learnt-in-building-ai-products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html">Track-value-not-just-performance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-development-lifecycle/">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-compliance-and-risk.html">Agent Compliance And Risk</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-development-and-prompt-engineering.html">Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agent-learning-and-adaptation.html">Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/agentic-ai-capabilities-2026.html">Agentic Ai Capabilities 2026</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/context-engineering-and-multi-agent-llm.html">Context Engineering And Multi Agent Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/criteria-is-use-case-agentic.html">Criteria Is Use Case Agentic</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/enterprise-ai-agent-risks-responsibility.html">Enterprise Ai Agent Risks Responsibility</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evaluating-ai-agent-and-data-generation.html">Evaluating Ai Agent And Data Generation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/evolution-of-ai-agent-rag.html">Evolution Of Ai Agent Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/framework-agent-ai.html">Framework Agent Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/measuring-agentic-ai-effectiveness.html">Measuring Agentic Ai Effectiveness</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/pillars-of-agentic-ai.html">Pillars Of Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rise-of-agentic-ai-info.html">Rise Of Agentic Ai Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/rpa-genai-agentic-ai.html">Rpa Genai Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/super-agent.html">Super Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/agentic-ai/when-to-use-ai-agent.html">When To Use Ai Agent</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Prashant Dhingra Website and Blog</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Prashant Dhingra Data Knobs. All rights reserved.</p>
+</div>
+</div>
+</footer>
+
+<script>
+(function () {
+  // Slide lightbox: cards link to deep-dive pages; JS opens a larger preview instead.
+  var dlg = document.getElementById('gx-lightbox');
+  if (dlg && typeof dlg.showModal === 'function') {
+    var img = document.getElementById('gx-lb-img');
+    var cap = document.getElementById('gx-lb-cap');
+    var link = document.getElementById('gx-lb-link');
+    document.querySelectorAll('.gx-slide').forEach(function (card) {
+      card.addEventListener('click', function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        img.src = card.getAttribute('data-full');
+        img.alt = card.getAttribute('data-caption') || '';
+        cap.textContent = card.getAttribute('data-caption') || '';
+        link.href = card.getAttribute('href');
+        link.textContent = card.getAttribute('data-label') || 'Go deeper →';
+        dlg.showModal();
+      });
+    });
+    img.addEventListener('error', function () {
+      var thumb = document.querySelector('.gx-slide[data-full="' + img.getAttribute('src') + '"] img');
+      if (thumb && img.src !== thumb.src) img.src = thumb.src;
+    });
+    dlg.querySelector('.gx-lb-close').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+  }
+
+  // Table-of-contents scroll spy
+  var tocLinks = document.querySelectorAll('.gx-toc a');
+  if ('IntersectionObserver' in window && tocLinks.length) {
+    var byId = {};
+    tocLinks.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting && byId[en.target.id]) {
+          tocLinks.forEach(function (a) { a.classList.remove('is-active'); });
+          byId[en.target.id].classList.add('is-active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    Object.keys(byId).forEach(function (id) { var s = document.getElementById(id); if (s) obs.observe(s); });
+  }
+})();
+</script>
+<script>
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuOpenIcon = document.getElementById('menu-open-icon');
+  const menuCloseIcon = document.getElementById('menu-close-icon');
+
+  if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
+    const closeMobileMenu = () => {
+      mobileMenu.classList.add('hidden');
+      mobileMenuButton.setAttribute('aria-expanded', 'false');
+      menuOpenIcon.classList.remove('hidden');
+      menuCloseIcon.classList.add('hidden');
+    };
+
+    const openMobileMenu = () => {
+      mobileMenu.classList.remove('hidden');
+      mobileMenuButton.setAttribute('aria-expanded', 'true');
+      menuOpenIcon.classList.add('hidden');
+      menuCloseIcon.classList.remove('hidden');
+    };
+
+    mobileMenuButton.addEventListener('click', () => {
+      const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+      isExpanded ? closeMobileMenu() : openMobileMenu();
+    });
+
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMobileMenu);
+    });
+  }
+</script>
+
+
+</body></html>

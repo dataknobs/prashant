@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Self-Editing Memory for Agentic AI | Prashant Dhingra</title><meta content="Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes." name="description"/><meta content="index,follow,max-image-preview:large" name="robots"/><link href="https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai" rel="canonical"/><meta content="article" property="og:type"/><meta content="Self-Editing Memory for Agentic AI" property="og:title"/><meta content="Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes." property="og:description"/><meta content="https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai" property="og:url"/><meta content="summary" name="twitter:card"/><meta content="Self-Editing Memory for Agentic AI" name="twitter:title"/><meta content="Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes." name="twitter:description"/><style>*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:80px}body{margin:0;background:#f7f5ef;color:#142532;font:17px/1.7 system-ui,sans-serif}a{color:#08649b}a:hover{text-decoration:none}a:focus-visible,summary:focus-visible{outline:3px solid #087baa;outline-offset:4px}.wrap{max-width:1180px;margin:auto;padding:0 24px}header{background:#142532;color:white;padding:18px 0}header a{color:white;text-decoration:none}.brand{font-weight:750}nav{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}.hero{padding:76px 0 56px;background:#142532;color:#fff}.eyebrow{color:#7ed8eb;text-transform:uppercase;letter-spacing:.16em;font-size:13px;font-weight:750}h1{font:700 clamp(40px,6vw,76px)/1.08 Georgia,serif;max-width:950px;margin:18px 0 24px}h2{font:700 34px/1.2 Georgia,serif}h3{font-size:23px;line-height:1.3}.lead{font-size:21px;max-width:800px;color:#d9e2e6}.chips{display:flex;gap:12px;flex-wrap:wrap}.chips span{border:1px solid #52616a;border-radius:30px;padding:5px 14px;font-size:14px}.button{display:inline-block;background:#087baa;color:white;padding:11px 20px;border-radius:7px;text-decoration:none;margin-top:24px}main{padding:34px 0}.intro,.faq{background:white;padding:28px;border:1px solid #dddcd5;border-radius:12px;margin:28px 0}.note{padding:16px 20px;border-left:4px solid #087baa;background:#e8f2f7;font-size:15px}.thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.thumbs a{display:block;background:white;border:1px solid #ddd;border-radius:8px;overflow:hidden;text-decoration:none;color:#142532}.thumbs span{display:block;padding:8px 12px;font-size:13px;line-height:1.4}.thumbs img{width:100%;height:auto;display:block}.slide{margin:42px 0 60px;scroll-margin-top:20px}.number{color:#08649b;font-size:13px;font-weight:800;letter-spacing:.1em}.slide p{max-width:960px}.slide figure{margin:22px 0 0;background:white;border:1px solid #d7d9d6;border-radius:10px;overflow:hidden}.slide img{display:block;width:100%;height:auto}figcaption{padding:10px 18px;font-size:13px;color:#59636a}.back{font-size:13px}.section-title{margin-top:60px;border-top:2px solid #087baa;padding-top:25px}details{border-bottom:1px solid #ddd;padding:17px 0}summary{font-weight:700;cursor:pointer}footer{background:#142532;color:#c4ced4;padding:30px 0;font-size:14px}footer a{color:white}@media(max-width:760px){.thumbs{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:45px 0}.wrap{padding:0 18px}.intro,.faq{padding:20px}h2{font-size:28px}}@media print{header,.thumbs,.back,.button{display:none}.hero{background:white;color:black;padding:10px 0}.lead{color:black}.slide{break-inside:avoid}.slide img{max-height:65vh;object-fit:contain}}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card{background:#fff;border:1px solid #d8dfe2;border-radius:12px;overflow:hidden}.card img{width:100%;height:auto;display:block}.copy{padding:20px}.copy h2{font-size:24px}.copy p{font-size:15px}.card[hidden]{display:none}.controls{display:flex;gap:14px;flex-wrap:wrap;background:white;padding:22px;margin:24px 0;border-radius:12px}.controls label{display:block;flex:1;min-width:210px}.controls input,.controls select{display:block;width:100%;font:inherit;padding:10px;border:1px solid #627783;border-radius:5px}.source-text{white-space:pre-wrap;font:14px/1.6 system-ui;overflow-wrap:anywhere;max-height:600px;overflow:auto;padding:16px;background:#edf2f4}.related{display:flex;gap:12px;flex-wrap:wrap}.related a{padding:8px 12px;background:#edf3f7;border-radius:5px}.subtle{font-size:14px;color:#596a75}.slide img{object-fit:contain}.skip{position:absolute;left:-9999px}.skip:focus{left:10px;top:10px;background:white;padding:10px;z-index:10}@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style><script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "Self-Editing Memory for Agentic AI", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai", "description": "Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes.", "author": {"@type": "Person", "name": "Prashant Dhingra"}, "hasPart": [{"@type": "CreativeWork", "name": "Self-Editing Memory for Agentic AI", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-1", "position": 1}, {"@type": "CreativeWork", "name": "A new contract between the model and memory", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-2", "position": 2}, {"@type": "CreativeWork", "name": "Longer context \u2260 better context", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-3", "position": 3}, {"@type": "CreativeWork", "name": "What self-editing memory is\u2014and is not", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-4", "position": 4}, {"@type": "CreativeWork", "name": "From replaying history to maintaining state", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-5", "position": 5}, {"@type": "CreativeWork", "name": "Six complementary memory categories", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-6", "position": 6}, {"@type": "CreativeWork", "name": "Memory architecture", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-7", "position": 7}, {"@type": "CreativeWork", "name": "The memory hierarchy: fast, selective, durable", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-8", "position": 8}, {"@type": "CreativeWork", "name": "Enterprise reference architecture", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-9", "position": 9}, {"@type": "CreativeWork", "name": "Context assembly at inference time", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-10", "position": 10}, {"@type": "CreativeWork", "name": "Memory writes are transactions, not free-form notes", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-11", "position": 11}, {"@type": "CreativeWork", "name": "Retrieval should optimize usefulness\u2014not just similarity", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-12", "position": 12}, {"@type": "CreativeWork", "name": "The key operation is often \u201csupersede,\u02ee not \u201cappend\u02ee", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-13", "position": 13}, {"@type": "CreativeWork", "name": "Compress what is noisy; preserve what is consequential", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-14", "position": 14}, {"@type": "CreativeWork", "name": "Memory records need provenance, version and scope", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-15", "position": 15}, {"@type": "CreativeWork", "name": "Shared memory needs namespaces and concurrency control", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-16", "position": 16}, {"@type": "CreativeWork", "name": "Governance & assurance", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-17", "position": 17}, {"@type": "CreativeWork", "name": "Three memory permission tiers", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-18", "position": 18}, {"@type": "CreativeWork", "name": "Memory poisoning turns one bad input into future behavior", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-19", "position": 19}, {"@type": "CreativeWork", "name": "Defense in depth: six control gates", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-20", "position": 20}, {"@type": "CreativeWork", "name": "Review the actual diff, not an opaque \u201cremember\u02ee request", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-21", "position": 21}, {"@type": "CreativeWork", "name": "Treat memory as an observable data product", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-22", "position": 22}, {"@type": "CreativeWork", "name": "Memory quality needs its own test suite", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-23", "position": 23}, {"@type": "CreativeWork", "name": "Context cost vs. memory management overhead", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-24", "position": 24}, {"@type": "CreativeWork", "name": "Implementation blueprint", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-25", "position": 25}, {"@type": "CreativeWork", "name": "Proposed service and storage components", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-26", "position": 26}, {"@type": "CreativeWork", "name": "Memory tools: small, typed and permissioned", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-27", "position": 27}, {"@type": "CreativeWork", "name": "A safe read\u2013reason\u2013propose\u2013commit loop", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-28", "position": 28}, {"@type": "CreativeWork", "name": "Memory is one layer of the broader agent harness", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-29", "position": 29}, {"@type": "CreativeWork", "name": "Governed Agent Memory within the Dataknobs portfolio", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-30", "position": 30}, {"@type": "CreativeWork", "name": "Coding / migration agent: lessons that survive sessions", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-31", "position": 31}, {"@type": "CreativeWork", "name": "Customer or finance assistant: useful memory, strict", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-32", "position": 32}, {"@type": "CreativeWork", "name": "A staged 90-day prototype-to-pilot plan", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-33", "position": 33}, {"@type": "CreativeWork", "name": "What the architecture team should decide next", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-34", "position": 34}, {"@type": "CreativeWork", "name": "Selected sources and further reading", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai#slide-35", "position": 35}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What does this guide cover?", "acceptedAnswer": {"@type": "Answer", "text": "Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes."}}, {"@type": "Question", "name": "How should the examples be used?", "acceptedAnswer": {"@type": "Answer", "text": "Treat architectures, code, thresholds and product comparisons as supplied presentation material. Validate them against your environment, requirements and evaluation set."}}, {"@type": "Question", "name": "How can I read or enlarge a slide?", "acceptedAnswer": {"@type": "Answer", "text": "Open the slide image for the full local version, or expand its text transcript. Transcripts can contain reading-order artifacts; diagrams and code layout are preserved in the image."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Advanced collection", "item": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-advanced-index"}, {"@type": "ListItem", "position": 2, "name": "Self-Editing Memory for Agentic AI", "item": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/self-editing-memory-agentic-ai"}]}]}</script><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head><body><a class="skip" href="#main">Skip to content</a><header><nav class="wrap"><a class="brand" href="index.html">Advanced Agent Engineering</a><a href="https://prashant.dhingra.website/">Prashant Dhingra</a></nav></header><script>document.addEventListener('error',e=>{const im=e.target;if(im.tagName==='IMG'&&im.dataset.fallback){const next=im.dataset.fallback;delete im.dataset.fallback;im.src=next}},true);</script><section class="hero"><div class="wrap"><div class="eyebrow">Memory · 35 slides</div><h1>Self-Editing Memory for Agentic AI</h1><p class="lead">Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes.</p><a class="button" href="#slides">Explore the presentation</a></div></section><main class="wrap" id="main"><section class="intro"><h2>About this guide</h2><p>Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes.</p><p class="subtle">Original slides and source text are preserved. Product claims, regulatory references, code and numerical examples are not independently verified or tested here.</p></section><section id="slides"><h2>Slide navigator</h2><div class="thumbs"><a href="#slide-1"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-1-thumb.jpg" width="320"/><span>01 · Self-Editing Memory for Agentic AI</span></a><a href="#slide-2"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-2-thumb.jpg" width="320"/><span>02 · A new contract between the model and memory</span></a><a href="#slide-3"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-3-thumb.jpg" width="320"/><span>03 · Longer context ≠ better context</span></a><a href="#slide-4"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-4-thumb.jpg" width="320"/><span>04 · What self-editing memory is—and is not</span></a><a href="#slide-5"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-5-thumb.jpg" width="320"/><span>05 · From replaying history to maintaining state</span></a><a href="#slide-6"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-6-thumb.jpg" width="320"/><span>06 · Six complementary memory categories</span></a><a href="#slide-7"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-7-thumb.jpg" width="320"/><span>07 · Memory architecture</span></a><a href="#slide-8"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-8-thumb.jpg" width="320"/><span>08 · The memory hierarchy: fast, selective, durable</span></a><a href="#slide-9"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-9-thumb.jpg" width="320"/><span>09 · Enterprise reference architecture</span></a><a href="#slide-10"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-10-thumb.jpg" width="320"/><span>10 · Context assembly at inference time</span></a><a href="#slide-11"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-11-thumb.jpg" width="320"/><span>11 · Memory writes are transactions, not free-form notes</span></a><a href="#slide-12"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-12-thumb.jpg" width="320"/><span>12 · Retrieval should optimize usefulness—not just similarity</span></a><a href="#slide-13"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-13-thumb.jpg" width="320"/><span>13 · The key operation is often “supersede,ˮ not “appendˮ</span></a><a href="#slide-14"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-14-thumb.jpg" width="320"/><span>14 · Compress what is noisy; preserve what is consequential</span></a><a href="#slide-15"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-15-thumb.jpg" width="320"/><span>15 · Memory records need provenance, version and scope</span></a><a href="#slide-16"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-16-thumb.jpg" width="320"/><span>16 · Shared memory needs namespaces and concurrency control</span></a><a href="#slide-17"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-17-thumb.jpg" width="320"/><span>17 · Governance &amp; assurance</span></a><a href="#slide-18"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-18-thumb.jpg" width="320"/><span>18 · Three memory permission tiers</span></a><a href="#slide-19"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-19-thumb.jpg" width="320"/><span>19 · Memory poisoning turns one bad input into future behavior</span></a><a href="#slide-20"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-20-thumb.jpg" width="320"/><span>20 · Defense in depth: six control gates</span></a><a href="#slide-21"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-21-thumb.jpg" width="320"/><span>21 · Review the actual diff, not an opaque “rememberˮ request</span></a><a href="#slide-22"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-22-thumb.jpg" width="320"/><span>22 · Treat memory as an observable data product</span></a><a href="#slide-23"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-23-thumb.jpg" width="320"/><span>23 · Memory quality needs its own test suite</span></a><a href="#slide-24"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-24-thumb.jpg" width="320"/><span>24 · Context cost vs. memory management overhead</span></a><a href="#slide-25"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-25-thumb.jpg" width="320"/><span>25 · Implementation blueprint</span></a><a href="#slide-26"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-26-thumb.jpg" width="320"/><span>26 · Proposed service and storage components</span></a><a href="#slide-27"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-27-thumb.jpg" width="320"/><span>27 · Memory tools: small, typed and permissioned</span></a><a href="#slide-28"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-28-thumb.jpg" width="320"/><span>28 · A safe read–reason–propose–commit loop</span></a><a href="#slide-29"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-29-thumb.jpg" width="320"/><span>29 · Memory is one layer of the broader agent harness</span></a><a href="#slide-30"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-30-thumb.jpg" width="320"/><span>30 · Governed Agent Memory within the Dataknobs portfolio</span></a><a href="#slide-31"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-31-thumb.jpg" width="320"/><span>31 · Coding / migration agent: lessons that survive sessions</span></a><a href="#slide-32"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-32-thumb.jpg" width="320"/><span>32 · Customer or finance assistant: useful memory, strict</span></a><a href="#slide-33"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-33-thumb.jpg" width="320"/><span>33 · A staged 90-day prototype-to-pilot plan</span></a><a href="#slide-34"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-34-thumb.jpg" width="320"/><span>34 · What the architecture team should decide next</span></a><a href="#slide-35"><img alt="" height="180" loading="lazy" src="assets/self-editing-memory-agentic-ai/slide-35-thumb.jpg" width="320"/><span>35 · Selected sources and further reading</span></a></div></section><article class="slide" id="slide-1"><div class="number">SLIDE 1 / 35</div><h2>Self-Editing Memory for Agentic AI</h2><figure><a aria-label="Enlarge slide 1" href="assets/self-editing-memory-agentic-ai/slide-1.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 1: Self-Editing Memory for Agentic AI" data-fallback="assets/self-editing-memory-agentic-ai/slide-1.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-1.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-1.png" width="1400"/></a><figcaption>Original slide 1 · Click to enlarge</figcaption></figure><details><summary>Read slide 1 text</summary><div class="source-text">ARCHITECTURE  ·  TRUST  ·  IMPLEMENTATION
+SELFEDITING
+MEMORY
+For LLM and Agentic AI Systems
+How agents maintain, revise, retrieve, and govern their own context 
+across sessions.
+LLM
+CORE
+RETRIEVE
+EDIT
+VERIFY
+KONTROLS  /  DATAKNOBS.COM</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-2"><div class="number">SLIDE 2 / 35</div><h2>A new contract between the model and memory</h2><figure><a aria-label="Enlarge slide 2" href="assets/self-editing-memory-agentic-ai/slide-2.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 2: A new contract between the model and memory" data-fallback="assets/self-editing-memory-agentic-ai/slide-2.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-2.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-2.png" width="1400"/></a><figcaption>Original slide 2 · Click to enlarge</figcaption></figure><details><summary>Read slide 2 text</summary><div class="source-text">EXECUTIVE VIEW
+A new contract between the model and memory
+The model may decide what to remember; the runtime must enforce what it can change.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+02
+01 / PROBLEM
+Context grows, decays 
+and contradicts itself.
+Long sessions bury decisions 
+inside noisy transcripts.
+02 / MECHANISM
+The agent proposes 
+memory edits.
+Tools persist, update, merge 
+and retrieve selected 
+knowledge.
+03 / CONTROL
+Storage is not a 
+free-form model 
+privilege.
+Policy, provenance and 
+authorization govern every 
+write.
+04 / VALUE
+Continuity without 
+replaying everything.
+Better task focus, explainable 
+changes and controlled cost.
+MODEL PROPOSES   →   POLICY VALIDATES   →   STORE VERSIONS   →   CONTEXT COMPILER RETRIEVES</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-3"><div class="number">SLIDE 3 / 35</div><h2>Longer context ≠ better context</h2><figure><a aria-label="Enlarge slide 3" href="assets/self-editing-memory-agentic-ai/slide-3.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 3: Longer context ≠ better context" data-fallback="assets/self-editing-memory-agentic-ai/slide-3.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-3.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-3.png" width="1400"/></a><figcaption>Original slide 3 · Click to enlarge</figcaption></figure><details><summary>Read slide 3 text</summary><div class="source-text">THE PROBLEM
+Longer context ≠ better context
+A long transcript can be expensive, noisy, stale or misleading.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+03
+A MULTISESSION CONVERSATION
+User preference from last month
+Tool output: 7,000 rows
+Architecture discussion v1
+Temporary error logs
+New deployment plan
+Confirmed decision
+Latest user request
+CURRENT
+WINDOW
+FAILURE MODES
+Token saturation
+Large tool outputs displace relevant facts.
+Stale beliefs
+Deprecated decisions remain in history.
+Poor retrieval
+Important evidence is hard to locate.
+Session reset
+Continuity breaks without durable state.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-4"><div class="number">SLIDE 4 / 35</div><h2>What self-editing memory is—and is not</h2><figure><a aria-label="Enlarge slide 4" href="assets/self-editing-memory-agentic-ai/slide-4.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 4: What self-editing memory is—and is not" data-fallback="assets/self-editing-memory-agentic-ai/slide-4.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-4.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-4.png" width="1400"/></a><figcaption>Original slide 4 · Click to enlarge</figcaption></figure><details><summary>Read slide 4 text</summary><div class="source-text">DEFINITION
+What self-editing memory is—and is not
+A model-driven workflow operating on external state, subject to application controls.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+04
+IS
+IS NOT
+Selecting durable facts from interactions
+Proposing insert, replace, merge or delete
+Keeping source, scope and revision history
+Retrieving memory just in time
+Changing model weights or fine-tuning
+Overriding system / governance policies
+Unlimited, unreviewed long-term retention
+A replacement for reliable source-of-truth data</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-5"><div class="number">SLIDE 5 / 35</div><h2>From replaying history to maintaining state</h2><figure><a aria-label="Enlarge slide 5" href="assets/self-editing-memory-agentic-ai/slide-5.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 5: From replaying history to maintaining state" data-fallback="assets/self-editing-memory-agentic-ai/slide-5.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-5.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-5.png" width="1400"/></a><figcaption>Original slide 5 · Click to enlarge</figcaption></figure><details><summary>Read slide 5 text</summary><div class="source-text">PARADIGM SHIFT
+From replaying history to maintaining state
+Move from transcript-centric prompts to governed, task-specific context.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+05
+BEFORE  /  STATIC HISTORY
+AFTER  /  ACTIVE MEMORY
+HISTORY
+HISTORY
+HISTORY
+HISTORY
+HISTORY
+ONE GIANT
+PROMPT
+Transcript
+SUPPORT
+Core facts
+ALWAYS
+Relevant evidence
+ON DEMAND
+LLM
+Everything is repeatedly passed in.
+Only relevant, authorized state is assembled.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-6"><div class="number">SLIDE 6 / 35</div><h2>Six complementary memory categories</h2><figure><a aria-label="Enlarge slide 6" href="assets/self-editing-memory-agentic-ai/slide-6.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 6: Six complementary memory categories" data-fallback="assets/self-editing-memory-agentic-ai/slide-6.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-6.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-6.png" width="1400"/></a><figcaption>Original slide 6 · Click to enlarge</figcaption></figure><details><summary>Read slide 6 text</summary><div class="source-text">MEMORY MODEL
+Six complementary memory categories
+Choose type and scope before choosing the storage technology.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+06
+WORKING
+Current task, tool results, 
+scratchpad
+Thread state  ·  short TTL
+CORE
+Durable facts always in context
+Small blocks  ·  strict budget
+SEMANTIC
+Facts, preferences, entities
+Structured records  ·  retrieval
+EPISODIC
+Events, outcomes, lessons
+Event records  ·  timelines
+PROCEDURAL
+Approved methods and 
+playbooks
+Versioned skills  ·  review
+ARCHIVAL
+Raw chats, files, source 
+evidence
+Object store  ·  search index</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-7"><div class="number">SLIDE 7 / 35</div><h2>Memory architecture</h2><figure><a aria-label="Enlarge slide 7" href="assets/self-editing-memory-agentic-ai/slide-7.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 7: Memory architecture" data-fallback="assets/self-editing-memory-agentic-ai/slide-7.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-7.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-7.png" width="1400"/></a><figcaption>Original slide 7 · Click to enlarge</figcaption></figure><details><summary>Read slide 7 text</summary><div class="source-text">CHAPTER 01
+01
+Memory architecture
+A layered system that manages what stays in context, what is retrieved and what can 
+change.
+Tiers
+Reads
+Writes
+Compaction
+DATAKNOBS  /  GOVERNED AGENT MEMORY</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-8"><div class="number">SLIDE 8 / 35</div><h2>The memory hierarchy: fast, selective, durable</h2><figure><a aria-label="Enlarge slide 8" href="assets/self-editing-memory-agentic-ai/slide-8.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 8: The memory hierarchy: fast, selective, durable" data-fallback="assets/self-editing-memory-agentic-ai/slide-8.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-8.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-8.png" width="1400"/></a><figcaption>Original slide 8 · Click to enlarge</figcaption></figure><details><summary>Read slide 8 text</summary><div class="source-text">ARCHITECTURE
+The memory hierarchy: fast, selective, durable
+Borrow the tiering concept from computer memory—not the assumption that storage is infinite.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+08
+L0   CONTEXT WINDOW
+System rules + task + small, pinned core blocks
+L1   STRUCTURED MEMORY
+Current facts, preferences, decisions and references
+L2   SEARCHABLE HISTORY
+Semantic + episodic retrieval; sparse and vector indexes
+L3   RAW EVIDENCE
+Chats, logs, documents, artifacts in managed storage
+Less always-visible
+More on-demand</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-9"><div class="number">SLIDE 9 / 35</div><h2>Enterprise reference architecture</h2><figure><a aria-label="Enlarge slide 9" href="assets/self-editing-memory-agentic-ai/slide-9.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 9: Enterprise reference architecture" data-fallback="assets/self-editing-memory-agentic-ai/slide-9.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-9.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-9.png" width="1400"/></a><figcaption>Original slide 9 · Click to enlarge</figcaption></figure><details><summary>Read slide 9 text</summary><div class="source-text">REFERENCE ARCHITECTURE
+Enterprise reference architecture
+The policy boundary wraps all memory operations—not only final model output.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+09
+CHANNELS
+Chat / UX
+Coding agent
+Workflow agent
+AGENT HARNESS
+Planner + LLM
+Tool Router
+Context Compiler
+Evaluation Hooks
+MEMORY 
+SERVICE
+Search &amp; Rank
+Extract / Edit
+Consolidate
+Policy / Approval
+STORAGE
+Core Blocks
+JSON / SQL
+Vector Index
+Event &amp; Audit Log
+Identity • Tenant scopes • DLP  Observability • Encrypted persistence • Change control</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-10"><div class="number">SLIDE 10 / 35</div><h2>Context assembly at inference time</h2><figure><a aria-label="Enlarge slide 10" href="assets/self-editing-memory-agentic-ai/slide-10.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 10: Context assembly at inference time" data-fallback="assets/self-editing-memory-agentic-ai/slide-10.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-10.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-10.png" width="1400"/></a><figcaption>Original slide 10 · Click to enlarge</figcaption></figure><details><summary>Read slide 10 text</summary><div class="source-text">READ PATH
+Context assembly at inference time
+Compile a high-value prompt instead of attaching every available memory.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+10
+1
+Understand intent
+2
+Resolve identity and scope
+3
+Retrieve candidates
+4
+Rerank + verify
+5
+Allocate token budget
+6
+Compile prompt
+ILLUSTRATIVE CONTEXT BUDGET  64K TOKENS
+Policy
+Core
+Task evidence
+History
+Reserve
+Retrieval is filtered by authorization before ranking; budget allocation is illustrative.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-11"><div class="number">SLIDE 11 / 35</div><h2>Memory writes are transactions, not free-form notes</h2><figure><a aria-label="Enlarge slide 11" href="assets/self-editing-memory-agentic-ai/slide-11.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 11: Memory writes are transactions, not free-form notes" data-fallback="assets/self-editing-memory-agentic-ai/slide-11.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-11.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-11.png" width="1400"/></a><figcaption>Original slide 11 · Click to enlarge</figcaption></figure><details><summary>Read slide 11 text</summary><div class="source-text">WRITE PATH
+Memory writes are transactions, not free-form notes
+The agent proposes a change; an application service determines whether it becomes durable.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+11
+OBSERVE
+Message / Tool
+EXTRACT
+Candidate fact
+CLASSIFY
+Type + sensitivity
+RECONCILE
+Dedup + conflict
+AUTHORIZE
+Policy + HITL
+COMMIT
+Version + audit
+EXAMPLE  USER CONFIRMED DEPLOYMENT CHANGE
+“Service now deploys to environment B.ˮ
+→ Supersede old target; link evidence; notify affected agents.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-12"><div class="number">SLIDE 12 / 35</div><h2>Retrieval should optimize usefulness—not just similarity</h2><figure><a aria-label="Enlarge slide 12" href="assets/self-editing-memory-agentic-ai/slide-12.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 12: Retrieval should optimize usefulness—not just similarity" data-fallback="assets/self-editing-memory-agentic-ai/slide-12.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-12.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-12.png" width="1400"/></a><figcaption>Original slide 12 · Click to enlarge</figcaption></figure><details><summary>Read slide 12 text</summary><div class="source-text">READ PATH
+Retrieval should optimize usefulness—not just similarity
+Use structured filters, hybrid search and task-aware ranking.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+12
+Candidate generation
+• Namespace + tenant filters
+• Exact key / entity lookup
+• Keyword + vector retrieval
+• Timestamp / status rules
+Candidate ranking
+• Task relevance
+• Source authority
+• Freshness / version
+• Contradiction penalty
+• Token footprint
+Context selection
+• Deduplicate semantically
+• Cite source and timestamp
+• Keep authoritative fact
+• Bound top-k and tokens
+• Return confidence signals
+A high-similarity but stale or unauthorized memory must not win retrieval.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-13"><div class="number">SLIDE 13 / 35</div><h2>The key operation is often “supersede,ˮ not “appendˮ</h2><figure><a aria-label="Enlarge slide 13" href="assets/self-editing-memory-agentic-ai/slide-13.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 13: The key operation is often “supersede,ˮ not “appendˮ" data-fallback="assets/self-editing-memory-agentic-ai/slide-13.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-13.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-13.png" width="1400"/></a><figcaption>Original slide 13 · Click to enlarge</figcaption></figure><details><summary>Read slide 13 text</summary><div class="source-text">UPDATES
+The key operation is often “supersede,ˮ not “appendˮ
+Facts evolve; memory must preserve lineage while returning the latest authorized truth.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+13
+V1
+Initial plan
+Service uses endpoint A
+V2
+Confirmed change
+Switch to endpoint B
+V3
+Approved state
+Endpoint B in production
+Active read: V3  ·  V1/V2 retained as evidence  ·  supersedes=[V2]  ·  audit shows who approved the change</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-14"><div class="number">SLIDE 14 / 35</div><h2>Compress what is noisy; preserve what is consequential</h2><figure><a aria-label="Enlarge slide 14" href="assets/self-editing-memory-agentic-ai/slide-14.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 14: Compress what is noisy; preserve what is consequential" data-fallback="assets/self-editing-memory-agentic-ai/slide-14.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-14.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-14.png" width="1400"/></a><figcaption>Original slide 14 · Click to enlarge</figcaption></figure><details><summary>Read slide 14 text</summary><div class="source-text">COMPACTION
+Compress what is noisy; preserve what is consequential
+Reduce tokens without losing decisions, open actions or the evidence needed to recover.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+14
+KEEP IN CORE
+Current objective
+Unresolved blockers
+High-confidence constraints
+SUMMARIZE
+Successful fixes
+Repeated interactions
+Closed task outcomes
+EXPIRE / ARCHIVE
+Temporary logs
+One-time URLs
+Superseded working notes
+Safety rule: deletion from the active prompt ≠ deletion from durable or regulated records.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-15"><div class="number">SLIDE 15 / 35</div><h2>Memory records need provenance, version and scope</h2><figure><a aria-label="Enlarge slide 15" href="assets/self-editing-memory-agentic-ai/slide-15.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 15: Memory records need provenance, version and scope" data-fallback="assets/self-editing-memory-agentic-ai/slide-15.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-15.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-15.png" width="1400"/></a><figcaption>Original slide 15 · Click to enlarge</figcaption></figure><details><summary>Read slide 15 text</summary><div class="source-text">DATA MODEL
+Memory records need provenance, version and scope
+A record is an auditable assertion, not just an embedding.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+15
+EXAMPLE RECORD ILLUSTRATIVE JSON
+{
+  "id": "mem_217",
+  "namespace": "org/team/agent",
+  "type": "semantic",
+  "content": "Service X uses Python API",
+  "source": {"kind":"user_confirmed"},
+  "status": "active", "version": 3,
+  "supersedes": ["mem_129"],
+  "ttl": null, "confidence": 0.95
+}
+IDENTITY
+ID + namespace + owner
+TRUST
+Evidence + source authority
+LIFECYCLE
+State + version + supersession
+POLICY
+Retention + sensitivity + consent
+OPERATIONS
+Access logs + ETags / version</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-16"><div class="number">SLIDE 16 / 35</div><h2>Shared memory needs namespaces and concurrency control</h2><figure><a aria-label="Enlarge slide 16" href="assets/self-editing-memory-agentic-ai/slide-16.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 16: Shared memory needs namespaces and concurrency control" data-fallback="assets/self-editing-memory-agentic-ai/slide-16.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-16.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-16.png" width="1400"/></a><figcaption>Original slide 16 · Click to enlarge</figcaption></figure><details><summary>Read slide 16 text</summary><div class="source-text">MULTIAGENT
+Shared memory needs namespaces and concurrency control
+“Sharedˮ does not mean every agent may edit every record.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+16
+ORG
+Read-only policies
+Admin / policy owner
+TEAM
+Approved project facts
+Maintainers / reviewers
+USER
+User-specific preferences
+User or delegated agent
+SESSION
+Scratchpad / task state
+Session agent
+RACE CONDITION
+Agent A reads v4
+Agent B reads v4
+A writes v5
+B tries v4 → reject / merge
+OPTIMISTIC LOCK</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-17"><div class="number">SLIDE 17 / 35</div><h2>Governance &amp; assurance</h2><figure><a aria-label="Enlarge slide 17" href="assets/self-editing-memory-agentic-ai/slide-17.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 17: Governance &amp; assurance" data-fallback="assets/self-editing-memory-agentic-ai/slide-17.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-17.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-17.png" width="1400"/></a><figcaption>Original slide 17 · Click to enlarge</figcaption></figure><details><summary>Read slide 17 text</summary><div class="source-text">CHAPTER 02
+02
+Governance &amp; assurance
+Memory itself is a security-sensitive asset: it can steer future reasoning and actions.
+Policy
+HITL
+Audit
+Evaluation
+DATAKNOBS  /  GOVERNED AGENT MEMORY</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-18"><div class="number">SLIDE 18 / 35</div><h2>Three memory permission tiers</h2><figure><a aria-label="Enlarge slide 18" href="assets/self-editing-memory-agentic-ai/slide-18.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 18: Three memory permission tiers" data-fallback="assets/self-editing-memory-agentic-ai/slide-18.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-18.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-18.png" width="1400"/></a><figcaption>Original slide 18 · Click to enlarge</figcaption></figure><details><summary>Read slide 18 text</summary><div class="source-text">GOVERNANCE
+Three memory permission tiers
+Define who can read, propose, commit and delete each class of memory.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+18
+TIER / EXAMPLES
+AGENT MAY PROPOSE
+AUTOCOMMIT
+REVIEW
+DELETE
+PROTECTED
+Policy, system instructions
+No
+Never
+Admin only
+Policy owner
+GOVERNED
+Architecture, procedures
+Yes
+No by default
+Approver
+Retention policy
+AGENTMANAGED
+Scratchpad, task state
+Yes
+Within scope
+On exception
+Agent / TTL
+Default-deny protected memory changes; require attribution and explicit ownership for material enterprise facts.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-19"><div class="number">SLIDE 19 / 35</div><h2>Memory poisoning turns one bad input into future behavior</h2><figure><a aria-label="Enlarge slide 19" href="assets/self-editing-memory-agentic-ai/slide-19.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 19: Memory poisoning turns one bad input into future behavior" data-fallback="assets/self-editing-memory-agentic-ai/slide-19.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-19.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-19.png" width="1400"/></a><figcaption>Original slide 19 · Click to enlarge</figcaption></figure><details><summary>Read slide 19 text</summary><div class="source-text">THREAT MODEL
+Memory poisoning turns one bad input into future behavior
+The attack can survive the original malicious message or document.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+19
+UNTRUSTED INPUT
+Malicious web page
+or peer-agent text
+BAD WRITE
+Agent saves false rule
+as trusted memory
+LATER RETRIEVAL
+The false memory
+looks authoritative
+UNSAFE ACTION
+Future agent follows
+poisoned instruction
+Attacker objective: convert untrusted source content into durable, high-trust context.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-20"><div class="number">SLIDE 20 / 35</div><h2>Defense in depth: six control gates</h2><figure><a aria-label="Enlarge slide 20" href="assets/self-editing-memory-agentic-ai/slide-20.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 20: Defense in depth: six control gates" data-fallback="assets/self-editing-memory-agentic-ai/slide-20.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-20.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-20.png" width="1400"/></a><figcaption>Original slide 20 · Click to enlarge</figcaption></figure><details><summary>Read slide 20 text</summary><div class="source-text">CONTROLS
+Defense in depth: six control gates
+A single prompt instruction is not an adequate memory security boundary.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+20
+01
+SOURCE TRUST
+Provenance, signing, source 
+classes
+02
+READ ISOLATION
+Tenant and role filters 
+pre-retrieval
+03
+WRITE VALIDATION
+Schema, facts, contradictions, 
+DLP
+04
+AUTHORIZATION
+Scopes, approvals, least 
+privilege
+05
+IMMUTABLE AUDIT
+Versioned diffs + restore points
+06
+ONGOING EVAL
+Poisoning tests, drift and alerts</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-21"><div class="number">SLIDE 21 / 35</div><h2>Review the actual diff, not an opaque “rememberˮ request</h2><figure><a aria-label="Enlarge slide 21" href="assets/self-editing-memory-agentic-ai/slide-21.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 21: Review the actual diff, not an opaque “rememberˮ request" data-fallback="assets/self-editing-memory-agentic-ai/slide-21.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-21.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-21.png" width="1400"/></a><figcaption>Original slide 21 · Click to enlarge</figcaption></figure><details><summary>Read slide 21 text</summary><div class="source-text">HUMANINTHELOOP
+Review the actual diff, not an opaque “rememberˮ request
+High-impact changes should be legible, attributable and reversible.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+21
+MEMORY REVIEW QUEUE  /  PENDING CHANGE
+GOVERNED
+PROPOSED UPDATE
+deployment.target
+OLD / SUPERSEDE
+“App runs on environment Aˮ
+NEW / PROPOSED
+“App now runs on environment Bˮ
+Source: user-confirmed  •  Scope: project/team  •  Version: 4  5
+APPROVE
+REJECT</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-22"><div class="number">SLIDE 22 / 35</div><h2>Treat memory as an observable data product</h2><figure><a aria-label="Enlarge slide 22" href="assets/self-editing-memory-agentic-ai/slide-22.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 22: Treat memory as an observable data product" data-fallback="assets/self-editing-memory-agentic-ai/slide-22.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-22.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-22.png" width="1400"/></a><figcaption>Original slide 22 · Click to enlarge</figcaption></figure><details><summary>Read slide 22 text</summary><div class="source-text">OBSERVABILITY
+Treat memory as an observable data product
+Measure what was written, why it was retrieved, and whether it helped.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+22
+EVENT STREAM
+&gt;  memory.proposed
+&gt;  memory.approved
+&gt;  memory.updated
+&gt;  memory.retrieved
+&gt;  memory.expired
+&gt;  memory.reverted
+QUALITY &amp; RISK SIGNALS
+Memory growth
+Records, bytes and token footprint
+Selection quality
+Helpful retrieval / stale retrieval
+Change quality
+Approval, reversal and conflict rate
+Security posture
+Unauthorized reads/writes; poisoning
+Operational impact
+Latency, storage and model cost</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-23"><div class="number">SLIDE 23 / 35</div><h2>Memory quality needs its own test suite</h2><figure><a aria-label="Enlarge slide 23" href="assets/self-editing-memory-agentic-ai/slide-23.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 23: Memory quality needs its own test suite" data-fallback="assets/self-editing-memory-agentic-ai/slide-23.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-23.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-23.png" width="1400"/></a><figcaption>Original slide 23 · Click to enlarge</figcaption></figure><details><summary>Read slide 23 text</summary><div class="source-text">EVALUATION
+Memory quality needs its own test suite
+Test both answering with correct memory and resisting incorrect memory changes.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+23
+RETENTION
+Does a durable fact survive multi-session gaps?
+CORRECTION
+Is an outdated fact superseded correctly?
+RETRIEVAL
+Was the right, authorized memory selected?
+FAITHFULNESS
+Can the answer trace to current evidence?
+SECURITY
+Can untrusted content poison shared memory?
+EFFICIENCY
+Quality vs tokens, latency and storage?
+Suggested evaluation: deterministic cases + adversarial traces + human-reviewed production samples.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-24"><div class="number">SLIDE 24 / 35</div><h2>Context cost vs. memory management overhead</h2><figure><a aria-label="Enlarge slide 24" href="assets/self-editing-memory-agentic-ai/slide-24.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 24: Context cost vs. memory management overhead" data-fallback="assets/self-editing-memory-agentic-ai/slide-24.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-24.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-24.png" width="1400"/></a><figcaption>Original slide 24 · Click to enlarge</figcaption></figure><details><summary>Read slide 24 text</summary><div class="source-text">TRADEOFFS
+Context cost vs. memory management overhead
+Illustrative budget example—replace these inputs with measurements from your workloads.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+24
+HYPOTHETICAL INPUT TOKENS / TASK
+Full transcript
+80k
+RAG only
+35k
+Governed memory
+25k
+Illustrative, not benchmark data: memory adds read/write, indexing, review and evaluation cost.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-25"><div class="number">SLIDE 25 / 35</div><h2>Implementation blueprint</h2><figure><a aria-label="Enlarge slide 25" href="assets/self-editing-memory-agentic-ai/slide-25.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 25: Implementation blueprint" data-fallback="assets/self-editing-memory-agentic-ai/slide-25.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-25.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-25.png" width="1400"/></a><figcaption>Original slide 25 · Click to enlarge</figcaption></figure><details><summary>Read slide 25 text</summary><div class="source-text">CHAPTER 03
+03
+Implementation blueprint
+A practical, vendor-neutral service that can be embedded into the Dataknobs agent 
+harness.
+Schema
+APIs
+Orchestration
+Rollout
+DATAKNOBS  /  GOVERNED AGENT MEMORY</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-26"><div class="number">SLIDE 26 / 35</div><h2>Proposed service and storage components</h2><figure><a aria-label="Enlarge slide 26" href="assets/self-editing-memory-agentic-ai/slide-26.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 26: Proposed service and storage components" data-fallback="assets/self-editing-memory-agentic-ai/slide-26.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-26.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-26.png" width="1400"/></a><figcaption>Original slide 26 · Click to enlarge</figcaption></figure><details><summary>Read slide 26 text</summary><div class="source-text">BUILDABLE DESIGN
+Proposed service and storage components
+Use a central memory service so tool callers cannot bypass policy.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+26
+NEXT.JS / NODE
+Agent UI, identity, review queue
+AGENT ORCHESTRATOR
+LLM + context compiler + tools
+PYTHON / FASTAPI
+Memory API + policy checks
+AUTHORIZE    CLASSIFY    DEDUPLICATE    VERSION    AUDIT
+PostgreSQL / JSONB
+Canonical records + versions
+pgvector / search
+Hybrid retrieval index
+Object store
+Source evidence + snapshots
+Redis / queue
+Caching + async consolidation
+Illustrative stack; cloud-neutral and deployable on GCP, Azure or AWS.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-27"><div class="number">SLIDE 27 / 35</div><h2>Memory tools: small, typed and permissioned</h2><figure><a aria-label="Enlarge slide 27" href="assets/self-editing-memory-agentic-ai/slide-27.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 27: Memory tools: small, typed and permissioned" data-fallback="assets/self-editing-memory-agentic-ai/slide-27.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-27.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-27.png" width="1400"/></a><figcaption>Original slide 27 · Click to enlarge</figcaption></figure><details><summary>Read slide 27 text</summary><div class="source-text">INTERFACES
+Memory tools: small, typed and permissioned
+Expose capabilities to agents—not arbitrary database or filesystem access.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+27
+memory.search
+query + namespace + filters
+Returns evidence-ranked records
+memory.propose
+candidate + source + scope
+Returns proposal_id + policy result
+memory.review
+proposal_id + decision
+Authorized approver only
+memory.commit
+proposal_id + expected_version
+Atomic change + audit event
+memory.history
+memory_id
+Versions, authorship and sources
+memory.expire
+memory_id + reason
+Retention-aware transition
+Enforce rate limits, idempotency keys, tenant scopes and schema validation server-side.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-28"><div class="number">SLIDE 28 / 35</div><h2>A safe read–reason–propose–commit loop</h2><figure><a aria-label="Enlarge slide 28" href="assets/self-editing-memory-agentic-ai/slide-28.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 28: A safe read–reason–propose–commit loop" data-fallback="assets/self-editing-memory-agentic-ai/slide-28.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-28.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-28.png" width="1400"/></a><figcaption>Original slide 28 · Click to enlarge</figcaption></figure><details><summary>Read slide 28 text</summary><div class="source-text">ORCHESTRATION
+A safe read–reason–propose–commit loop
+Pseudocode: model intent is advisory; deterministic checks control persistence.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+28
+PYTHONLIKE PSEUDOCODE
+async def respond(query, actor):
+    context = await compile_context(
+        query, actor=actor, scope=actor.scope)
+    answer, proposals = await agent.run(
+        query=query, context=context)
+    for p in proposals:
+        decision = await policy.evaluate(p, actor)
+        if decision == "AUTO_COMMIT":
+            await store.commit_if_version(p)
+        elif decision == "REVIEW":
+            await review_queue.enqueue(p)
+    return answer
+BOUNDARIES
+Read permissions enforced before 
+retrieval
+Writes validated against current 
+version
+Policy changes cannot be 
+self-authorized</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-29"><div class="number">SLIDE 29 / 35</div><h2>Memory is one layer of the broader agent harness</h2><figure><a aria-label="Enlarge slide 29" href="assets/self-editing-memory-agentic-ai/slide-29.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 29: Memory is one layer of the broader agent harness" data-fallback="assets/self-editing-memory-agentic-ai/slide-29.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-29.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-29.png" width="1400"/></a><figcaption>Original slide 29 · Click to enlarge</figcaption></figure><details><summary>Read slide 29 text</summary><div class="source-text">AGENT HARNESS
+Memory is one layer of the broader agent harness
+Context, tools, evaluation and controls form a feedback system.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+29
+AGENT  LLM
+CONTEXT
+Build right-sized prompt
+TOOLS
+Constrain external actions
+GUARDRAILS
+Block unsafe memory edits
+EVALUATION
+Score retrieval and outcomes
+HUMAN REVIEW
+Approve material changes
+OBSERVABILITY
+Audit use, quality and cost</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-30"><div class="number">SLIDE 30 / 35</div><h2>Governed Agent Memory within the Dataknobs portfolio</h2><figure><a aria-label="Enlarge slide 30" href="assets/self-editing-memory-agentic-ai/slide-30.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 30: Governed Agent Memory within the Dataknobs portfolio" data-fallback="assets/self-editing-memory-agentic-ai/slide-30.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-30.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-30.png" width="1400"/></a><figcaption>Original slide 30 · Click to enlarge</figcaption></figure><details><summary>Read slide 30 text</summary><div class="source-text">DATAKNOBS PRODUCT STORY
+Governed Agent Memory within the Dataknobs portfolio
+A proposed capability across building, experimentation and oversight.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+30
+KREATE
+Build persistent, 
+context-aware agents
+Agent memory tools
+Context compiler
+Reusable agent templates
+KNOBS
+Experiment with memory 
+strategy
+Retrieval A/B tests
+Compression variants
+Task success + cost metrics
+KONTROLS
+Govern the memory lifecycle
+Policy enforcement
+Approvals + rollback
+Audit + poisoning defense
+DESIGN PRINCIPLE: agents may learn; enterprises remain in control.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-31"><div class="number">SLIDE 31 / 35</div><h2>Coding / migration agent: lessons that survive sessions</h2><figure><a aria-label="Enlarge slide 31" href="assets/self-editing-memory-agentic-ai/slide-31.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 31: Coding / migration agent: lessons that survive sessions" data-fallback="assets/self-editing-memory-agentic-ai/slide-31.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-31.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-31.png" width="1400"/></a><figcaption>Original slide 31 · Click to enlarge</figcaption></figure><details><summary>Read slide 31 text</summary><div class="source-text">USE CASE 01
+Coding / migration agent: lessons that survive sessions
+Demonstration scenario—architecture facts and incident lessons are durable, logs are not.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+31
+SESSION 1
+Discover
+Backend uses Python.
+Frontend uses Next.js.
+SESSION 2
+Troubleshoot
+Build fails due to
+missing cloud permission.
+SESSION 3
+Consolidate
+Save root cause, fix
+and verified deployment.
+SESSION 4
+Resume
+Fetch current decisions.
+Avoid repeat investigation.
+Guardrail: write “verified root causeˮ only after evidence or user confirmation; preserve source links.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-32"><div class="number">SLIDE 32 / 35</div><h2>Customer or finance assistant: useful memory, strict</h2><figure><a aria-label="Enlarge slide 32" href="assets/self-editing-memory-agentic-ai/slide-32.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 32: Customer or finance assistant: useful memory, strict" data-fallback="assets/self-editing-memory-agentic-ai/slide-32.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-32.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-32.png" width="1400"/></a><figcaption>Original slide 32 · Click to enlarge</figcaption></figure><details><summary>Read slide 32 text</summary><div class="source-text">USE CASE 02
+Customer or finance assistant: useful memory, strict 
+boundaries
+Memory policy must reflect user consent, confidentiality, freshness and domain risk.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+32
+CAN REMEMBER
+Display preferences, product 
+navigation, approved workflow 
+defaults
+REQUIRES REVIEW
+Long-lived financial 
+preferences, sensitive user 
+profiling, shared team facts
+SHOULD NOT PIN
+Secrets, account numbers, 
+unverified forecasts, ephemeral 
+market prices
+Market and customer facts are retrieved from authorized systems of record; memory is context, not authority.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-33"><div class="number">SLIDE 33 / 35</div><h2>A staged 90-day prototype-to-pilot plan</h2><figure><a aria-label="Enlarge slide 33" href="assets/self-editing-memory-agentic-ai/slide-33.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 33: A staged 90-day prototype-to-pilot plan" data-fallback="assets/self-editing-memory-agentic-ai/slide-33.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-33.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-33.png" width="1400"/></a><figcaption>Original slide 33 · Click to enlarge</figcaption></figure><details><summary>Read slide 33 text</summary><div class="source-text">ROADMAP
+A staged 90-day prototype-to-pilot plan
+Suggested sequence with exit gates—not an implementation commitment.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+33
+DAYS 030
+FOUNDATION
+Schema + versioning
+Policy tiers + auth
+Basic write/read API
+Exit: isolated scopes + tested rollback
+DAYS 3160
+ASSURANCE
+Hybrid retrieval
+Review queue + audit
+Golden evaluation suite
+Exit: measured quality + poisoning tests
+DAYS 6190
+PILOT
+Connect one coding agent
+Shadow-mode comparison
+Cost / quality dashboard
+Exit: approved production readiness</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-34"><div class="number">SLIDE 34 / 35</div><h2>What the architecture team should decide next</h2><figure><a aria-label="Enlarge slide 34" href="assets/self-editing-memory-agentic-ai/slide-34.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 34: What the architecture team should decide next" data-fallback="assets/self-editing-memory-agentic-ai/slide-34.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-34.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-34.png" width="1400"/></a><figcaption>Original slide 34 · Click to enlarge</figcaption></figure><details><summary>Read slide 34 text</summary><div class="source-text">DECISION REGISTER
+What the architecture team should decide next
+Seven choices determine the product, cost and risk profile.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+34
+1
+Who owns memory?
+User, agent, team, organization and system scopes
+2
+What is writable?
+Protected vs governed vs autonomous record classes
+3
+What is authoritative?
+System-of-record precedence and source confidence
+4
+When is approval needed?
+Risk threshold, reviewer roles, emergency rollback
+5
+How do we expire?
+TTL, privacy erasure, backups and audit retention
+6
+How will we evaluate?
+Memory fidelity, security, task quality and cost
+7
+Which pilot first?
+Choose one agent with repeat multi-session work
+Proposed owner: KONTROLS  Agent Platform</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-35"><div class="number">SLIDE 35 / 35</div><h2>Selected sources and further reading</h2><figure><a aria-label="Enlarge slide 35" href="assets/self-editing-memory-agentic-ai/slide-35.jpg" rel="noopener" target="_blank"><img alt="Self-Editing Memory for Agentic AI — slide 35: Selected sources and further reading" data-fallback="assets/self-editing-memory-agentic-ai/slide-35.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-35.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/self-editing-memory-agentic-ai/images/Slide1200/slide-35.png" width="1400"/></a><figcaption>Original slide 35 · Click to enlarge</figcaption></figure><details><summary>Read slide 35 text</summary><div class="source-text">REFERENCES
+Selected sources and further reading
+Foundational research, vendor patterns and enterprise governance references.
+DATAKNOBS  /  GOVERNED AGENT MEMORY
+35
+MemGPT 2023
+Virtual context management and tiered memory.
+Letta memory blocks
+Editable in-context memory and external history.
+LangGraph memory concepts
+Thread state; semantic, episodic and procedural memory.
+Anthropic context engineering 2025
+Compaction, just-in-time retrieval and structured notes.
+Anthropic memory tool
+Model requests storage operations; host executes them.
+OWASP agentic threats
+Memory and context poisoning as a risk surface.
+NIST AI RMF GAI profile
+Risk and provenance principles for enterprise AI.
+All architecture diagrams, API examples and roadmap elements are illustrative Dataknobs proposals.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><section class="faq"><h2>Questions answered</h2><details><summary>What does this guide cover?</summary><p>Treat memory updates as permissioned, versioned transactions. Explore retrieval, supersession, compression, namespaces, poisoning defenses and evaluation with a clear separation between proposed and committed changes.</p></details><details><summary>How should the examples be used?</summary><p>Treat architectures, code, thresholds and product comparisons as supplied presentation material. Validate them against your environment, requirements and evaluation set.</p></details><details><summary>How can I read or enlarge a slide?</summary><p>Open the slide image for the full local version, or expand its text transcript. Transcripts can contain reading-order artifacts; diagrams and code layout are preserved in the image.</p></details></section><section class="intro"><h2>Continue exploring</h2><div class="related"><a href="index.html">All advanced guides</a></div></section></main><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>

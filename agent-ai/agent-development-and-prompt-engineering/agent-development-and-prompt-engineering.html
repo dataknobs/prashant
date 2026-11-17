@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Agent Development &amp; Prompt Engineering Guide</title>
+  <meta content="A practical guide to system prompts, agent instructions, behavioral constraints, personas, prompt versioning, testing, and Prompt-Ops." name="description"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="#0a2147" name="theme-color"/>
+  <meta content="article" property="og:type"/>
+  <meta content="Agent Development &amp; Prompt Engineering Guide" property="og:title"/>
+  <meta content="How to design prompts that shape agent behavior and operate them as versioned, tested production infrastructure." property="og:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-1.png" property="og:image"/>
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Agent Development &amp; Prompt Engineering Guide" name="twitter:title"/>
+  <meta content="A practical Prompt-Ops guide covering prompt craft, constraints, personas, versioning, testing, and continuous improvement." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-1.png" name="twitter:image"/>
+  <style>
+    :root{--navy:#0a2147;--navy2:#102d5d;--teal:#129b91;--teal2:#1bb7ad;--ink:#17243c;--muted:#627085;--line:#dbe3ec;--soft:#eef3f7;--soft2:#f7f9fb;--white:#fff;--amber:#c98528;--rose:#b84e70;--shadow:0 12px 32px rgba(10,33,71,.10);--radius:18px;--max:1180px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--white);line-height:1.68}img{max-width:100%;height:auto;display:block}a{color:var(--teal);text-decoration-thickness:1px;text-underline-offset:3px}.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:16px;z-index:999;background:#fff;padding:10px 14px;border-radius:10px;box-shadow:var(--shadow)}
+    .wrap{width:min(var(--max),calc(100% - 36px));margin-inline:auto}.hero{background:linear-gradient(135deg,var(--navy) 0%,#0f3469 62%,#0f6b71 100%);color:#fff;padding:28px 0 62px;overflow:hidden}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:48px}.brand{font-weight:800;letter-spacing:.04em}.brand span{color:#52d6cc}.topnav{display:flex;gap:20px;flex-wrap:wrap}.topnav a{color:#d7e6f8;text-decoration:none;font-size:.94rem}.topnav a:hover{color:#fff}.hero-grid{display:grid;grid-template-columns:1.03fr .97fr;gap:46px;align-items:center}.eyebrow{display:inline-flex;text-transform:uppercase;letter-spacing:.14em;font-weight:800;font-size:.78rem;color:#6ee1d7;margin-bottom:16px}h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.15;color:var(--navy);margin:0 0 16px}h1{font-size:clamp(2.7rem,6vw,5.2rem);color:#fff;letter-spacing:-.045em}h2{font-size:clamp(2rem,4vw,3.25rem);letter-spacing:-.025em}h3{font-size:1.43rem}.hero p{font-size:1.15rem;color:#dfe9f5;max-width:760px;margin:0 0 28px}.hero-pills{display:flex;gap:10px;flex-wrap:wrap}.pill{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);border-radius:999px;padding:8px 12px;font-size:.86rem;color:#edf7ff}.hero-card{background:rgba(255,255,255,.96);border-radius:22px;padding:14px;box-shadow:0 22px 55px rgba(0,0,0,.23);transform:rotate(1deg)}.hero-card img{border-radius:13px;width:100%;aspect-ratio:4/3;object-fit:cover}
+    .section{padding:78px 0}.section.alt{background:var(--soft2)}.section-head{max-width:900px;margin-bottom:34px}.kicker{text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:var(--teal);font-size:.78rem;margin-bottom:8px}.lead{font-size:1.12rem;color:#4e5c70}.toc{margin-top:-28px;position:relative;z-index:2}.toc-inner{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px 24px;display:flex;flex-wrap:wrap;gap:10px}.toc a{padding:8px 11px;background:var(--soft);border-radius:999px;text-decoration:none;color:var(--navy);font-size:.9rem;font-weight:700}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{border:1px solid var(--line);background:#fff;border-radius:var(--radius);padding:24px;box-shadow:0 6px 18px rgba(10,33,71,.04)}.card.dark{background:var(--navy);color:#fff;border-color:var(--navy)}.card.dark h3{color:#fff}.card p{color:var(--muted);margin-bottom:0}.card.dark p{color:#d9e7f2}.icon{width:44px;height:44px;border-radius:12px;background:var(--navy);display:grid;place-items:center;color:#fff;font-weight:900;margin-bottom:16px}.card.dark .icon{background:var(--teal)}.label{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+    .content-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:38px;align-items:start}.visual{background:#fff;border:1px solid var(--line);padding:12px;border-radius:18px;box-shadow:var(--shadow)}.visual img{width:100%;border-radius:10px;aspect-ratio:4/3;object-fit:cover}.caption{font-size:.82rem;color:var(--muted);margin-top:9px}.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}.box{border:1px solid var(--line);border-radius:16px;padding:22px;background:#fff}.box.dark{background:var(--navy);color:#fff;border-color:var(--navy)}.box.dark h3{color:#fff}.box ul{margin:12px 0 0;padding-left:20px}.rule{border-left:5px solid var(--teal);background:var(--soft);padding:18px 20px;border-radius:0 14px 14px 0;margin-top:20px;font-weight:700;color:var(--navy)}.warning{border-left-color:var(--amber);background:#fff8ec;color:#654719}.danger{border-left-color:var(--rose);background:#fff1f5;color:#68283f}
+    .anatomy{display:grid;grid-template-columns:1fr 1fr;gap:18px}.stack{display:grid;gap:9px}.layer{padding:14px 16px;border-radius:10px;background:var(--navy);color:#fff;font-weight:800;text-align:center}.layer.teal{background:var(--teal)}.matrix{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:16px}.matrix th,.matrix td{text-align:left;padding:15px 16px;border-bottom:1px solid var(--line);vertical-align:top}.matrix th{background:var(--navy);color:#fff}.matrix tr:last-child td{border-bottom:0}.matrix tr:nth-child(even) td{background:#f7fafc}.tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#e7f7f4;color:#0c776e;font-size:.75rem;font-weight:800}.tag.amber{background:#fff1da;color:#8a5e19}.tag.rose{background:#fde9ef;color:#8c3553}
+    .flow{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:22px 0}.step{background:var(--navy);color:#fff;padding:16px 18px;border-radius:12px;font-weight:800}.step.teal{background:var(--teal)}.step.light{background:var(--soft);color:var(--navy);border:1px solid var(--line)}.arrow{font-weight:900;color:var(--teal);font-size:1.3rem}.lifecycle{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.phase{border-radius:14px;padding:20px;border:1px solid var(--line);background:#fff;text-align:center;font-weight:800;color:var(--navy)}.phase:nth-child(even){background:var(--teal);color:#fff;border-color:var(--teal)}
+    .takeaways{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.take{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}.take b{display:block;color:var(--navy);margin-bottom:8px}.take p{margin:0;color:var(--muted)}.faq{display:grid;gap:12px}.faq details{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:#fff}.faq summary{cursor:pointer;font-weight:800;color:var(--navy)}.faq p{color:var(--muted);margin-bottom:0}.small{font-size:.88rem}footer{background:#071a39;color:#b9c8d9;padding:34px 0;margin-top:20px}footer strong{color:#fff}
+    @media (max-width:900px){.hero-grid,.content-grid,.anatomy{grid-template-columns:1fr}.cards,.takeaways{grid-template-columns:1fr 1fr}.lifecycle{grid-template-columns:repeat(3,1fr)}.hero-card{transform:none}.topnav{display:none}}@media (max-width:640px){.section{padding:56px 0}.cards,.compare,.takeaways,.lifecycle{grid-template-columns:1fr}.topbar{margin-bottom:34px}.hero{padding-bottom:46px}.matrix{display:block;overflow-x:auto}.toc-inner{padding:16px}}:focus-visible{outline:3px solid #f0aa45;outline-offset:3px}
+  </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Article","headline":"Agent Development & Prompt Engineering Guide","description":"A practical guide to prompt craft and Prompt-Ops for AI agents, covering system prompts, instructions, constraints, personas, prompt versioning, and testing.","image":"https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-1.png"}
+  </script>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="topbar"><div class="brand">ADLC <span>Practice Area 08</span></div><nav aria-label="Primary" class="topnav"><a href="#craft">Prompt craft</a><a href="#constraints">Constraints</a><a href="#versioning">Versioning</a><a href="#testing">Testing</a><a href="#lifecycle">Lifecycle</a></nav></div>
+    <div class="hero-grid">
+      <div><div class="eyebrow">Agent engineering</div><h1>Agent Development &amp; Prompt Engineering</h1><p>Designing agent behavior is only half the job. The other half is managing prompts like production code: structured, versioned, tested, promoted, monitored, and improved.</p><div class="hero-pills"><span class="pill">System prompt design</span><span class="pill">Agent instructions</span><span class="pill">Behavioral constraints</span><span class="pill">Persona design</span><span class="pill">Prompt versioning</span><span class="pill">Prompt testing</span></div></div>
+      <figure class="hero-card"><img alt="Title slide for Agent Development and Prompt Engineering" fetchpriority="high" height="900" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-1.png" width="1200"/></figure>
+    </div>
+  </div>
+</header>
+<main id="main">
+<section class="toc"><div class="wrap"><nav aria-label="Page sections" class="toc-inner"><a href="#overview">Overview</a><a href="#system-prompt">System prompt</a><a href="#instructions">Instructions</a><a href="#constraints">Constraints</a><a href="#persona">Persona</a><a href="#versioning">Versioning</a><a href="#testing">Testing</a><a href="#lifecycle">Prompt-Ops lifecycle</a></nav></div></section>
+
+<section class="section" id="overview"><div class="wrap"><div class="section-head"><div class="kicker">Overview</div><h2>From prompt craft to Prompt-Ops</h2><p class="lead">The source divides prompt engineering into two disciplines. The first four levers shape the agent's behavior directly; the last two make that behavior reproducible, testable, and safe to change over time.</p></div><div class="cards"><article class="card"><div class="label">1</div><h3>System Prompt Design</h3><p>Set role, context, capabilities, ground rules, output format, and stable top-level framing.</p></article><article class="card"><div class="label">2</div><h3>Agent Instructions</h3><p>Describe the task precisely enough that the model does not need to fill critical gaps with guesses.</p></article><article class="card"><div class="label">3</div><h3>Behavioral Constraints</h3><p>Define the lines the agent must not cross and reinforce them beyond prompt text alone.</p></article><article class="card"><div class="label">4</div><h3>Persona Design</h3><p>Create a consistent voice, role, style, and boundary set without letting character overpower clarity.</p></article><article class="card"><div class="label">5</div><h3>Prompt Versioning</h3><p>Treat every behavior-changing prompt as an immutable, diffable artifact that can be promoted or rolled back.</p></article><article class="card dark"><div class="label">6</div><h3>Prompt Testing</h3><p>Run prompt versions against a dataset, score the outputs, compare to a baseline, and block regressions.</p></article></div><div class="rule">Core principle: treat prompts like code. A small wording change can alter behavior, so changes need version history, review, evaluation, and rollback.</div><figure class="visual" style="margin-top:28px"><img alt="Overview of six prompt engineering and Prompt-Ops levers" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-2.png" width="1200"/><figcaption class="caption">The overview separates prompt craft from operational controls that keep quality from drifting.</figcaption></figure></div></section>
+
+<section class="section alt" id="system-prompt"><div class="wrap"><div class="section-head"><div class="kicker">Craft</div><h2>System prompt design: write the agent's charter</h2><p class="lead">The system prompt is the stable, top-level context that frames every response. The deck treats it as the agent's charter: it should define identity, domain, available capabilities, hard rules, and the expected output shape without becoming a dumping ground for dynamic data.</p></div><div class="content-grid"><div><div class="anatomy"><div class="box"><h3>Anatomy</h3><div class="stack"><div class="layer teal">Role &amp; identity</div><div class="layer">Context &amp; domain</div><div class="layer">Capabilities &amp; tools</div><div class="layer">Rules &amp; guardrails</div><div class="layer">Output format</div><div class="layer">Examples (optional)</div></div></div><div class="box"><h3>Design principles</h3><ul><li>Be specific about role, scope, and what success looks like.</li><li>Keep stable, reusable context here; place dynamic data downstream.</li><li>Structure the prompt with clear sections, headers, or parseable tags.</li><li>State rules positively and unambiguously, then define hard limits.</li><li>Specify output format explicitly when structure matters.</li><li>Keep the prompt lean; extra tokens compete for attention.</li><li>Tune structure to the model instead of assuming one universal format.</li></ul></div></div><div class="rule">Order matters: role and stable context belong near the top so the model knows what frame to use before it interprets task-specific details.</div></div><figure class="visual"><img alt="System prompt anatomy and design principles" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-3.png" width="1200"/><figcaption class="caption">The system-prompt slide prioritizes stable identity and context, then capabilities, rules, output shape, and optional examples.</figcaption></figure></div></div></section>
+
+<section class="section" id="instructions"><div class="wrap"><div class="section-head"><div class="kicker">Craft</div><h2>Agent instructions: remove ambiguity before the model fills it</h2><p class="lead">Instructions define what the agent should do on a specific task. The source emphasizes that ambiguity creates drift because the model has to infer missing requirements.</p></div><div class="compare"><div class="box"><h3>Principles of good instructions</h3><ul><li>Be specific and unambiguous.</li><li>Prefer positive framing: say what to do, not only what to avoid.</li><li>Use examples when they communicate the target faster than prose.</li><li>Specify fields, length, structure, and formatting precisely.</li><li>Break complex work into ordered steps.</li><li>Define the success criteria so “done” is testable.</li></ul></div><div class="box dark"><h3>Vague vs. specific</h3><p><strong>Vague:</strong> “Summarize this document.”</p><p><strong>Specific:</strong> “Summarize in exactly 3 bullets, each under 15 words, focused on financial risks. Output as a markdown list.”</p></div></div><div class="rule">A practical test from the deck: could a new hire follow the instruction and produce the intended result without asking a question? If not, tighten it.</div><figure class="visual" style="margin-top:28px"><img alt="Good agent instruction principles with vague versus specific example" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-4.png" width="1200"/><figcaption class="caption">The source contrasts a vague summarization request with a constrained, measurable instruction.</figcaption></figure></div></section>
+
+<section class="section alt" id="constraints"><div class="wrap"><div class="section-head"><div class="kicker">Craft</div><h2>Behavioral constraints: define boundaries and enforce them in layers</h2><p class="lead">Constraints are the lines the agent must not cross. The deck stresses that prompt-level rules matter, but they are not sufficient for high-risk actions or sensitive data flows.</p></div><div class="compare"><div class="box"><h3>What to constrain</h3><ul><li><strong>Scope:</strong> stay on-task and redirect out-of-scope work.</li><li><strong>Safety:</strong> decline harmful, disallowed, or high-risk actions.</li><li><strong>Data:</strong> do not expose secrets, PII, or system internals.</li><li><strong>Actions:</strong> gate irreversible or costly operations behind approval.</li><li><strong>Tone:</strong> maintain the intended professional register and avoid promises the agent cannot keep.</li><li><strong>Escalation:</strong> hand off when uncertainty or limits are reached.</li></ul></div><div class="box"><h3>Making constraints stick</h3><ul><li>State them explicitly and positively, reserving a small number of hard “nevers.”</li><li>Do not rely on prompt text alone when a bypass would matter.</li><li>Layer prompt rules with input/output validation and guardrail systems.</li><li>Enforce irreversible operations in code, not merely in prose.</li><li>Red-team the agent by actively trying to make it violate its own rules.</li><li>Treat a bypass as a product bug and regression-test it.</li></ul></div></div><figure class="visual" style="margin-top:28px"><img alt="Behavioral constraint categories and enforcement guidance" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-5.png" width="1200"/><figcaption class="caption">The slide distinguishes the policy itself from the enforcement mechanisms required to make it durable.</figcaption></figure></div></section>
+
+<section class="section" id="persona"><div class="wrap"><div class="section-head"><div class="kicker">Craft</div><h2>Persona design: consistency without role-play excess</h2><p class="lead">Persona is the user's experience of the agent's voice and character. The source positions it as useful UX and brand structure, but not as a substitute for real constraints or accurate task execution.</p></div><div class="content-grid"><div><div class="box"><h3>Elements of a persona</h3><ul><li><strong>Name &amp; role:</strong> who the agent is and what it is for.</li><li><strong>Tone &amp; voice:</strong> warm or formal, playful or precise.</li><li><strong>Style:</strong> sentence length, vocabulary, and how examples are used.</li><li><strong>Values &amp; boundaries:</strong> what the agent stands for and what it will not do.</li></ul></div><div class="rule warning">Persona helps when it creates consistency and brand fit. It hurts when “acting the character” reduces clarity or accuracy.</div></div><div class="box dark"><h3>Example persona card</h3><table class="matrix"><tbody><tr><td><strong>Name</strong></td><td>Aria</td></tr><tr><td><strong>Role</strong></td><td>Customer-support guide</td></tr><tr><td><strong>Tone</strong></td><td>Warm, calm, concise</td></tr><tr><td><strong>Style</strong></td><td>Plain language, no jargon</td></tr><tr><td><strong>Never</strong></td><td>Promises refunds or invents policy</td></tr></tbody></table></div></div><figure class="visual" style="margin-top:28px"><img alt="Persona design elements and reusable persona card" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-6.png" width="1200"/><figcaption class="caption">The persona card makes voice, role, style, and non-negotiable boundaries explicit and reusable.</figcaption></figure></div></section>
+
+<section class="section alt" id="versioning"><div class="wrap"><div class="section-head"><div class="kicker">Prompt-Ops</div><h2>Prompt versioning: make behavior reproducible</h2><p class="lead">A prompt is not just text. The deck treats a production prompt version as a behavior-defining artifact whose identity must be stable enough to reproduce, debug, promote, and roll back.</p></div><div aria-label="Prompt promotion flow" class="flow"><div class="step">Author &amp; edit</div><div class="arrow">›</div><div class="step teal">Commit immutable version</div><div class="arrow">›</div><div class="step light">Staging eval gate</div><div class="arrow">›</div><div class="step teal">Production</div></div><div class="compare"><div class="box"><h3>A version captures more than text</h3><ul><li>Prompt text.</li><li>Model and parameters.</li><li>Tools and associated metadata.</li><li>An immutable ID for reproducibility.</li><li>A clear diff showing exactly what changed.</li></ul></div><div class="box"><h3>Why versioning matters</h3><ul><li>Audit trail: who changed what, when, and why.</li><li>Safe promotion through environments with eval gates.</li><li>Fast rollback when a change regresses behavior.</li><li>Shared iteration without copy-paste drift between product and engineering.</li></ul></div></div><div class="rule">The source names LangSmith, Langfuse, PromptLayer, Braintrust, Promptfoo, and Maxim AI as examples of tools that support this workflow; the underlying principle is more important than any single product.</div><figure class="visual" style="margin-top:28px"><img alt="Prompt versioning lifecycle from authoring through production" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-7.png" width="1200"/><figcaption class="caption">The versioning slide shows prompts promoted through environments just like code, with immutable versions and evaluation gates.</figcaption></figure></div></section>
+
+<section class="section" id="testing"><div class="wrap"><div class="section-head"><div class="kicker">Prompt-Ops</div><h2>Prompt testing: unit tests for behavior</h2><p class="lead">Because outputs are non-deterministic, the source argues that prompt quality cannot be judged by eyeballing one response. Testing means evaluating each version against a representative dataset and a defined baseline.</p></div><div class="flow"><div class="step">Dataset cases</div><div class="arrow">›</div><div class="step teal">Run variants</div><div class="arrow">›</div><div class="step">Score outputs</div><div class="arrow">›</div><div class="step teal">Compare to baseline</div><div class="arrow">›</div><div class="step">Ship or iterate</div></div><div class="compare"><div class="box"><h3>What makes a good eval</h3><ul><li>A dataset mixing common requests, edge cases, and adversarial inputs.</li><li>Deterministic checks for objective structure plus quality scorers where judgment is required.</li><li>A baseline score a new version must beat to ship.</li><li>Regression coverage so one fix does not quietly break another behavior.</li></ul></div><div class="box"><h3>Close the loop</h3><ul><li>Score a sample of real production traffic using the same logic.</li><li>Turn low-scoring production cases into new eval cases.</li><li>Grow coverage over time so known failures do not return.</li><li>Prefer grounded scoring criteria over subjective “looks good” review.</li></ul></div></div><div class="rule">The deck recommends running the suite on every prompt change and suggests roughly 20 diverse cases as a minimum viable starting point.</div><figure class="visual" style="margin-top:28px"><img alt="Prompt testing flow from dataset through baseline comparison" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-8.png" width="1200"/><figcaption class="caption">Prompt testing operationalizes behavioral quality by turning cases, scorers, baselines, and regression checks into a release gate.</figcaption></figure></div></section>
+
+<section class="section alt" id="lifecycle"><div class="wrap"><div class="section-head"><div class="kicker">Putting it together</div><h2>The Prompt-Ops lifecycle</h2><p class="lead">The final slide closes the loop: prompt quality starts with craft, but operational discipline is what keeps that quality from silently degrading as prompts, models, tools, and data change.</p></div><div class="lifecycle"><div class="phase">Author</div><div class="phase">Test</div><div class="phase">Version</div><div class="phase">Deploy</div><div class="phase">Monitor</div><div class="phase">Improve</div></div><div class="compare" style="margin-top:26px"><div class="box"><h3>Craft sets the ceiling</h3><p>A clear system prompt, precise task instructions, firm constraints, and a consistent persona determine how good the agent can be.</p></div><div class="box dark"><h3>Ops keeps it there</h3><p>Versioning, evaluation, monitoring, and rollback prevent quiet regression as the rest of the system evolves.</p></div></div><div class="rule">Every production signal should feed the next round of authoring. Prompt engineering is not a one-time writing exercise; it is an operating loop.</div><figure class="visual" style="margin-top:28px"><img alt="Prompt-Ops lifecycle from authoring through improvement" height="900" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1200/agent-development-and-prompt-engineering-9.png" width="1200"/><figcaption class="caption">The lifecycle connects craft, testing, version control, deployment, monitoring, and continuous improvement.</figcaption></figure></div></section>
+
+<section class="section"><div class="wrap"><div class="section-head"><div class="kicker">Implementation checklist</div><h2>What a production prompt practice should be able to prove</h2><p class="lead">Taken together, the slides imply a concrete operating standard for prompt-driven agents.</p></div><div class="takeaways"><div class="take"><b>Stable system charter</b><p>Role, domain, capabilities, limits, and output expectations are explicit and kept separate from dynamic task data.</p></div><div class="take"><b>Task-level precision</b><p>Instructions define success, sequence, format, and examples tightly enough to limit guesswork.</p></div><div class="take"><b>Layered constraints</b><p>Prompt rules are reinforced by validation, approvals, and code-level enforcement where failure would matter.</p></div><div class="take"><b>Reusable persona spec</b><p>Voice and style are intentional, consistent, and subordinate to accuracy and policy boundaries.</p></div><div class="take"><b>Immutable prompt versions</b><p>Each production behavior can be tied to a specific prompt, model, parameters, tools, and metadata snapshot.</p></div><div class="take"><b>Behavioral eval gate</b><p>Every material change runs against representative cases and must clear the baseline before promotion.</p></div></div></div></section>
+
+<section class="section alt"><div class="wrap"><div class="section-head"><div class="kicker">FAQ</div><h2>Common questions about prompt engineering and Prompt-Ops</h2></div><div class="faq"><details><summary>What belongs in the system prompt?</summary><p>Stable, reusable framing: role, domain context, available capabilities, rules, output expectations, and optional examples. Dynamic task data should usually be supplied downstream.</p></details><details><summary>How is an instruction different from a system prompt?</summary><p>The system prompt defines the agent's durable charter. Instructions define what to do for a particular task and should make success criteria and output structure concrete.</p></details><details><summary>Are prompt constraints enough for safety?</summary><p>No. The source explicitly recommends layered defenses and code-level enforcement for irreversible or costly actions because prompt text can be bypassed.</p></details><details><summary>Why version prompts separately?</summary><p>A wording change can alter behavior without any code change. Separate immutable versions make diffs, promotion, debugging, audit, and rollback possible.</p></details><details><summary>How should prompt changes be tested?</summary><p>Run each version against a diverse evaluation dataset, score outputs, compare to a baseline, and add production failures back into the suite so coverage improves over time.</p></details></div></div></section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+
+</body></html>

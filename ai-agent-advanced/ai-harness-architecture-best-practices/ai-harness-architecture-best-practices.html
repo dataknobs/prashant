@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>AI Harness Architecture and Best Practices | Prashant Dhingra</title><meta content="The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap." name="description"/><meta content="index,follow,max-image-preview:large" name="robots"/><link href="https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices" rel="canonical"/><meta content="article" property="og:type"/><meta content="AI Harness Architecture and Best Practices" property="og:title"/><meta content="The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap." property="og:description"/><meta content="https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices" property="og:url"/><meta content="summary" name="twitter:card"/><meta content="AI Harness Architecture and Best Practices" name="twitter:title"/><meta content="The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap." name="twitter:description"/><style>*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:80px}body{margin:0;background:#f7f5ef;color:#142532;font:17px/1.7 system-ui,sans-serif}a{color:#08649b}a:hover{text-decoration:none}a:focus-visible,summary:focus-visible{outline:3px solid #087baa;outline-offset:4px}.wrap{max-width:1180px;margin:auto;padding:0 24px}header{background:#142532;color:white;padding:18px 0}header a{color:white;text-decoration:none}.brand{font-weight:750}nav{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}.hero{padding:76px 0 56px;background:#142532;color:#fff}.eyebrow{color:#7ed8eb;text-transform:uppercase;letter-spacing:.16em;font-size:13px;font-weight:750}h1{font:700 clamp(40px,6vw,76px)/1.08 Georgia,serif;max-width:950px;margin:18px 0 24px}h2{font:700 34px/1.2 Georgia,serif}h3{font-size:23px;line-height:1.3}.lead{font-size:21px;max-width:800px;color:#d9e2e6}.chips{display:flex;gap:12px;flex-wrap:wrap}.chips span{border:1px solid #52616a;border-radius:30px;padding:5px 14px;font-size:14px}.button{display:inline-block;background:#087baa;color:white;padding:11px 20px;border-radius:7px;text-decoration:none;margin-top:24px}main{padding:34px 0}.intro,.faq{background:white;padding:28px;border:1px solid #dddcd5;border-radius:12px;margin:28px 0}.note{padding:16px 20px;border-left:4px solid #087baa;background:#e8f2f7;font-size:15px}.thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.thumbs a{display:block;background:white;border:1px solid #ddd;border-radius:8px;overflow:hidden;text-decoration:none;color:#142532}.thumbs span{display:block;padding:8px 12px;font-size:13px;line-height:1.4}.thumbs img{width:100%;height:auto;display:block}.slide{margin:42px 0 60px;scroll-margin-top:20px}.number{color:#08649b;font-size:13px;font-weight:800;letter-spacing:.1em}.slide p{max-width:960px}.slide figure{margin:22px 0 0;background:white;border:1px solid #d7d9d6;border-radius:10px;overflow:hidden}.slide img{display:block;width:100%;height:auto}figcaption{padding:10px 18px;font-size:13px;color:#59636a}.back{font-size:13px}.section-title{margin-top:60px;border-top:2px solid #087baa;padding-top:25px}details{border-bottom:1px solid #ddd;padding:17px 0}summary{font-weight:700;cursor:pointer}footer{background:#142532;color:#c4ced4;padding:30px 0;font-size:14px}footer a{color:white}@media(max-width:760px){.thumbs{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:45px 0}.wrap{padding:0 18px}.intro,.faq{padding:20px}h2{font-size:28px}}@media print{header,.thumbs,.back,.button{display:none}.hero{background:white;color:black;padding:10px 0}.lead{color:black}.slide{break-inside:avoid}.slide img{max-height:65vh;object-fit:contain}}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card{background:#fff;border:1px solid #d8dfe2;border-radius:12px;overflow:hidden}.card img{width:100%;height:auto;display:block}.copy{padding:20px}.copy h2{font-size:24px}.copy p{font-size:15px}.card[hidden]{display:none}.controls{display:flex;gap:14px;flex-wrap:wrap;background:white;padding:22px;margin:24px 0;border-radius:12px}.controls label{display:block;flex:1;min-width:210px}.controls input,.controls select{display:block;width:100%;font:inherit;padding:10px;border:1px solid #627783;border-radius:5px}.source-text{white-space:pre-wrap;font:14px/1.6 system-ui;overflow-wrap:anywhere;max-height:600px;overflow:auto;padding:16px;background:#edf2f4}.related{display:flex;gap:12px;flex-wrap:wrap}.related a{padding:8px 12px;background:#edf3f7;border-radius:5px}.subtle{font-size:14px;color:#596a75}.slide img{object-fit:contain}.skip{position:absolute;left:-9999px}.skip:focus{left:10px;top:10px;background:white;padding:10px;z-index:10}@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style><script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "AI Harness Architecture and Best Practices", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices", "description": "The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap.", "author": {"@type": "Person", "name": "Prashant Dhingra"}, "hasPart": [{"@type": "CreativeWork", "name": "AI Harness Architecture and Best Practices", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-1", "position": 1}, {"@type": "CreativeWork", "name": "Executive thesis", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-2", "position": 2}, {"@type": "CreativeWork", "name": "What is an AI harness?", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-3", "position": 3}, {"@type": "CreativeWork", "name": "The boundary: model vs. harness", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-4", "position": 4}, {"@type": "CreativeWork", "name": "Reference architecture: five layers", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-5", "position": 5}, {"@type": "CreativeWork", "name": "Runtime execution loop", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-6", "position": 6}, {"@type": "CreativeWork", "name": "Context engineering is harness engineering", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-7", "position": 7}, {"@type": "CreativeWork", "name": "Context pipeline: select, shape, verify", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-8", "position": 8}, {"@type": "CreativeWork", "name": "Memory is not the context window", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-9", "position": 9}, {"@type": "CreativeWork", "name": "Tools: the agent\u2019s hands", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-10", "position": 10}, {"@type": "CreativeWork", "name": "Policy and guardrails: where they run", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-11", "position": 11}, {"@type": "CreativeWork", "name": "Human-in-the-loop: approval, not decoration", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-12", "position": 12}, {"@type": "CreativeWork", "name": "Evaluate the whole run\u2014not just final text", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-13", "position": 13}, {"@type": "CreativeWork", "name": "Evaluation as a release gate", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-14", "position": 14}, {"@type": "CreativeWork", "name": "Tracing is the harness black box recorder", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-15", "position": 15}, {"@type": "CreativeWork", "name": "Cost optimization belongs in the harness", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-16", "position": 16}, {"@type": "CreativeWork", "name": "Failure modes and resilience patterns", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-17", "position": 17}, {"@type": "CreativeWork", "name": "Multi-agent harness: coordinated autonomy", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-18", "position": 18}, {"@type": "CreativeWork", "name": "Harness versus related components", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-19", "position": 19}, {"@type": "CreativeWork", "name": "Implementation blueprint: service map", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-20", "position": 20}, {"@type": "CreativeWork", "name": "End-to-end example: banking complaint agent", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-21", "position": 21}, {"@type": "CreativeWork", "name": "Concrete episode: policy prevents a risky action", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-22", "position": 22}, {"@type": "CreativeWork", "name": "Testing matrix before production", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-23", "position": 23}, {"@type": "CreativeWork", "name": "Adoption roadmap: 0 to 90 days", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-24", "position": 24}, {"@type": "CreativeWork", "name": "Operating metrics: what good looks like", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-25", "position": 25}, {"@type": "CreativeWork", "name": "Design principles to remember", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-26", "position": 26}, {"@type": "CreativeWork", "name": "Further reading & reference standards", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices#slide-27", "position": 27}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What does this guide cover?", "acceptedAnswer": {"@type": "Answer", "text": "The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap."}}, {"@type": "Question", "name": "How should the examples be used?", "acceptedAnswer": {"@type": "Answer", "text": "Treat architectures, code, thresholds and product comparisons as supplied presentation material. Validate them against your environment, requirements and evaluation set."}}, {"@type": "Question", "name": "How can I read or enlarge a slide?", "acceptedAnswer": {"@type": "Answer", "text": "Open the slide image for the full local version, or expand its text transcript. Transcripts can contain reading-order artifacts; diagrams and code layout are preserved in the image."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Advanced collection", "item": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-advanced-index"}, {"@type": "ListItem", "position": 2, "name": "AI Harness Architecture and Best Practices", "item": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-harness-architecture-best-practices"}]}]}</script><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head><body><a class="skip" href="#main">Skip to content</a><header><nav class="wrap"><a class="brand" href="index.html">Advanced Agent Engineering</a><a href="https://prashant.dhingra.website/">Prashant Dhingra</a></nav></header><script>document.addEventListener('error',e=>{const im=e.target;if(im.tagName==='IMG'&&im.dataset.fallback){const next=im.dataset.fallback;delete im.dataset.fallback;im.src=next}},true);</script><section class="hero"><div class="wrap"><div class="eyebrow">Architecture · 27 slides</div><h1>AI Harness Architecture and Best Practices</h1><p class="lead">The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap.</p><a class="button" href="#slides">Explore the presentation</a></div></section><main class="wrap" id="main"><section class="intro"><h2>About this guide</h2><p>The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap.</p><p class="subtle">Original slides and source text are preserved. Product claims, regulatory references, code and numerical examples are not independently verified or tested here.</p></section><section id="slides"><h2>Slide navigator</h2><div class="thumbs"><a href="#slide-1"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-1-thumb.jpg" width="320"/><span>01 · AI Harness Architecture and Best Practices</span></a><a href="#slide-2"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-2-thumb.jpg" width="320"/><span>02 · Executive thesis</span></a><a href="#slide-3"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-3-thumb.jpg" width="320"/><span>03 · What is an AI harness?</span></a><a href="#slide-4"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-4-thumb.jpg" width="320"/><span>04 · The boundary: model vs. harness</span></a><a href="#slide-5"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-5-thumb.jpg" width="320"/><span>05 · Reference architecture: five layers</span></a><a href="#slide-6"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-6-thumb.jpg" width="320"/><span>06 · Runtime execution loop</span></a><a href="#slide-7"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-7-thumb.jpg" width="320"/><span>07 · Context engineering is harness engineering</span></a><a href="#slide-8"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-8-thumb.jpg" width="320"/><span>08 · Context pipeline: select, shape, verify</span></a><a href="#slide-9"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-9-thumb.jpg" width="320"/><span>09 · Memory is not the context window</span></a><a href="#slide-10"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-10-thumb.jpg" width="320"/><span>10 · Tools: the agent’s hands</span></a><a href="#slide-11"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-11-thumb.jpg" width="320"/><span>11 · Policy and guardrails: where they run</span></a><a href="#slide-12"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-12-thumb.jpg" width="320"/><span>12 · Human-in-the-loop: approval, not decoration</span></a><a href="#slide-13"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-13-thumb.jpg" width="320"/><span>13 · Evaluate the whole run—not just final text</span></a><a href="#slide-14"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-14-thumb.jpg" width="320"/><span>14 · Evaluation as a release gate</span></a><a href="#slide-15"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-15-thumb.jpg" width="320"/><span>15 · Tracing is the harness black box recorder</span></a><a href="#slide-16"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-16-thumb.jpg" width="320"/><span>16 · Cost optimization belongs in the harness</span></a><a href="#slide-17"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-17-thumb.jpg" width="320"/><span>17 · Failure modes and resilience patterns</span></a><a href="#slide-18"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-18-thumb.jpg" width="320"/><span>18 · Multi-agent harness: coordinated autonomy</span></a><a href="#slide-19"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-19-thumb.jpg" width="320"/><span>19 · Harness versus related components</span></a><a href="#slide-20"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-20-thumb.jpg" width="320"/><span>20 · Implementation blueprint: service map</span></a><a href="#slide-21"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-21-thumb.jpg" width="320"/><span>21 · End-to-end example: banking complaint agent</span></a><a href="#slide-22"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-22-thumb.jpg" width="320"/><span>22 · Concrete episode: policy prevents a risky action</span></a><a href="#slide-23"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-23-thumb.jpg" width="320"/><span>23 · Testing matrix before production</span></a><a href="#slide-24"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-24-thumb.jpg" width="320"/><span>24 · Adoption roadmap: 0 to 90 days</span></a><a href="#slide-25"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-25-thumb.jpg" width="320"/><span>25 · Operating metrics: what good looks like</span></a><a href="#slide-26"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-26-thumb.jpg" width="320"/><span>26 · Design principles to remember</span></a><a href="#slide-27"><img alt="" height="180" loading="lazy" src="assets/ai-harness-architecture-best-practices/slide-27-thumb.jpg" width="320"/><span>27 · Further reading &amp; reference standards</span></a></div></section><article class="slide" id="slide-1"><div class="number">SLIDE 1 / 27</div><h2>AI Harness Architecture and Best Practices</h2><figure><a aria-label="Enlarge slide 1" href="assets/ai-harness-architecture-best-practices/slide-1.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 1: AI Harness Architecture and Best Practices" data-fallback="assets/ai-harness-architecture-best-practices/slide-1.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-1.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-1.png" width="1400"/></a><figcaption>Original slide 1 · Click to enlarge</figcaption></figure><details><summary>Read slide 1 text</summary><div class="source-text">A R C H I T E C T U R E  •  P R A C T I C E S  •  C O N T R O L  P L A N E S
+AI Harness
+The execution system around an intelligent model
+AI HARNESS  •  ENTERPRISE REFERENCE
+01
+MODEL  +  HARNESS  +  ENVIRONMENT
+Reasoning is a capability. Reliable action is a system property.
+Context  •  Tools  •  Policies  •  State  •  Evaluation  •  Observability</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-2"><div class="number">SLIDE 2 / 27</div><h2>Executive thesis</h2><figure><a aria-label="Enlarge slide 2" href="assets/ai-harness-architecture-best-practices/slide-2.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 2: Executive thesis" data-fallback="assets/ai-harness-architecture-best-practices/slide-2.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-2.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-2.png" width="1400"/></a><figcaption>Original slide 2 · Click to enlarge</figcaption></figure><details><summary>Read slide 2 text</summary><div class="source-text">0 1  /  T H E  I D E A
+Executive thesis
+A harness turns individual model calls into governed, resumable workflows.
+AI HARNESS  •  ENTERPRISE REFERENCE
+02
+Model
+Interprets instructions, reasons about 
+information, and proposes responses or 
+actions.
+Harness
+Constructs context, runs the loop, mediates 
+tools, records state, and enforces decisions.
+Environment
+Real data, systems, APIs, files, sandboxes 
+and people where actions have 
+consequences.
+Harness quality can matter as much as model quality for end-to-end reliability.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-3"><div class="number">SLIDE 3 / 27</div><h2>What is an AI harness?</h2><figure><a aria-label="Enlarge slide 3" href="assets/ai-harness-architecture-best-practices/slide-3.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 3: What is an AI harness?" data-fallback="assets/ai-harness-architecture-best-practices/slide-3.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-3.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-3.png" width="1400"/></a><figcaption>Original slide 3 · Click to enlarge</figcaption></figure><details><summary>Read slide 3 text</summary><div class="source-text">0 2  /  D E F I N I T I O N
+What is an AI harness?
+The runtime substrate that mediates model ↔ world interaction.
+AI HARNESS  •  ENTERPRISE REFERENCE
+03
+Observe
+Select inputs, retrieve evidence, read 
+memory, normalize tool outputs.
+Decide
+Assemble model context, choose model, 
+manage response schemas and agent 
+steps.
+Act
+Authorize and execute tools; pause for 
+human review; isolate risky operations.
+Recover
+Persist checkpoints, retry safely, resume 
+paused work and handle failures.
+Measure
+Capture traces, quality outcomes, cost, 
+latency, and feedback.
+Improve
+Use evaluation findings to adjust prompts, 
+tools, policy, model routing and context.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-4"><div class="number">SLIDE 4 / 27</div><h2>The boundary: model vs. harness</h2><figure><a aria-label="Enlarge slide 4" href="assets/ai-harness-architecture-best-practices/slide-4.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 4: The boundary: model vs. harness" data-fallback="assets/ai-harness-architecture-best-practices/slide-4.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-4.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-4.png" width="1400"/></a><figcaption>Original slide 4 · Click to enlarge</figcaption></figure><details><summary>Read slide 4 text</summary><div class="source-text">0 3  /  R E S P O N S I B I L I T Y  S P L I T
+The boundary: model vs. harness
+AI HARNESS  •  ENTERPRISE REFERENCE
+04
+Model decides (proposes)
+Which facts are useful, how to reason, what 
+next step may help, what tool to request.
+Harness decides (enforces)
+Which model, exact context, tool 
+permission, spending limits, approval, 
+retries and state.
+Systems decide (commit)
+Database constraints, business validation, 
+transaction integrity, identity and audit.
+Never rely on a model-generated “permission granted” statement as authorization.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-5"><div class="number">SLIDE 5 / 27</div><h2>Reference architecture: five layers</h2><figure><a aria-label="Enlarge slide 5" href="assets/ai-harness-architecture-best-practices/slide-5.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 5: Reference architecture: five layers" data-fallback="assets/ai-harness-architecture-best-practices/slide-5.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-5.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-5.png" width="1400"/></a><figcaption>Original slide 5 · Click to enlarge</figcaption></figure><details><summary>Read slide 5 text</summary><div class="source-text">0 4  /  B I G  P I C T U R E
+Reference architecture: five layers
+Separation of concerns keeps the runtime measurable and governable.
+AI HARNESS  •  ENTERPRISE REFERENCE
+05
+CHANNELS &amp; BUSINESS APPS
+Web · API · Chat · Batch · Event triggers
+HARNESS / ORCHESTRATION
+Run state · Agent loop · Planning · Context builder · Model router
+CONTROL SERVICES
+Tool gateway · Policy engine · HITL · Budget · Identity
+EXECUTION &amp; DATA
+MCP/tools · APIs · RAG · DB · Sandbox · External services
+ASSURANCE PLANE
+Traces · Evals · Audit · Alerts · Experimentation</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-6"><div class="number">SLIDE 6 / 27</div><h2>Runtime execution loop</h2><figure><a aria-label="Enlarge slide 6" href="assets/ai-harness-architecture-best-practices/slide-6.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 6: Runtime execution loop" data-fallback="assets/ai-harness-architecture-best-practices/slide-6.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-6.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-6.png" width="1400"/></a><figcaption>Original slide 6 · Click to enlarge</figcaption></figure><details><summary>Read slide 6 text</summary><div class="source-text">0 5  /  S E Q U E N C E
+Runtime execution loop
+Every iteration is a controlled step, not an unrestricted chain of actions.
+AI HARNESS  •  ENTERPRISE REFERENCE
+06
+01
+Receive goal
+02
+Load state &amp; 
+context
+03
+Model 
+proposes next 
+step
+04
+Validate policy 
+&amp; risk
+05
+Execute tool / 
+review
+06
+Observe result
+07
+Continue or 
+finish
+Guard limits every iteration: max steps, max elapsed time, max spend and permitted actions.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-7"><div class="number">SLIDE 7 / 27</div><h2>Context engineering is harness engineering</h2><figure><a aria-label="Enlarge slide 7" href="assets/ai-harness-architecture-best-practices/slide-7.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 7: Context engineering is harness engineering" data-fallback="assets/ai-harness-architecture-best-practices/slide-7.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-7.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-7.png" width="1400"/></a><figcaption>Original slide 7 · Click to enlarge</figcaption></figure><details><summary>Read slide 7 text</summary><div class="source-text">0 6  /  C O N T E X T
+Context engineering is harness engineering
+The context window is a scarce working set—not a data warehouse.
+AI HARNESS  •  ENTERPRISE REFERENCE
+07
+System + policy
+Trusted instructions, role, goals, output 
+contract, constraints.
+Retrieved knowledge
+Authorized passages with provenance, 
+freshness and relevance.
+Tool observations
+Structured responses, filtered or 
+summarized before reinsertion.
+Session state
+Recent turns, unresolved tasks, checkpoints 
+and next actions.
+Long-term memory
+Approved persistent facts or skills retrieved 
+just in time.
+Budget allocator
+Select what enters context by importance, 
+risk and token budget.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-8"><div class="number">SLIDE 8 / 27</div><h2>Context pipeline: select, shape, verify</h2><figure><a aria-label="Enlarge slide 8" href="assets/ai-harness-architecture-best-practices/slide-8.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 8: Context pipeline: select, shape, verify" data-fallback="assets/ai-harness-architecture-best-practices/slide-8.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-8.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-8.png" width="1400"/></a><figcaption>Original slide 8 · Click to enlarge</figcaption></figure><details><summary>Read slide 8 text</summary><div class="source-text">0 7  /  C O N T E X T  B U I L D
+Context pipeline: select, shape, verify
+AI HARNESS  •  ENTERPRISE REFERENCE
+08
+1  Collect
+User intent + current state
+2  Retrieve
+Search, memory, registry
+3  Filter
+ACL, PII, source trust
+4  Rank
+Recency + relevance
+5  Compact
+Keep decisions and evidence
+6  Assemble
+Typed prompt / token budget
+Record which context sources were used so failures can be attributed and replayed.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-9"><div class="number">SLIDE 9 / 27</div><h2>Memory is not the context window</h2><figure><a aria-label="Enlarge slide 9" href="assets/ai-harness-architecture-best-practices/slide-9.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 9: Memory is not the context window" data-fallback="assets/ai-harness-architecture-best-practices/slide-9.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-9.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-9.png" width="1400"/></a><figcaption>Original slide 9 · Click to enlarge</figcaption></figure><details><summary>Read slide 9 text</summary><div class="source-text">0 8  /  S TAT E  &amp;  M E M O RY
+Memory is not the context window
+AI HARNESS  •  ENTERPRISE REFERENCE
+09
+Ephemeral context
+Working tokens currently shown to the 
+model; disposable and budgeted.
+Run state
+Durable task status, intermediate results, 
+checkpoint IDs and pending approvals.
+Persistent memory
+Cross-run facts and preferences with 
+ownership, retention and deletion rules.
+Do not silently write unverified model claims to persistent memory.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-10"><div class="number">SLIDE 10 / 27</div><h2>Tools: the agent’s hands</h2><figure><a aria-label="Enlarge slide 10" href="assets/ai-harness-architecture-best-practices/slide-10.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 10: Tools: the agent’s hands" data-fallback="assets/ai-harness-architecture-best-practices/slide-10.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-10.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-10.png" width="1400"/></a><figcaption>Original slide 10 · Click to enlarge</figcaption></figure><details><summary>Read slide 10 text</summary><div class="source-text">0 9  /  T O O L  I N T E G R AT I O N
+Tools: the agent’s hands
+AI HARNESS  •  ENTERPRISE REFERENCE
+10
+Tool discovery
+Expose only necessary tools and concise 
+schemas; progressively reveal capability.
+Tool contracts
+Typed parameters, strict validation, stable 
+errors, bounded output size.
+Tool gateway
+Check identity, permissions, tenant, quotas, 
+target resources and destination.
+Execution semantics
+Timeouts, idempotency keys, retries, dry 
+runs, compensation actions.
+Trust boundaries
+Treat tool outputs as untrusted data; defend 
+against injected instructions.
+Audit trail
+Log decision, input/output metadata, 
+effective policy and transaction ID.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-11"><div class="number">SLIDE 11 / 27</div><h2>Policy and guardrails: where they run</h2><figure><a aria-label="Enlarge slide 11" href="assets/ai-harness-architecture-best-practices/slide-11.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 11: Policy and guardrails: where they run" data-fallback="assets/ai-harness-architecture-best-practices/slide-11.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-11.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-11.png" width="1400"/></a><figcaption>Original slide 11 · Click to enlarge</figcaption></figure><details><summary>Read slide 11 text</summary><div class="source-text">1 0  /  S A F E T Y
+Policy and guardrails: where they run
+AI HARNESS  •  ENTERPRISE REFERENCE
+11
+Before model
+AuthN/AuthZ · input handling · data classification
+Before tool
+Permission check · parameter constraints · spending limits
+During execution
+Sandbox · network egress · timeouts · rate limits
+After tool
+Result sanitization · schema checks · sensitive data filters
+Before response
+Grounding · disclosure · structured output · final policy check</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-12"><div class="number">SLIDE 12 / 27</div><h2>Human-in-the-loop: approval, not decoration</h2><figure><a aria-label="Enlarge slide 12" href="assets/ai-harness-architecture-best-practices/slide-12.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 12: Human-in-the-loop: approval, not decoration" data-fallback="assets/ai-harness-architecture-best-practices/slide-12.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-12.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-12.png" width="1400"/></a><figcaption>Original slide 12 · Click to enlarge</figcaption></figure><details><summary>Read slide 12 text</summary><div class="source-text">11  /  H I T L
+Human-in-the-loop: approval, not decoration
+AI HARNESS  •  ENTERPRISE REFERENCE
+12
+ALLOW
+Read-only, bounded, low-risk work 
+proceeds automatically.
+REVIEW
+Payments, external communication, 
+sensitive changes or uncertainty pause for 
+approval.
+DENY / ESCALATE
+Forbidden or high-impact requests are 
+blocked or routed to owners.
+Approve a specific action payload, not a vague agent intention. Bind approval to the exact parameters.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-13"><div class="number">SLIDE 13 / 27</div><h2>Evaluate the whole run—not just final text</h2><figure><a aria-label="Enlarge slide 13" href="assets/ai-harness-architecture-best-practices/slide-13.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 13: Evaluate the whole run—not just final text" data-fallback="assets/ai-harness-architecture-best-practices/slide-13.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-13.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-13.png" width="1400"/></a><figcaption>Original slide 13 · Click to enlarge</figcaption></figure><details><summary>Read slide 13 text</summary><div class="source-text">1 2  /  E VA L U AT I O N
+Evaluate the whole run—not just final text
+AI HARNESS  •  ENTERPRISE REFERENCE
+13
+Outcome
+Task completion, business correctness, 
+user usefulness.
+Trajectory
+Tool selection, ordering, unnecessary loops, 
+handoff quality.
+Safety
+Unauthorized action attempts, data leakage, 
+policy violations.
+Grounding
+Evidence quality, source faithfulness, 
+retrieval misses.
+Reliability
+Timeouts, recovery rate, determinism of tool 
+contracts.
+Efficiency
+Cost per successful task, latency, token and 
+tool budgets.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-14"><div class="number">SLIDE 14 / 27</div><h2>Evaluation as a release gate</h2><figure><a aria-label="Enlarge slide 14" href="assets/ai-harness-architecture-best-practices/slide-14.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 14: Evaluation as a release gate" data-fallback="assets/ai-harness-architecture-best-practices/slide-14.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-14.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-14.png" width="1400"/></a><figcaption>Original slide 14 · Click to enlarge</figcaption></figure><details><summary>Read slide 14 text</summary><div class="source-text">1 3  /  C O N T I N U O U S  Q U A L I T Y
+Evaluation as a release gate
+Offline evaluation + canary monitoring + human feedback form one loop.
+AI HARNESS  •  ENTERPRISE REFERENCE
+14
+Curate test episodes
+Happy path, edge cases, attacks
+Run candidate harness
+Same dataset; fixed policies
+Score + adjudicate
+Deterministic checks + reviewers
+Compare to baseline
+Quality, safety, cost, latency
+Release gradually
+Shadow → canary → expanded
+Feed production failures
+Redacted traces → new evals</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-15"><div class="number">SLIDE 15 / 27</div><h2>Tracing is the harness black box recorder</h2><figure><a aria-label="Enlarge slide 15" href="assets/ai-harness-architecture-best-practices/slide-15.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 15: Tracing is the harness black box recorder" data-fallback="assets/ai-harness-architecture-best-practices/slide-15.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-15.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-15.png" width="1400"/></a><figcaption>Original slide 15 · Click to enlarge</figcaption></figure><details><summary>Read slide 15 text</summary><div class="source-text">1 4  /  O B S E R VA B I L I T Y
+Tracing is the harness black box recorder
+AI HARNESS  •  ENTERPRISE REFERENCE
+15
+Trace hierarchy
+Run → model call → tool call → policy → 
+human approval.
+Essential metadata
+Run ID, model and prompt versions, tool 
+version, elapsed time and costs.
+Quality feedback
+Outcome, grader result, user correction and 
+resolution.
+Privacy controls
+Redaction, retention, access control and 
+consent-dependent sampling.
+Diagnostics
+Loop detection, failed tool transitions, 
+blocked actions, context overflow.
+Operational SLOs
+Task success, p95 latency, review backlog, 
+cost per success.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-16"><div class="number">SLIDE 16 / 27</div><h2>Cost optimization belongs in the harness</h2><figure><a aria-label="Enlarge slide 16" href="assets/ai-harness-architecture-best-practices/slide-16.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 16: Cost optimization belongs in the harness" data-fallback="assets/ai-harness-architecture-best-practices/slide-16.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-16.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-16.png" width="1400"/></a><figcaption>Original slide 16 · Click to enlarge</figcaption></figure><details><summary>Read slide 16 text</summary><div class="source-text">1 5  /  U N I T  E C O N O M I C S
+Cost optimization belongs in the harness
+AI HARNESS  •  ENTERPRISE REFERENCE
+16
+Cache smartly
+Keep stable prompt prefixes; reuse 
+permitted retrieval and computation.
+Reduce context
+Tool-output filtering, just-in-time retrieval, 
+structured compaction.
+Route models
+Choose model and reasoning effort based 
+on task difficulty and risk.
+Limit loops
+Max turns, max tool calls, timeout and 
+graceful fallback.
+Batch appropriately
+Process non-urgent evaluation and 
+background jobs asynchronously.
+Optimize the outcome
+Track $ / successful task, not just $ / million 
+tokens.
+Optimize against a fixed eval set; cheaper but less reliable can cost more overall.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-17"><div class="number">SLIDE 17 / 27</div><h2>Failure modes and resilience patterns</h2><figure><a aria-label="Enlarge slide 17" href="assets/ai-harness-architecture-best-practices/slide-17.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 17: Failure modes and resilience patterns" data-fallback="assets/ai-harness-architecture-best-practices/slide-17.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-17.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-17.png" width="1400"/></a><figcaption>Original slide 17 · Click to enlarge</figcaption></figure><details><summary>Read slide 17 text</summary><div class="source-text">1 6  /  R E L I A B I L I T Y
+Failure modes and resilience patterns
+AI HARNESS  •  ENTERPRISE REFERENCE
+17
+Tool failure
+Retry with jitter for safe operations; circuit 
+break persistent faults.
+Duplicate side effects
+Idempotency keys, outbox patterns and 
+reconciliation.
+Run interruption
+Checkpoint state; resume from last verified 
+stage.
+Infinite agent loops
+Step ceilings, progress checks, dead-end 
+detectors.
+Untrusted content
+Segregate content from instructions; 
+constrain tool outputs.
+Partial success
+Compensating actions; escalate irreversible 
+operations.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-18"><div class="number">SLIDE 18 / 27</div><h2>Multi-agent harness: coordinated autonomy</h2><figure><a aria-label="Enlarge slide 18" href="assets/ai-harness-architecture-best-practices/slide-18.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 18: Multi-agent harness: coordinated autonomy" data-fallback="assets/ai-harness-architecture-best-practices/slide-18.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-18.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-18.png" width="1400"/></a><figcaption>Original slide 18 · Click to enlarge</figcaption></figure><details><summary>Read slide 18 text</summary><div class="source-text">1 7  /  O R C H E S T R AT I O N
+Multi-agent harness: coordinated autonomy
+AI HARNESS  •  ENTERPRISE REFERENCE
+18
+Supervisor
+Owns task routing, shared state and 
+completion criteria.
+Specialists
+Narrow roles and scoped tool privileges.
+Handoff contract
+Typed inputs/outputs, evidence, provenance 
+and ownership.
+Shared policy
+A central tool gateway applies consistent 
+rules across agents.
+Trace correlation
+One top-level run ID across subagents and 
+handoffs.
+Termination
+Explicit success, failure and escalation 
+conditions.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-19"><div class="number">SLIDE 19 / 27</div><h2>Harness versus related components</h2><figure><a aria-label="Enlarge slide 19" href="assets/ai-harness-architecture-best-practices/slide-19.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 19: Harness versus related components" data-fallback="assets/ai-harness-architecture-best-practices/slide-19.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-19.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-19.png" width="1400"/></a><figcaption>Original slide 19 · Click to enlarge</figcaption></figure><details><summary>Read slide 19 text</summary><div class="source-text">1 8  /  T E R M I N O L O G Y
+Harness versus related components
+AI HARNESS  •  ENTERPRISE REFERENCE
+19
+LLM
+The reasoning engine; one model may 
+serve many agents.
+Agent
+Role, objectives, instructions and available 
+capabilities.
+Harness
+The execution loop and supporting runtime 
+controls.
+Workflow engine
+Deterministic process and business-state 
+orchestration.
+MCP / tool server
+Standard interface or service exposing 
+external capabilities.
+Eval platform
+Offline/online testing, scoring and 
+improvement evidence.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-20"><div class="number">SLIDE 20 / 27</div><h2>Implementation blueprint: service map</h2><figure><a aria-label="Enlarge slide 20" href="assets/ai-harness-architecture-best-practices/slide-20.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 20: Implementation blueprint: service map" data-fallback="assets/ai-harness-architecture-best-practices/slide-20.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-20.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-20.png" width="1400"/></a><figcaption>Original slide 20 · Click to enlarge</figcaption></figure><details><summary>Read slide 20 text</summary><div class="source-text">1 9  /  E N G I N E E R I N G
+Implementation blueprint: service map
+AI HARNESS  •  ENTERPRISE REFERENCE
+20
+Harness API
+Request intake, run lifecycle, authentication, 
+quotas.
+Context service
+Retrieval, state, memory, token budgeting, 
+provenance.
+Agent runner
+Models, scheduling, handoffs, stopping and 
+checkpoints.
+Tool gateway
+Allowlist, scoped credentials, sandbox, 
+validation and audit.
+Approval service
+Queue, signed decisions, approver identity 
+and expiry.
+Assurance stack
+Tracing, evaluation registry, dashboards 
+and alerts.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-21"><div class="number">SLIDE 21 / 27</div><h2>End-to-end example: banking complaint agent</h2><figure><a aria-label="Enlarge slide 21" href="assets/ai-harness-architecture-best-practices/slide-21.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 21: End-to-end example: banking complaint agent" data-fallback="assets/ai-harness-architecture-best-practices/slide-21.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-21.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-21.png" width="1400"/></a><figcaption>Original slide 21 · Click to enlarge</figcaption></figure><details><summary>Read slide 21 text</summary><div class="source-text">2 0  /  U S E  C A S E
+End-to-end example: banking complaint agent
+AI HARNESS  •  ENTERPRISE REFERENCE
+21
+1  Intake
+Classify complaint, redact sensitive data
+2  Investigate
+Read CRM, policies and transaction history through scoped tools
+3  Propose
+Draft categorization, evidence and resolution recommendation
+4  Evaluate
+Check source grounding, risk and business-policy conformance
+5  Approve
+Route customer-impacting adjustments or communications to a reviewer
+6  Execute
+Commit approved actions via idempotent tools and capture receipt</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-22"><div class="number">SLIDE 22 / 27</div><h2>Concrete episode: policy prevents a risky action</h2><figure><a aria-label="Enlarge slide 22" href="assets/ai-harness-architecture-best-practices/slide-22.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 22: Concrete episode: policy prevents a risky action" data-fallback="assets/ai-harness-architecture-best-practices/slide-22.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-22.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-22.png" width="1400"/></a><figcaption>Original slide 22 · Click to enlarge</figcaption></figure><details><summary>Read slide 22 text</summary><div class="source-text">2 1  /  C O N T R O L  WA L K T H R O U G H
+Concrete episode: policy prevents a risky action
+AI HARNESS  •  ENTERPRISE REFERENCE
+22
+Model request
+“Issue a $500 goodwill credit to account X.”
+Harness check
+Account scope valid? Threshold requires 
+approval? Case evidence present?
+Outcome
+Pause with exact action, evidence 
+snapshot, approver and expiry.
+Human decision
+Approver signs off $200 instead; action 
+must be resubmitted with new payload.
+Execution
+Gateway sends idempotent API request 
+only after payload-bound approval.
+Assurance
+Audit logs model proposal, changes, 
+approvals, response and final outcome.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-23"><div class="number">SLIDE 23 / 27</div><h2>Testing matrix before production</h2><figure><a aria-label="Enlarge slide 23" href="assets/ai-harness-architecture-best-practices/slide-23.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 23: Testing matrix before production" data-fallback="assets/ai-harness-architecture-best-practices/slide-23.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-23.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-23.png" width="1400"/></a><figcaption>Original slide 23 · Click to enlarge</figcaption></figure><details><summary>Read slide 23 text</summary><div class="source-text">2 2  /  VA L I D AT I O N
+Testing matrix before production
+AI HARNESS  •  ENTERPRISE REFERENCE
+23
+Functional
+Tool schema, outputs, task completion, 
+timeout cases.
+Safety
+Prompt injection, cross-tenant access, 
+exfiltration and abuse.
+Stateful
+Resume, restart, duplicate delivery and 
+partial commits.
+Human review
+Approval mismatch, expired token, 
+escalation and rejection.
+Performance
+Concurrency, context growth, tool fan-out 
+and costs.
+Change control
+Model/prompt/tool policy version regression 
+and rollback.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-24"><div class="number">SLIDE 24 / 27</div><h2>Adoption roadmap: 0 to 90 days</h2><figure><a aria-label="Enlarge slide 24" href="assets/ai-harness-architecture-best-practices/slide-24.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 24: Adoption roadmap: 0 to 90 days" data-fallback="assets/ai-harness-architecture-best-practices/slide-24.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-24.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-24.png" width="1400"/></a><figcaption>Original slide 24 · Click to enlarge</figcaption></figure><details><summary>Read slide 24 text</summary><div class="source-text">2 3  /  D E L I V E RY
+Adoption roadmap: 0 to 90 days
+AI HARNESS  •  ENTERPRISE REFERENCE
+24
+Days 0–30 · Baseline
+Pick one agent, record traces, define risks 
+and a 50–100 case evaluation set.
+Days 31–60 · Control
+Add context service, tool gateway, approval 
+checkpoints and test automation.
+Days 61–90 · Scale
+Canary rollout, cost-per-success 
+dashboard, incident response and policy 
+ownership.
+Suggested sequence, not a guarantee: verify readiness against risk and regulatory requirements.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-25"><div class="number">SLIDE 25 / 27</div><h2>Operating metrics: what good looks like</h2><figure><a aria-label="Enlarge slide 25" href="assets/ai-harness-architecture-best-practices/slide-25.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 25: Operating metrics: what good looks like" data-fallback="assets/ai-harness-architecture-best-practices/slide-25.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-25.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-25.png" width="1400"/></a><figcaption>Original slide 25 · Click to enlarge</figcaption></figure><details><summary>Read slide 25 text</summary><div class="source-text">2 4  /  S C O R E C A R D
+Operating metrics: what good looks like
+AI HARNESS  •  ENTERPRISE REFERENCE
+25
+Outcome
+Task success %, containment %, correction 
+rate.
+Safety
+Unauthorized actions committed: zero 
+target; blocked attempts tracked.
+Reliability
+Retry / resume success; incident rate; 
+incomplete run age.
+Human burden
+Review volume, review time, overturn rate.
+Cost
+Cost per successful task, tokens/task, tool 
+cost and cache hit.
+Delivery
+Eval coverage, regression escape, time to 
+diagnose.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-26"><div class="number">SLIDE 26 / 27</div><h2>Design principles to remember</h2><figure><a aria-label="Enlarge slide 26" href="assets/ai-harness-architecture-best-practices/slide-26.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 26: Design principles to remember" data-fallback="assets/ai-harness-architecture-best-practices/slide-26.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-26.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-26.png" width="1400"/></a><figcaption>Original slide 26 · Click to enlarge</figcaption></figure><details><summary>Read slide 26 text</summary><div class="source-text">2 5  /  TA K E AWAY S
+Design principles to remember
+AI HARNESS  •  ENTERPRISE REFERENCE
+26
+Treat model output as 
+proposals
+Policy and business systems are the 
+authority for actions.
+Design context deliberately
+Retrieve and compact; do not dump 
+everything into the prompt.
+Gate every side effect
+Authorize the specific payload before 
+execution.
+Measure successful outcomes
+Quality and safety matter alongside cost 
+and speed.
+Keep runs reconstructable
+Persist state, traces, versions and decision 
+evidence.
+Improve the complete system
+Model + harness + environment must be 
+evaluated together.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-27"><div class="number">SLIDE 27 / 27</div><h2>Further reading &amp; reference standards</h2><figure><a aria-label="Enlarge slide 27" href="assets/ai-harness-architecture-best-practices/slide-27.jpg" rel="noopener" target="_blank"><img alt="AI Harness Architecture and Best Practices — slide 27: Further reading &amp; reference standards" data-fallback="assets/ai-harness-architecture-best-practices/slide-27.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-27.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-harness-architecture-best-practices/images/Slide1200/slide-27.png" width="1400"/></a><figcaption>Original slide 27 · Click to enlarge</figcaption></figure><details><summary>Read slide 27 text</summary><div class="source-text">2 6  /  R E F E R E N C E S
+Further reading &amp; reference standards
+AI HARNESS  •  ENTERPRISE REFERENCE
+27
+OpenAI Agents SDK
+developers.openai.com/api/docs/guides/agents/sdk
+OpenAI Sandbox Agents
+developers.openai.com/api/docs/guides/agents/sandboxes
+OpenAI Tracing
+developers.openai.com/api/docs/guides/agents/integrations-observability
+Anthropic Context Engineering
+anthropic.com/research/effective-context-engineering-for-ai-agents
+User-supplied optimization note
+token-cost-optimization.pdf · contextual recommendations</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><section class="faq"><h2>Questions answered</h2><details><summary>What does this guide cover?</summary><p>The harness manages context, state, tools, policy, evaluations and recovery around a model. Explore the runtime architecture, operational controls, test matrix and delivery roadmap.</p></details><details><summary>How should the examples be used?</summary><p>Treat architectures, code, thresholds and product comparisons as supplied presentation material. Validate them against your environment, requirements and evaluation set.</p></details><details><summary>How can I read or enlarge a slide?</summary><p>Open the slide image for the full local version, or expand its text transcript. Transcripts can contain reading-order artifacts; diagrams and code layout are preserved in the image.</p></details></section><section class="intro"><h2>Continue exploring</h2><div class="related"><a href="index.html">All advanced guides</a><a href="agent-control-data-execution-planes.html">Agent Control, Data and Execution Planes</a><a href="agentic-ai-detailed-architecture-best-practices.html">Agentic AI Assurance Architecture</a><a href="ai-agent-design-patterns-detailed.html">AI Agent Design Patterns</a><a href="jev-decision-native-ai.html">Jev and the Decision-Native AI Shift</a></div></section></main><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>

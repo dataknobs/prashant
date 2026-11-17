@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>AI Agent Design Patterns | Prashant Dhingra</title><meta content="Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes." name="description"/><meta content="index,follow,max-image-preview:large" name="robots"/><link href="https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed" rel="canonical"/><meta content="article" property="og:type"/><meta content="AI Agent Design Patterns" property="og:title"/><meta content="Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes." property="og:description"/><meta content="https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed" property="og:url"/><meta content="summary" name="twitter:card"/><meta content="AI Agent Design Patterns" name="twitter:title"/><meta content="Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes." name="twitter:description"/><style>*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:80px}body{margin:0;background:#f7f5ef;color:#142532;font:17px/1.7 system-ui,sans-serif}a{color:#08649b}a:hover{text-decoration:none}a:focus-visible,summary:focus-visible{outline:3px solid #087baa;outline-offset:4px}.wrap{max-width:1180px;margin:auto;padding:0 24px}header{background:#142532;color:white;padding:18px 0}header a{color:white;text-decoration:none}.brand{font-weight:750}nav{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}.hero{padding:76px 0 56px;background:#142532;color:#fff}.eyebrow{color:#7ed8eb;text-transform:uppercase;letter-spacing:.16em;font-size:13px;font-weight:750}h1{font:700 clamp(40px,6vw,76px)/1.08 Georgia,serif;max-width:950px;margin:18px 0 24px}h2{font:700 34px/1.2 Georgia,serif}h3{font-size:23px;line-height:1.3}.lead{font-size:21px;max-width:800px;color:#d9e2e6}.chips{display:flex;gap:12px;flex-wrap:wrap}.chips span{border:1px solid #52616a;border-radius:30px;padding:5px 14px;font-size:14px}.button{display:inline-block;background:#087baa;color:white;padding:11px 20px;border-radius:7px;text-decoration:none;margin-top:24px}main{padding:34px 0}.intro,.faq{background:white;padding:28px;border:1px solid #dddcd5;border-radius:12px;margin:28px 0}.note{padding:16px 20px;border-left:4px solid #087baa;background:#e8f2f7;font-size:15px}.thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.thumbs a{display:block;background:white;border:1px solid #ddd;border-radius:8px;overflow:hidden;text-decoration:none;color:#142532}.thumbs span{display:block;padding:8px 12px;font-size:13px;line-height:1.4}.thumbs img{width:100%;height:auto;display:block}.slide{margin:42px 0 60px;scroll-margin-top:20px}.number{color:#08649b;font-size:13px;font-weight:800;letter-spacing:.1em}.slide p{max-width:960px}.slide figure{margin:22px 0 0;background:white;border:1px solid #d7d9d6;border-radius:10px;overflow:hidden}.slide img{display:block;width:100%;height:auto}figcaption{padding:10px 18px;font-size:13px;color:#59636a}.back{font-size:13px}.section-title{margin-top:60px;border-top:2px solid #087baa;padding-top:25px}details{border-bottom:1px solid #ddd;padding:17px 0}summary{font-weight:700;cursor:pointer}footer{background:#142532;color:#c4ced4;padding:30px 0;font-size:14px}footer a{color:white}@media(max-width:760px){.thumbs{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:45px 0}.wrap{padding:0 18px}.intro,.faq{padding:20px}h2{font-size:28px}}@media print{header,.thumbs,.back,.button{display:none}.hero{background:white;color:black;padding:10px 0}.lead{color:black}.slide{break-inside:avoid}.slide img{max-height:65vh;object-fit:contain}}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card{background:#fff;border:1px solid #d8dfe2;border-radius:12px;overflow:hidden}.card img{width:100%;height:auto;display:block}.copy{padding:20px}.copy h2{font-size:24px}.copy p{font-size:15px}.card[hidden]{display:none}.controls{display:flex;gap:14px;flex-wrap:wrap;background:white;padding:22px;margin:24px 0;border-radius:12px}.controls label{display:block;flex:1;min-width:210px}.controls input,.controls select{display:block;width:100%;font:inherit;padding:10px;border:1px solid #627783;border-radius:5px}.source-text{white-space:pre-wrap;font:14px/1.6 system-ui;overflow-wrap:anywhere;max-height:600px;overflow:auto;padding:16px;background:#edf2f4}.related{display:flex;gap:12px;flex-wrap:wrap}.related a{padding:8px 12px;background:#edf3f7;border-radius:5px}.subtle{font-size:14px;color:#596a75}.slide img{object-fit:contain}.skip{position:absolute;left:-9999px}.skip:focus{left:10px;top:10px;background:white;padding:10px;z-index:10}@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style><script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "AI Agent Design Patterns", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed", "description": "Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes.", "author": {"@type": "Person", "name": "Prashant Dhingra"}, "hasPart": [{"@type": "CreativeWork", "name": "AI Agent Design Patterns", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-1", "position": 1}, {"@type": "CreativeWork", "name": "Executive framework", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-2", "position": 2}, {"@type": "CreativeWork", "name": "Decision map: choosing the smallest useful pattern", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-3", "position": 3}, {"@type": "CreativeWork", "name": "Pattern 01 \u00b7 Prompt chaining", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-4", "position": 4}, {"@type": "CreativeWork", "name": "Pattern 02 \u00b7 Routing", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-5", "position": 5}, {"@type": "CreativeWork", "name": "Pattern 03 \u00b7 Parallel fan-out / fan-in", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-6", "position": 6}, {"@type": "CreativeWork", "name": "Pattern 04 \u00b7 Map\u2013reduce over documents", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-7", "position": 7}, {"@type": "CreativeWork", "name": "Pattern 05 \u00b7 ReAct / tool-use loop", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-8", "position": 8}, {"@type": "CreativeWork", "name": "Pattern 06 \u00b7 Plan \u2192 execute \u2192 replan", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-9", "position": 9}, {"@type": "CreativeWork", "name": "Pattern 07 \u00b7 Evaluator \u2192 optimizer", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-10", "position": 10}, {"@type": "CreativeWork", "name": "Pattern 08 \u00b7 Reflection and self-correction", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-11", "position": 11}, {"@type": "CreativeWork", "name": "Pattern 09 \u00b7 Supervisor / orchestrator\u2013workers", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-12", "position": 12}, {"@type": "CreativeWork", "name": "Pattern 10 \u00b7 Specialists as tools", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-13", "position": 13}, {"@type": "CreativeWork", "name": "Pattern 11 \u00b7 Handoffs", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-14", "position": 14}, {"@type": "CreativeWork", "name": "Pattern 12 \u00b7 Debate / ensemble / voting", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-15", "position": 15}, {"@type": "CreativeWork", "name": "Pattern 13 \u00b7 Human approval checkpoint", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-16", "position": 16}, {"@type": "CreativeWork", "name": "Pattern 14 \u00b7 Event-driven durable agents", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-17", "position": 17}, {"@type": "CreativeWork", "name": "Cross-pattern architecture: the enterprise agent harness", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-18", "position": 18}, {"@type": "CreativeWork", "name": "Context engineering and memory patterns", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-19", "position": 19}, {"@type": "CreativeWork", "name": "Tool integration: read vs write vs privileged", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-20", "position": 20}, {"@type": "CreativeWork", "name": "Pattern-specific failure modes", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-21", "position": 21}, {"@type": "CreativeWork", "name": "Evaluate trajectories\u2014not only final responses", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-22", "position": 22}, {"@type": "CreativeWork", "name": "Pattern economics: latency, cost and complexity", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-23", "position": 23}, {"@type": "CreativeWork", "name": "Enterprise example: complaint-resolution agent", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-24", "position": 24}, {"@type": "CreativeWork", "name": "Enterprise example: coding and website migration agent", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-25", "position": 25}, {"@type": "CreativeWork", "name": "Implementation blueprint: contracts and state", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-26", "position": 26}, {"@type": "CreativeWork", "name": "Deployment blueprint: controlled autonomy ladder", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-27", "position": 27}, {"@type": "CreativeWork", "name": "Measure whether complexity is earning its place.", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-28", "position": 28}, {"@type": "CreativeWork", "name": "Best-practice checklist and takeaways", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-29", "position": 29}, {"@type": "CreativeWork", "name": "References and further reading", "url": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed#slide-30", "position": 30}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What does this guide cover?", "acceptedAnswer": {"@type": "Answer", "text": "Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes."}}, {"@type": "Question", "name": "How should the examples be used?", "acceptedAnswer": {"@type": "Answer", "text": "Treat architectures, code, thresholds and product comparisons as supplied presentation material. Validate them against your environment, requirements and evaluation set."}}, {"@type": "Question", "name": "How can I read or enlarge a slide?", "acceptedAnswer": {"@type": "Answer", "text": "Open the slide image for the full local version, or expand its text transcript. Transcripts can contain reading-order artifacts; diagrams and code layout are preserved in the image."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Advanced collection", "item": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-advanced-index"}, {"@type": "ListItem", "position": 2, "name": "AI Agent Design Patterns", "item": "https://prashant.dhingra.website/ai/agentic-ai-advance-topic/ai-agent-design-patterns-detailed"}]}]}</script><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-6VP7SGRYD9"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-6VP7SGRYD9');
+</script></head><body><a class="skip" href="#main">Skip to content</a><header><nav class="wrap"><a class="brand" href="index.html">Advanced Agent Engineering</a><a href="https://prashant.dhingra.website/">Prashant Dhingra</a></nav></header><script>document.addEventListener('error',e=>{const im=e.target;if(im.tagName==='IMG'&&im.dataset.fallback){const next=im.dataset.fallback;delete im.dataset.fallback;im.src=next}},true);</script><section class="hero"><div class="wrap"><div class="eyebrow">Architecture · 30 slides</div><h1>AI Agent Design Patterns</h1><p class="lead">Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes.</p><a class="button" href="#slides">Explore the presentation</a></div></section><main class="wrap" id="main"><section class="intro"><h2>About this guide</h2><p>Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes.</p><p class="subtle">Original slides and source text are preserved. Product claims, regulatory references, code and numerical examples are not independently verified or tested here.</p></section><section id="slides"><h2>Slide navigator</h2><div class="thumbs"><a href="#slide-1"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-1-thumb.jpg" width="320"/><span>01 · AI Agent Design Patterns</span></a><a href="#slide-2"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-2-thumb.jpg" width="320"/><span>02 · Executive framework</span></a><a href="#slide-3"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-3-thumb.jpg" width="320"/><span>03 · Decision map: choosing the smallest useful pattern</span></a><a href="#slide-4"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-4-thumb.jpg" width="320"/><span>04 · Pattern 01 · Prompt chaining</span></a><a href="#slide-5"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-5-thumb.jpg" width="320"/><span>05 · Pattern 02 · Routing</span></a><a href="#slide-6"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-6-thumb.jpg" width="320"/><span>06 · Pattern 03 · Parallel fan-out / fan-in</span></a><a href="#slide-7"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-7-thumb.jpg" width="320"/><span>07 · Pattern 04 · Map–reduce over documents</span></a><a href="#slide-8"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-8-thumb.jpg" width="320"/><span>08 · Pattern 05 · ReAct / tool-use loop</span></a><a href="#slide-9"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-9-thumb.jpg" width="320"/><span>09 · Pattern 06 · Plan → execute → replan</span></a><a href="#slide-10"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-10-thumb.jpg" width="320"/><span>10 · Pattern 07 · Evaluator → optimizer</span></a><a href="#slide-11"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-11-thumb.jpg" width="320"/><span>11 · Pattern 08 · Reflection and self-correction</span></a><a href="#slide-12"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-12-thumb.jpg" width="320"/><span>12 · Pattern 09 · Supervisor / orchestrator–workers</span></a><a href="#slide-13"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-13-thumb.jpg" width="320"/><span>13 · Pattern 10 · Specialists as tools</span></a><a href="#slide-14"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-14-thumb.jpg" width="320"/><span>14 · Pattern 11 · Handoffs</span></a><a href="#slide-15"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-15-thumb.jpg" width="320"/><span>15 · Pattern 12 · Debate / ensemble / voting</span></a><a href="#slide-16"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-16-thumb.jpg" width="320"/><span>16 · Pattern 13 · Human approval checkpoint</span></a><a href="#slide-17"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-17-thumb.jpg" width="320"/><span>17 · Pattern 14 · Event-driven durable agents</span></a><a href="#slide-18"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-18-thumb.jpg" width="320"/><span>18 · Cross-pattern architecture: the enterprise agent harness</span></a><a href="#slide-19"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-19-thumb.jpg" width="320"/><span>19 · Context engineering and memory patterns</span></a><a href="#slide-20"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-20-thumb.jpg" width="320"/><span>20 · Tool integration: read vs write vs privileged</span></a><a href="#slide-21"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-21-thumb.jpg" width="320"/><span>21 · Pattern-specific failure modes</span></a><a href="#slide-22"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-22-thumb.jpg" width="320"/><span>22 · Evaluate trajectories—not only final responses</span></a><a href="#slide-23"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-23-thumb.jpg" width="320"/><span>23 · Pattern economics: latency, cost and complexity</span></a><a href="#slide-24"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-24-thumb.jpg" width="320"/><span>24 · Enterprise example: complaint-resolution agent</span></a><a href="#slide-25"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-25-thumb.jpg" width="320"/><span>25 · Enterprise example: coding and website migration agent</span></a><a href="#slide-26"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-26-thumb.jpg" width="320"/><span>26 · Implementation blueprint: contracts and state</span></a><a href="#slide-27"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-27-thumb.jpg" width="320"/><span>27 · Deployment blueprint: controlled autonomy ladder</span></a><a href="#slide-28"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-28-thumb.jpg" width="320"/><span>28 · Measure whether complexity is earning its place.</span></a><a href="#slide-29"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-29-thumb.jpg" width="320"/><span>29 · Best-practice checklist and takeaways</span></a><a href="#slide-30"><img alt="" height="180" loading="lazy" src="assets/ai-agent-design-patterns-detailed/slide-30-thumb.jpg" width="320"/><span>30 · References and further reading</span></a></div></section><article class="slide" id="slide-1"><div class="number">SLIDE 1 / 30</div><h2>AI Agent Design Patterns</h2><figure><a aria-label="Enlarge slide 1" href="assets/ai-agent-design-patterns-detailed/slide-1.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 1: AI Agent Design Patterns" data-fallback="assets/ai-agent-design-patterns-detailed/slide-1.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-1.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-1.png" width="1400"/></a><figcaption>Original slide 1 · Click to enlarge</figcaption></figure><details><summary>Read slide 1 text</summary><div class="source-text">AI AGENT
+DESIGN PATTERNS
+Architectures, execution flows, governance and production best practices
+From simple workflows to resilient multi-agent systems</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-2"><div class="number">SLIDE 2 / 30</div><h2>Executive framework</h2><figure><a aria-label="Enlarge slide 2" href="assets/ai-agent-design-patterns-detailed/slide-2.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 2: Executive framework" data-fallback="assets/ai-agent-design-patterns-detailed/slide-2.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-2.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-2.png" width="1400"/></a><figcaption>Original slide 2 · Click to enlarge</figcaption></figure><details><summary>Read slide 2 text</summary><div class="source-text">Executive framework
+A pattern is a control-flow choice—not a framework or model brand.
+AI AGENT DESIGN PATTERNS
+02
+1. Workflow patterns
+Sequence, routing, parallel fan-out, 
+map-reduce and evaluator loops. The workflow 
+often defines the next step.
+2. Agentic patterns
+ReAct tool loops, plan–execute, reflection and 
+dynamically delegated worker tasks.
+3. Multi-agent patterns
+Supervisor, specialists-as-tools, handoff, 
+debate and collaborative arrangements.
+Rule: start with the simplest architecture that passes quality, latency, risk and cost targets.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-3"><div class="number">SLIDE 3 / 30</div><h2>Decision map: choosing the smallest useful pattern</h2><figure><a aria-label="Enlarge slide 3" href="assets/ai-agent-design-patterns-detailed/slide-3.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 3: Decision map: choosing the smallest useful pattern" data-fallback="assets/ai-agent-design-patterns-detailed/slide-3.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-3.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-3.png" width="1400"/></a><figcaption>Original slide 3 · Click to enlarge</figcaption></figure><details><summary>Read slide 3 text</summary><div class="source-text">Decision map: choosing the smallest useful pattern
+Let task structure, independence, uncertainty and risk drive the architecture.
+AI AGENT DESIGN PATTERNS
+03
+Predictable steps
+Prompt chain / state machine
+Distinct request types
+Router + specialists
+Independent subtasks
+Parallel fan-out + aggregator
+Unknown dynamic subtasks
+Orchestrator–workers
+Tools and changing evidence
+Bounded ReAct loop
+Measurably improvable output
+Evaluator–optimizer
+Consequential write actions
+Human approval + transactional tools</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-4"><div class="number">SLIDE 4 / 30</div><h2>Pattern 01 · Prompt chaining</h2><figure><a aria-label="Enlarge slide 4" href="assets/ai-agent-design-patterns-detailed/slide-4.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 4: Pattern 01 · Prompt chaining" data-fallback="assets/ai-agent-design-patterns-detailed/slide-4.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-4.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-4.png" width="1400"/></a><figcaption>Original slide 4 · Click to enlarge</figcaption></figure><details><summary>Read slide 4 text</summary><div class="source-text">Pattern 01 · Prompt chaining
+Decompose a known sequence into checked stages.
+AI AGENT DESIGN PATTERNS
+04
+Extract
+Validate
+Draft
+Review
+Publish
+When to use
+When outputs depend on a fixed sequence, such as document 
+processing or complaint summarization.
+Main trade-off
+More sequential latency; intermediate errors can propagate.
+Control / failure protection
+Typed stage contracts; validation gates; stop on failed checks.
+Evaluate
+Stage pass rate, end-to-end quality, latency, cost/task.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-5"><div class="number">SLIDE 5 / 30</div><h2>Pattern 02 · Routing</h2><figure><a aria-label="Enlarge slide 5" href="assets/ai-agent-design-patterns-detailed/slide-5.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 5: Pattern 02 · Routing" data-fallback="assets/ai-agent-design-patterns-detailed/slide-5.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-5.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-5.png" width="1400"/></a><figcaption>Original slide 5 · Click to enlarge</figcaption></figure><details><summary>Read slide 5 text</summary><div class="source-text">Pattern 02 · Routing
+Classify intent and choose a specialist or execution path.
+AI AGENT DESIGN PATTERNS
+05
+Input
+Classifier
+Specialist
+Result
+When to use
+Distinct request families, tool access levels, or model tiers.
+Main trade-off
+Misrouting can silently degrade the entire task.
+Control / failure protection
+Confidence threshold; safe default; route-specific permissions.
+Evaluate
+Routing accuracy, fallback frequency, task success.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-6"><div class="number">SLIDE 6 / 30</div><h2>Pattern 03 · Parallel fan-out / fan-in</h2><figure><a aria-label="Enlarge slide 6" href="assets/ai-agent-design-patterns-detailed/slide-6.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 6: Pattern 03 · Parallel fan-out / fan-in" data-fallback="assets/ai-agent-design-patterns-detailed/slide-6.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-6.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-6.png" width="1400"/></a><figcaption>Original slide 6 · Click to enlarge</figcaption></figure><details><summary>Read slide 6 text</summary><div class="source-text">Pattern 03 · Parallel fan-out / fan-in
+Run independent specialists concurrently, then aggregate.
+AI AGENT DESIGN PATTERNS
+06
+Split
+Worker A
+Aggregate
+Final
+When to use
+Independent analyses: policy, finance and compliance reviews of one 
+case.
+Main trade-off
+Higher concurrency and token cost; contradictory results.
+Control / failure protection
+Versioned input snapshot; timeouts; conflict resolution and provenance.
+Evaluate
+Wall-clock time, agreement, cost, aggregate quality.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-7"><div class="number">SLIDE 7 / 30</div><h2>Pattern 04 · Map–reduce over documents</h2><figure><a aria-label="Enlarge slide 7" href="assets/ai-agent-design-patterns-detailed/slide-7.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 7: Pattern 04 · Map–reduce over documents" data-fallback="assets/ai-agent-design-patterns-detailed/slide-7.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-7.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-7.png" width="1400"/></a><figcaption>Original slide 7 · Click to enlarge</figcaption></figure><details><summary>Read slide 7 text</summary><div class="source-text">Pattern 04 · Map–reduce over documents
+Break large corpora into bounded chunks then synthesize.
+AI AGENT DESIGN PATTERNS
+07
+Partition
+Map tasks
+Reduce
+Verify
+When to use
+Large document sets, research, regulations, transaction reviews.
+Main trade-off
+May miss cross-document relationships or minority evidence.
+Control / failure protection
+Coverage manifest; citations; hierarchical reducers; missing-chunk 
+detection.
+Evaluate
+Coverage, citation precision, synthesis faithfulness.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-8"><div class="number">SLIDE 8 / 30</div><h2>Pattern 05 · ReAct / tool-use loop</h2><figure><a aria-label="Enlarge slide 8" href="assets/ai-agent-design-patterns-detailed/slide-8.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 8: Pattern 05 · ReAct / tool-use loop" data-fallback="assets/ai-agent-design-patterns-detailed/slide-8.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-8.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-8.png" width="1400"/></a><figcaption>Original slide 8 · Click to enlarge</figcaption></figure><details><summary>Read slide 8 text</summary><div class="source-text">Pattern 05 · ReAct / tool-use loop
+Reason about next actions, execute approved tools, observe and repeat.
+AI AGENT DESIGN PATTERNS
+08
+Observe
+Decide
+Tool call
+Feedback
+Stop
+When to use
+Interactive investigations requiring fresh API/database evidence.
+Main trade-off
+Unbounded loops, unsafe calls, tool-result injection.
+Control / failure protection
+Tool gateway; step/time/cost budgets; read/write isolation.
+Evaluate
+Task completion, invalid calls, steps/task, incident rate.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-9"><div class="number">SLIDE 9 / 30</div><h2>Pattern 06 · Plan → execute → replan</h2><figure><a aria-label="Enlarge slide 9" href="assets/ai-agent-design-patterns-detailed/slide-9.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 9: Pattern 06 · Plan → execute → replan" data-fallback="assets/ai-agent-design-patterns-detailed/slide-9.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-9.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-9.png" width="1400"/></a><figcaption>Original slide 9 · Click to enlarge</figcaption></figure><details><summary>Read slide 9 text</summary><div class="source-text">Pattern 06 · Plan → execute → replan
+Separate decomposition from controlled step execution.
+AI AGENT DESIGN PATTERNS
+09
+Goal
+Plan
+Execute
+Verify
+Replan
+When to use
+Longer tasks with dependencies, e.g. website migration or multi-system 
+updates.
+Main trade-off
+Plans become stale; repeated replanning may consume budget.
+Control / failure protection
+Plan state + checkpoints; invalidate on changed evidence; bounded 
+replans.
+Evaluate
+Plan adherence, recovery success, cumulative cost.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-10"><div class="number">SLIDE 10 / 30</div><h2>Pattern 07 · Evaluator → optimizer</h2><figure><a aria-label="Enlarge slide 10" href="assets/ai-agent-design-patterns-detailed/slide-10.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 10: Pattern 07 · Evaluator → optimizer" data-fallback="assets/ai-agent-design-patterns-detailed/slide-10.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-10.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-10.png" width="1400"/></a><figcaption>Original slide 10 · Click to enlarge</figcaption></figure><details><summary>Read slide 10 text</summary><div class="source-text">Pattern 07 · Evaluator → optimizer
+Use explicit criteria to critique and revise a candidate.
+AI AGENT DESIGN PATTERNS
+10
+Generate
+Evaluate
+Feedback
+Revise
+Gate
+When to use
+Reports, code, content and outputs with measurable rubrics.
+Main trade-off
+Runaway self-criticism, grader bias and extra token usage.
+Control / failure protection
+Max revisions; independent tests; human escalation on low confidence.
+Evaluate
+Rubric score uplift per revision, cost per accepted result.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-11"><div class="number">SLIDE 11 / 30</div><h2>Pattern 08 · Reflection and self-correction</h2><figure><a aria-label="Enlarge slide 11" href="assets/ai-agent-design-patterns-detailed/slide-11.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 11: Pattern 08 · Reflection and self-correction" data-fallback="assets/ai-agent-design-patterns-detailed/slide-11.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-11.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-11.png" width="1400"/></a><figcaption>Original slide 11 · Click to enlarge</figcaption></figure><details><summary>Read slide 11 text</summary><div class="source-text">Pattern 08 · Reflection and self-correction
+Agent reviews execution trace, identifies errors, and retries selectively.
+AI AGENT DESIGN PATTERNS
+11
+Act
+Inspect
+Diagnose
+Repair
+Re-test
+When to use
+Tasks with objective failures: broken tests, missing citations or tool 
+errors.
+Main trade-off
+Self-assessment alone can reinforce mistakes.
+Control / failure protection
+Ground diagnosis in external evidence; cap repair attempts.
+Evaluate
+Repair success, regression rate, wasted retries.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-12"><div class="number">SLIDE 12 / 30</div><h2>Pattern 09 · Supervisor / orchestrator–workers</h2><figure><a aria-label="Enlarge slide 12" href="assets/ai-agent-design-patterns-detailed/slide-12.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 12: Pattern 09 · Supervisor / orchestrator–workers" data-fallback="assets/ai-agent-design-patterns-detailed/slide-12.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-12.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-12.png" width="1400"/></a><figcaption>Original slide 12 · Click to enlarge</figcaption></figure><details><summary>Read slide 12 text</summary><div class="source-text">Pattern 09 · Supervisor / orchestrator–workers
+Central planner delegates variable subtasks and synthesizes.
+AI AGENT DESIGN PATTERNS
+12
+Supervisor
+Delegate
+Workers
+Synthesize
+When to use
+Dynamic work requiring different specialist capabilities and 
+dependencies.
+Main trade-off
+Coordination overhead and single-manager bottleneck.
+Control / failure protection
+Scoped subtasks; worker budgets; correlation IDs; verified synthesis.
+Evaluate
+Delegation accuracy, task success, critical path, cost.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-13"><div class="number">SLIDE 13 / 30</div><h2>Pattern 10 · Specialists as tools</h2><figure><a aria-label="Enlarge slide 13" href="assets/ai-agent-design-patterns-detailed/slide-13.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 13: Pattern 10 · Specialists as tools" data-fallback="assets/ai-agent-design-patterns-detailed/slide-13.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-13.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-13.png" width="1400"/></a><figcaption>Original slide 13 · Click to enlarge</figcaption></figure><details><summary>Read slide 13 text</summary><div class="source-text">Pattern 10 · Specialists as tools
+A manager agent retains user-facing ownership.
+AI AGENT DESIGN PATTERNS
+13
+Manager
+Agent-tool
+Result
+Manager
+When to use
+Specialized research, calculator, legal reviewer or data analyst as 
+bounded capability.
+Main trade-off
+Manager context overload and dependency on subagent summaries.
+Control / failure protection
+Structured output schema; narrow tool permissions; redact return 
+payloads.
+Evaluate
+Subagent reliability, manager final-answer quality.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-14"><div class="number">SLIDE 14 / 30</div><h2>Pattern 11 · Handoffs</h2><figure><a aria-label="Enlarge slide 14" href="assets/ai-agent-design-patterns-detailed/slide-14.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 14: Pattern 11 · Handoffs" data-fallback="assets/ai-agent-design-patterns-detailed/slide-14.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-14.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-14.png" width="1400"/></a><figcaption>Original slide 14 · Click to enlarge</figcaption></figure><details><summary>Read slide 14 text</summary><div class="source-text">Pattern 11 · Handoffs
+Transfer control and conversational ownership to a specialist.
+AI AGENT DESIGN PATTERNS
+14
+Triage
+Handoff
+Specialist
+Respond
+When to use
+A billing, technical support or claims specialist should own the next turn.
+Main trade-off
+State loss, confusing ownership and authorization drift.
+Control / failure protection
+Explicit owner, handoff payload, state audit, user-visible transitions.
+Evaluate
+Handoff success, re-triage rate, user resolution.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-15"><div class="number">SLIDE 15 / 30</div><h2>Pattern 12 · Debate / ensemble / voting</h2><figure><a aria-label="Enlarge slide 15" href="assets/ai-agent-design-patterns-detailed/slide-15.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 15: Pattern 12 · Debate / ensemble / voting" data-fallback="assets/ai-agent-design-patterns-detailed/slide-15.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-15.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-15.png" width="1400"/></a><figcaption>Original slide 15 · Click to enlarge</figcaption></figure><details><summary>Read slide 15 text</summary><div class="source-text">Pattern 12 · Debate / ensemble / voting
+Compare independent alternatives before a validated decision.
+AI AGENT DESIGN PATTERNS
+15
+Proposal A
+Proposal B
+Compare
+Decide
+When to use
+High-ambiguity analysis where diverse perspectives may reveal gaps.
+Main trade-off
+Correlated model errors; expensive consensus; false confidence.
+Control / failure protection
+Independent evidence; adjudication rules; no majority-only approvals for 
+risky actions.
+Evaluate
+Calibration, diversity, correctness, cost.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-16"><div class="number">SLIDE 16 / 30</div><h2>Pattern 13 · Human approval checkpoint</h2><figure><a aria-label="Enlarge slide 16" href="assets/ai-agent-design-patterns-detailed/slide-16.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 16: Pattern 13 · Human approval checkpoint" data-fallback="assets/ai-agent-design-patterns-detailed/slide-16.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-16.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-16.png" width="1400"/></a><figcaption>Original slide 16 · Click to enlarge</figcaption></figure><details><summary>Read slide 16 text</summary><div class="source-text">Pattern 13 · Human approval checkpoint
+Pause before high-impact external actions; resume from durable state.
+AI AGENT DESIGN PATTERNS
+16
+Propose
+Policy gate
+Human
+Execute
+Audit
+When to use
+Refunds, transfers, production deployments and compliance-sensitive 
+changes.
+Main trade-off
+Review queues slow throughput and can become rubber-stamp 
+approval.
+Control / failure protection
+Bind approval to exact action parameters and expiry; deny by default.
+Evaluate
+Unauthorized actions = 0 target; review SLA; reversal rate.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-17"><div class="number">SLIDE 17 / 30</div><h2>Pattern 14 · Event-driven durable agents</h2><figure><a aria-label="Enlarge slide 17" href="assets/ai-agent-design-patterns-detailed/slide-17.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 17: Pattern 14 · Event-driven durable agents" data-fallback="assets/ai-agent-design-patterns-detailed/slide-17.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-17.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-17.png" width="1400"/></a><figcaption>Original slide 17 · Click to enlarge</figcaption></figure><details><summary>Read slide 17 text</summary><div class="source-text">Pattern 14 · Event-driven durable agents
+Resume across delays, callbacks and system failures.
+AI AGENT DESIGN PATTERNS
+17
+Event
+Checkpoint
+Wait
+Resume
+Commit
+When to use
+Long-running operations with asynchronous APIs, approvals or 
+scheduled follow-up.
+Main trade-off
+Duplicate execution and difficult state consistency.
+Control / failure protection
+Idempotency keys; transactional outbox; replay-safe operations.
+Evaluate
+Resume success, duplicate side effects, timeout rate.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-18"><div class="number">SLIDE 18 / 30</div><h2>Cross-pattern architecture: the enterprise agent harness</h2><figure><a aria-label="Enlarge slide 18" href="assets/ai-agent-design-patterns-detailed/slide-18.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 18: Cross-pattern architecture: the enterprise agent harness" data-fallback="assets/ai-agent-design-patterns-detailed/slide-18.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-18.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-18.png" width="1400"/></a><figcaption>Original slide 18 · Click to enlarge</figcaption></figure><details><summary>Read slide 18 text</summary><div class="source-text">Cross-pattern architecture: the enterprise agent harness
+Patterns execute inside shared control services, not as unrestricted prompt loops.
+AI AGENT DESIGN PATTERNS
+18
+Channels / API
+Agent runtime
+Tool gateway
+Context / memory
+Retrieval, relevance, provenance, scoped persistence
+Model router
+Fit model to complexity, budgets, modality
+Trace &amp; eval
+Trajectory events, outcome tests, regression suites
+State machine
+Retries, stop conditions, durable checkpoints</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-19"><div class="number">SLIDE 19 / 30</div><h2>Context engineering and memory patterns</h2><figure><a aria-label="Enlarge slide 19" href="assets/ai-agent-design-patterns-detailed/slide-19.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 19: Context engineering and memory patterns" data-fallback="assets/ai-agent-design-patterns-detailed/slide-19.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-19.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-19.png" width="1400"/></a><figcaption>Original slide 19 · Click to enlarge</figcaption></figure><details><summary>Read slide 19 text</summary><div class="source-text">Context engineering and memory patterns
+Context is a curated working set, not a full transcript dump.
+AI AGENT DESIGN PATTERNS
+19
+•
+Assemble from instructions, current task, verified retrieval and tool results.
+•
+Apply context budgets: relevance, recency, source trust and token ceilings.
+•
+Compact into structured state: facts, decisions, pending steps, citations.
+•
+Partition memory: ephemeral scratchpad vs approved long-lived facts.
+•
+Treat retrieved content as untrusted data, never as new authority.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-20"><div class="number">SLIDE 20 / 30</div><h2>Tool integration: read vs write vs privileged</h2><figure><a aria-label="Enlarge slide 20" href="assets/ai-agent-design-patterns-detailed/slide-20.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 20: Tool integration: read vs write vs privileged" data-fallback="assets/ai-agent-design-patterns-detailed/slide-20.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-20.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-20.png" width="1400"/></a><figcaption>Original slide 20 · Click to enlarge</figcaption></figure><details><summary>Read slide 20 text</summary><div class="source-text">Tool integration: read vs write vs privileged
+Tools expand capability; the gateway enforces actual authority.
+AI AGENT DESIGN PATTERNS
+20
+READ
+Search, retrieval and analytics. Apply data 
+scope, rate limits, query limits and output 
+filtering.
+WRITE
+CRM updates, emails, tickets and database 
+mutations. Require validation, idempotency and 
+audit.
+PRIVILEGED
+Payments, deployments, deletions and policy 
+changes. Use stronger authorization and 
+human approval.
+Never rely on a model prompt as the only authorization control.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-21"><div class="number">SLIDE 21 / 30</div><h2>Pattern-specific failure modes</h2><figure><a aria-label="Enlarge slide 21" href="assets/ai-agent-design-patterns-detailed/slide-21.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 21: Pattern-specific failure modes" data-fallback="assets/ai-agent-design-patterns-detailed/slide-21.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-21.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-21.png" width="1400"/></a><figcaption>Original slide 21 · Click to enlarge</figcaption></figure><details><summary>Read slide 21 text</summary><div class="source-text">Pattern-specific failure modes
+Build explicit escape hatches before you increase autonomy.
+AI AGENT DESIGN PATTERNS
+21
+Chaining
+Stage error propagates
+Stage validation + rollback
+Routing
+Wrong specialist
+Confidence gate + fallback
+Parallel
+Conflicting results
+Adjudication + evidence
+Tool loop
+Unsafe or endless actions
+Allowlist + budgets
+Multi-agent
+Lost context or ownership
+Handoff contract + trace
+Evaluator loop
+Self-reinforcing bad critique
+External gold tests + cap
+Durable workflow
+Duplicate side effects
+Idempotency + ledger</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-22"><div class="number">SLIDE 22 / 30</div><h2>Evaluate trajectories—not only final responses</h2><figure><a aria-label="Enlarge slide 22" href="assets/ai-agent-design-patterns-detailed/slide-22.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 22: Evaluate trajectories—not only final responses" data-fallback="assets/ai-agent-design-patterns-detailed/slide-22.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-22.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-22.png" width="1400"/></a><figcaption>Original slide 22 · Click to enlarge</figcaption></figure><details><summary>Read slide 22 text</summary><div class="source-text">Evaluate trajectories—not only final responses
+Different patterns require different tests and observability.
+AI AGENT DESIGN PATTERNS
+22
+Outcome checks
+Task success, correctness, policy compliance, user utility.
+Trace checks
+Plan quality, tool choice/arguments, handoffs, retries and stop behavior.
+Operational checks
+Latency p95, token spend, completion rate, escalation time.
+Adversarial checks
+Prompt injection, exfiltration, permission bypass and malicious tool 
+results.
+Release gate = risk-based thresholds + adversarial suites + human review of sampled 
+failures.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-23"><div class="number">SLIDE 23 / 30</div><h2>Pattern economics: latency, cost and complexity</h2><figure><a aria-label="Enlarge slide 23" href="assets/ai-agent-design-patterns-detailed/slide-23.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 23: Pattern economics: latency, cost and complexity" data-fallback="assets/ai-agent-design-patterns-detailed/slide-23.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-23.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-23.png" width="1400"/></a><figcaption>Original slide 23 · Click to enlarge</figcaption></figure><details><summary>Read slide 23 text</summary><div class="source-text">Pattern economics: latency, cost and complexity
+Illustrative relative tendencies—not universal benchmarks.
+AI AGENT DESIGN PATTERNS
+23
+Pattern
+Latency
+Inference cost
+Operational complexity
+Chain
+Medium
+Medium
+Low
+Parallel
+Low wall time
+High
+Medium
+ReAct
+Variable
+Variable
+Medium
+Evaluator loop
+High
+High
+Medium
+Supervisor
+Variable
+High
+High
+Human gate
+Queue-dependent
+Review cost
+High</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-24"><div class="number">SLIDE 24 / 30</div><h2>Enterprise example: complaint-resolution agent</h2><figure><a aria-label="Enlarge slide 24" href="assets/ai-agent-design-patterns-detailed/slide-24.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 24: Enterprise example: complaint-resolution agent" data-fallback="assets/ai-agent-design-patterns-detailed/slide-24.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-24.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-24.png" width="1400"/></a><figcaption>Original slide 24 · Click to enlarge</figcaption></figure><details><summary>Read slide 24 text</summary><div class="source-text">Enterprise example: complaint-resolution agent
+Compose patterns, instead of forcing one pattern onto all tasks.
+AI AGENT DESIGN PATTERNS
+24
+Intake + classify
+Parallel research
+Supervisor
+Write + audit
+Read phase
+Classify complaint; retrieve policy, account facts and relevant 
+regulations independently.
+Action phase
+Draft remediation, validate policy, require approval for compensation, 
+record all actions.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-25"><div class="number">SLIDE 25 / 30</div><h2>Enterprise example: coding and website migration agent</h2><figure><a aria-label="Enlarge slide 25" href="assets/ai-agent-design-patterns-detailed/slide-25.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 25: Enterprise example: coding and website migration agent" data-fallback="assets/ai-agent-design-patterns-detailed/slide-25.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-25.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-25.png" width="1400"/></a><figcaption>Original slide 25 · Click to enlarge</figcaption></figure><details><summary>Read slide 25 text</summary><div class="source-text">Enterprise example: coding and website migration agent
+Plan–execute + parallel workers + tests + reversible deployment.
+AI AGENT DESIGN PATTERNS
+25
+Discover
+Plan
+Transform
+Deploy
+•
+Workers migrate assets, content and routing in parallel with isolated workspaces.
+•
+Evaluate links, layout, accessibility, SEO, behavior and screenshot diffs.
+•
+Approve publication only after checks; retain rollback snapshot.
+•
+Durable checkpoints make partial migration safe to retry.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-26"><div class="number">SLIDE 26 / 30</div><h2>Implementation blueprint: contracts and state</h2><figure><a aria-label="Enlarge slide 26" href="assets/ai-agent-design-patterns-detailed/slide-26.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 26: Implementation blueprint: contracts and state" data-fallback="assets/ai-agent-design-patterns-detailed/slide-26.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-26.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-26.png" width="1400"/></a><figcaption>Original slide 26 · Click to enlarge</figcaption></figure><details><summary>Read slide 26 text</summary><div class="source-text">Implementation blueprint: contracts and state
+Specify every transition as an observable, testable interface.
+AI AGENT DESIGN PATTERNS
+26
+Agent contract
+Objective, input schema, output schema, tools, maximum steps and 
+success criteria.
+Tool contract
+Auth scope, schema, side effects, timeout, idempotency key, error 
+classes.
+State contract
+Task ID, owner, plan, checkpoints, evidence, tool results and pending 
+approvals.
+Evaluation contract
+Gold examples, trajectory expectations, unsafe behavior checks and 
+thresholds.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-27"><div class="number">SLIDE 27 / 30</div><h2>Deployment blueprint: controlled autonomy ladder</h2><figure><a aria-label="Enlarge slide 27" href="assets/ai-agent-design-patterns-detailed/slide-27.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 27: Deployment blueprint: controlled autonomy ladder" data-fallback="assets/ai-agent-design-patterns-detailed/slide-27.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-27.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-27.png" width="1400"/></a><figcaption>Original slide 27 · Click to enlarge</figcaption></figure><details><summary>Read slide 27 text</summary><div class="source-text">Deployment blueprint: controlled autonomy ladder
+Give agents more authority only after evidence shows they can handle it.
+AI AGENT DESIGN PATTERNS
+27
+L0
+Assist
+Draft only
+L1
+Read
+Read-only tools
+L2
+Propose
+Human approves writes
+L3
+Constrained
+Low-risk auto writes
+L4
+Expanded
+Scoped autonomy + 
+audit
+Promotion requires outcome evals, risk sign-off, tool permission review and rollback 
+readiness.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-28"><div class="number">SLIDE 28 / 30</div><h2>Measure whether complexity is earning its place.</h2><figure><a aria-label="Enlarge slide 28" href="assets/ai-agent-design-patterns-detailed/slide-28.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 28: Measure whether complexity is earning its place." data-fallback="assets/ai-agent-design-patterns-detailed/slide-28.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-28.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-28.png" width="1400"/></a><figcaption>Original slide 28 · Click to enlarge</figcaption></figure><details><summary>Read slide 28 text</summary><div class="source-text">30 / 60 / 90-day adoption plan
+Measure whether complexity is earning its place.
+AI AGENT DESIGN PATTERNS
+28
+Days 1–30: baseline
+Choose 2 workflows; build single-agent 
+baseline; define data, metrics and risk tiers; 
+instrument traces.
+Days 31–60: compose
+Add routing or parallelism only where justified; 
+tool gateway; evaluation suites; human queue.
+Days 61–90: harden
+Chaos/adversarial tests, budget controls, 
+durable state, runbooks and progressive 
+deployment.
+Decision: promote pattern only when measured quality / throughput gains exceed added risk and 
+cost.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-29"><div class="number">SLIDE 29 / 30</div><h2>Best-practice checklist and takeaways</h2><figure><a aria-label="Enlarge slide 29" href="assets/ai-agent-design-patterns-detailed/slide-29.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 29: Best-practice checklist and takeaways" data-fallback="assets/ai-agent-design-patterns-detailed/slide-29.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-29.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-29.png" width="1400"/></a><figcaption>Original slide 29 · Click to enlarge</figcaption></figure><details><summary>Read slide 29 text</summary><div class="source-text">Best-practice checklist and takeaways
+Production agent design is constrained automation with measured outcomes.
+AI AGENT DESIGN PATTERNS
+29
+•
+Prefer deterministic workflow edges wherever the task structure is known.
+•
+Use explicit contracts for state, tool invocations, handoffs and approvals.
+•
+Keep model-generated proposals separate from authorization and execution.
+•
+Evaluate outputs, tool trajectories, policy adherence, latency and spend.
+•
+Record provenance, enforce stop budgets, recover safely and scale autonomy gradually.</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><article class="slide" id="slide-30"><div class="number">SLIDE 30 / 30</div><h2>References and further reading</h2><figure><a aria-label="Enlarge slide 30" href="assets/ai-agent-design-patterns-detailed/slide-30.jpg" rel="noopener" target="_blank"><img alt="AI Agent Design Patterns — slide 30: References and further reading" data-fallback="assets/ai-agent-design-patterns-detailed/slide-30.jpg" data-hosted-thumbnail="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-30.png" decoding="async" height="788" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/ai-agent-advanced/ai-agent-design-patterns-detailed/images/Slide1200/slide-30.png" width="1400"/></a><figcaption>Original slide 30 · Click to enlarge</figcaption></figure><details><summary>Read slide 30 text</summary><div class="source-text">References and further reading
+Source links are also included in slide speaker notes.
+AI AGENT DESIGN PATTERNS
+30
+•
+Anthropic — Building effective agents (workflow taxonomy).
+•
+Anthropic — Common workflow patterns for AI agents (March 2026).
+•
+OpenAI — Orchestration and handoffs (agents as tools vs handoff).
+•
+OpenAI — Building agents (models, tools, memory and orchestration).
+•
+Anthropic — Common architecture patterns (centralized vs decentralized).</div></details><a class="back" href="#slides">Back to navigator ↑</a></article><section class="faq"><h2>Questions answered</h2><details><summary>What does this guide cover?</summary><p>Compare chaining, routing, parallel work, tool loops, planning, reflection, supervision, handoffs and durable agents. Choose the smallest pattern that fits the task and measure whether added complexity improves outcomes.</p></details><details><summary>How should the examples be used?</summary><p>Treat architectures, code, thresholds and product comparisons as supplied presentation material. Validate them against your environment, requirements and evaluation set.</p></details><details><summary>How can I read or enlarge a slide?</summary><p>Open the slide image for the full local version, or expand its text transcript. Transcripts can contain reading-order artifacts; diagrams and code layout are preserved in the image.</p></details></section><section class="intro"><h2>Continue exploring</h2><div class="related"><a href="index.html">All advanced guides</a><a href="agent-control-data-execution-planes.html">Agent Control, Data and Execution Planes</a><a href="agentic-ai-detailed-architecture-best-practices.html">Agentic AI Assurance Architecture</a><a href="ai-harness-architecture-best-practices.html">AI Harness Architecture and Best Practices</a><a href="jev-decision-native-ai.html">Jev and the Decision-Native AI Shift</a></div></section></main><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Data Product Use Cases</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Home</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/ai-agent/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai agent</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/blog/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Blog</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Build data as products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/cats/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cats</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/data-centric-tutorial/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Data centric tutorial</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/experience-summary/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Experience summary</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/gen-ai-adoption/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Gen ai adoption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/genai-cost-risks/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Genai cost risks</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/llm-presentation/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Llm presentation</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/slides/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Slides</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/why-generative-engine-optimization/" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Why generative engine optimization</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Build Data Products</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/build-reusable-not-oneoff-signal.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Build-reusable-not-oneoff-signal</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cdo-turn-data-into-products-not-just-pipelines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Cdo-turn-data-into-products-not-just-pipelines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cio-turn-legacy-systems-into-data-product-engines.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Cio-turn-legacy-systems-into-data-product-engines</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/close-loop-with-business-feedback.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Close-loop-with-business-feedback</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cpo-design-products-thatleanr-and-compound-value.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Cpo-design-products-thatleanr-and-compound-value</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/cto-data-products-are-new-microservices.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Cto-data-products-are-new-microservices</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/data-products-learnings.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-products-learnings</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/dataproduct-or-data-as-product.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Dataproduct-or-data-as-product</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/define-start-with-decisions-not-data.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Define-start-with-decisions-not-data</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/development-life-cycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Development-life-cycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/e2e-lifecycle.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">E2e-lifecycle</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/experiment-framework-for-data-product-consumption.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Experiment-framework-for-data-product-consumption</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/mistakes-and-lesssons-learnt-in-building-ai-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Mistakes-and-lesssons-learnt-in-building-ai-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/build-data-as-products/track-value-not-just-performance.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Track-value-not-just-performance</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Guide and Tutorial</h5>
+<ul class="space-y-2">
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-product-design-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl01_title">Ai-data-product-design-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-data-stack-for-enterprise.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl02_title">Ai-data-stack-for-enterprise</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/ai-self-serve-data-platform-architecture.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl03_title">Ai-self-serve-data-platform-architecture</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-data-quality-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl04_title">Architecting-data-quality-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/architecting-enterprise-ai-guideline.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl05_title">Architecting-enterprise-ai-guideline</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/automated-data-quality-for-ai-projetcs.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl06_title">Automated-data-quality-for-ai-projetcs</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-interoperability-guide.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl07_title">Data-interoperability-guide</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-for-ai-data-products.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl08_title">Data-quality-for-ai-data-products</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/data-quality-framework-for-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl09_title">Data-quality-framework-for-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/datamesh-security-and-privacy.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl10_title">Datamesh-security-and-privacy</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-compuation-governance-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl11_title">Federated-compuation-governance-datamesh</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/federated-governance-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl12_title">Federated-governance-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/fully-managed-data-products-datamesh-ai.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl13_title">Fully-managed-data-products-datamesh-ai</a>
+</li>
+<li>
+<a href="https://prashant.dhingra.website/enterprise-ai/self-serve-data-platform-with-datamesh.html" id="ctl00_ContentPlaceHolder1_RepLinks_ctl14_title">Self-serve-data-platform-with-datamesh</a>
+</li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/">Large Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/large-language-model/finetuning-llms/">Finetuning LLMs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/small-language-model/">Small Language Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://prashant.dhingra.website/ai-agent/slides/">AI Agent Slides</a></li>
+</ul>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/kreatewebsites/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/kreatewebsites/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/kreatewebsites/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></body></html>
